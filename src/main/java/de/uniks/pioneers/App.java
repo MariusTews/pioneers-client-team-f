@@ -1,5 +1,6 @@
 package de.uniks.pioneers;
 
+import de.uniks.pioneers.controller.Controller;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -12,7 +13,7 @@ public class App extends Application {
     private Controller controller;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         this.stage = primaryStage;
         stage.setWidth(640);
         stage.setHeight(480);
@@ -25,7 +26,7 @@ public class App extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         cleanup();
     }
 

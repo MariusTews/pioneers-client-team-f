@@ -1,4 +1,4 @@
-package de.uniks.pioneers;
+package de.uniks.pioneers.controller;
 
 import javafx.scene.Parent;
 
