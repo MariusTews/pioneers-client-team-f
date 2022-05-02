@@ -1,41 +1,39 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.AuthService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 
 import javax.inject.Inject;
 import java.io.IOException;
 
-public class LoginController implements Controller {
-    private final App app;
-    private final AuthService authService;
+public class SignUpController implements Controller {
     @FXML
     public TextField usernameTextField;
     @FXML
-    public PasswordField userPasswordField;
+    public PasswordField passwordField;
     @FXML
-    public CheckBox rememberMeCheckBox;
-    @FXML
-    public Button loginButton;
-    @FXML
-    public Hyperlink signUpHyperlink;
+    public PasswordField repeatPasswordField;
     @FXML
     public Label errorLabel;
+    @FXML
+    public Button signUpButton;
+    @FXML
+    public Button backButton;
 
     @Inject
-    public LoginController(App app, AuthService authService){
-        this.app = app;
-        this.authService = authService;
+    public SignUpController(){
+
     }
     @Override
     public void init() {
-        
+
     }
 
     @Override
@@ -45,8 +43,7 @@ public class LoginController implements Controller {
 
     @Override
     public Parent render() {
-
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/LoginScreen.fxml"));
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/SignUpScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
         try{
@@ -60,6 +57,10 @@ public class LoginController implements Controller {
         return parent;
     }
 
-    public void loginButtonPressed(ActionEvent event) {
+
+    public void signUpButtonPressed(ActionEvent actionEvent) {
+    }
+
+    public void backButtonPressed(ActionEvent actionEvent) {
     }
 }
