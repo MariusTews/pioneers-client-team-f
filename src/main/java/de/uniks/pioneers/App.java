@@ -1,6 +1,8 @@
 package de.uniks.pioneers;
 
 import de.uniks.pioneers.controller.Controller;
+import de.uniks.pioneers.controller.GameLobbyController;
+import de.uniks.pioneers.service.GameLobbyService;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -29,18 +31,18 @@ public class App extends Application {
         setAppIcon(stage);
 
         primaryStage.show();
+
+        // temporary for testing
+        show(new GameLobbyController(new GameLobbyService()));
     }
 
-    private void setAppIcon(Stage stage)
-    {
+    private void setAppIcon(Stage stage) {
         final Image image = new Image(App.class.getResource("FATARI_logo.png").toString());
         stage.getIcons().add(image);
     }
 
-    private void setTaskbarIcon()
-    {
-        if (GraphicsEnvironment.isHeadless())
-        {
+    private void setTaskbarIcon() {
+        if (GraphicsEnvironment.isHeadless()) {
             return;
         }
 
@@ -49,8 +51,7 @@ public class App extends Application {
             final java.awt.Image image = ImageIO.read(Main.class.getResource("FATARI_logo.png"));
             taskbar.setIconImage(image);
         }
-        catch (Exception ignored)
-        {
+        catch (Exception ignored) {
 
         }
     }
@@ -66,6 +67,7 @@ public class App extends Application {
         controller.init();
         stage.getScene().setRoot(controller.render());
     }
+
     private void cleanup() {
         if (controller != null) {
             controller.destroy();
