@@ -44,5 +44,4 @@ public class JoinGameController implements Controller {
 
     public void joinButtonPressed(ActionEvent event) {
     }
-
 }

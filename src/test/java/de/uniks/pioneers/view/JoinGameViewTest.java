@@ -24,7 +24,7 @@ public class JoinGameViewTest extends ApplicationTest {
     @Test
     public void testViewParameters()
     {
-        //opens the Lobby to test the View without the need to Login
+        //opens the JoinGame screen to test the View
         app.show(new JoinGameController());
 
         Button backButtonJoinGame = lookup("#backButtonJoinGame").query();
@@ -43,6 +43,5 @@ public class JoinGameViewTest extends ApplicationTest {
 
         clickOn(backButtonJoinGame);
         clickOn(joinButton);
-
     }
 }
