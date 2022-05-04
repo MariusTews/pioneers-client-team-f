@@ -59,18 +59,14 @@ public class GameLobbyController implements Controller{
     }
 
     public void leave(ActionEvent event) {
-        System.out.println("leave pressed");
     }
 
     public void send(ActionEvent event) {
-        System.out.println("send pressed");
     }
 
     public void ready(ActionEvent event) {
-        System.out.println("ready pressed");
     }
 
     public void startGame(ActionEvent event) {
-        System.out.println("startGame pressed");
     }
 }
