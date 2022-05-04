@@ -17,9 +17,9 @@ public class UserService {
         this.userApiService = userApiService;
     }
 
-    public void register(String username, String password) throws IOException {
+    public void register(String username, String avatar, String password) throws IOException {
         try {
-            Response<User> response = userApiService.create(new CreateUserDto(username, password)).execute();
+            Response<User> response = userApiService.create(new CreateUserDto(username, avatar, password)).execute();
             final User user = response.body();
         } catch (IOException e) {
             throw new RuntimeException(e);
