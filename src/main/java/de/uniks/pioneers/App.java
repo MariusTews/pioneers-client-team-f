@@ -1,6 +1,7 @@
 package de.uniks.pioneers;
 
 import de.uniks.pioneers.controller.Controller;
+import de.uniks.pioneers.controller.LoginController;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -18,6 +19,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
+
         this.stage = primaryStage;
         stage.setWidth(640);
         stage.setHeight(480);
@@ -29,18 +32,16 @@ public class App extends Application {
         setAppIcon(stage);
 
         primaryStage.show();
+        show(mainComponent.loginController());
     }
 
-    private void setAppIcon(Stage stage)
-    {
+    private void setAppIcon(Stage stage) {
         final Image image = new Image(App.class.getResource("FATARI_logo.png").toString());
         stage.getIcons().add(image);
     }
 
-    private void setTaskbarIcon()
-    {
-        if (GraphicsEnvironment.isHeadless())
-        {
+    private void setTaskbarIcon() {
+        if (GraphicsEnvironment.isHeadless()) {
             return;
         }
 
@@ -48,9 +49,7 @@ public class App extends Application {
             final Taskbar taskbar = Taskbar.getTaskbar();
             final java.awt.Image image = ImageIO.read(Main.class.getResource("FATARI_logo.png"));
             taskbar.setIconImage(image);
-        }
-        catch (Exception ignored)
-        {
+        } catch (Exception ignored) {
 
         }
     }
@@ -66,6 +65,7 @@ public class App extends Application {
         controller.init();
         stage.getScene().setRoot(controller.render());
     }
+
     private void cleanup() {
         if (controller != null) {
             controller.destroy();
