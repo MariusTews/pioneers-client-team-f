@@ -45,8 +45,7 @@ public class App extends Application {
             final Taskbar taskbar = Taskbar.getTaskbar();
             final java.awt.Image image = ImageIO.read(Main.class.getResource("FATARI_logo.png"));
             taskbar.setIconImage(image);
-        }
-        catch (Exception ignored) {
+        } catch (Exception ignored) {
 
         }
     }
