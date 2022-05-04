@@ -10,11 +10,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 
 public class LoginController implements Controller {
     private final App app;
     private final AuthService authService;
+    private Provider<SignUpController> signUpController;
     @FXML
     public TextField usernameTextField;
     @FXML
@@ -29,9 +31,10 @@ public class LoginController implements Controller {
     public Label errorLabel;
 
     @Inject
-    public LoginController(App app, AuthService authService) {
+    public LoginController(App app, AuthService authService, Provider<SignUpController> signUpController) {
         this.app = app;
         this.authService = authService;
+        this.signUpController = signUpController;
     }
 
     @Override
@@ -57,9 +60,17 @@ public class LoginController implements Controller {
             return null;
         }
 
+        loginButton.setOnAction(this::loginButtonPressed);
+        signUpHyperlink.setOnAction(this::signUPHyperlinkPressed);
+
         return parent;
     }
 
     public void loginButtonPressed(ActionEvent event) {
+    }
+
+    public void signUPHyperlinkPressed(ActionEvent event) {
+        final SignUpController controller = signUpController.get();
+        app.show(controller);
     }
 }

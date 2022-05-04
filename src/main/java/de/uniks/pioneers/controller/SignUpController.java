@@ -1,6 +1,8 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.service.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +13,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 
 public class SignUpController implements Controller {
@@ -26,10 +29,16 @@ public class SignUpController implements Controller {
     public Button signUpButton;
     @FXML
     public Button backButton;
+    private App app;
+    private UserService userService;
+    private Provider<LoginController> loginController;
 
     @Inject
-    public SignUpController() {
-
+    public SignUpController(App app, UserService userService,
+                            Provider<LoginController> loginController) {
+        this.app = app;
+        this.userService = userService;
+        this.loginController = loginController;
     }
 
     @Override
@@ -62,5 +71,7 @@ public class SignUpController implements Controller {
     }
 
     public void backButtonPressed(ActionEvent actionEvent) {
+        final LoginController controller = loginController.get();
+        this.app.show(controller);
     }
 }
