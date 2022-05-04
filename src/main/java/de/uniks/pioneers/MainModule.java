@@ -8,10 +8,10 @@ import dagger.Provides;
 import de.uniks.pioneers.rest.AuthApiService;
 import de.uniks.pioneers.rest.UserApiService;
 import de.uniks.pioneers.service.TokenStorage;
-import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Singleton;
@@ -55,7 +55,7 @@ public class MainModule {
                 .baseUrl(BASE_URL)
                 .client(client)
                 .addConverterFactory(JacksonConverterFactory.create(mapper))
-                .addCallAdapterFactory(RxJava3CallAdapterFactory.createAsync())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .build();
     }
 

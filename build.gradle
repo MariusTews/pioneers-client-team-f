@@ -52,9 +52,6 @@ dependencies {
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/adapter-rxjava3
     implementation group: 'com.squareup.retrofit2', name: 'adapter-rxjava3', version: '2.9.0'
 
-    // https://mvnrepository.com/artifact/com.github.akarnokd/rxjava3-retrofit-adapter
-    implementation group: 'com.github.akarnokd', name: 'rxjava3-retrofit-adapter', version: '3.0.0'
-
 
 
 
