@@ -1,8 +1,6 @@
 package de.uniks.pioneers;
 
 import de.uniks.pioneers.controller.Controller;
-import de.uniks.pioneers.controller.GameLobbyController;
-import de.uniks.pioneers.service.GameLobbyService;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -31,9 +29,6 @@ public class App extends Application {
         setAppIcon(stage);
 
         primaryStage.show();
-
-        // temporary for testing
-        show(new GameLobbyController(new GameLobbyService()));
     }
 
     private void setAppIcon(Stage stage) {

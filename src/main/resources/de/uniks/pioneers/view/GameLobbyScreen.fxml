@@ -59,6 +59,9 @@
                         </TextField>
                         <Button fx:id="idSendButton" mnemonicParsing="false" onAction="#send" prefHeight="35.0" prefWidth="50.0" text="Send" textFill="WHITE">
                            <style>-fx-background-color: #008cff; -fx-background-radius: 10px;</style>
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
                         </Button>
                      </children>
                   </HBox>

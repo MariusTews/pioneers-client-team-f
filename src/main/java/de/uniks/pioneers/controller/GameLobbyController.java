@@ -17,6 +17,7 @@ import java.io.IOException;
 public class GameLobbyController implements Controller{
 
     private final GameLobbyService gameLobbyService;
+
     @FXML public Text idTitle;
     @FXML public Button idLeaveButton;
     @FXML public ScrollPane idUserInLobby;
@@ -43,7 +44,6 @@ public class GameLobbyController implements Controller{
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameLobbyScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
-
 
         try {
             parent = loader.load();
