@@ -98,7 +98,7 @@ public class LobbyViewTest extends ApplicationTest {
         clickOn(chatMessage);
         write("test");
 
-        press(KeyCode.ENTER);
+        type(KeyCode.ENTER);
         Assertions.assertThat(chat.getChildren().size()).isEqualTo(1);
         Label message = (Label) chat.getChildren().get(0);
         Assertions.assertThat(chatMessage.getText()).isEqualTo("");
