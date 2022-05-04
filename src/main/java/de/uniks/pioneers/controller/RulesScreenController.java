@@ -15,7 +15,7 @@ public class RulesScreenController implements Controller {
     public Button backButton;
 
     @Inject
-    public RulesScreenController(){
+    public RulesScreenController() {
     }
 
     @Override
@@ -33,10 +33,9 @@ public class RulesScreenController implements Controller {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/RulesScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
-        try{
+        try {
             parent = loader.load();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }

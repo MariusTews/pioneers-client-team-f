@@ -10,9 +10,12 @@ import javafx.scene.control.*;
 import java.io.IOException;
 
 public class JoinGameController implements Controller {
-    @FXML public Button backButtonJoinGame;
-    @FXML public Button joinButton;
-    @FXML public TextField passwordTextField;
+    @FXML
+    public Button backButtonJoinGame;
+    @FXML
+    public Button joinButton;
+    @FXML
+    public TextField passwordTextField;
 
     @Override
     public void init() {
@@ -28,10 +31,9 @@ public class JoinGameController implements Controller {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/JoinGameScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
-        try{
+        try {
             parent = loader.load();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }

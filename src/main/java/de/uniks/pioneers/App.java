@@ -35,16 +35,13 @@ public class App extends Application {
         show(mainComponent.loginController());
     }
 
-    private void setAppIcon(Stage stage)
-    {
+    private void setAppIcon(Stage stage) {
         final Image image = new Image(App.class.getResource("FATARI_logo.png").toString());
         stage.getIcons().add(image);
     }
 
-    private void setTaskbarIcon()
-    {
-        if (GraphicsEnvironment.isHeadless())
-        {
+    private void setTaskbarIcon() {
+        if (GraphicsEnvironment.isHeadless()) {
             return;
         }
 
@@ -52,9 +49,7 @@ public class App extends Application {
             final Taskbar taskbar = Taskbar.getTaskbar();
             final java.awt.Image image = ImageIO.read(Main.class.getResource("FATARI_logo.png"));
             taskbar.setIconImage(image);
-        }
-        catch (Exception ignored)
-        {
+        } catch (Exception ignored) {
 
         }
     }
@@ -70,6 +65,7 @@ public class App extends Application {
         controller.init();
         stage.getScene().setRoot(controller.render());
     }
+
     private void cleanup() {
         if (controller != null) {
             controller.destroy();

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationTest;
 
-public class LoginViewTest  extends ApplicationTest {
+public class LoginViewTest extends ApplicationTest {
 
     private Stage stage;
     private App app;
@@ -24,7 +24,7 @@ public class LoginViewTest  extends ApplicationTest {
     }
 
     @Test
-    public void testViewParameters(){
+    public void testViewParameters() {
         TextField username = lookup("#usernameTextField").query();
         clickOn(username);
         write("test");
@@ -45,7 +45,4 @@ public class LoginViewTest  extends ApplicationTest {
         write("test");
         Assertions.assertThat(passwordField.getText()).isEqualTo("test");
     }
-
-
-
 }

@@ -12,10 +12,10 @@ public interface MainComponent {
     LoginController loginController();
 
     @Component.Builder
-    interface Builder
-    {
+    interface Builder {
         @BindsInstance
         Builder mainapp(App app);
+
         MainComponent build();
     }
 }

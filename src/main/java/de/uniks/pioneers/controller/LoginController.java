@@ -29,13 +29,14 @@ public class LoginController implements Controller {
     public Label errorLabel;
 
     @Inject
-    public LoginController(App app, AuthService authService){
+    public LoginController(App app, AuthService authService) {
         this.app = app;
         this.authService = authService;
     }
+
     @Override
     public void init() {
-        
+
     }
 
     @Override
@@ -49,10 +50,9 @@ public class LoginController implements Controller {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/LoginScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
-        try{
+        try {
             parent = loader.load();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }

@@ -24,7 +24,7 @@ class SignUpViewTest extends ApplicationTest {
     }
 
     @Test
-    public void testViewParameters(){
+    public void testViewParameters() {
         // open signUp directly
         app.show(new SignUpController());
 

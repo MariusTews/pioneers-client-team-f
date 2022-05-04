@@ -16,5 +16,4 @@ class RulesScreenViewTest extends ApplicationTest {
         this.app.start(stage);
     }
 
-
 }

@@ -28,9 +28,10 @@ public class SignUpController implements Controller {
     public Button backButton;
 
     @Inject
-    public SignUpController(){
+    public SignUpController() {
 
     }
+
     @Override
     public void init() {
 
@@ -46,10 +47,9 @@ public class SignUpController implements Controller {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/SignUpScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
-        try{
+        try {
             parent = loader.load();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
