@@ -19,9 +19,6 @@ import org.testfx.framework.junit5.ApplicationTest;
 @ExtendWith(MockitoExtension.class)
 class SignUpViewTest extends ApplicationTest {
     @Mock
-    UserService userService;
-
-    @Mock
     LoginController loginController;
 
     @InjectMocks
