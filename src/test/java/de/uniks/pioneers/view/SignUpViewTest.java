@@ -1,17 +1,32 @@
 package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.SignUpController;
+import de.uniks.pioneers.service.UserService;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationTest;
 
+@ExtendWith(MockitoExtension.class)
 class SignUpViewTest extends ApplicationTest {
+    @Mock
+    UserService userService;
+
+    @Mock
+    LoginController loginController;
+
+    @InjectMocks
+    SignUpController signUpController;
     private Stage stage;
     private App app;
 
@@ -19,15 +34,12 @@ class SignUpViewTest extends ApplicationTest {
     public void start(Stage stage) {
         // start application
         this.stage = stage;
-        this.app = new App();
+        this.app = new App(signUpController);
         this.app.start(stage);
     }
 
     @Test
     public void testViewParameters() {
-        // open signUp directly
-        app.show(new SignUpController());
-
         TextField username = lookup("#usernameTextField").query();
         clickOn(username);
         write("test");
@@ -45,6 +57,5 @@ class SignUpViewTest extends ApplicationTest {
         clickOn(repeatPasswordField);
         write("test");
         Assertions.assertThat(repeatPasswordField.getText()).isEqualTo("test");
-
     }
 }
