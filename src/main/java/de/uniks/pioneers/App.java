@@ -1,7 +1,6 @@
 package de.uniks.pioneers;
 
 import de.uniks.pioneers.controller.Controller;
-import de.uniks.pioneers.controller.LoginController;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -16,6 +15,15 @@ public class App extends Application {
     private Stage stage;
 
     private Controller controller;
+
+    public App(){
+        final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
+        controller = mainComponent.loginController();
+    }
+
+    public App(Controller controller){
+        this.controller = controller;
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -32,7 +40,9 @@ public class App extends Application {
         setAppIcon(stage);
 
         primaryStage.show();
-        show(mainComponent.loginController());
+        if(controller != null) {
+            show(controller);
+        }
     }
 
     private void setAppIcon(Stage stage) {
