@@ -2,7 +2,6 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,14 +29,12 @@ public class SignUpController implements Controller {
     @FXML
     public Button backButton;
     private App app;
-    private UserService userService;
     private Provider<LoginController> loginController;
 
     @Inject
-    public SignUpController(App app, UserService userService,
+    public SignUpController(App app,
                             Provider<LoginController> loginController) {
         this.app = app;
-        this.userService = userService;
         this.loginController = loginController;
     }
 
