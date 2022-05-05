@@ -1,7 +1,6 @@
 package de.uniks.pioneers;
 
 import de.uniks.pioneers.controller.Controller;
-import de.uniks.pioneers.controller.LoginController;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -24,7 +23,6 @@ public class App extends Application {
 
     public App(Controller controller){
         this.controller = controller;
-
     }
 
     @Override

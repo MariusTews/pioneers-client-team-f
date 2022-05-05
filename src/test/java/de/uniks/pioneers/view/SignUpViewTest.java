@@ -5,7 +5,6 @@ import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.SignUpController;
 import de.uniks.pioneers.service.UserService;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
