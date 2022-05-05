@@ -1,5 +1,6 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 
 public class LobbyController implements Controller {
@@ -36,11 +38,19 @@ public class LobbyController implements Controller {
     public Button editUserButton;
     @FXML
     public Button createGameButton;
+    private App app;
+    private Provider <LoginController> loginController;
+    private Provider<RulesScreenController> rulesScreenController;
 
     //added an empty Constructor with the Annotation Inject for later use
     @Inject
-    public LobbyController() {
+    public LobbyController(App app,
+                           Provider<LoginController> loginController,
+                           Provider<RulesScreenController> rulesScreenController) {
 
+        this.app = app;
+        this.loginController = loginController;
+        this.rulesScreenController = rulesScreenController;
     }
 
     @Override
@@ -70,10 +80,14 @@ public class LobbyController implements Controller {
     }
 
     public void rulesButtonPressed(ActionEvent event) {
-
+        final RulesScreenController controller = rulesScreenController.get();
+        app.show(controller);
     }
 
     public void logoutButtonPressed(ActionEvent event) {
+        final LoginController controller = loginController.get();
+        app.show(controller);
+
     }
 
     public void sendButtonPressed(ActionEvent event) {

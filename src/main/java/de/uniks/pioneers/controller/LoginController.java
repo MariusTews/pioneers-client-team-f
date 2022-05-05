@@ -17,6 +17,7 @@ public class LoginController implements Controller {
     private final App app;
     private final AuthService authService;
     private Provider<SignUpController> signUpController;
+    private Provider<LobbyController> lobbyController;
     @FXML
     public TextField usernameTextField;
     @FXML
@@ -31,10 +32,13 @@ public class LoginController implements Controller {
     public Label errorLabel;
 
     @Inject
-    public LoginController(App app, AuthService authService, Provider<SignUpController> signUpController) {
+    public LoginController(App app, AuthService authService,
+                           Provider<SignUpController> signUpController,
+                           Provider<LobbyController> lobbyController) {
         this.app = app;
         this.authService = authService;
         this.signUpController = signUpController;
+        this.lobbyController = lobbyController;
     }
 
     @Override
@@ -67,6 +71,7 @@ public class LoginController implements Controller {
     }
 
     public void loginButtonPressed(ActionEvent event) {
+        app.show(lobbyController.get());
     }
 
     public void signUPHyperlinkPressed(ActionEvent event) {
