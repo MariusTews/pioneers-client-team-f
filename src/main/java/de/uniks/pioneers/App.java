@@ -17,6 +17,16 @@ public class App extends Application {
 
     private Controller controller;
 
+    public App(){
+        final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
+        controller = mainComponent.loginController();
+    }
+
+    public App(Controller controller){
+        this.controller = controller;
+
+    }
+
     @Override
     public void start(Stage primaryStage) {
         final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
@@ -32,7 +42,9 @@ public class App extends Application {
         setAppIcon(stage);
 
         primaryStage.show();
-        show(mainComponent.loginController());
+        if(controller != null) {
+            show(controller);
+        }
     }
 
     private void setAppIcon(Stage stage) {
