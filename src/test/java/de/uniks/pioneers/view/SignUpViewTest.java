@@ -3,7 +3,6 @@ package de.uniks.pioneers.view;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.SignUpController;
-import de.uniks.pioneers.service.UserService;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
