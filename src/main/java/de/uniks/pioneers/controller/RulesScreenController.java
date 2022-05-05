@@ -50,7 +50,7 @@ public class RulesScreenController implements Controller {
         return parent;
     }
 
-    public void backButtonPressed(ActionEvent actionEvent) {
+    public void backButtonPressed(ActionEvent event) {
         final LobbyController controller = lobbyController.get();
         app.show(controller);
     }

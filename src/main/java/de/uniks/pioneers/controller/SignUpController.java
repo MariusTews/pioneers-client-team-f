@@ -64,10 +64,10 @@ public class SignUpController implements Controller {
     }
 
 
-    public void signUpButtonPressed(ActionEvent actionEvent) {
+    public void signUpButtonPressed(ActionEvent event) {
     }
 
-    public void backButtonPressed(ActionEvent actionEvent) {
+    public void backButtonPressed(ActionEvent event) {
         final LoginController controller = loginController.get();
         this.app.show(controller);
     }
