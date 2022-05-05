@@ -1,6 +1,5 @@
 package de.uniks.pioneers.dto;
 
 public record LoginDto(
-		String name,
-		String password
-) {}
+        String name,
+        String password) {}
