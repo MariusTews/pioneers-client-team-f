@@ -42,8 +42,6 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.2'
 
 
-
-
     // rxjava
 
     // https://mvnrepository.com/artifact/io.reactivex.rxjava3/rxjava
@@ -51,8 +49,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/adapter-rxjava3
     implementation group: 'com.squareup.retrofit2', name: 'adapter-rxjava3', version: '2.9.0'
-
-
 
 
     //WebSocket
@@ -64,7 +60,6 @@ dependencies {
     implementation group: 'org.glassfish.tyrus', name: 'tyrus-container-grizzly-client', version: '2.0.2'
 
 
-
     // Dagger
     implementation 'com.google.dagger:dagger:2.41'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.41'
@@ -73,7 +68,7 @@ dependencies {
 
 javafx {
     version = '17'
-    modules = [ 'javafx.controls', 'javafx.graphics', 'javafx.fxml' ]
+    modules = ['javafx.controls', 'javafx.graphics', 'javafx.fxml']
 }
 
 jacoco {
