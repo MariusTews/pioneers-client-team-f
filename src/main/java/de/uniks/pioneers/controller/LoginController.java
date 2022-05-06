@@ -2,7 +2,6 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.AuthService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,7 +14,6 @@ import java.io.IOException;
 
 public class LoginController implements Controller {
     private final App app;
-    private final AuthService authService;
     private Provider<SignUpController> signUpController;
     private Provider<LobbyController> lobbyController;
     @FXML
@@ -32,11 +30,10 @@ public class LoginController implements Controller {
     public Label errorLabel;
 
     @Inject
-    public LoginController(App app, AuthService authService,
+    public LoginController(App app,
                            Provider<SignUpController> signUpController,
                            Provider<LobbyController> lobbyController) {
         this.app = app;
-        this.authService = authService;
         this.signUpController = signUpController;
         this.lobbyController = lobbyController;
     }
