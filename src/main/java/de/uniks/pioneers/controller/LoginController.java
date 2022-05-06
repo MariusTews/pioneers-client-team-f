@@ -2,7 +2,9 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.AuthService;
+import de.uniks.pioneers.service.LoginService;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,7 +17,7 @@ import java.io.IOException;
 
 public class LoginController implements Controller {
     private final App app;
-    private final AuthService authService;
+    private final LoginService loginService;
     private Provider<SignUpController> signUpController;
     private Provider<LobbyController> lobbyController;
     @FXML
@@ -32,11 +34,11 @@ public class LoginController implements Controller {
     public Label errorLabel;
 
     @Inject
-    public LoginController(App app, AuthService authService,
+    public LoginController(App app, LoginService loginService,
                            Provider<SignUpController> signUpController,
                            Provider<LobbyController> lobbyController) {
         this.app = app;
-        this.authService = authService;
+        this.loginService = loginService;
         this.signUpController = signUpController;
         this.lobbyController = lobbyController;
     }
@@ -64,14 +66,19 @@ public class LoginController implements Controller {
             return null;
         }
 
-        loginButton.setOnAction(this::loginButtonPressed);
         signUpHyperlink.setOnAction(this::signUPHyperlinkPressed);
 
         return parent;
     }
 
+    public void login(String username, String password) {
+        loginService.login(username, password)
+                .observeOn(Schedulers.from(Platform::runLater))
+                .subscribe(result -> app.show(lobbyController.get()));
+    }
+
     public void loginButtonPressed(ActionEvent event) {
-        app.show(lobbyController.get());
+        login(usernameTextField.getText(), userPasswordField.getText());
     }
 
     public void signUPHyperlinkPressed(ActionEvent event) {
