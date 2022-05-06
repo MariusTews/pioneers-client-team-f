@@ -41,7 +41,7 @@ public class MainModule {
             final Request newRequest = chain
                     .request()
                     .newBuilder()
-                    .addHeader("Authorization", "Bearer" + token)
+                    .addHeader("Authorization", "Bearer " + token)
                     .build();
             return chain.proceed(newRequest);
         }).build();
