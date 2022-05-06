@@ -2,6 +2,7 @@ package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.controller.GameLobbyController;
+import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.service.GameLobbyService;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,6 +11,8 @@ import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
+
+import javax.inject.Provider;
 
 public class GameLobbyScreenTest extends ApplicationTest {
 
@@ -27,7 +30,12 @@ public class GameLobbyScreenTest extends ApplicationTest {
     @Test
     public void testGameLobbyScreen() {
         // show GameLobbyScreen
-        app.show(new GameLobbyController(new GameLobbyService()));
+        app.show(new GameLobbyController(new App(), new Provider<LobbyController>() {
+            @Override
+            public LobbyController get() {
+                return null;
+            }
+        }));
 
         // buttons
         Button leaveButton = lookup("#idLeaveButton").query();
