@@ -1,5 +1,6 @@
 package de.uniks.pioneers.controller;
 
+import com.sun.javafx.UnmodifiableArrayList;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import javafx.event.ActionEvent;
@@ -41,16 +42,22 @@ public class LobbyController implements Controller {
     private App app;
     private Provider <LoginController> loginController;
     private Provider<RulesScreenController> rulesScreenController;
+    private Provider<CreateGameController> createGameController;
+    private Provider<EditUserController> editUserController;
 
     //added an empty Constructor with the Annotation Inject for later use
     @Inject
     public LobbyController(App app,
                            Provider<LoginController> loginController,
-                           Provider<RulesScreenController> rulesScreenController) {
+                           Provider<RulesScreenController> rulesScreenController,
+                           Provider<CreateGameController> createGameController,
+                           Provider<EditUserController> editUserController) {
 
         this.app = app;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
+        this.createGameController = createGameController;
+        this.editUserController = editUserController;
     }
 
     @Override
@@ -95,9 +102,13 @@ public class LobbyController implements Controller {
     }
 
     public void editButtonPressed(ActionEvent event) {
+        final EditUserController controller = editUserController.get();
+        app.show(controller);
     }
 
     public void createGameButtonPressed(ActionEvent event) {
+        final CreateGameController controller = createGameController.get();
+        app.show(controller);
     }
 
     public void enterKeyPressed(KeyEvent keyEvent) {

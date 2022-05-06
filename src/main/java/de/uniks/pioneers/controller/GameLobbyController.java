@@ -12,11 +12,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 public class GameLobbyController implements Controller{
 
-    private final GameLobbyService gameLobbyService;
+    //private final GameLobbyService gameLobbyService;
 
     @FXML public Text idTitle;
     @FXML public Button idLeaveButton;
@@ -27,8 +28,10 @@ public class GameLobbyController implements Controller{
     @FXML public Button idReadyButton;
     @FXML public Button idStartGameButton;
 
-    public GameLobbyController(GameLobbyService gameLobbyService) {
-        this.gameLobbyService = gameLobbyService;
+    @Inject
+    public GameLobbyController() {
+
+
     }
     @Override
     public void init() {
