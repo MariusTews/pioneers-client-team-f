@@ -15,6 +15,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+
 public class LoginController implements Controller {
     private final App app;
     private final LoginService loginService;
@@ -73,7 +75,7 @@ public class LoginController implements Controller {
 
     public void login(String username, String password) {
         loginService.login(username, password)
-                .observeOn(Schedulers.from(Platform::runLater))
+                .observeOn(FX_SCHEDULER)
                 .subscribe(result -> app.show(lobbyController.get()));
     }
 
