@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class LoginTest {
+class LoginServiceTest {
     @Spy
     TokenStorage tokenStorage;
 
@@ -28,7 +28,7 @@ class LoginTest {
     LoginService loginService;
 
     @Test
-    void login() {
+    void loginTest() {
         when(authApiService.login(any())).thenReturn(Observable.just(new LoginResult("123", "name", "status", "avatar", "accessToken", "refreshToken")));
 
         final String result = loginService.login("username", "password").blockingFirst();
