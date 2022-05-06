@@ -27,7 +27,7 @@ public class GameLobbyScreenTest extends ApplicationTest {
     @Test
     public void testGameLobbyScreen() {
         // show GameLobbyScreen
-        app.show(new GameLobbyController(new GameLobbyService()));
+        app.show(new GameLobbyController());
 
         // buttons
         Button leaveButton = lookup("#idLeaveButton").query();
