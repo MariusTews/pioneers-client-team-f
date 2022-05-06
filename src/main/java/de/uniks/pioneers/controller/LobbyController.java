@@ -2,6 +2,11 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.UserService;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,7 +20,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+
 public class LobbyController implements Controller {
+
+    private final ObservableList<User> users = FXCollections.observableArrayList();
     @FXML
     public Button rulesButton;
     @FXML
@@ -23,7 +32,7 @@ public class LobbyController implements Controller {
     @FXML
     public Button logoutButton;
     @FXML
-    public ListView userListView;
+    public ListView<String> userListView;
     @FXML
     public TabPane tabPane;
     @FXML
@@ -39,22 +48,24 @@ public class LobbyController implements Controller {
     @FXML
     public Button createGameButton;
     private App app;
+    private UserService userService;
     private Provider <LoginController> loginController;
     private Provider<RulesScreenController> rulesScreenController;
 
-    //added an empty Constructor with the Annotation Inject for later use
     @Inject
-    public LobbyController(App app,
+    public LobbyController(App app, UserService userService,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController) {
 
         this.app = app;
+        this.userService = userService;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
     }
 
     @Override
     public void init() {
+        userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this.users::setAll);
     }
 
     @Override
@@ -75,6 +86,15 @@ public class LobbyController implements Controller {
             return null;
         }
 
+        users.addListener((ListChangeListener<? super User>) c -> {
+            userListView.getItems().removeAll();
+            for(User user: c.getList())
+            {
+                String toAdd = user.name() + " " + user.status();
+                userListView.getItems().add(userListView.getItems().size(), toAdd);
+            }
+        });
+
         sendButton.setOnAction(this::sendButtonPressed);
         return parent;
     }
@@ -92,6 +112,7 @@ public class LobbyController implements Controller {
 
     public void sendButtonPressed(ActionEvent event) {
         checkMessageField();
+        userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this.users::setAll);
     }
 
     public void editButtonPressed(ActionEvent event) {
