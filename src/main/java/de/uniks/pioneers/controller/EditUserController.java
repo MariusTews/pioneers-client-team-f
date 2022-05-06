@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
-public class EditUserController implements  Controller{
+public class EditUserController implements Controller {
     private final Provider<LobbyController> lobbyController;
     @FXML
     public TextField newUserNameTextField;
@@ -52,10 +52,9 @@ public class EditUserController implements  Controller{
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/EditUser.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
-        try{
+        try {
             parent = loader.load();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -63,11 +62,11 @@ public class EditUserController implements  Controller{
         return parent;
     }
 
-    public void cancelButtonPressed(ActionEvent actionEvent) {
+    public void cancelButtonPressed(ActionEvent event) {
         final LobbyController controller = lobbyController.get();
         this.app.show(controller);
     }
 
-    public void confirmButtonPressed(ActionEvent actionEvent) {
+    public void confirmButtonPressed(ActionEvent event) {
     }
 }

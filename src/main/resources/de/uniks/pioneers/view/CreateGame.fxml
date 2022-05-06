@@ -56,7 +56,7 @@
       <HBox.margin>
          <Insets top="30.0"/>
       </HBox.margin>
-      <Button fx:id="BackToLobbyButton" mnemonicParsing="false" onAction="#BackToLobbyButtonPressed"
+      <Button fx:id="backToLobbyButton" mnemonicParsing="false" onAction="#backToLobbyButtonPressed"
               prefHeight="31.0" prefWidth="90.0" text="Back">
          <font>
             <Font size="15.0"/>

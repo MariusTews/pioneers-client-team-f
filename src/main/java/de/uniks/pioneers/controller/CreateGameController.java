@@ -14,14 +14,18 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
-public class CreateGameController implements Controller{
+public class CreateGameController implements Controller {
     private final Provider<GameLobbyController> gameLobbyController;
     private final Provider<LobbyController> lobbyController;
-    @FXML public TextField gameNameTextField;
+    @FXML
+    public TextField gameNameTextField;
 
-    @FXML public Button BackToLobbyButton;
-    @FXML public Button createGameButton;
-    @FXML public PasswordField passwordTextField;
+    @FXML
+    public Button backToLobbyButton;
+    @FXML
+    public Button createGameButton;
+    @FXML
+    public PasswordField passwordTextField;
     private final App app;
 
     @Inject
@@ -50,10 +54,9 @@ public class CreateGameController implements Controller{
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/CreateGame.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
-        try{
+        try {
             parent = loader.load();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -61,12 +64,12 @@ public class CreateGameController implements Controller{
         return parent;
     }
 
-    public void BackToLobbyButtonPressed(ActionEvent actionEvent) {
+    public void backToLobbyButtonPressed(ActionEvent event) {
         final LobbyController controller = lobbyController.get();
         this.app.show(controller);
     }
 
-    public void createGameButtonPressed(ActionEvent actionEvent) {
+    public void createGameButtonPressed(ActionEvent event) {
         final GameLobbyController controller = gameLobbyController.get();
         this.app.show(controller);
     }

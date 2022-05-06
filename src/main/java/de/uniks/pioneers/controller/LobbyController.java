@@ -111,8 +111,8 @@ public class LobbyController implements Controller {
         app.show(controller);
     }
 
-    public void enterKeyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+    public void enterKeyPressed(KeyEvent event) {
+        if (event.getCode().equals(KeyCode.ENTER)) {
             checkMessageField();
         }
     }

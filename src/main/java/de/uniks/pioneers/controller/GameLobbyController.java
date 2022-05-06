@@ -1,5 +1,6 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.service.GameLobbyService;
 import javafx.event.ActionEvent;
@@ -13,26 +14,43 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 
-public class GameLobbyController implements Controller{
+public class GameLobbyController implements Controller {
 
     //private final GameLobbyService gameLobbyService;
 
-    @FXML public Text idTitle;
-    @FXML public Button idLeaveButton;
-    @FXML public ScrollPane idUserInLobby;
-    @FXML public AnchorPane idMessageArea;
-    @FXML public TextField idMessageField;
-    @FXML public Button idSendButton;
-    @FXML public Button idReadyButton;
-    @FXML public Button idStartGameButton;
+    @FXML
+    public Text idTitle;
+    @FXML
+    public Button idLeaveButton;
+    @FXML
+    public ScrollPane idUserInLobby;
+    @FXML
+    public AnchorPane idMessageArea;
+    @FXML
+    public TextField idMessageField;
+    @FXML
+    public Button idSendButton;
+    @FXML
+    public Button idReadyButton;
+    @FXML
+    public Button idStartGameButton;
+
+    private final App app;
+
+    private final Provider<LobbyController> lobbyController;
 
     @Inject
-    public GameLobbyController() {
+    public GameLobbyController(App app,
+                               Provider<LobbyController> lobbyController) {
+        this.app = app;
+        this.lobbyController = lobbyController;
 
 
     }
+
     @Override
     public void init() {
     }
@@ -62,6 +80,8 @@ public class GameLobbyController implements Controller{
     }
 
     public void leave(ActionEvent event) {
+        final LobbyController controller = lobbyController.get();
+        app.show(controller);
     }
 
     public void send(ActionEvent event) {
