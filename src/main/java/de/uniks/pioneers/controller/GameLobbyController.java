@@ -48,7 +48,6 @@ public class GameLobbyController implements Controller {
         this.app = app;
         this.lobbyController = lobbyController;
 
-
     }
 
     @Override
