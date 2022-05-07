@@ -22,8 +22,7 @@ public class UserService {
     public void register(String username, String avatar, String password) {
     }
 
-    public Observable<List<User>> findAll() {
-        return this.userApiService.findAll();
+    public Observable<List<User>> findAllUsers() {
+        return this.userApiService.findAllUsers();
     }
-
 }

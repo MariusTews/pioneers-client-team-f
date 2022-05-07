@@ -9,11 +9,17 @@ import java.util.List;
 
 public interface UserApiService {
     @POST("users")
-    Observable<User> create(@Body CreateUserDto dto);
+    Observable<User> createUser(@Body CreateUserDto dto);
 
     @GET("users")
-    Observable<List<User>> findAll();
+    Observable<List<User>> findAllUsers();
 
     @GET("users/{id}")
-    Observable<User> findOne(@Path("id") String id);
+    Observable<User> findUser(@Path("id") String id);
+
+    @PATCH("users/{id}")
+    Observable<User> updateUser(@Path("id") String id);
+
+    @DELETE("users/{id}")
+    Observable<User> deleteUser(@Path("id") String id);
 }
