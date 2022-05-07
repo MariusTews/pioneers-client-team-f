@@ -4,6 +4,7 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
+import de.uniks.pioneers.service.UserService;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
@@ -23,6 +24,9 @@ public class LobbyViewTest extends ApplicationTest {
 
     @Mock
     LoginController loginController;
+
+    @Mock
+    UserService userService;
 
     @InjectMocks
     LobbyController lobbyController;
