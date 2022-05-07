@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.UserService;
 import javafx.collections.FXCollections;
@@ -15,15 +16,13 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 public class LobbyController implements Controller {
-
     private final ObservableList<User> users = FXCollections.observableArrayList();
     @FXML
     public Button rulesButton;
@@ -49,16 +48,18 @@ public class LobbyController implements Controller {
     public Button createGameButton;
     private App app;
     private UserService userService;
+    private EventListener eventListener;
     private Provider <LoginController> loginController;
     private Provider<RulesScreenController> rulesScreenController;
 
     @Inject
-    public LobbyController(App app, UserService userService,
+    public LobbyController(App app, UserService userService, EventListener eventListener,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController) {
 
         this.app = app;
         this.userService = userService;
+        this.eventListener = eventListener;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
     }
@@ -66,11 +67,27 @@ public class LobbyController implements Controller {
     @Override
     public void init() {
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this.users::setAll);
+        eventListener.listen("users.*.*", User.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(userEvent -> {
+                    final User user = userEvent.data();
+                    if (userEvent.event().endsWith(CREATED))
+                    {
+                        users.add(user);
+                    }
+                    else if(userEvent.event().endsWith(DELETED))
+                    {
+                        users.removeIf(u -> u._id().equals(user._id()));
+                    }
+                    else if (userEvent.event().endsWith(UPDATED))
+                    {
+                        users.replaceAll(u -> u._id().equals(user._id()) ? user: u);
+                    }
+                });
     }
 
     @Override
     public void destroy() {
-
     }
 
     @Override
@@ -107,7 +124,6 @@ public class LobbyController implements Controller {
     public void logoutButtonPressed(ActionEvent event) {
         final LoginController controller = loginController.get();
         app.show(controller);
-
     }
 
     public void sendButtonPressed(ActionEvent event) {

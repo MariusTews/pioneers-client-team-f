@@ -1,6 +1,7 @@
 package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
@@ -27,6 +28,9 @@ public class LobbyViewTest extends ApplicationTest {
 
     @Mock
     UserService userService;
+
+    @Mock
+    EventListener eventListener;
 
     @InjectMocks
     LobbyController lobbyController;

@@ -5,7 +5,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.application.Platform;
 
 public class Constants {
-
     public static final String VERSION_PREFIX = "/v1";
     public static final String API_PREFIX = "/api";
 
@@ -19,5 +18,13 @@ public class Constants {
 
     public static final String WS_AUTHTOKEN_URL = WS_URL + WS_PREFIX + VERSION_PREFIX + WS_AUTHTOKEN_PREFIX;
 
+    //Runtime
     public static final Scheduler FX_SCHEDULER = Schedulers.from(Platform::runLater);
+
+    //Websocket calls
+    public static final String CREATED = ".created";
+
+    public static final String DELETED = ".deleted";
+
+    public static final String UPDATED = ".updated";
 }
