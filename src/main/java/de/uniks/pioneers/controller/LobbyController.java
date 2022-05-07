@@ -112,7 +112,6 @@ public class LobbyController implements Controller {
 
     public void sendButtonPressed(ActionEvent event) {
         checkMessageField();
-        userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this.users::setAll);
     }
 
     public void editButtonPressed(ActionEvent event) {
