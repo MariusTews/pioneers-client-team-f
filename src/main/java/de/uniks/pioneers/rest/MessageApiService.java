@@ -1,12 +1,10 @@
 package de.uniks.pioneers.rest;
 
 import de.uniks.pioneers.dto.CreateMessageDto;
+import de.uniks.pioneers.dto.UpdateMemberDto;
 import de.uniks.pioneers.model.Message;
 import io.reactivex.rxjava3.core.Observable;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
+import retrofit2.http.*;
 
 import java.util.List;
 
@@ -25,4 +23,15 @@ public interface MessageApiService {
     Observable<Message> getOne(@Path("namespace") String namespace,
                                @Path("parent") String parent,
                                @Path("id") String id);
+
+    @PATCH("{namespace}/{parent}/messages/{id}")
+    Observable<Message> patchOne(@Path("namespace") String namespace,
+                                 @Path("parent") String parent,
+                                 @Path("id") String id,
+                                 @Body UpdateMemberDto dto);
+
+    @DELETE("{namespace}/{parent}/messages/{id}")
+    Observable<Message> deleteOne(@Path("namespace") String namespace,
+                                  @Path("parent") String parent,
+                                  @Path("id") String id);
 }

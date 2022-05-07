@@ -123,4 +123,9 @@ public class LobbyController implements Controller {
             chatMessageField.setText("");
         }
     }
+
+    //TODO: implement and test
+    private void send() {
+
+    }
 }

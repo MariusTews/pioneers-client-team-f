@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dagger.Module;
 import dagger.Provides;
 import de.uniks.pioneers.rest.AuthApiService;
+import de.uniks.pioneers.rest.GroupeApiService;
+import de.uniks.pioneers.rest.MessageApiService;
 import de.uniks.pioneers.rest.UserApiService;
 import de.uniks.pioneers.service.TokenStorage;
 import okhttp3.OkHttpClient;
@@ -69,5 +71,17 @@ public class MainModule {
     @Singleton
     AuthApiService authApiService(Retrofit retrofit) {
         return retrofit.create(AuthApiService.class);
+    }
+
+    @Provides
+    @Singleton
+    MessageApiService messageApiService(Retrofit retrofit) {
+        return retrofit.create(MessageApiService.class);
+    }
+
+    @Provides
+    @Singleton
+    GroupeApiService groupeApiService(Retrofit retrofit) {
+        return retrofit.create(GroupeApiService.class);
     }
 }
