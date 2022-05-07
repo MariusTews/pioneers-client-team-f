@@ -22,8 +22,7 @@ public class JoinGameViewTest extends ApplicationTest {
     }
 
     @Test
-    public void testViewParameters()
-    {
+    public void testViewParameters() {
         //opens the JoinGame screen to test the View
         app.show(new JoinGameController());
 

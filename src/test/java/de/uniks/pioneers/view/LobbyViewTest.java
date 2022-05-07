@@ -2,106 +2,112 @@ package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.controller.LobbyController;
+import de.uniks.pioneers.controller.LoginController;
+import de.uniks.pioneers.controller.RulesScreenController;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationTest;
 
+@ExtendWith(MockitoExtension.class)
 public class LobbyViewTest extends ApplicationTest {
+    @Mock
+    RulesScreenController rulesScreenController;
 
-	private Stage stage;
-	private App app;
+    @Mock
+    LoginController loginController;
 
-	@Override
-	public void start(Stage stage) {
-		// start application
-		this.stage = stage;
-		this.app = new App();
-		this.app.start(stage);
-	}
+    @InjectMocks
+    LobbyController lobbyController;
 
-	@Test
-	public void testViewParameters()
-	{
-		//opens the Lobby to test the View without the need to Login
-		app.show(new LobbyController());
+    private Stage stage;
+    private App app;
 
-		Button rules = lookup("#rulesButton").query();
-		Button logout = lookup("#logoutButton").query();
-		Button editUser = lookup("#editUserButton").query();
-		Button createGame = lookup("#createGameButton").query();
-		Button send = lookup("#sendButton").query();
+    @Override
+    public void start(Stage stage) {
+        // start application
+        this.stage = stage;
+        this.app = new App(lobbyController);
+        this.app.start(stage);
+    }
 
-		Label welcomeLabel = lookup("#userWelcomeLabel").query();
+    @Test
+    public void testViewParameters() {
+        Button rules = lookup("#rulesButton").query();
+        Button logout = lookup("#logoutButton").query();
+        Button editUser = lookup("#editUserButton").query();
+        Button createGame = lookup("#createGameButton").query();
+        Button send = lookup("#sendButton").query();
 
-		TextField chatMessage = lookup("#chatMessageField").query();
+        Label welcomeLabel = lookup("#userWelcomeLabel").query();
 
-		ListView usersList = lookup("#userListView").query();
-		ListView gamesList = lookup("#gameListView").query();
+        TextField chatMessage = lookup("#chatMessageField").query();
 
-		Assertions.assertThat(rules.getText()).isEqualTo("Rules");
-		Assertions.assertThat(logout.getText()).isEqualTo("Logout");
-		Assertions.assertThat(editUser.getText()).isEqualTo("Edit User");
-		Assertions.assertThat(createGame.getText()).isEqualTo("Create Game");
-		Assertions.assertThat(send.getText()).isEqualTo("send");
+        ListView usersList = lookup("#userListView").query();
+        ListView gamesList = lookup("#gameListView").query();
 
-		Assertions.assertThat(welcomeLabel.getText()).isEqualTo("Nice to see you again, username!");
+        Assertions.assertThat(rules.getText()).isEqualTo("Rules");
+        Assertions.assertThat(logout.getText()).isEqualTo("Logout");
+        Assertions.assertThat(editUser.getText()).isEqualTo("Edit User");
+        Assertions.assertThat(createGame.getText()).isEqualTo("Create Game");
+        Assertions.assertThat(send.getText()).isEqualTo("send");
 
-		Assertions.assertThat(chatMessage.getText()).isEqualTo("");
+        Assertions.assertThat(welcomeLabel.getText()).isEqualTo("Nice to see you again, username!");
 
-		clickOn(chatMessage);
-		write("test");
-		Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
+        Assertions.assertThat(chatMessage.getText()).isEqualTo("");
 
-		Assertions.assertThat(usersList.getItems().isEmpty()).isTrue();
-		Assertions.assertThat(gamesList.getItems().isEmpty()).isTrue();
-	}
-	@Test
-	public void testSendButton(){
-		//opens the Lobby to test the View without the need to Login
-		app.show(new LobbyController());
+        clickOn(chatMessage);
+        write("test");
+        Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
 
-		Button send = lookup("#sendButton").query();
-		TextField chatMessage = lookup("#chatMessageField").query();
+        Assertions.assertThat(usersList.getItems().isEmpty()).isTrue();
+        Assertions.assertThat(gamesList.getItems().isEmpty()).isTrue();
+    }
 
-		TabPane tabPane = lookup("#tabPane").query();
-		Tab allTab = tabPane.getTabs().get(0);
-		VBox chat = ((VBox) ((ScrollPane) allTab.getContent()).getContent());
+    @Test
+    public void testSendButton() {
+        Button send = lookup("#sendButton").query();
+        TextField chatMessage = lookup("#chatMessageField").query();
+
+        TabPane tabPane = lookup("#tabPane").query();
+        Tab allTab = tabPane.getTabs().get(0);
+        VBox chat = ((VBox) ((ScrollPane) allTab.getContent()).getContent());
 
 
-		Assertions.assertThat(chat.getChildren().isEmpty()).isTrue();
-		clickOn(chatMessage);
-		write("test");
+        Assertions.assertThat(chat.getChildren().isEmpty()).isTrue();
+        clickOn(chatMessage);
+        write("test");
 
-		clickOn(send);
-		Assertions.assertThat(chat.getChildren().size()).isEqualTo(1);
-		Label message = (Label) chat.getChildren().get(0);
-		Assertions.assertThat(chatMessage.getText()).isEqualTo("");
-		Assertions.assertThat(message.getText()).isEqualTo("username: test");
-	}
+        clickOn(send);
+        Assertions.assertThat(chat.getChildren().size()).isEqualTo(1);
+        Label message = (Label) chat.getChildren().get(0);
+        Assertions.assertThat(chatMessage.getText()).isEqualTo("");
+        Assertions.assertThat(message.getText()).isEqualTo("username: test");
+    }
 
-	@Test
-	public void testSendviaEnter(){
-		//opens the Lobby to test the View without the need to Login
-		app.show(new LobbyController());
+    @Test
+    public void testSendviaEnter() {
+        TextField chatMessage = lookup("#chatMessageField").query();
 
-		TextField chatMessage = lookup("#chatMessageField").query();
+        TabPane tabPane = lookup("#tabPane").query();
+        Tab allTab = tabPane.getTabs().get(0);
+        VBox chat = ((VBox) ((ScrollPane) allTab.getContent()).getContent());
 
-		TabPane tabPane = lookup("#tabPane").query();
-		Tab allTab = tabPane.getTabs().get(0);
-		VBox chat = ((VBox) ((ScrollPane) allTab.getContent()).getContent());
+        Assertions.assertThat(chat.getChildren().isEmpty()).isTrue();
+        clickOn(chatMessage);
+        write("test");
 
-		Assertions.assertThat(chat.getChildren().isEmpty()).isTrue();
-		clickOn(chatMessage);
-		write("test");
-
-		press(KeyCode.ENTER);
-		Assertions.assertThat(chat.getChildren().size()).isEqualTo(1);
-		Label message = (Label) chat.getChildren().get(0);
-		Assertions.assertThat(chatMessage.getText()).isEqualTo("");
-		Assertions.assertThat(message.getText()).isEqualTo("username: test");
-	}
+        type(KeyCode.ENTER);
+        Assertions.assertThat(chat.getChildren().size()).isEqualTo(1);
+        Label message = (Label) chat.getChildren().get(0);
+        Assertions.assertThat(chatMessage.getText()).isEqualTo("");
+        Assertions.assertThat(message.getText()).isEqualTo("username: test");
+    }
 }
