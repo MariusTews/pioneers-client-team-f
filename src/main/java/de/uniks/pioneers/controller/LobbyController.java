@@ -3,13 +3,22 @@ package de.uniks.pioneers.controller;
 import com.sun.javafx.UnmodifiableArrayList;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.model.Message;
+import de.uniks.pioneers.service.MessageService;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import javax.inject.Inject;
@@ -45,15 +54,21 @@ public class LobbyController implements Controller {
     private Provider<CreateGameController> createGameController;
     private Provider<EditUserController> editUserController;
 
+    //TODO: look after this
+    private final MessageService messageService;
+    private final ObservableList<Message> messages = FXCollections.observableArrayList();
+
     //added an empty Constructor with the Annotation Inject for later use
     @Inject
     public LobbyController(App app,
+                           MessageService messageService,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
                            Provider<EditUserController> editUserController) {
 
         this.app = app;
+        this.messageService = messageService;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
         this.createGameController = createGameController;
@@ -62,6 +77,8 @@ public class LobbyController implements Controller {
 
     @Override
     public void init() {
+        //TODO: get all-group and display all messages
+        messageService.getAll().observeOn(Schedulers.from(Platform::runLater)).subscribe(this.messages::setAll);
     }
 
     @Override
@@ -83,7 +100,30 @@ public class LobbyController implements Controller {
         }
 
         sendButton.setOnAction(this::sendButtonPressed);
+
+        // TODO: change
+        messages.addListener((ListChangeListener<? super Message>) c ->{
+            //tabPane.getTabs().add(new Tab("All").setContent(c.getList().stream().map(this::renderItem));
+            //System.out.println("-> " + c.getList().stream().map(this::renderItem).toList().get(0));
+            System.out.println(c.getList());
+
+            ScrollPane scrollPane = new ScrollPane();
+            VBox box = new VBox();
+            allTab.setContent(scrollPane);
+            scrollPane.setContent(box);
+
+            for(Message message : c.getList()) {
+                box.getChildren().add(new Label(message.sender() + ": " + message.body()));
+            }
+        });
+
         return parent;
+    }
+
+    private Node renderItem(Message message) {
+        final Label m = new Label(message.sender() + ": " + message.body());
+
+        return new HBox(5, m);
     }
 
     public void rulesButtonPressed(ActionEvent event) {
@@ -98,7 +138,9 @@ public class LobbyController implements Controller {
     }
 
     public void sendButtonPressed(ActionEvent event) {
-        checkMessageField();
+        //TODO: check comment because of testing
+        //checkMessageField();
+        send();
     }
 
     public void editButtonPressed(ActionEvent event) {
@@ -126,6 +168,7 @@ public class LobbyController implements Controller {
 
     //TODO: implement and test
     private void send() {
+        String text = this.chatMessageField.getText();
 
     }
 }
