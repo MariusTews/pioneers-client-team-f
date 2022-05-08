@@ -9,20 +9,18 @@ import io.reactivex.rxjava3.core.Observable;
 import java.util.List;
 
 public interface UserApiService {
-
     @GET("users")
-    Observable<List<User>> findAll();
+    Observable<List<User>> findAllUsers();
 
     @POST("users")
-    Observable<User> create(@Body CreateUserDto dto);
+    Observable<User> createUser(@Body CreateUserDto dto);
 
     @GET("users/{id}")
-    Observable<User> findOne(@Path("id") String id);
+    Observable<User> findUser(@Path("id") String id);
 
     @PATCH("users/{id}")
-    Observable<User> patch(@Path(("id")) String id,
-                           @Body UpdateUserDto dto);
+    Observable<User> updateUser(@Path("id") String id, @Body UpdateUserDto dto);
 
     @DELETE("users/{id}")
-    Observable<User> delete(@Path("id") String id);
+    Observable<User> deleteUser(@Path("id") String id);
 }

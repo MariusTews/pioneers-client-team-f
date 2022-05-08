@@ -3,8 +3,6 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.service.LoginService;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +12,8 @@ import javafx.scene.control.*;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
+
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class LoginController implements Controller {
     private final App app;
@@ -73,7 +73,7 @@ public class LoginController implements Controller {
 
     public void login(String username, String password) {
         loginService.login(username, password)
-                .observeOn(Schedulers.from(Platform::runLater))
+                .observeOn(FX_SCHEDULER)
                 .subscribe(result -> app.show(lobbyController.get()));
     }
 

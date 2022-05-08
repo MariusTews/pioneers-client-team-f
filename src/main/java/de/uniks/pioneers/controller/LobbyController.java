@@ -1,12 +1,10 @@
 package de.uniks.pioneers.controller;
 
-import com.sun.javafx.UnmodifiableArrayList;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.model.Message;
-import de.uniks.pioneers.service.MessageService;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import javafx.application.Platform;
+import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -20,12 +18,14 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
+import static de.uniks.pioneers.Constants.*;
+
 public class LobbyController implements Controller {
+    private final ObservableList<User> users = FXCollections.observableArrayList();
     @FXML
     public Button rulesButton;
     @FXML
@@ -33,7 +33,7 @@ public class LobbyController implements Controller {
     @FXML
     public Button logoutButton;
     @FXML
-    public ListView userListView;
+    public ListView<String> userListView;
     @FXML
     public TabPane tabPane;
     @FXML
@@ -49,25 +49,23 @@ public class LobbyController implements Controller {
     @FXML
     public Button createGameButton;
     private App app;
+    private UserService userService;
+    private EventListener eventListener;
     private Provider <LoginController> loginController;
     private Provider<RulesScreenController> rulesScreenController;
     private Provider<CreateGameController> createGameController;
     private Provider<EditUserController> editUserController;
 
-    private final MessageService messageService;
-    private final ObservableList<Message> messages = FXCollections.observableArrayList();
-
-    //added an empty Constructor with the Annotation Inject for later use
     @Inject
-    public LobbyController(App app,
-                           MessageService messageService,
+    public LobbyController(App app, UserService userService, EventListener eventListener,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
                            Provider<EditUserController> editUserController) {
 
         this.app = app;
-        this.messageService = messageService;
+        this.userService = userService;
+        this.eventListener = eventListener;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
         this.createGameController = createGameController;
@@ -76,12 +74,28 @@ public class LobbyController implements Controller {
 
     @Override
     public void init() {
-        messageService.getAll().observeOn(Schedulers.from(Platform::runLater)).subscribe(this.messages::setAll);
+        userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this.users::setAll);
+        eventListener.listen("users.*.*", User.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(userEvent -> {
+                    final User user = userEvent.data();
+                    if (userEvent.event().endsWith(CREATED))
+                    {
+                        users.add(user);
+                    }
+                    else if(userEvent.event().endsWith(DELETED))
+                    {
+                        users.removeIf(u -> u._id().equals(user._id()));
+                    }
+                    else if (userEvent.event().endsWith(UPDATED))
+                    {
+                        users.replaceAll(u -> u._id().equals(user._id()) ? user: u);
+                    }
+                });
     }
 
     @Override
     public void destroy() {
-
     }
 
     @Override
@@ -96,6 +110,15 @@ public class LobbyController implements Controller {
             e.printStackTrace();
             return null;
         }
+
+        users.addListener((ListChangeListener<? super User>) c -> {
+            userListView.getItems().removeAll();
+            for(User user: c.getList())
+            {
+                String toAdd = user.name() + " " + user.status();
+                userListView.getItems().add(userListView.getItems().size(), toAdd);
+            }
+        });
 
         sendButton.setOnAction(this::sendButtonPressed);
 
@@ -129,7 +152,6 @@ public class LobbyController implements Controller {
     public void logoutButtonPressed(ActionEvent event) {
         final LoginController controller = loginController.get();
         app.show(controller);
-
     }
 
     public void sendButtonPressed(ActionEvent event) {
