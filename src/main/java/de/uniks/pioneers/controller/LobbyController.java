@@ -1,6 +1,5 @@
 package de.uniks.pioneers.controller;
 
-import com.sun.javafx.UnmodifiableArrayList;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
