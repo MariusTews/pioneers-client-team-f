@@ -122,26 +122,7 @@ public class LobbyController implements Controller {
 
         sendButton.setOnAction(this::sendButtonPressed);
 
-        messages.addListener((ListChangeListener<? super Message>) c ->{
-            System.out.println(c.getList());
-
-            ScrollPane scrollPane = new ScrollPane();
-            VBox box = new VBox();
-            allTab.setContent(scrollPane);
-            scrollPane.setContent(box);
-
-            for(Message message : c.getList()) {
-                box.getChildren().add(new Label(message.sender() + ": " + message.body()));
-            }
-        });
-
         return parent;
-    }
-
-    private Node renderItem(Message message) {
-        final Label m = new Label(message.sender() + ": " + message.body());
-
-        return new HBox(5, m);
     }
 
     public void rulesButtonPressed(ActionEvent event) {
@@ -155,8 +136,7 @@ public class LobbyController implements Controller {
     }
 
     public void sendButtonPressed(ActionEvent event) {
-        //checkMessageField();
-        send();
+        checkMessageField();
     }
 
     public void editButtonPressed(ActionEvent event) {
@@ -179,13 +159,6 @@ public class LobbyController implements Controller {
         if (!chatMessageField.getText().isEmpty()) {
             ((VBox) ((ScrollPane) this.allTab.getContent()).getContent()).getChildren().add(new Label("username: " + chatMessageField.getText()));
             chatMessageField.setText("");
-        }
-    }
-
-    private void send() {
-        if (!chatMessageField.getText().isEmpty()) {
-            messageService.send(chatMessageField.getText());
-            chatMessageField.clear();
         }
     }
 }

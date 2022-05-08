@@ -2,7 +2,7 @@ package de.uniks.pioneers.model;
 
 import java.util.List;
 
-public record Group(
+public record Groupe(
 		String createdAt,
 		String updatedAt,
 		String _id,
