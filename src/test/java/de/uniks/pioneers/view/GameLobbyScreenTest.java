@@ -3,7 +3,6 @@ package de.uniks.pioneers.view;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.controller.LobbyController;
-import de.uniks.pioneers.service.GameLobbyService;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
