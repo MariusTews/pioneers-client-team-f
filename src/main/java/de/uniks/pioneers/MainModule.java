@@ -72,8 +72,8 @@ public class MainModule {
 
     @Provides
     @Singleton
-    GroupeApiService groupeApiService(Retrofit retrofit) {
-        return retrofit.create(GroupeApiService.class);
+    GroupApiService groupApiService(Retrofit retrofit) {
+        return retrofit.create(GroupApiService.class);
     }
 
     @Provides

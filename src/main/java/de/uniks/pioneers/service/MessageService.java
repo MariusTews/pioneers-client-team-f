@@ -1,5 +1,6 @@
 package de.uniks.pioneers.service;
 
+import de.uniks.pioneers.dto.CreateMessageDto;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.rest.MessageApiService;
 import io.reactivex.rxjava3.core.Observable;
@@ -16,11 +17,11 @@ public class MessageService {
         this.messageApiService = messageApiService;
     }
 
-    public void send(String message) {
-
+    public Observable<List<Message>> getAllMessages(String namespace, String parent) {
+        return messageApiService.findAll(namespace, parent);
     }
 
-    public Observable<List<Message>> getAll() {
-        return messageApiService.findAll("groups", "62756e8567968900144280a9");
+    public Observable<Message> send(String namespace, String parent, String message) {
+        return messageApiService.create(namespace, parent, new CreateMessageDto(message));
     }
 }
