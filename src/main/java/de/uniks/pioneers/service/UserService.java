@@ -16,7 +16,9 @@ public class UserService {
         this.userApiService = userApiService;
     }
 
-    public void register(String username, String avatar, String password) {
+    public Observable<User> register(String username, String avatar, String password) {
+        return userApiService
+                .createUser(new CreateUserDto(username, avatar, password));
     }
 
     public Observable<List<User>> findAllUsers() {
