@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dagger.Module;
 import dagger.Provides;
-import de.uniks.pioneers.rest.AuthApiService;
-import de.uniks.pioneers.rest.GroupeApiService;
-import de.uniks.pioneers.rest.MessageApiService;
-import de.uniks.pioneers.rest.UserApiService;
+import de.uniks.pioneers.rest.*;
 import de.uniks.pioneers.service.TokenStorage;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -63,14 +60,20 @@ public class MainModule {
 
     @Provides
     @Singleton
+    AuthApiService authApiService(Retrofit retrofit) {
+        return retrofit.create(AuthApiService.class);
+    }
+
+    @Provides
+    @Singleton
     UserApiService userApiService(Retrofit retrofit) {
         return retrofit.create(UserApiService.class);
     }
 
     @Provides
     @Singleton
-    AuthApiService authApiService(Retrofit retrofit) {
-        return retrofit.create(AuthApiService.class);
+    GroupeApiService groupeApiService(Retrofit retrofit) {
+        return retrofit.create(GroupeApiService.class);
     }
 
     @Provides
@@ -81,7 +84,13 @@ public class MainModule {
 
     @Provides
     @Singleton
-    GroupeApiService groupeApiService(Retrofit retrofit) {
-        return retrofit.create(GroupeApiService.class);
+    GameMembersApiService gameMembersApiService(Retrofit retrofit) {
+        return retrofit.create(GameMembersApiService.class);
+    }
+
+    @Provides
+    @Singleton
+    GamesApiService gamesApiService(Retrofit retrofit) {
+        return retrofit.create(GamesApiService.class);
     }
 }

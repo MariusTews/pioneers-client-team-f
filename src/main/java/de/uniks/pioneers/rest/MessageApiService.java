@@ -11,27 +11,27 @@ import java.util.List;
 public interface MessageApiService {
 
     @GET("{namespace}/{parent}/messages")
-    Observable<List<Message>> getAll(@Path("namespace") String namespace,
+    Observable<List<Message>> findAll(@Path("namespace") String namespace,
                                      @Path("parent") String parent);
 
     @POST("{namespace}/{parent}/messages")
-    Observable<Message> sendMessage(@Path("namespace") String namespace,
+    Observable<Message> create(@Path("namespace") String namespace,
                                     @Path("parent") String parent,
                                     @Body CreateMessageDto dto);
 
     @GET("{namespace}/{parent}/messages/{id}")
-    Observable<Message> getOne(@Path("namespace") String namespace,
+    Observable<Message> findOne(@Path("namespace") String namespace,
                                @Path("parent") String parent,
                                @Path("id") String id);
 
     @PATCH("{namespace}/{parent}/messages/{id}")
-    Observable<Message> patchOne(@Path("namespace") String namespace,
+    Observable<Message> patch(@Path("namespace") String namespace,
                                  @Path("parent") String parent,
                                  @Path("id") String id,
                                  @Body UpdateMemberDto dto);
 
     @DELETE("{namespace}/{parent}/messages/{id}")
-    Observable<Message> deleteOne(@Path("namespace") String namespace,
+    Observable<Message> delete(@Path("namespace") String namespace,
                                   @Path("parent") String parent,
                                   @Path("id") String id);
 }

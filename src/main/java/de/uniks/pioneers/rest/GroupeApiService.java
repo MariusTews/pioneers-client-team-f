@@ -19,8 +19,8 @@ public interface GroupeApiService {
     Observable<Groupe> getOne(@Path("id") String id);
 
     @PATCH("groups/{id}")
-    Observable<Groupe> patchOne(@Path("id") String id);
+    Observable<Groupe> patch(@Path("id") String id);
 
     @DELETE("groups/{id}")
-    Observable<Groupe> deleteOne(@Path("id") String id);
+    Observable<Groupe> delete(@Path("id") String id);
 }

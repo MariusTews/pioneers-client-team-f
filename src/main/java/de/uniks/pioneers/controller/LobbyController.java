@@ -139,6 +139,7 @@ public class LobbyController implements Controller {
 
     public void sendButtonPressed(ActionEvent event) {
         //TODO: check comment because of testing
+        //TODO: check what tab your in and give as parameter to send method
         //checkMessageField();
         send();
     }
@@ -166,9 +167,11 @@ public class LobbyController implements Controller {
         }
     }
 
-    //TODO: implement and test
+    //TODO: implement and test first for message to all users
     private void send() {
-        String text = this.chatMessageField.getText();
-
+        if (!chatMessageField.getText().isEmpty()) {
+            messageService.send(chatMessageField.getText());
+            chatMessageField.clear();
+        }
     }
 }
