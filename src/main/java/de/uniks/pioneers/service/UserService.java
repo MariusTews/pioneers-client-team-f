@@ -25,4 +25,8 @@ public class UserService {
     public Observable<List<User>> findAllUsers() {
         return this.userApiService.findAllUsers();
     }
+
+    public Observable<User> getUser(String id) {
+        return userApiService.findUser(id);
+    }
 }

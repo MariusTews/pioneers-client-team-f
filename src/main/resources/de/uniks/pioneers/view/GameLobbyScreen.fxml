@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -41,13 +40,16 @@
                <HBox.margin>
                   <Insets left="40.0" right="5.0" />
                </HBox.margin>
+               <content>
+                  <VBox fx:id="idUserList" prefHeight="321.0" prefWidth="173.0" />
+               </content>
             </ScrollPane>
             <VBox prefHeight="323.0" prefWidth="294.0">
                <children>
                   <ScrollPane prefHeight="336.0" prefWidth="294.0" style="-fx-background-color: white;">
-                    <content>
-                      <AnchorPane fx:id="idMessageArea" minHeight="0.0" minWidth="0.0" prefHeight="271.0" prefWidth="286.0" />
-                    </content>
+                     <content>
+                        <VBox prefHeight="278.0" prefWidth="292.0" />
+                     </content>
                   </ScrollPane>
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                      <children>
