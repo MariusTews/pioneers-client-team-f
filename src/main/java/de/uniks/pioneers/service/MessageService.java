@@ -16,12 +16,10 @@ public class MessageService {
         this.messageApiService = messageApiService;
     }
 
-    //TODO: send a message to all users
     public void send(String message) {
 
     }
 
-    //TODO: replace group id -> get all groups, take first group, set id
     public Observable<List<Message>> getAll() {
         return messageApiService.findAll("groups", "62756e8567968900144280a9");
     }

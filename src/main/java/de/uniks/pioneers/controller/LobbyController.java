@@ -54,7 +54,6 @@ public class LobbyController implements Controller {
     private Provider<CreateGameController> createGameController;
     private Provider<EditUserController> editUserController;
 
-    //TODO: look after this
     private final MessageService messageService;
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
 
@@ -77,7 +76,6 @@ public class LobbyController implements Controller {
 
     @Override
     public void init() {
-        //TODO: get all-group and display all messages
         messageService.getAll().observeOn(Schedulers.from(Platform::runLater)).subscribe(this.messages::setAll);
     }
 
@@ -101,10 +99,7 @@ public class LobbyController implements Controller {
 
         sendButton.setOnAction(this::sendButtonPressed);
 
-        // TODO: change
         messages.addListener((ListChangeListener<? super Message>) c ->{
-            //tabPane.getTabs().add(new Tab("All").setContent(c.getList().stream().map(this::renderItem));
-            //System.out.println("-> " + c.getList().stream().map(this::renderItem).toList().get(0));
             System.out.println(c.getList());
 
             ScrollPane scrollPane = new ScrollPane();
@@ -138,8 +133,6 @@ public class LobbyController implements Controller {
     }
 
     public void sendButtonPressed(ActionEvent event) {
-        //TODO: check comment because of testing
-        //TODO: check what tab your in and give as parameter to send method
         //checkMessageField();
         send();
     }
@@ -167,7 +160,6 @@ public class LobbyController implements Controller {
         }
     }
 
-    //TODO: implement and test first for message to all users
     private void send() {
         if (!chatMessageField.getText().isEmpty()) {
             messageService.send(chatMessageField.getText());
