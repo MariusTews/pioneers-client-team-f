@@ -1,5 +1,6 @@
 package de.uniks.pioneers.service;
 
+import de.uniks.pioneers.dto.CreateUserDto;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.rest.UserApiService;
 import io.reactivex.rxjava3.core.Observable;
