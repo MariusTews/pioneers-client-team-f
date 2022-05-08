@@ -9,11 +9,11 @@ import io.reactivex.rxjava3.core.Observable;
 import java.util.List;
 
 public interface UserApiService {
-    @POST("users")
-    Observable<User> createUser(@Body CreateUserDto dto);
-
     @GET("users")
     Observable<List<User>> findAllUsers();
+
+    @POST("users")
+    Observable<User> createUser(@Body CreateUserDto dto);
 
     @GET("users/{id}")
     Observable<User> findUser(@Path("id") String id);

@@ -119,6 +119,7 @@ public class LobbyController implements Controller {
         });
 
         sendButton.setOnAction(this::sendButtonPressed);
+
         return parent;
     }
 
