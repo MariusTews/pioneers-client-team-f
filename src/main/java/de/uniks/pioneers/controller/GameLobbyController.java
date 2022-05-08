@@ -71,7 +71,7 @@ public class GameLobbyController implements Controller {
             return null;
         }
 
-        // disable start game button when entering lobby
+        // disable start until everybody is ready
         idStartGameButton.disableProperty().set(true);
 
         return parent;
