@@ -4,10 +4,8 @@ import de.uniks.pioneers.dto.CreateUserDto;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.rest.UserApiService;
 import io.reactivex.rxjava3.core.Observable;
-import retrofit2.Response;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.List;
 
 public class UserService {
