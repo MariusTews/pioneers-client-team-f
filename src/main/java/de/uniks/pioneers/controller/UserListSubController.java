@@ -48,7 +48,7 @@ public class UserListSubController implements Controller {
 
 	@Override
 	public Parent render() {
-		final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/UserlistSubView.fxml"));
+		final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/UserListSubView.fxml"));
 		loader.setControllerFactory(c -> this);
 		final Parent parent;
 		try {

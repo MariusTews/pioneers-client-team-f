@@ -39,7 +39,7 @@ public class GameListSubController implements Controller {
 
 	@Override
 	public Parent render() {
-		final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GamelistSubView.fxml"));
+		final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameListSubView.fxml"));
 		loader.setControllerFactory(c -> this);
 		final Parent parent;
 		try {
