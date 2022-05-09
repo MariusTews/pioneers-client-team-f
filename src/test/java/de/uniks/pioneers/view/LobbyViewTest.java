@@ -58,7 +58,6 @@ public class LobbyViewTest extends ApplicationTest {
 
         TextField chatMessage = lookup("#chatMessageField").query();
 
-        ListView usersList = lookup("#userListView").query();
         ListView gamesList = lookup("#gameListView").query();
 
         Assertions.assertThat(rules.getText()).isEqualTo("Rules");
@@ -75,7 +74,6 @@ public class LobbyViewTest extends ApplicationTest {
         write("test");
         Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
 
-        Assertions.assertThat(usersList.getItems().isEmpty()).isTrue();
         Assertions.assertThat(gamesList.getItems().isEmpty()).isTrue();
     }
 
