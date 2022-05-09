@@ -28,8 +28,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
-
         this.stage = primaryStage;
         stage.setWidth(640);
         stage.setHeight(480);
