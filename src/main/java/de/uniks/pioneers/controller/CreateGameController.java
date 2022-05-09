@@ -2,6 +2,9 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.service.GameService;
+import io.reactivex.rxjava3.core.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,9 +17,12 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+
 public class CreateGameController implements Controller {
     private final Provider<GameLobbyController> gameLobbyController;
     private final Provider<LobbyController> lobbyController;
+    private final GameService gameService;
     @FXML
     public TextField gameNameTextField;
 
@@ -30,12 +36,13 @@ public class CreateGameController implements Controller {
 
     @Inject
     public CreateGameController(App app,
-
+                                GameService gameService,
                                 Provider<LobbyController> lobbyController,
                                 Provider<GameLobbyController> gameLobbyController) {
         this.app = app;
         this.gameLobbyController = gameLobbyController;
         this.lobbyController = lobbyController;
+        this.gameService = gameService;
 
     }
 
@@ -70,7 +77,10 @@ public class CreateGameController implements Controller {
     }
 
     public void createGameButtonPressed(ActionEvent event) {
-        final GameLobbyController controller = gameLobbyController.get();
-        this.app.show(controller);
+
+        Observable<Game> gameObservable = gameService.create(gameNameTextField.getText(), passwordTextField.getText());
+
+        gameObservable.observeOn(FX_SCHEDULER)
+                .subscribe(result -> app.show(gameLobbyController.get()));
     }
 }
