@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.LoginService;
 import de.uniks.pioneers.service.UserService;
 import javafx.event.ActionEvent;
@@ -22,6 +23,7 @@ public class LoginController implements Controller {
     private final UserService userService;
     private Provider<SignUpController> signUpController;
     private Provider<LobbyController> lobbyController;
+    private IDStorage idStorage;
     @FXML
     public TextField usernameTextField;
     @FXML
@@ -39,12 +41,14 @@ public class LoginController implements Controller {
     public LoginController(App app, LoginService loginService,
                            UserService userService,
                            Provider<SignUpController> signUpController,
-                           Provider<LobbyController> lobbyController) {
+                           Provider<LobbyController> lobbyController,
+                           IDStorage idStorage) {
         this.app = app;
         this.loginService = loginService;
         this.userService = userService;
         this.signUpController = signUpController;
         this.lobbyController = lobbyController;
+        this.idStorage = idStorage;
     }
 
     @Override
@@ -79,7 +83,7 @@ public class LoginController implements Controller {
         loginService.login(username, password)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
-                    userService.statusUpdate(result._id(), "online")
+                    userService.statusUpdate(result, "online")
                                     .observeOn(FX_SCHEDULER)
                                             .subscribe();
                     app.show(lobbyController.get());

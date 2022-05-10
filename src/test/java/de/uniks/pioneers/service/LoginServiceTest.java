@@ -21,6 +21,9 @@ class LoginServiceTest {
     @Spy
     TokenStorage tokenStorage;
 
+    @Spy
+    IDStorage idStorage;
+
     @Mock
     AuthApiService authApiService;
 
@@ -32,9 +35,11 @@ class LoginServiceTest {
         when(authApiService.login(any())).thenReturn(Observable.just(new LoginResult("123", "name", "status", "avatar", "accessToken", "refreshToken")));
 
         final String result = loginService.login("username", "password").blockingFirst();
-        assertEquals("name", result);
+        assertEquals("123", result);
 
         assertEquals("accessToken", tokenStorage.getToken());
+
+        assertEquals("123", idStorage.getID());
 
         verify(authApiService).login(new LoginDto("username", "password"));
     }

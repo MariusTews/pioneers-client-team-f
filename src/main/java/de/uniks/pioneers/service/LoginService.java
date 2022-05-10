@@ -22,12 +22,13 @@ public class LoginService {
         this.idStorage = idStorage;
     }
 
-    public Observable<LoginResult> login(String username, String password) {
+    public Observable<String> login(String username, String password) {
         return authApiService
                 .login(new LoginDto(username, password))
                 .doOnNext(result -> {
                     tokenStorage.setToken(result.accessToken());
                     idStorage.setID(result._id());
-                });
+                })
+                .map(LoginResult::_id);
     }
 }
