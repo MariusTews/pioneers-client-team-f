@@ -106,6 +106,10 @@ public class LobbyController implements Controller {
 
     @Override
     public void destroy() {
+        this.userSubCons.forEach(UserListSubController::destroy);
+        this.userSubCons.clear();
+
+        eventListener.listen("users.*.*", User.class).unsubscribeOn(FX_SCHEDULER);
     }
 
     @Override
