@@ -29,7 +29,7 @@ public class UserService {
                 .updateUser(id, new UpdateUserDto(name, status, avatar, password));
     }
 
-    public Observable<User> loginUpdate(String id, String status) {
+    public Observable<User> statusUpdate(String id, String status) {
         return userApiService
                 .statusUpdate(id, new StatusUpdateDto(status));
     }

@@ -79,7 +79,7 @@ public class LoginController implements Controller {
         loginService.login(username, password)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
-                    userService.loginUpdate(result._id(), "online")
+                    userService.statusUpdate(result._id(), "online")
                                     .observeOn(FX_SCHEDULER)
                                             .subscribe();
                     app.show(lobbyController.get());
