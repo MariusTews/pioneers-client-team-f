@@ -1,6 +1,7 @@
 package de.uniks.pioneers.service;
 
 import de.uniks.pioneers.dto.CreateUserDto;
+import de.uniks.pioneers.dto.StatusUpdateDto;
 import de.uniks.pioneers.dto.UpdateUserDto;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.rest.UserApiService;
@@ -26,6 +27,11 @@ public class UserService {
     public Observable<User> userUpdate(String id, String name, String avatar, String status, String password) {
         return userApiService
                 .updateUser(id, new UpdateUserDto(name, status, avatar, password));
+    }
+
+    public Observable<User> loginUpdate(String id, String status) {
+        return userApiService
+                .statusUpdate(id, new StatusUpdateDto(status));
     }
 
     public Observable<List<User>> findAllUsers() {
