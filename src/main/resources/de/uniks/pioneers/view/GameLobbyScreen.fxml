@@ -48,7 +48,7 @@
                <children>
                   <ScrollPane prefHeight="336.0" prefWidth="294.0" style="-fx-background-color: white;">
                      <content>
-                        <VBox prefHeight="278.0" prefWidth="292.0" />
+                        <VBox fx:id="idMessageView" prefHeight="278.0" prefWidth="292.0" />
                      </content>
                   </ScrollPane>
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">

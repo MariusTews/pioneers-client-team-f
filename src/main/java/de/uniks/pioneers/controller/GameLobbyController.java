@@ -3,9 +3,13 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Constants;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
+import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameMembersService;
+import de.uniks.pioneers.service.MessageService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
@@ -31,11 +35,12 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 public class GameLobbyController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
+    private final ObservableList<Message> messages = FXCollections.observableArrayList();
 
     @FXML
     public Text idTitle;
@@ -59,17 +64,24 @@ public class GameLobbyController implements Controller {
     private final App app;
     private final GameMembersService gameMembersService;
     private final UserService userService;
+    private final MessageService messageService;
     private final Provider<LobbyController> lobbyController;
+    private final EventListener eventListener;
+    public VBox idMessageView;
 
     @Inject
     public GameLobbyController(App app,
                                GameMembersService gameMembersService,
                                UserService userService,
-                               Provider<LobbyController> lobbyController) {
+                               MessageService messageService,
+                               Provider<LobbyController> lobbyController,
+                               EventListener eventListener) {
         this.app = app;
         this.gameMembersService = gameMembersService;
         this.userService = userService;
+        this.messageService = messageService;
         this.lobbyController = lobbyController;
+        this.eventListener = eventListener;
     }
 
     @Override
@@ -77,9 +89,31 @@ public class GameLobbyController implements Controller {
         //TODO: remove later because of use of concrete variable for testGAME
         // get gameId from somewhere else
         gameMembersService
-                .getAllGameMembers("6273d25f8800880014e65b84")
+                .getAllGameMembers("6279a76625989c0014457670")
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.members::setAll);
+
+        // get all messages
+        messageService
+                .getAllMessages("games", "6279a76625989c0014457670")
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this.messages::setAll);
+
+        // listen to game lobby messages
+        eventListener
+                .listen("games.6279a76625989c0014457670.*.*.*", Message.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    final Message message = event.data();
+                   if (event.event().endsWith(CREATED)) {
+                       messages.add(message);
+                   } else if (event.event().endsWith(UPDATED)) {
+                        // how do messages getting updated
+                   } else if (event.event().endsWith(DELETED)) {
+                       // implement later
+                   }
+                });
+
     }
 
     @Override
@@ -89,7 +123,7 @@ public class GameLobbyController implements Controller {
 
     @Override
     public Parent render() {
-        // load ui elements
+        // load UI elements
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameLobbyScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
@@ -107,6 +141,14 @@ public class GameLobbyController implements Controller {
             idUserList.getChildren().removeAll();
             for(Member member: c.getList()) {
                 idUserList.getChildren().add(constructUser(member));
+            }
+        });
+
+        // load game lobby messages
+        messages.addListener((ListChangeListener<? super Message>) c -> {
+            idMessageView.getChildren().removeAll();
+            for(Message message: c.getList()) {
+                idMessageView.getChildren().add(new Label(message.sender() + ": " + message.body()));
             }
         });
 
