@@ -99,7 +99,6 @@ public class LobbyController implements Controller {
                     }
                     else if (userEvent.event().endsWith(UPDATED))
                     {
-                        System.out.println("update");
                         this.users.replaceAll(u -> u._id().equals(user._id()) ? user: u);
                     }
                 });
@@ -111,7 +110,6 @@ public class LobbyController implements Controller {
 
     @Override
     public Parent render() {
-
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/LobbyScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
@@ -122,22 +120,9 @@ public class LobbyController implements Controller {
             return null;
         }
 
-        /*
-        this.users.addListener((ListChangeListener<? super User>) c -> {
-            userListView.getItems().removeAll();
-            for(User user: c.getList())
-            {
-                String toAdd = user.name() + " " + user.status();
-                userListView.getItems().add(userListView.getItems().size(), toAdd);
-            }
-        });
-        */
-
         this.users.addListener((ListChangeListener<? super User>) c -> {
             ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
         });
-
-        sendButton.setOnAction(this::sendButtonPressed);
 
         return parent;
     }
