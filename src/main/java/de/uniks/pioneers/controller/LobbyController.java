@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -19,19 +20,24 @@ import javafx.scene.layout.VBox;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
 public class LobbyController implements Controller {
-    private final ObservableList<User> users = FXCollections.observableArrayList();
+
+    private ObservableList<User> users = FXCollections.observableArrayList();
+    private List<UserListSubController> userSubCons = new ArrayList<>();
+
+    @FXML
+    public ScrollPane userScrollPane;
     @FXML
     public Button rulesButton;
     @FXML
     public Label userWelcomeLabel;
     @FXML
     public Button logoutButton;
-    @FXML
-    public ListView<String> userListView;
     @FXML
     public TabPane tabPane;
     @FXML
@@ -72,33 +78,42 @@ public class LobbyController implements Controller {
 
     @Override
     public void init() {
-        userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this.users::setAll);
+        userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(users -> {
+            List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
+            List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
+            this.users.addAll(online);
+            this.users.addAll(offline);
+        });
+
         eventListener.listen("users.*.*", User.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(userEvent -> {
                     final User user = userEvent.data();
                     if (userEvent.event().endsWith(CREATED))
                     {
-                        users.add(user);
+                        this.users.add(user);
                     }
                     else if(userEvent.event().endsWith(DELETED))
                     {
-                        users.removeIf(u -> u._id().equals(user._id()));
+                        this.users.removeIf(u -> u._id().equals(user._id()));
                     }
                     else if (userEvent.event().endsWith(UPDATED))
                     {
-                        users.replaceAll(u -> u._id().equals(user._id()) ? user: u);
+                        this.users.replaceAll(u -> u._id().equals(user._id()) ? user: u);
                     }
                 });
     }
 
     @Override
     public void destroy() {
+        this.userSubCons.forEach(UserListSubController::destroy);
+        this.userSubCons.clear();
+
+        eventListener.listen("users.*.*", User.class).unsubscribeOn(FX_SCHEDULER);
     }
 
     @Override
     public Parent render() {
-
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/LobbyScreen.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
@@ -109,16 +124,9 @@ public class LobbyController implements Controller {
             return null;
         }
 
-        users.addListener((ListChangeListener<? super User>) c -> {
-            userListView.getItems().removeAll();
-            for(User user: c.getList())
-            {
-                String toAdd = user.name() + " " + user.status();
-                userListView.getItems().add(userListView.getItems().size(), toAdd);
-            }
+        this.users.addListener((ListChangeListener<? super User>) c -> {
+            ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
         });
-
-        sendButton.setOnAction(this::sendButtonPressed);
 
         return parent;
     }
@@ -158,5 +166,11 @@ public class LobbyController implements Controller {
             ((VBox) ((ScrollPane) this.allTab.getContent()).getContent()).getChildren().add(new Label("username: " + chatMessageField.getText()));
             chatMessageField.setText("");
         }
+    }
+
+    private Node renderUser(User user){
+        UserListSubController userCon = new UserListSubController(this.app,user);
+        userSubCons.add(userCon);
+        return userCon.render();
     }
 }

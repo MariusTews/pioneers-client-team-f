@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
@@ -71,6 +72,11 @@ public class UserListSubController implements Controller {
 
 			if (this.user.avatar()!=null){
 				this.userImageView.setImage(new Image(this.user.avatar().toString()));
+			}
+
+			if(this.user.status().equals("offline")){
+				HBox box = (HBox) this.chatButton.getParent();
+				box.getChildren().removeIf(node -> node.equals(chatButton));
 			}
 		}
 
