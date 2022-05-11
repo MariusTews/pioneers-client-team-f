@@ -2,8 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.LoginService;
+import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,11 +18,10 @@ import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class LoginController implements Controller {
     private final App app;
-    private final LoginService loginService;
+    private final AuthService authService;
     private final UserService userService;
     private Provider<SignUpController> signUpController;
     private Provider<LobbyController> lobbyController;
-    private IDStorage idStorage;
     @FXML
     public TextField usernameTextField;
     @FXML
@@ -38,17 +36,15 @@ public class LoginController implements Controller {
     public Label errorLabel;
 
     @Inject
-    public LoginController(App app, LoginService loginService,
+    public LoginController(App app, AuthService authService,
                            UserService userService,
                            Provider<SignUpController> signUpController,
-                           Provider<LobbyController> lobbyController,
-                           IDStorage idStorage) {
+                           Provider<LobbyController> lobbyController) {
         this.app = app;
-        this.loginService = loginService;
+        this.authService = authService;
         this.userService = userService;
         this.signUpController = signUpController;
         this.lobbyController = lobbyController;
-        this.idStorage = idStorage;
     }
 
     @Override
@@ -80,7 +76,7 @@ public class LoginController implements Controller {
     }
 
     public void login(String username, String password) {
-        loginService.login(username, password)
+        authService.login(username, password)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                     userService.statusUpdate(result, "online")

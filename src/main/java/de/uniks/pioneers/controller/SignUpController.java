@@ -2,7 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.LoginService;
+import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,18 +34,18 @@ public class SignUpController implements Controller {
     public Button backButton;
     private final App app;
     private Provider<LoginController> loginController;
-    private final LoginService loginService;
+    private final AuthService authService;
     private final UserService userService;
 
 
     @Inject
     public SignUpController(App app,
                             Provider<LoginController> loginController,
-                            LoginService loginService,
+                            AuthService authService,
                             UserService userService) {
         this.app = app;
         this.loginController = loginController;
-        this.loginService = loginService;
+        this.authService = authService;
         this.userService = userService;
     }
 
