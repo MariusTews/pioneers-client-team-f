@@ -6,6 +6,7 @@ import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
 import de.uniks.pioneers.service.UserService;
+import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
@@ -17,6 +18,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationTest;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class LobbyViewTest extends ApplicationTest {
@@ -41,6 +45,9 @@ public class LobbyViewTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         // start application
+        //init calls need to be mocked here
+        when(userService.findAllUsers()).thenReturn(Observable.empty());
+        when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
         this.stage = stage;
         this.app = new App(lobbyController);
         this.app.start(stage);
