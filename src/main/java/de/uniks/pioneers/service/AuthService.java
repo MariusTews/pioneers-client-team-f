@@ -1,5 +1,6 @@
 package de.uniks.pioneers.service;
 
+import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.dto.LoginDto;
 import de.uniks.pioneers.dto.LoginResult;
 import de.uniks.pioneers.rest.AuthApiService;
@@ -7,16 +8,16 @@ import io.reactivex.rxjava3.core.Observable;
 
 import javax.inject.Inject;
 
-public class LoginService {
+public class AuthService {
 
     private final AuthApiService authApiService;
     private final TokenStorage tokenStorage;
     private final IDStorage idStorage;
 
     @Inject
-    public LoginService(AuthApiService authApiService,
-                        TokenStorage tokenStorage,
-                        IDStorage idStorage) {
+    public AuthService(AuthApiService authApiService,
+                       TokenStorage tokenStorage,
+                       IDStorage idStorage) {
         this.authApiService = authApiService;
         this.tokenStorage = tokenStorage;
         this.idStorage = idStorage;
@@ -30,5 +31,10 @@ public class LoginService {
                     idStorage.setID(result._id());
                 })
                 .map(LoginResult::_id);
+    }
+
+    public Observable<ErrorResponse> logout() {
+        return authApiService
+                .logout();
     }
 }
