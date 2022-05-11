@@ -4,6 +4,8 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.AuthService;
+import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -53,7 +55,9 @@ public class LobbyController implements Controller {
     @FXML
     public Button createGameButton;
     private App app;
+    private IDStorage idStorage;
     private UserService userService;
+    private AuthService authService;
     private EventListener eventListener;
     private Provider <LoginController> loginController;
     private Provider<RulesScreenController> rulesScreenController;
@@ -61,14 +65,20 @@ public class LobbyController implements Controller {
     private Provider<EditUserController> editUserController;
 
     @Inject
-    public LobbyController(App app, UserService userService, EventListener eventListener,
+    public LobbyController(App app,
+                           IDStorage idStorage,
+                           UserService userService,
+                           AuthService authService,
+                           EventListener eventListener,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
                            Provider<EditUserController> editUserController) {
 
         this.app = app;
+        this.idStorage = idStorage;
         this.userService = userService;
+        this.authService = authService;
         this.eventListener = eventListener;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
@@ -137,8 +147,17 @@ public class LobbyController implements Controller {
     }
 
     public void logoutButtonPressed(ActionEvent event) {
-        final LoginController controller = loginController.get();
-        app.show(controller);
+        logout();
+    }
+
+    public void logout() {
+        userService.statusUpdate(idStorage.getID(), "offline")
+                        .observeOn(FX_SCHEDULER)
+                                .subscribe();
+        authService.logout()
+                        .observeOn(FX_SCHEDULER)
+                                .subscribe();
+        app.show(loginController.get());
     }
 
     public void sendButtonPressed(ActionEvent event) {
