@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -54,7 +53,11 @@
                   </HBox>
                </children>
             </VBox>
-            <ListView fx:id="gameListView" maxWidth="180.0" prefHeight="120.0" prefWidth="200.0" />
+            <ScrollPane fx:id="gamesScrollPane" prefHeight="200.0" prefWidth="200.0">
+               <content>
+                  <VBox prefHeight="375.0" prefWidth="190.0" spacing="6.0" />
+               </content>
+            </ScrollPane>
          </children>
       </HBox>
       <HBox alignment="TOP_CENTER" maxHeight="40.0" prefHeight="100.0" prefWidth="200.0" spacing="12.0">

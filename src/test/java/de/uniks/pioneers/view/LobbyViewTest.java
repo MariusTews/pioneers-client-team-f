@@ -5,6 +5,7 @@ import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
+import de.uniks.pioneers.service.GameService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
@@ -34,6 +35,9 @@ public class LobbyViewTest extends ApplicationTest {
     UserService userService;
 
     @Mock
+    GameService gameService;
+
+    @Mock
     EventListener eventListener;
 
     @InjectMocks
@@ -47,6 +51,7 @@ public class LobbyViewTest extends ApplicationTest {
         // start application
         //init calls need to be mocked here
         when(userService.findAllUsers()).thenReturn(Observable.empty());
+        when(gameService.findAllGames()).thenReturn(Observable.empty());
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
         this.stage = stage;
         this.app = new App(lobbyController);
@@ -65,8 +70,6 @@ public class LobbyViewTest extends ApplicationTest {
 
         TextField chatMessage = lookup("#chatMessageField").query();
 
-        ListView gamesList = lookup("#gameListView").query();
-
         Assertions.assertThat(rules.getText()).isEqualTo("Rules");
         Assertions.assertThat(logout.getText()).isEqualTo("Logout");
         Assertions.assertThat(editUser.getText()).isEqualTo("Edit User");
@@ -80,8 +83,6 @@ public class LobbyViewTest extends ApplicationTest {
         clickOn(chatMessage);
         write("test");
         Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
-
-        Assertions.assertThat(gamesList.getItems().isEmpty()).isTrue();
     }
 
     @Test

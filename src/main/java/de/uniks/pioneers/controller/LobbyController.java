@@ -4,8 +4,10 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
+import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.AuthService;
+import de.uniks.pioneers.service.GameService;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import javafx.collections.FXCollections;
@@ -31,8 +33,12 @@ import static de.uniks.pioneers.Constants.*;
 public class LobbyController implements Controller {
 
     private ObservableList<User> users = FXCollections.observableArrayList();
+    private ObservableList<Game> games = FXCollections.observableArrayList();
     private List<UserListSubController> userSubCons = new ArrayList<>();
+    private List<GameListSubController> gameSubCons = new ArrayList<>();
 
+    @FXML
+    public ScrollPane gamesScrollPane;
     @FXML
     public ScrollPane userScrollPane;
     @FXML
@@ -50,14 +56,13 @@ public class LobbyController implements Controller {
     @FXML
     public Button sendButton;
     @FXML
-    public ListView gameListView;
-    @FXML
     public Button editUserButton;
     @FXML
     public Button createGameButton;
     private App app;
     private IDStorage idStorage;
     private UserService userService;
+    private GameService gameService;
     private AuthService authService;
     private EventListener eventListener;
     private Provider <LoginController> loginController;
@@ -69,6 +74,7 @@ public class LobbyController implements Controller {
     public LobbyController(App app,
                            IDStorage idStorage,
                            UserService userService,
+                           GameService gameService,
                            AuthService authService,
                            EventListener eventListener,
                            Provider<LoginController> loginController,
@@ -79,6 +85,7 @@ public class LobbyController implements Controller {
         this.app = app;
         this.idStorage = idStorage;
         this.userService = userService;
+        this.gameService = gameService;
         this.authService = authService;
         this.eventListener = eventListener;
         this.loginController = loginController;
@@ -89,6 +96,7 @@ public class LobbyController implements Controller {
 
     @Override
     public void init() {
+        gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this.games::addAll);
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(users -> {
             List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
             List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
@@ -97,14 +105,18 @@ public class LobbyController implements Controller {
         });
 
         eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents);
+        eventListener.listen("games.*.*",Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents);
     }
 
     @Override
     public void destroy() {
         this.userSubCons.forEach(UserListSubController::destroy);
+        this.gameSubCons.forEach(GameListSubController::destroy);
         this.userSubCons.clear();
+        this.gameSubCons.clear();
 
         eventListener.listen("users.*.*", User.class).unsubscribeOn(FX_SCHEDULER);
+        eventListener.listen("games.*.*",Game.class).unsubscribeOn(FX_SCHEDULER);
     }
 
     @Override
@@ -121,6 +133,10 @@ public class LobbyController implements Controller {
 
         this.users.addListener((ListChangeListener<? super User>) c -> {
             ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
+        });
+
+        this.games.addListener((ListChangeListener<? super Game>) c -> {
+            ((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().map(this::renderGame).toList());
         });
 
         return parent;
@@ -178,6 +194,12 @@ public class LobbyController implements Controller {
         return userCon.render();
     }
 
+    private Node renderGame(Game game){
+        GameListSubController gameCon = new GameListSubController(this.app,game);
+        gameSubCons.add(gameCon);
+        return gameCon.render();
+    }
+
     private void handleUserEvents(Event<User> userEvent) {
         final User user = userEvent.data();
         if (userEvent.event().endsWith(CREATED)) {
@@ -188,6 +210,22 @@ public class LobbyController implements Controller {
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
                     this.users.set(this.users.indexOf(updatedUser),user);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void handleGameEvents(Event<Game> gameEvent) {
+        final Game game = gameEvent.data();
+        if (gameEvent.event().endsWith(CREATED)) {
+            this.games.add(game);
+        } else if (gameEvent.event().endsWith(DELETED)) {
+            this.games.removeIf(u -> u._id().equals(game._id()));
+        } else if (gameEvent.event().endsWith(UPDATED)) {
+            for (Game updatedGame : this.games) {
+                if (updatedGame._id().equals(game._id())) {
+                    this.games.set(this.games.indexOf(updatedGame),game);
                     break;
                 }
             }
