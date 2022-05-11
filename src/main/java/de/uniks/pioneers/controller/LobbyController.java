@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.IDStorage;
@@ -95,23 +96,7 @@ public class LobbyController implements Controller {
             this.users.addAll(offline);
         });
 
-        eventListener.listen("users.*.*", User.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(userEvent -> {
-                    final User user = userEvent.data();
-                    if (userEvent.event().endsWith(CREATED))
-                    {
-                        this.users.add(user);
-                    }
-                    else if(userEvent.event().endsWith(DELETED))
-                    {
-                        this.users.removeIf(u -> u._id().equals(user._id()));
-                    }
-                    else if (userEvent.event().endsWith(UPDATED))
-                    {
-                        this.users.replaceAll(u -> u._id().equals(user._id()) ? user: u);
-                    }
-                });
+        eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents);
     }
 
     @Override
@@ -191,5 +176,21 @@ public class LobbyController implements Controller {
         UserListSubController userCon = new UserListSubController(this.app,user);
         userSubCons.add(userCon);
         return userCon.render();
+    }
+
+    private void handleUserEvents(Event<User> userEvent) {
+        final User user = userEvent.data();
+        if (userEvent.event().endsWith(CREATED)) {
+            this.users.add(user);
+        } else if (userEvent.event().endsWith(DELETED)) {
+            this.users.removeIf(u -> u._id().equals(user._id()));
+        } else if (userEvent.event().endsWith(UPDATED)) {
+            for (User updatedUser : this.users) {
+                if (updatedUser._id().equals(user._id())) {
+                    this.users.set(this.users.indexOf(updatedUser),user);
+                    break;
+                }
+            }
+        }
     }
 }
