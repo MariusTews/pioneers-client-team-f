@@ -1,7 +1,6 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.Constants;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
@@ -11,6 +10,7 @@ import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.GameService;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
@@ -72,6 +71,10 @@ public class LobbyController implements Controller {
     private Provider<CreateGameController> createGameController;
     private Provider<EditUserController> editUserController;
 
+    private CompositeDisposable disposable = new CompositeDisposable();
+
+    private int i = 0;
+
     @Inject
     public LobbyController(App app,
                            IDStorage idStorage,
@@ -106,8 +109,8 @@ public class LobbyController implements Controller {
             this.users.addAll(offline);
         });
 
-        eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents);
-        eventListener.listen("games.*.*",Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents);
+        disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
+        disposable.add(eventListener.listen("games.*.*",Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
     }
 
     @Override
@@ -119,6 +122,8 @@ public class LobbyController implements Controller {
 
         eventListener.listen("users.*.*", User.class).unsubscribeOn(FX_SCHEDULER);
         eventListener.listen("games.*.*",Game.class).unsubscribeOn(FX_SCHEDULER);
+
+        disposable.dispose();
     }
 
     @Override
@@ -134,6 +139,8 @@ public class LobbyController implements Controller {
         }
 
         this.users.addListener((ListChangeListener<? super User>) c -> {
+            System.out.println(i);
+            i++;
             ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
         });
 
@@ -225,6 +232,7 @@ public class LobbyController implements Controller {
         }
 
         else if (userEvent.event().endsWith(UPDATED)) {
+            System.out.println(user.name() + " " + user.status());
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
                     removeUserSubCon(user);
