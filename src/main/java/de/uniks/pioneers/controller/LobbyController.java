@@ -1,6 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.Constants;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
@@ -26,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
@@ -132,11 +134,11 @@ public class LobbyController implements Controller {
         }
 
         this.users.addListener((ListChangeListener<? super User>) c -> {
-            ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
+            ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
         });
 
         this.games.addListener((ListChangeListener<? super Game>) c -> {
-            ((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().map(this::renderGame).toList());
+            ((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList());
         });
 
         return parent;
@@ -189,12 +191,22 @@ public class LobbyController implements Controller {
     }
 
     private Node renderUser(User user){
+        for(UserListSubController subCon: this.userSubCons) {
+            if (subCon.getId().equals(user._id())){
+                return subCon.getParent();
+            }
+        }
         UserListSubController userCon = new UserListSubController(this.app,user);
         userSubCons.add(userCon);
         return userCon.render();
     }
 
     private Node renderGame(Game game){
+        for(GameListSubController subCon: this.gameSubCons) {
+            if (subCon.getId().equals(game._id())){
+                return subCon.getParent();
+            }
+        }
         GameListSubController gameCon = new GameListSubController(this.app,game);
         gameSubCons.add(gameCon);
         return gameCon.render();
@@ -202,13 +214,20 @@ public class LobbyController implements Controller {
 
     private void handleUserEvents(Event<User> userEvent) {
         final User user = userEvent.data();
+
         if (userEvent.event().endsWith(CREATED)) {
             this.users.add(user);
-        } else if (userEvent.event().endsWith(DELETED)) {
+        }
+
+        else if (userEvent.event().endsWith(DELETED)) {
+            removeUserSubCon(user);
             this.users.removeIf(u -> u._id().equals(user._id()));
-        } else if (userEvent.event().endsWith(UPDATED)) {
+        }
+
+        else if (userEvent.event().endsWith(UPDATED)) {
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
+                    removeUserSubCon(user);
                     this.users.set(this.users.indexOf(updatedUser),user);
                     break;
                 }
@@ -216,18 +235,43 @@ public class LobbyController implements Controller {
         }
     }
 
+    private void removeUserSubCon(User updatedUser) {
+        for (UserListSubController subCon: this.userSubCons) {
+            if(subCon.getId().equals(updatedUser._id())){
+                this.userSubCons.remove(subCon);
+                break;
+            }
+        }
+    }
+
     private void handleGameEvents(Event<Game> gameEvent) {
         final Game game = gameEvent.data();
+
         if (gameEvent.event().endsWith(CREATED)) {
             this.games.add(game);
-        } else if (gameEvent.event().endsWith(DELETED)) {
+        }
+
+        else if (gameEvent.event().endsWith(DELETED)) {
+            removeGameSubcon(game);
             this.games.removeIf(u -> u._id().equals(game._id()));
-        } else if (gameEvent.event().endsWith(UPDATED)) {
+        }
+
+        else if (gameEvent.event().endsWith(UPDATED)) {
             for (Game updatedGame : this.games) {
                 if (updatedGame._id().equals(game._id())) {
+                    removeGameSubcon(updatedGame);
                     this.games.set(this.games.indexOf(updatedGame),game);
                     break;
                 }
+            }
+        }
+    }
+
+    private void removeGameSubcon(Game updatedGame) {
+        for (GameListSubController subCon: this.gameSubCons) {
+            if(subCon.getId().equals(updatedGame._id())){
+                this.gameSubCons.remove(subCon);
+                break;
             }
         }
     }
