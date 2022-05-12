@@ -4,6 +4,8 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -71,6 +73,9 @@ public class LoginController implements Controller {
         }
 
         signUpHyperlink.setOnAction(this::signUPHyperlinkPressed);
+
+        final BooleanBinding length = Bindings.greaterThan(8, userPasswordField.lengthProperty());
+        loginButton.disableProperty().bind(length);
 
         return parent;
     }

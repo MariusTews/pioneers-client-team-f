@@ -165,7 +165,7 @@ public class LobbyController implements Controller {
                         .observeOn(FX_SCHEDULER)
                                 .subscribe();
         authService.logout()
-                        .observeOn(FX_SCHEDULER)
+                        .subscribeOn(FX_SCHEDULER)
                                 .subscribe();
         app.show(loginController.get());
     }
