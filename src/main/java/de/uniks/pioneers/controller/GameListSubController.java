@@ -50,7 +50,7 @@ public class GameListSubController implements Controller {
 		}
 
 		if(game != null) {
-			this.gameNameLabel.setText(this.game.name());
+			this.gameNameLabel.setText(this.game.name() + " (" + game.members() + "/6)");
 		}
 
 		return parent;
