@@ -6,10 +6,9 @@ import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.AuthService;
-import de.uniks.pioneers.service.GameService;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -22,11 +21,13 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -65,10 +66,11 @@ public class LobbyController implements Controller {
     private GameService gameService;
     private AuthService authService;
     private EventListener eventListener;
-    private Provider <LoginController> loginController;
+    private Provider<LoginController> loginController;
     private Provider<RulesScreenController> rulesScreenController;
     private Provider<CreateGameController> createGameController;
     private Provider<EditUserController> editUserController;
+    private CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     public LobbyController(App app,
@@ -104,8 +106,8 @@ public class LobbyController implements Controller {
             this.users.addAll(offline);
         });
 
-        eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents);
-        eventListener.listen("games.*.*",Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents);
+        disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
+        disposable.add(eventListener.listen("games.*.*", Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
     }
 
     @Override
@@ -116,7 +118,9 @@ public class LobbyController implements Controller {
         this.gameSubCons.clear();
 
         eventListener.listen("users.*.*", User.class).unsubscribeOn(FX_SCHEDULER);
-        eventListener.listen("games.*.*",Game.class).unsubscribeOn(FX_SCHEDULER);
+        eventListener.listen("games.*.*", Game.class).unsubscribeOn(FX_SCHEDULER);
+
+        disposable.dispose();
     }
 
     @Override
@@ -153,11 +157,10 @@ public class LobbyController implements Controller {
 
     public void logout() {
         userService.statusUpdate(idStorage.getID(), "offline")
-                        .observeOn(FX_SCHEDULER)
-                                .subscribe();
+                .observeOn(FX_SCHEDULER)
+                .subscribe();
         authService.logout()
-                        .subscribeOn(FX_SCHEDULER)
-                                .subscribe();
+                .subscribe();
         app.show(loginController.get());
     }
 
@@ -188,14 +191,14 @@ public class LobbyController implements Controller {
         }
     }
 
-    private Node renderUser(User user){
-        UserListSubController userCon = new UserListSubController(this.app,user);
+    private Node renderUser(User user) {
+        UserListSubController userCon = new UserListSubController(this.app, user);
         userSubCons.add(userCon);
         return userCon.render();
     }
 
-    private Node renderGame(Game game){
-        GameListSubController gameCon = new GameListSubController(this.app,game);
+    private Node renderGame(Game game) {
+        GameListSubController gameCon = new GameListSubController(this.app, game);
         gameSubCons.add(gameCon);
         return gameCon.render();
     }
@@ -209,7 +212,7 @@ public class LobbyController implements Controller {
         } else if (userEvent.event().endsWith(UPDATED)) {
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
-                    this.users.set(this.users.indexOf(updatedUser),user);
+                    this.users.set(this.users.indexOf(updatedUser), user);
                     break;
                 }
             }
@@ -225,7 +228,7 @@ public class LobbyController implements Controller {
         } else if (gameEvent.event().endsWith(UPDATED)) {
             for (Game updatedGame : this.games) {
                 if (updatedGame._id().equals(game._id())) {
-                    this.games.set(this.games.indexOf(updatedGame),game);
+                    this.games.set(this.games.indexOf(updatedGame), game);
                     break;
                 }
             }
