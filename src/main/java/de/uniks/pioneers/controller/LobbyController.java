@@ -73,8 +73,6 @@ public class LobbyController implements Controller {
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
-    private int i = 0;
-
     @Inject
     public LobbyController(App app,
                            IDStorage idStorage,
@@ -139,8 +137,6 @@ public class LobbyController implements Controller {
         }
 
         this.users.addListener((ListChangeListener<? super User>) c -> {
-            System.out.println(i);
-            i++;
             ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
         });
 
@@ -232,7 +228,6 @@ public class LobbyController implements Controller {
         }
 
         else if (userEvent.event().endsWith(UPDATED)) {
-            System.out.println(user.name() + " " + user.status());
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
                     removeUserSubCon(user);
