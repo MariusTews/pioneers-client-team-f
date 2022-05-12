@@ -4,14 +4,13 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -71,6 +70,16 @@ public class SignUpController implements Controller {
             return null;
         }
 
+        final BooleanBinding match = Bindings.equal(passwordField.textProperty(), repeatPasswordField.textProperty());
+        final BooleanBinding length = Bindings.greaterThan(8, passwordField.lengthProperty());
+        errorLabel.textProperty().bind(
+                Bindings.when(match)
+                        .then("")
+                        .otherwise("Passwords do not match")
+        );
+        signUpButton.disableProperty().bind(length.or(match.not()));
+
+
         return parent;
     }
 
@@ -78,7 +87,13 @@ public class SignUpController implements Controller {
 
         userService.register(username, avatar, password)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result -> app.show(loginController.get()));
+                .subscribe(result -> {
+                    if (result._id() != null) {
+                        new Alert(Alert.AlertType.INFORMATION, "sign up successful")
+                                .showAndWait()
+                                .ifPresent((btn) -> app.show(loginController.get()));
+                    }
+                });
     }
 
 
