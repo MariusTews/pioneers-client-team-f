@@ -28,7 +28,11 @@ public class UserListSubController implements Controller {
 	@FXML
 	public Button chatButton;
 	private App app;
-	private User user;
+	private final User user;
+
+	private Parent parent;
+
+	private String id;
 
 	@Inject
 	public UserListSubController(App app, User user){
@@ -61,6 +65,7 @@ public class UserListSubController implements Controller {
 
 		if (this.user != null){
 			this.userNameLabel.setText(this.user.name());
+			this.id = user._id();
 
 			if (this.user.status().equals("online")){
 				this.userStatusCircle.setFill(Color.GREEN);
@@ -80,9 +85,18 @@ public class UserListSubController implements Controller {
 			}
 		}
 
+		this.parent = parent;
 		return parent;
 	}
 
 	public void chatButtonPressed(ActionEvent event) {
+	}
+
+	public Parent getParent() {
+		return parent;
+	}
+
+	public String getId() {
+		return id;
 	}
 }
