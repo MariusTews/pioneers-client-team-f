@@ -27,4 +27,8 @@ public class Constants {
     public static final String DELETED = ".deleted";
 
     public static final String UPDATED = ".updated";
+
+    //Messages
+    public static final String GROUPS = "groups";
+    public static final String GAMES = "games";
 }

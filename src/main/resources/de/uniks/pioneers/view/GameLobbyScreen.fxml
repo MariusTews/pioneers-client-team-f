@@ -53,7 +53,7 @@
                   </ScrollPane>
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <TextField fx:id="idMessageField" prefHeight="35.0" prefWidth="240.0" promptText="Type message">
+                        <TextField fx:id="idMessageField" onKeyPressed="#enterKeyPressed" prefHeight="35.0" prefWidth="240.0" promptText="Type message">
                            <style>-fx-background-radius: 10px;</style>
                            <HBox.margin>
                               <Insets right="5.0" />

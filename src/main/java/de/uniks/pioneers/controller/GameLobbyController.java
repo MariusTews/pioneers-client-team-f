@@ -23,11 +23,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -92,6 +95,8 @@ public class GameLobbyController implements Controller {
     @Override
     public void init() {
 
+        //TODO: remove
+        System.out.println("GameID: " + this.idStorage.getID());
         // get all game members
         gameMembersService
                 .getAllGameMembers(this.idStorage.getID())
@@ -100,7 +105,7 @@ public class GameLobbyController implements Controller {
 
         // get all messages
         messageService
-                .getAllMessages("games", this.idStorage.getID())
+                .getAllMessages(GAMES, this.idStorage.getID())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.messages::setAll);
 
@@ -141,19 +146,25 @@ public class GameLobbyController implements Controller {
         }
 
         // load game members
-        //TODO: load game members
-        members.addListener((ListChangeListener<? super Member>) c -> {
+        /*members.addListener((ListChangeListener<? super Member>) c -> {
             idUserList.getChildren().removeAll();
             for(Member member: c.getList()) {
-                idUserList.getChildren().add(constructUser(member));
+                idUserList.getChildren().add(renderUser(member));
             }
+        });*/
+        members.addListener((ListChangeListener<? super Member>) c -> {
+            this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
         });
 
         // load game lobby messages
         messages.addListener((ListChangeListener<? super Message>) c -> {
-            idMessageView.getChildren().removeAll();
+            idMessageView.getChildren().clear();
             for(Message message: c.getList()) {
-                idMessageView.getChildren().add(new Label(message.sender() + ": " + message.body()));
+                Label label = new Label();
+                userService.getUser(message.sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
+                    label.setText(result.name() + ": " + message.body());
+                    idMessageView.getChildren().add(label);
+                });
             }
         });
 
@@ -169,7 +180,14 @@ public class GameLobbyController implements Controller {
     }
 
     public void send(ActionEvent event) {
-        //TODO: send a message to all
+        this.checkMessageField();
+    }
+
+    // enter key for sending message
+    public void enterKeyPressed(KeyEvent event) {
+        if (event.getCode().equals(KeyCode.ENTER)) {
+            this.checkMessageField();
+        }
     }
 
     public void ready(ActionEvent event) {
@@ -179,8 +197,19 @@ public class GameLobbyController implements Controller {
     }
 
     // private methods
+
+    // checkMessageField
+    private void checkMessageField() {
+        if (!this.idMessageField.getText().isEmpty()) {
+            messageService
+                    .send(GAMES, idStorage.getID(), idMessageField.getText())
+                    .subscribe();
+            this.idMessageField.clear();
+        }
+    }
+
     // construct user by id
-    private Label constructUser(Member member) {
+    private Label renderUser(Member member) {
         Label label = new Label();
 
         userService
@@ -191,16 +220,5 @@ public class GameLobbyController implements Controller {
                 });
 
         return label;
-    }
-
-    private String getMemberName(String id) {
-        userService
-                .getUser(id)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    String name = result.name();
-                });
-
-        return null;
     }
 }
