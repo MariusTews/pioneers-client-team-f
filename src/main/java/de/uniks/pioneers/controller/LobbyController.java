@@ -10,6 +10,7 @@ import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.GameService;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -70,6 +71,8 @@ public class LobbyController implements Controller {
     private Provider<CreateGameController> createGameController;
     private Provider<EditUserController> editUserController;
 
+    private CompositeDisposable disposable = new CompositeDisposable();
+
     @Inject
     public LobbyController(App app,
                            IDStorage idStorage,
@@ -104,8 +107,8 @@ public class LobbyController implements Controller {
             this.users.addAll(offline);
         });
 
-        eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents);
-        eventListener.listen("games.*.*",Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents);
+        disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
+        disposable.add(eventListener.listen("games.*.*",Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
     }
 
     @Override
@@ -117,6 +120,8 @@ public class LobbyController implements Controller {
 
         eventListener.listen("users.*.*", User.class).unsubscribeOn(FX_SCHEDULER);
         eventListener.listen("games.*.*",Game.class).unsubscribeOn(FX_SCHEDULER);
+
+        disposable.dispose();
     }
 
     @Override
@@ -132,11 +137,11 @@ public class LobbyController implements Controller {
         }
 
         this.users.addListener((ListChangeListener<? super User>) c -> {
-            ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
+            ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
         });
 
         this.games.addListener((ListChangeListener<? super Game>) c -> {
-            ((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().map(this::renderGame).toList());
+            ((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList());
         });
 
         return parent;
@@ -156,7 +161,7 @@ public class LobbyController implements Controller {
                         .observeOn(FX_SCHEDULER)
                                 .subscribe();
         authService.logout()
-                        .observeOn(FX_SCHEDULER)
+                        .subscribeOn(FX_SCHEDULER)
                                 .subscribe();
         app.show(loginController.get());
     }
@@ -189,12 +194,22 @@ public class LobbyController implements Controller {
     }
 
     private Node renderUser(User user){
+        for(UserListSubController subCon: this.userSubCons) {
+            if (subCon.getId().equals(user._id())){
+                return subCon.getParent();
+            }
+        }
         UserListSubController userCon = new UserListSubController(this.app,user);
         userSubCons.add(userCon);
         return userCon.render();
     }
 
     private Node renderGame(Game game){
+        for(GameListSubController subCon: this.gameSubCons) {
+            if (subCon.getId().equals(game._id())){
+                return subCon.getParent();
+            }
+        }
         GameListSubController gameCon = new GameListSubController(this.app,game);
         gameSubCons.add(gameCon);
         return gameCon.render();
@@ -202,13 +217,20 @@ public class LobbyController implements Controller {
 
     private void handleUserEvents(Event<User> userEvent) {
         final User user = userEvent.data();
+
         if (userEvent.event().endsWith(CREATED)) {
             this.users.add(user);
-        } else if (userEvent.event().endsWith(DELETED)) {
+        }
+
+        else if (userEvent.event().endsWith(DELETED)) {
+            removeUserSubCon(user);
             this.users.removeIf(u -> u._id().equals(user._id()));
-        } else if (userEvent.event().endsWith(UPDATED)) {
+        }
+
+        else if (userEvent.event().endsWith(UPDATED)) {
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
+                    removeUserSubCon(user);
                     this.users.set(this.users.indexOf(updatedUser),user);
                     break;
                 }
@@ -216,18 +238,43 @@ public class LobbyController implements Controller {
         }
     }
 
+    private void removeUserSubCon(User updatedUser) {
+        for (UserListSubController subCon: this.userSubCons) {
+            if(subCon.getId().equals(updatedUser._id())){
+                this.userSubCons.remove(subCon);
+                break;
+            }
+        }
+    }
+
     private void handleGameEvents(Event<Game> gameEvent) {
         final Game game = gameEvent.data();
+
         if (gameEvent.event().endsWith(CREATED)) {
             this.games.add(game);
-        } else if (gameEvent.event().endsWith(DELETED)) {
+        }
+
+        else if (gameEvent.event().endsWith(DELETED)) {
+            removeGameSubcon(game);
             this.games.removeIf(u -> u._id().equals(game._id()));
-        } else if (gameEvent.event().endsWith(UPDATED)) {
+        }
+
+        else if (gameEvent.event().endsWith(UPDATED)) {
             for (Game updatedGame : this.games) {
                 if (updatedGame._id().equals(game._id())) {
+                    removeGameSubcon(updatedGame);
                     this.games.set(this.games.indexOf(updatedGame),game);
                     break;
                 }
+            }
+        }
+    }
+
+    private void removeGameSubcon(Game updatedGame) {
+        for (GameListSubController subCon: this.gameSubCons) {
+            if(subCon.getId().equals(updatedGame._id())){
+                this.gameSubCons.remove(subCon);
+                break;
             }
         }
     }
