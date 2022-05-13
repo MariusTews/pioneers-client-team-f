@@ -9,6 +9,7 @@ import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameMembersService;
+import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MessageService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -60,6 +61,8 @@ public class GameLobbyController implements Controller {
     public Button idStartGameButton;
     @FXML
     public VBox idUserList;
+    @FXML
+    public VBox idMessageView;
 
     private final App app;
     private final GameMembersService gameMembersService;
@@ -67,7 +70,7 @@ public class GameLobbyController implements Controller {
     private final MessageService messageService;
     private final Provider<LobbyController> lobbyController;
     private final EventListener eventListener;
-    public VBox idMessageView;
+    private final IDStorage idStorage;
 
     @Inject
     public GameLobbyController(App app,
@@ -75,33 +78,35 @@ public class GameLobbyController implements Controller {
                                UserService userService,
                                MessageService messageService,
                                Provider<LobbyController> lobbyController,
-                               EventListener eventListener) {
+                               EventListener eventListener,
+                               IDStorage idStorage) {
         this.app = app;
         this.gameMembersService = gameMembersService;
         this.userService = userService;
         this.messageService = messageService;
         this.lobbyController = lobbyController;
         this.eventListener = eventListener;
+        this.idStorage = idStorage;
     }
 
     @Override
     public void init() {
-        //TODO: remove later because of use of concrete variable for testGAME
-        // get gameId from somewhere else
+
+        // get all game members
         gameMembersService
-                .getAllGameMembers("6279a76625989c0014457670")
+                .getAllGameMembers(this.idStorage.getID())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.members::setAll);
 
         // get all messages
         messageService
-                .getAllMessages("games", "6279a76625989c0014457670")
+                .getAllMessages("games", this.idStorage.getID())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.messages::setAll);
 
         // listen to game lobby messages
         eventListener
-                .listen("games.6279a76625989c0014457670.*.*.*", Message.class)
+                .listen("games." + idStorage.getID() + ".*.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Message message = event.data();
@@ -173,6 +178,7 @@ public class GameLobbyController implements Controller {
     public void startGame(ActionEvent event) {
     }
 
+    // private methods
     // construct user by id
     private Label constructUser(Member member) {
         Label label = new Label();
@@ -186,4 +192,14 @@ public class GameLobbyController implements Controller {
 
         return label;
     }
+
+    /*private String getMemberName(String id) {
+        userService
+                .getUser(id)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    String name = result.name();
+                });
+
+    }*/
 }
