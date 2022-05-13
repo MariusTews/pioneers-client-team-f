@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="200.0" spacing="10.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameListSubController">
+   <children>
+      <Label fx:id="gameNameLabel" prefHeight="17.0" prefWidth="100.0" text="gamename" />
+      <Button fx:id="joinButton" mnemonicParsing="false" onAction="#joinButtonPressed" text="join" />
+   </children>
+</HBox>

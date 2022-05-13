@@ -15,7 +15,6 @@ public class App extends Application {
     private Stage stage;
 
     private Controller controller;
-    private Controller testController;
 
     public App(){
         final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
@@ -23,13 +22,11 @@ public class App extends Application {
     }
 
     public App(Controller controller){
-        testController = controller;
+        this.controller = controller;
     }
 
     @Override
     public void start(Stage primaryStage) {
-        final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
-
         this.stage = primaryStage;
         stage.setWidth(640);
         stage.setHeight(480);
@@ -43,10 +40,6 @@ public class App extends Application {
         primaryStage.show();
         if(controller != null) {
             show(controller);
-        }
-
-        if (testController != null){
-            showTest(testController);
         }
     }
 
@@ -78,12 +71,6 @@ public class App extends Application {
         cleanup();
         this.controller = controller;
         controller.init();
-        stage.getScene().setRoot(controller.render());
-    }
-
-    public void showTest(Controller controller){
-        cleanup();
-        this.controller = controller;
         stage.getScene().setRoot(controller.render());
     }
 

@@ -1,6 +1,7 @@
 package de.uniks.pioneers.rest;
 
 import de.uniks.pioneers.dto.CreateUserDto;
+import de.uniks.pioneers.dto.StatusUpdateDto;
 import de.uniks.pioneers.dto.UpdateUserDto;
 import de.uniks.pioneers.model.User;
 import retrofit2.http.*;
@@ -20,6 +21,9 @@ public interface UserApiService {
 
     @PATCH("users/{id}")
     Observable<User> updateUser(@Path("id") String id, @Body UpdateUserDto dto);
+
+    @PATCH("users/{id}")
+    Observable<User> statusUpdate(@Path("id") String id, @Body StatusUpdateDto dto);
 
     @DELETE("users/{id}")
     Observable<User> deleteUser(@Path("id") String id);
