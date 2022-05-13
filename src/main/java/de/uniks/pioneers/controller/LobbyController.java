@@ -73,7 +73,6 @@ public class LobbyController implements Controller {
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
-
     @Inject
     public LobbyController(App app,
                            IDStorage idStorage,
@@ -229,7 +228,6 @@ public class LobbyController implements Controller {
         }
 
         else if (userEvent.event().endsWith(UPDATED)) {
-            System.out.println(user.name() + " " + user.status());
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
                     removeUserSubCon(user);
