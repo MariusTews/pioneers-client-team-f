@@ -37,4 +37,12 @@ public class UserService {
     public Observable<List<User>> findAllUsers() {
         return this.userApiService.findAllUsers();
     }
+
+    public Observable<User> delete(String id) {
+        return userApiService.deleteUser(id);
+    }
+
+    public Observable<User>findOne(String id){
+        return userApiService.findUser(id);
+    }
 }
