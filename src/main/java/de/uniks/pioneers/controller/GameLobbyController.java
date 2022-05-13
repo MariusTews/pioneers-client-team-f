@@ -156,16 +156,15 @@ public class GameLobbyController implements Controller {
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
         });
 
-        // load game lobby messages
+        // load and update game lobby messages
         messages.addListener((ListChangeListener<? super Message>) c -> {
-            idMessageView.getChildren().clear();
-            for(Message message: c.getList()) {
-                Label label = new Label();
-                userService.getUser(message.sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
-                    label.setText(result.name() + ": " + message.body());
-                    idMessageView.getChildren().add(label);
-                });
-            }
+            int indexLastElem = c.getList().size() - 1;
+            Label label = new Label();
+            userService.getUser(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
+                label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
+                idMessageView.getChildren().add(label);
+                System.out.println("Send: " + label.getText());
+            });
         });
 
         // disable start game button when entering lobby
