@@ -66,6 +66,8 @@ public class GameLobbyController implements Controller {
     public VBox idUserList;
     @FXML
     public VBox idMessageView;
+    @FXML
+    public ScrollPane idChatScrollPane;
 
     private final App app;
     private final GameMembersService gameMembersService;
@@ -165,6 +167,8 @@ public class GameLobbyController implements Controller {
                 idMessageView.getChildren().add(label);
                 System.out.println("Send: " + label.getText());
             });
+            //this.idChatScrollPane.setVvalue(1.0);
+            this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
         });
 
         // disable start game button when entering lobby
