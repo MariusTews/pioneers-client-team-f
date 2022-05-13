@@ -1,29 +1,20 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.Constants;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
-import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
-import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameMembersService;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MessageService;
 import de.uniks.pioneers.service.UserService;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -47,7 +38,7 @@ public class GameLobbyController implements Controller {
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
 
     @FXML
-    public Text idTitle;
+    public Label idTitleLabel;
     @FXML
     public Button idLeaveButton;
     @FXML
@@ -96,9 +87,6 @@ public class GameLobbyController implements Controller {
 
     @Override
     public void init() {
-
-        //TODO: remove
-        System.out.println("GameID: " + this.idStorage.getID());
         // get all game members
         gameMembersService
                 .getAllGameMembers(this.idStorage.getID())
@@ -148,12 +136,6 @@ public class GameLobbyController implements Controller {
         }
 
         // load game members
-        /*members.addListener((ListChangeListener<? super Member>) c -> {
-            idUserList.getChildren().removeAll();
-            for(Member member: c.getList()) {
-                idUserList.getChildren().add(renderUser(member));
-            }
-        });*/
         members.addListener((ListChangeListener<? super Member>) c -> {
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
         });
@@ -167,11 +149,10 @@ public class GameLobbyController implements Controller {
                 idMessageView.getChildren().add(label);
                 System.out.println("Send: " + label.getText());
             });
-            //this.idChatScrollPane.setVvalue(1.0);
             this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
         });
 
-        // disable start game button when entering lobby
+        // disable start game button when entering the GameLobby
         idStartGameButton.disableProperty().set(true);
 
         return parent;
@@ -211,7 +192,7 @@ public class GameLobbyController implements Controller {
         }
     }
 
-    // construct user by id
+    // render user by id
     private Label renderUser(Member member) {
         Label label = new Label();
 

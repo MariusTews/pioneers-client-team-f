@@ -14,7 +14,7 @@
    <children>
       <HBox alignment="CENTER_RIGHT" prefHeight="90.0" prefWidth="640.0">
          <children>
-            <Label fx:id="idTitleLabel" text="Welcome to -the game-">
+            <Label fx:id="idTitleLabel">
                <font>
                   <Font name="Arial Bold" size="24.0" />
                </font>
