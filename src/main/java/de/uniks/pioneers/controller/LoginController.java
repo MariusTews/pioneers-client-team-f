@@ -83,6 +83,11 @@ public class LoginController implements Controller {
     public void login(String username, String password) {
         authService.login(username, password)
                 .observeOn(FX_SCHEDULER)
+                .doOnError(error -> {
+                    if ("HTTP 401 ".equals(error.getMessage())) {
+                        errorLabel.setText("Invalid username or password");
+                    }
+                })
                 .subscribe(result -> {
                     userService.statusUpdate(result, "online")
                                     .observeOn(FX_SCHEDULER)
