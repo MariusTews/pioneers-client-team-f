@@ -84,10 +84,8 @@ public class LoginController implements Controller {
         authService.login(username, password)
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error -> {
-                    switch (error.getMessage()) {
-                        case "HTTP 401 ":
-                            new Alert(Alert.AlertType.ERROR, "Invalid username or password")
-                                    .showAndWait();
+                    if ("HTTP 401 ".equals(error.getMessage())) {
+                        errorLabel.setText("Invalid username or password");
                     }
                 })
                 .subscribe(result -> {
