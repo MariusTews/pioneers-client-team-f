@@ -72,12 +72,14 @@ public class SignUpController implements Controller {
 
         final BooleanBinding match = Bindings.equal(passwordField.textProperty(), repeatPasswordField.textProperty());
         final BooleanBinding length = Bindings.greaterThan(8, passwordField.lengthProperty());
+        final BooleanBinding usernameLengthMax = Bindings.greaterThan(33, usernameTextField.lengthProperty());
+        final BooleanBinding usernameLengthMin = Bindings.greaterThan(1, usernameTextField.lengthProperty());
         errorLabel.textProperty().bind(
                 Bindings.when(match)
                         .then("")
                         .otherwise("Passwords do not match")
         );
-        signUpButton.disableProperty().bind(length.or(match.not()));
+        signUpButton.disableProperty().bind(length.or(match.not()).or(usernameLengthMax.not().or(usernameLengthMin)));
 
 
         return parent;
