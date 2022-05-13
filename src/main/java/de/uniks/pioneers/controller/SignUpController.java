@@ -87,6 +87,12 @@ public class SignUpController implements Controller {
 
         userService.register(username, avatar, password)
                 .observeOn(FX_SCHEDULER)
+                .doOnError(error -> {
+                    if (error.getMessage().equals("HTTP 409 ")) {
+                        new Alert(Alert.AlertType.ERROR, "Username already taken")
+                                .showAndWait();
+                    }
+                })
                 .subscribe(result -> {
                     if (result._id() != null) {
                         new Alert(Alert.AlertType.INFORMATION, "sign up successful")
