@@ -193,7 +193,7 @@ public class GameLobbyController implements Controller {
         return label;
     }
 
-    /*private String getMemberName(String id) {
+    private String getMemberName(String id) {
         userService
                 .getUser(id)
                 .observeOn(FX_SCHEDULER)
@@ -201,5 +201,6 @@ public class GameLobbyController implements Controller {
                     String name = result.name();
                 });
 
-    }*/
+        return null;
+    }
 }

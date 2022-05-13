@@ -34,19 +34,16 @@ public class CreateGameController implements Controller {
     @FXML
     public PasswordField passwordTextField;
     private final App app;
-    private final IDStorage idStorage;
 
     @Inject
     public CreateGameController(App app,
                                 GameService gameService,
                                 Provider<LobbyController> lobbyController,
-                                Provider<GameLobbyController> gameLobbyController,
-                                IDStorage idStorage) {
+                                Provider<GameLobbyController> gameLobbyController) {
         this.app = app;
         this.gameLobbyController = gameLobbyController;
         this.lobbyController = lobbyController;
         this.gameService = gameService;
-        this.idStorage = idStorage;
     }
 
     @Override
@@ -85,9 +82,6 @@ public class CreateGameController implements Controller {
 
         // create game and pass gameId
         gameObservable.observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    this.idStorage.setID(result._id());
-                    app.show(gameLobbyController.get());
-                });
+                .subscribe(result -> app.show(gameLobbyController.get()));
     }
 }
