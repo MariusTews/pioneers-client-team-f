@@ -24,7 +24,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -140,7 +139,7 @@ public class GameLobbyController implements Controller {
         messages.addListener((ListChangeListener<? super Message>) c -> {
             int indexLastElem = c.getList().size() - 1;
             Label label = new Label();
-            userService.getUser(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
+            userService.findOne(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
                 label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
                 idMessageView.getChildren().add(label);
                 System.out.println("Send: " + label.getText());
@@ -193,7 +192,7 @@ public class GameLobbyController implements Controller {
         Label label = new Label();
 
         userService
-                .getUser(member.userId())
+                .findOne(member.userId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                     label.setText(result.name() + " - ready: " + member.ready());
