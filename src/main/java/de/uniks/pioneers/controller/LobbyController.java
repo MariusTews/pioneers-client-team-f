@@ -5,11 +5,9 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.model.Group;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.AuthService;
-import de.uniks.pioneers.service.GameService;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -35,6 +33,8 @@ public class LobbyController implements Controller {
 
     private ObservableList<User> users = FXCollections.observableArrayList();
     private ObservableList<Game> games = FXCollections.observableArrayList();
+
+    private ObservableList<Group> groups = FXCollections.observableArrayList();
     private List<UserListSubController> userSubCons = new ArrayList<>();
     private List<GameListSubController> gameSubCons = new ArrayList<>();
 
@@ -64,6 +64,8 @@ public class LobbyController implements Controller {
     private IDStorage idStorage;
     private UserService userService;
     private GameService gameService;
+    private GroupService groupService;
+    private MessageService messageService;
     private AuthService authService;
     private EventListener eventListener;
     private Provider <LoginController> loginController;
@@ -78,6 +80,8 @@ public class LobbyController implements Controller {
                            IDStorage idStorage,
                            UserService userService,
                            GameService gameService,
+                           GroupService groupService,
+                           MessageService messageService,
                            AuthService authService,
                            EventListener eventListener,
                            Provider<LoginController> loginController,
@@ -89,6 +93,8 @@ public class LobbyController implements Controller {
         this.idStorage = idStorage;
         this.userService = userService;
         this.gameService = gameService;
+        this.groupService = groupService;
+        this.messageService = messageService;
         this.authService = authService;
         this.eventListener = eventListener;
         this.loginController = loginController;
@@ -100,12 +106,8 @@ public class LobbyController implements Controller {
     @Override
     public void init() {
         gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this.games::addAll);
-        userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(users -> {
-            List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
-            List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
-            this.users.addAll(online);
-            this.users.addAll(offline);
-        });
+        userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
+        groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this.groups::addAll);
 
         disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
         disposable.add(eventListener.listen("games.*.*",Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
@@ -144,6 +146,7 @@ public class LobbyController implements Controller {
             ((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList());
         });
 
+        tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
         return parent;
     }
 
@@ -199,7 +202,7 @@ public class LobbyController implements Controller {
                 return subCon.getParent();
             }
         }
-        UserListSubController userCon = new UserListSubController(this.app,user);
+        UserListSubController userCon = new UserListSubController(this.app, this, user);
         userSubCons.add(userCon);
         return userCon.render();
     }
@@ -277,5 +280,31 @@ public class LobbyController implements Controller {
                 break;
             }
         }
+    }
+
+    public void openDirectChat(User user)
+    {
+        if (user._id().equals(this.idStorage.getID())){
+            return;
+        }
+        List<Tab> tabs = this.tabPane.getTabs();
+
+        for (Tab tab: tabs){
+            if (tab.getText().equals(DirectMessage + user.name())){
+                return;
+            }
+        }
+
+        Tab tab = new Tab();
+        tab.setText(DirectMessage + user.name());
+        tab.setClosable(true);
+        this.tabPane.getTabs().add(tab);
+    }
+
+    private void loadUsers(List<User> users) {
+        List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
+        List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
+        this.users.addAll(online);
+        this.users.addAll(offline);
     }
 }

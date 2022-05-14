@@ -28,6 +28,7 @@ public class UserListSubController implements Controller {
 	@FXML
 	public Button chatButton;
 	private App app;
+	private LobbyController lobbyController;
 	private final User user;
 
 	private Parent parent;
@@ -35,9 +36,10 @@ public class UserListSubController implements Controller {
 	private String id;
 
 	@Inject
-	public UserListSubController(App app, User user){
+	public UserListSubController(App app, LobbyController lobbyController, User user){
 
 		this.app = app;
+		this.lobbyController = lobbyController;
 		this.user = user;
 	}
 
@@ -90,6 +92,7 @@ public class UserListSubController implements Controller {
 	}
 
 	public void chatButtonPressed(ActionEvent event) {
+		this.lobbyController.openDirectChat(this.user);
 	}
 
 	public Parent getParent() {

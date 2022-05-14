@@ -18,6 +18,8 @@ import org.testfx.framework.junit5.ApplicationTest;
 @ExtendWith(MockitoExtension.class)
 public class UserListSubControllerTest extends ApplicationTest {
 
+	@Mock
+	LobbyController lobbyController;
 	@InjectMocks
 	UserListSubController userListSubController;
 	private Stage stage;

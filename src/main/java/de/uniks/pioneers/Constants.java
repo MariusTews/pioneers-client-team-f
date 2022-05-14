@@ -37,4 +37,8 @@ public class Constants {
     public static final Comparator<User> userComparator = Comparator.comparing(User::status).reversed().thenComparing(User::name);
 
     public static final Comparator<Game> gameComparator = Comparator.comparing(Game::name);
+
+    //Tabname
+    public static final String DirectMessage = "DirectMessage ";
+
 }

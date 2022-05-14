@@ -6,6 +6,8 @@ import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
 import de.uniks.pioneers.service.GameService;
+import de.uniks.pioneers.service.GroupService;
+import de.uniks.pioneers.service.MessageService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
@@ -38,6 +40,12 @@ public class LobbyViewTest extends ApplicationTest {
     GameService gameService;
 
     @Mock
+    GroupService groupService;
+
+    @Mock
+    MessageService messageService;
+
+    @Mock
     EventListener eventListener;
 
     @InjectMocks
@@ -53,6 +61,7 @@ public class LobbyViewTest extends ApplicationTest {
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(gameService.findAllGames()).thenReturn(Observable.empty());
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
+        when(groupService.getAll()).thenReturn(Observable.empty());
         this.stage = stage;
         this.app = new App(lobbyController);
         this.app.start(stage);
