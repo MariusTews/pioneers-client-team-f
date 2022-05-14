@@ -107,10 +107,6 @@ public class GameLobbyController implements Controller {
                     final Message message = event.data();
                    if (event.event().endsWith(CREATED)) {
                        messages.add(message);
-                   } else if (event.event().endsWith(UPDATED)) {
-                        // how do messages getting updated
-                   } else if (event.event().endsWith(DELETED)) {
-                       // implement later
                    }
                 });
 
