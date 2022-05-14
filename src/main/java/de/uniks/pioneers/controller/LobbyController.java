@@ -107,7 +107,7 @@ public class LobbyController implements Controller {
     public void init() {
         gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this.games::addAll);
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
-        groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this.groups::addAll);
+        groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this::loadGroups);
 
         disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
         disposable.add(eventListener.listen("games.*.*",Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
@@ -291,6 +291,7 @@ public class LobbyController implements Controller {
 
         for (Tab tab: tabs){
             if (tab.getText().equals(DirectMessage + user.name())){
+                checkGroups(user);
                 return;
             }
         }
@@ -298,7 +299,26 @@ public class LobbyController implements Controller {
         Tab tab = new Tab();
         tab.setText(DirectMessage + user.name());
         tab.setClosable(true);
+        checkGroups(user);
         this.tabPane.getTabs().add(tab);
+    }
+
+    private void checkGroups(User user) {
+        List<Group> groupList = this.groups;
+
+        for (Group group: groupList){
+            if (group.members().size() == 2 && group.members().contains(user._id()) && group.members().contains(this.idStorage.getID()))
+            {
+                return;
+            }
+        }
+        String userId = this.idStorage.getID() ;
+
+        List<String> toAdd = new ArrayList<>();
+        toAdd.add(userId);
+        toAdd.add(user._id());
+
+        this.groupService.createGroup(toAdd).observeOn(FX_SCHEDULER).subscribe(this.groups::add);
     }
 
     private void loadUsers(List<User> users) {
@@ -306,5 +326,9 @@ public class LobbyController implements Controller {
         List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
         this.users.addAll(online);
         this.users.addAll(offline);
+    }
+
+    private void loadGroups(List<Group> groups) {
+        this.groups.addAll(groups);
     }
 }

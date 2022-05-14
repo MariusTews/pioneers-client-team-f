@@ -1,5 +1,6 @@
 package de.uniks.pioneers.service;
 
+import de.uniks.pioneers.dto.CreateGroupDto;
 import de.uniks.pioneers.model.Group;
 import de.uniks.pioneers.rest.GroupApiService;
 import io.reactivex.rxjava3.core.Observable;
@@ -20,5 +21,8 @@ public class GroupService {
         return groupApiService.getAll();
     }
 
-
+    public Observable<Group> createGroup( List<String> toAdd) {
+        return groupApiService
+                .create(new CreateGroupDto(null,toAdd));
+    }
 }
