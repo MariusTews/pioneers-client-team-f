@@ -14,12 +14,15 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 public class GameListSubController implements Controller {
+	private String id;
 	@FXML
 	public Label gameNameLabel;
 	@FXML
 	public Button joinButton;
-	private Game game;
+	private final Game game;
 	private App app;
+
+	private Parent parent;
 
 	@Inject
 	public GameListSubController(App app, Game game){
@@ -51,12 +54,22 @@ public class GameListSubController implements Controller {
 
 		if(game != null) {
 			this.gameNameLabel.setText(this.game.name() + " (" + game.members() + "/6)");
+			this.id = game._id();
 		}
 
+		this.parent = parent;
 		return parent;
 	}
 
 	public void joinButtonPressed(ActionEvent event) {
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public Parent getParent() {
+		return parent;
 	}
 }
 
