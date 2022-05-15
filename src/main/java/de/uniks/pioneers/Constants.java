@@ -33,6 +33,10 @@ public class Constants {
 
     public static final String UPDATED = ".updated";
 
+    //Messages
+    public static final String GROUPS = "groups";
+    public static final String GAMES = "games";
+
     //Sorting
     public static final Comparator<User> userComparator = Comparator.comparing(User::status).reversed().thenComparing(User::name);
 

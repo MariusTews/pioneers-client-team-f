@@ -1,41 +1,70 @@
 package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.controller.LobbyController;
+import de.uniks.pioneers.service.GameMembersService;
+import de.uniks.pioneers.service.IDStorage;
+import de.uniks.pioneers.service.MessageService;
+import de.uniks.pioneers.service.UserService;
+import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 
-import javax.inject.Provider;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-public class GameLobbyScreenTest extends ApplicationTest {
+@ExtendWith(MockitoExtension.class)
+public class GameLobbyViewTest extends ApplicationTest {
+    @Mock
+    GameMembersService gameMembersService;
+
+    @Mock
+    UserService userService;
+
+    @Mock
+    MessageService messageService;
+
+    @Mock
+    LobbyController lobbyController;
+
+    @Mock
+    EventListener eventListener;
+
+    @Spy
+    IDStorage idStorage;
+
+    @InjectMocks
+    GameLobbyController gameLobbyController;
 
     private Stage stage;
     private App app;
 
     @Override
     public void start(Stage stage) {
+        // empty init
+        when(gameMembersService.getAllGameMembers(any())).thenReturn(Observable.empty());
+        when(messageService.getAllMessages(any(), any())).thenReturn(Observable.empty());
+        when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         // start application
         this.stage = stage;
-        this.app = new App();
+        this.app = new App(gameLobbyController);
         this.app.start(stage);
     }
 
     @Test
-    public void testGameLobbyScreen() {
-        // show GameLobbyScreen
-        app.show(new GameLobbyController(new App(), new Provider<LobbyController>() {
-            @Override
-            public LobbyController get() {
-                return null;
-            }
-        }));
-
+    public void testGameLobbyUIElement() {
         // buttons
         Button leaveButton = lookup("#idLeaveButton").query();
         Button sendButton = lookup("#idSendButton").query();
@@ -55,7 +84,7 @@ public class GameLobbyScreenTest extends ApplicationTest {
         Assertions.assertEquals(startGameButton.getText(), "Start Game");
 
         // assertion title
-        Assertions.assertEquals(titleLabel.getText(), "Welcome to -the game-");
+        Assertions.assertEquals(titleLabel.getText(), "");
 
         // assertion message field
         clickOn(messageField);

@@ -19,6 +19,4 @@ public class GroupService {
     public Observable<List<Group>> getAll() {
         return groupApiService.getAll();
     }
-
-
 }
