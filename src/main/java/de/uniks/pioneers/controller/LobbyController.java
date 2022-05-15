@@ -31,12 +31,14 @@ import static de.uniks.pioneers.Constants.*;
 
 public class LobbyController implements Controller {
 
-    private ObservableList<User> users = FXCollections.observableArrayList();
-    private ObservableList<Game> games = FXCollections.observableArrayList();
+    private final ObservableList<User> users = FXCollections.observableArrayList();
+    private final ObservableList<Game> games = FXCollections.observableArrayList();
 
-    private ObservableList<Group> groups = FXCollections.observableArrayList();
-    private List<UserListSubController> userSubCons = new ArrayList<>();
-    private List<GameListSubController> gameSubCons = new ArrayList<>();
+    private final ObservableList<Group> groups = FXCollections.observableArrayList();
+    private final List<UserListSubController> userSubCons = new ArrayList<>();
+    private final List<GameListSubController> gameSubCons = new ArrayList<>();
+
+    private final List<DirectChatStorage> directChatStorages = new ArrayList<>();
 
     @FXML
     public ScrollPane gamesScrollPane;
@@ -60,20 +62,20 @@ public class LobbyController implements Controller {
     public Button editUserButton;
     @FXML
     public Button createGameButton;
-    private App app;
-    private IDStorage idStorage;
-    private UserService userService;
-    private GameService gameService;
-    private GroupService groupService;
-    private MessageService messageService;
-    private AuthService authService;
-    private EventListener eventListener;
-    private Provider <LoginController> loginController;
-    private Provider<RulesScreenController> rulesScreenController;
-    private Provider<CreateGameController> createGameController;
-    private Provider<EditUserController> editUserController;
+    private final App app;
+    private final IDStorage idStorage;
+    private final UserService userService;
+    private final GameService gameService;
+    private final GroupService groupService;
+    private final MessageService messageService;
+    private final AuthService authService;
+    private final EventListener eventListener;
+    private final Provider <LoginController> loginController;
+    private final Provider<RulesScreenController> rulesScreenController;
+    private final Provider<CreateGameController> createGameController;
+    private final Provider<EditUserController> editUserController;
 
-    private CompositeDisposable disposable = new CompositeDisposable();
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     public LobbyController(App app,
@@ -119,6 +121,7 @@ public class LobbyController implements Controller {
         this.gameSubCons.forEach(GameListSubController::destroy);
         this.userSubCons.clear();
         this.gameSubCons.clear();
+        this.directChatStorages.clear();
 
         eventListener.listen("users.*.*", User.class).unsubscribeOn(FX_SCHEDULER);
         eventListener.listen("games.*.*",Game.class).unsubscribeOn(FX_SCHEDULER);
@@ -150,12 +153,12 @@ public class LobbyController implements Controller {
         return parent;
     }
 
-    public void rulesButtonPressed(ActionEvent event) {
+    public void rulesButtonPressed(ActionEvent ignoredEvent) {
         final RulesScreenController controller = rulesScreenController.get();
         app.show(controller);
     }
 
-    public void logoutButtonPressed(ActionEvent event) {
+    public void logoutButtonPressed(ActionEvent ignoredEvent) {
         logout();
     }
 
@@ -169,16 +172,16 @@ public class LobbyController implements Controller {
         app.show(loginController.get());
     }
 
-    public void sendButtonPressed(ActionEvent event) {
+    public void sendButtonPressed(ActionEvent ignoredEvent) {
         checkMessageField();
     }
 
-    public void editButtonPressed(ActionEvent event) {
+    public void editButtonPressed(ActionEvent ignoredEvent) {
         final EditUserController controller = editUserController.get();
         app.show(controller);
     }
 
-    public void createGameButtonPressed(ActionEvent event) {
+    public void createGameButtonPressed(ActionEvent ignoredEvent) {
         final CreateGameController controller = createGameController.get();
         app.show(controller);
     }
@@ -282,8 +285,7 @@ public class LobbyController implements Controller {
         }
     }
 
-    public void openDirectChat(User user)
-    {
+    public void openDirectChat(User user) {
         if (user._id().equals(this.idStorage.getID())){
             return;
         }
@@ -291,7 +293,7 @@ public class LobbyController implements Controller {
 
         for (Tab tab: tabs){
             if (tab.getText().equals(DirectMessage + user.name())){
-                checkGroups(user);
+                checkGroups(user, tab);
                 return;
             }
         }
@@ -299,16 +301,22 @@ public class LobbyController implements Controller {
         Tab tab = new Tab();
         tab.setText(DirectMessage + user.name());
         tab.setClosable(true);
-        checkGroups(user);
+        checkGroups(user, tab);
         this.tabPane.getTabs().add(tab);
     }
 
-    private void checkGroups(User user) {
-        List<Group> groupList = this.groups;
+    private void checkGroups(User user, Tab tab) {
 
-        for (Group group: groupList){
-            if (group.members().size() == 2 && group.members().contains(user._id()) && group.members().contains(this.idStorage.getID()))
-            {
+        for (Group group: this.groups){
+            if (group.members().size() == 2 && group.members().contains(user._id()) && group.members().contains(this.idStorage.getID())) {
+                for (DirectChatStorage storage: directChatStorages)
+                {
+                    if(storage.getGroupId().equals(group._id()) && storage.getUserId().equals(user._id()))
+                    {
+                        return;
+                    }
+                    addToDirectChatStorage(group._id(),user._id(), tab);
+                }
                 return;
             }
         }
@@ -318,7 +326,10 @@ public class LobbyController implements Controller {
         toAdd.add(userId);
         toAdd.add(user._id());
 
-        this.groupService.createGroup(toAdd).observeOn(FX_SCHEDULER).subscribe(this.groups::add);
+        this.groupService.createGroup(toAdd).observeOn(FX_SCHEDULER).subscribe(group -> {
+            addToDirectChatStorage(group._id(),user._id(), tab);
+            this.groups.add(group);
+        });
     }
 
     private void loadUsers(List<User> users) {
@@ -330,5 +341,13 @@ public class LobbyController implements Controller {
 
     private void loadGroups(List<Group> groups) {
         this.groups.addAll(groups);
+    }
+
+    private void addToDirectChatStorage( String groupId, String userId, Tab tab) {
+        DirectChatStorage directChatStorage = new DirectChatStorage();
+        directChatStorage.setGroupId(groupId);
+        directChatStorage.setUserId(userId);
+        directChatStorage.setTab(tab);
+        this.directChatStorages.add(directChatStorage);
     }
 }
