@@ -6,10 +6,7 @@ import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.AuthService;
-import de.uniks.pioneers.service.GameService;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -65,11 +62,13 @@ public class LobbyController implements Controller {
     private UserService userService;
     private GameService gameService;
     private AuthService authService;
+    private MemberService memberService;
     private EventListener eventListener;
     private Provider <LoginController> loginController;
     private Provider<RulesScreenController> rulesScreenController;
     private Provider<CreateGameController> createGameController;
     private Provider<EditUserController> editUserController;
+    private Provider<GameLobbyController> gameLobbyController;
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
@@ -79,22 +78,26 @@ public class LobbyController implements Controller {
                            UserService userService,
                            GameService gameService,
                            AuthService authService,
+                           MemberService memberService,
                            EventListener eventListener,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
-                           Provider<EditUserController> editUserController) {
+                           Provider<EditUserController> editUserController,
+                           Provider<GameLobbyController> gameLobbyController) {
 
         this.app = app;
         this.idStorage = idStorage;
         this.userService = userService;
         this.gameService = gameService;
         this.authService = authService;
+        this.memberService = memberService;
         this.eventListener = eventListener;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
         this.createGameController = createGameController;
         this.editUserController = editUserController;
+        this.gameLobbyController = gameLobbyController;
     }
 
     @Override
@@ -210,7 +213,7 @@ public class LobbyController implements Controller {
                 return subCon.getParent();
             }
         }
-        GameListSubController gameCon = new GameListSubController(this.app,game);
+        GameListSubController gameCon = new GameListSubController(this.app,game, this);
         gameSubCons.add(gameCon);
         return gameCon.render();
     }
@@ -277,5 +280,24 @@ public class LobbyController implements Controller {
                 break;
             }
         }
+    }
+    public void joinGame(Game game) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Enter the password");
+        dialog.setHeaderText("password");
+        dialog.showAndWait()
+                .ifPresent(password -> {
+                    this.memberService.join(game._id(), password)
+                            .observeOn(FX_SCHEDULER)
+                            .doOnError(error -> {
+                                if ("HTTP 401 ".equals(error.getMessage())) {
+                                    new Alert(Alert.AlertType.ERROR, "wrong password")
+                                            .showAndWait();
+                                }
+                            })
+                            .subscribe(result -> {
+                                app.show(gameLobbyController.get());
+                            });
+                });
     }
 }
