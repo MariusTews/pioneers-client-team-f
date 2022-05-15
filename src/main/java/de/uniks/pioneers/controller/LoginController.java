@@ -75,7 +75,9 @@ public class LoginController implements Controller {
         signUpHyperlink.setOnAction(this::signUPHyperlinkPressed);
 
         final BooleanBinding length = Bindings.greaterThan(8, userPasswordField.lengthProperty());
-        loginButton.disableProperty().bind(length);
+        final BooleanBinding usernameLengthMin = Bindings.greaterThan(1, usernameTextField.lengthProperty());
+        final BooleanBinding usernameLengthMax = Bindings.greaterThan(33, usernameTextField.lengthProperty());
+        loginButton.disableProperty().bind(length.or(usernameLengthMin.or(usernameLengthMax.not())));
 
         return parent;
     }
