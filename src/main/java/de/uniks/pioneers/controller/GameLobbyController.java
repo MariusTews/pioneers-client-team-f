@@ -88,19 +88,12 @@ public class GameLobbyController implements Controller {
     @Override
     public void init() {
         //TODO: remove
-        System.out.println(this.idStorage.getID());
+        System.out.println(idStorage.getID());
         // get all game members
         gameMembersService
                 .getAllGameMembers(this.idStorage.getID())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.members::setAll);
-
-        //TODO: remove
-        System.out.println("After gameMemberService");
-        for (Member member :
-             members) {
-            System.out.println(member.userId());
-        }
 
         // get all messages
         messageService
@@ -108,9 +101,20 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.messages::setAll);
 
+
+        eventListener
+                .listen("games." + idStorage.getID() + ".members.*.*", Member.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    final Member member = event.data();
+                    if (event.event().endsWith(CREATED)) {
+                        members.add(member);
+                    }
+                });
+
         // listen to game lobby messages
         eventListener
-                .listen("games." + idStorage.getID() + ".*.*.*", Message.class)
+                .listen("games." + idStorage.getID() + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Message message = event.data();
@@ -118,28 +122,6 @@ public class GameLobbyController implements Controller {
                         messages.add(message);
                     }
                 });
-
-        eventListener
-                .listen("games." + idStorage.getID() + ".*.*.*", Member.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    final Member member = event.data();
-                    if (event.event().endsWith(CREATED)) {
-                        //TODO: solve problem why it gets called twice for every new member
-                        if (!members.contains(member)) {
-                            members.add(member);
-                        }
-                        //TODO: remove
-                        System.out.println("EVENT");
-                    }
-                });
-
-        //TODO: remove
-        System.out.println("After eventListener");
-        for (Member member :
-             members) {
-            System.out.println(member.userId());
-        }
     }
 
     @Override
@@ -163,34 +145,21 @@ public class GameLobbyController implements Controller {
 
         // load game members
         members.addListener((ListChangeListener<? super Member>) c -> {
-            //this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
-
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
-            //TODO remove
-            System.out.println("After addListener");
-            for (Member member:
-                 members) {
-                System.out.println(member.userId());
-            }
-            /*int indexLastElem = c.getList().size() - 1;
-            idUserList.getChildren().add(renderMember(c.getList().get(indexLastElem)));
-            System.out.println("User joint: " + c.getList().get(indexLastElem).userId());*/
-
         });
 
         // load and update game lobby messages
         messages.addListener((ListChangeListener<? super Message>) c -> {
             int indexLastElem = c.getList().size() - 1;
             Label label = new Label();
+            /*label.setOnMouseEntered(event -> {
+                label.setStyle("-fx-background-color: GREY");
+            });*/
             // when second member joins, a message gets send with null as sender
-            if (c.getList().get(indexLastElem).sender() != null) {
-                userService.findOne(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
-                    label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
-                    idMessageView.getChildren().add(label);
-                    //TODO remove
-                    System.out.println("Send: " + label.getText());
-                });
-            }
+            userService.findOne(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
+                label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
+                idMessageView.getChildren().add(label);
+            });
             this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
         });
 
@@ -223,7 +192,6 @@ public class GameLobbyController implements Controller {
     }
 
     // private methods
-
     // checkMessageField
     private void checkMessageField() {
         if (!this.idMessageField.getText().isEmpty()) {
@@ -234,25 +202,8 @@ public class GameLobbyController implements Controller {
         }
     }
 
-    // render user by id
-    private Label renderUser(Member member) {
-        Label label = new Label();
-
-        userService
-                .findOne(member.userId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    label.setText(result.name() + " - ready: " + member.ready());
-                });
-
-        return label;
-    }
-
     private Node renderMember(Member member) {
-        //this.idUserList.getChildren().clear();
         MemberListSubcontroller memberListSubcontroller = new MemberListSubcontroller(this.app, member, this.userService);
-        //TODO remove
-        System.out.println("Call render");
         return memberListSubcontroller.render();
     }
 }
