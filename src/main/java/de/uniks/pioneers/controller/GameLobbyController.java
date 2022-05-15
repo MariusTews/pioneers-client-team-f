@@ -17,10 +17,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -101,7 +98,7 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.messages::setAll);
 
-
+        // listen to members
         eventListener
                 .listen("games." + idStorage.getID() + ".members.*.*", Member.class)
                 .observeOn(FX_SCHEDULER)
@@ -152,9 +149,14 @@ public class GameLobbyController implements Controller {
         messages.addListener((ListChangeListener<? super Message>) c -> {
             int indexLastElem = c.getList().size() - 1;
             Label label = new Label();
-            /*label.setOnMouseEntered(event -> {
-                label.setStyle("-fx-background-color: GREY");
-            });*/
+            label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
+            this.initRightClick(label);
+            label.setOnMouseEntered(event -> {
+                label.setStyle("-fx-background-color: LIGHTGREY");
+            });
+            label.setOnMouseExited(event -> {
+                label.setStyle("-fx-background-color: DEFAULT");
+            });
             // when second member joins, a message gets send with null as sender
             userService.findOne(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
                 label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
@@ -205,5 +207,22 @@ public class GameLobbyController implements Controller {
     private Node renderMember(Member member) {
         MemberListSubcontroller memberListSubcontroller = new MemberListSubcontroller(this.app, member, this.userService);
         return memberListSubcontroller.render();
+    }
+
+    //TODO: messageService delete
+    // cut off username and delete threw service
+    // maybe replace with new label and the text that this message where deleted
+    private void initRightClick(Label label) {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem menuItem = new MenuItem("delete");
+
+        contextMenu.getItems().add(menuItem);
+
+        label.setContextMenu(contextMenu);
+
+        menuItem.setOnAction(event -> {
+            System.out.println(label.getText());
+        });
+
     }
 }
