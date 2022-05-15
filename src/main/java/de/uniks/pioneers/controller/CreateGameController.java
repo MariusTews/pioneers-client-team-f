@@ -4,6 +4,7 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.service.GameService;
+import de.uniks.pioneers.service.IDStorage;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -43,7 +44,6 @@ public class CreateGameController implements Controller {
         this.gameLobbyController = gameLobbyController;
         this.lobbyController = lobbyController;
         this.gameService = gameService;
-
     }
 
     @Override
@@ -80,6 +80,7 @@ public class CreateGameController implements Controller {
 
         Observable<Game> gameObservable = gameService.create(gameNameTextField.getText(), passwordTextField.getText());
 
+        // create game and pass gameId
         gameObservable.observeOn(FX_SCHEDULER)
                 .subscribe(result -> app.show(gameLobbyController.get()));
     }

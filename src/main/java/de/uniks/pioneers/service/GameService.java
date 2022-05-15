@@ -12,15 +12,18 @@ import java.util.List;
 public class GameService {
 
     private final GamesApiService gamesApiService;
+    private final IDStorage idStorage;
 
     @Inject
-    public GameService(GamesApiService gamesApiService) {
+    public GameService(GamesApiService gamesApiService, IDStorage idStorage) {
         this.gamesApiService = gamesApiService;
+        this.idStorage = idStorage;
     }
 
     public Observable<Game> create(String gameName, String password) {
         return gamesApiService
-                .create(new CreateGameDto(gameName, password));
+                .create(new CreateGameDto(gameName, password))
+                .doOnNext(result -> this.idStorage.setID(result._id()));
     }
 
     public Observable<List<Game>> findAllGames() {
