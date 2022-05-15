@@ -1,9 +1,13 @@
 package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
+import de.uniks.pioneers.service.GameService;
+import de.uniks.pioneers.service.UserService;
+import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
@@ -16,6 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationTest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 public class LobbyViewTest extends ApplicationTest {
     @Mock
@@ -23,6 +30,15 @@ public class LobbyViewTest extends ApplicationTest {
 
     @Mock
     LoginController loginController;
+
+    @Mock
+    UserService userService;
+
+    @Mock
+    GameService gameService;
+
+    @Mock
+    EventListener eventListener;
 
     @InjectMocks
     LobbyController lobbyController;
@@ -33,6 +49,10 @@ public class LobbyViewTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         // start application
+        //init calls need to be mocked here
+        when(userService.findAllUsers()).thenReturn(Observable.empty());
+        when(gameService.findAllGames()).thenReturn(Observable.empty());
+        when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
         this.stage = stage;
         this.app = new App(lobbyController);
         this.app.start(stage);
@@ -50,9 +70,6 @@ public class LobbyViewTest extends ApplicationTest {
 
         TextField chatMessage = lookup("#chatMessageField").query();
 
-        ListView usersList = lookup("#userListView").query();
-        ListView gamesList = lookup("#gameListView").query();
-
         Assertions.assertThat(rules.getText()).isEqualTo("Rules");
         Assertions.assertThat(logout.getText()).isEqualTo("Logout");
         Assertions.assertThat(editUser.getText()).isEqualTo("Edit User");
@@ -66,9 +83,6 @@ public class LobbyViewTest extends ApplicationTest {
         clickOn(chatMessage);
         write("test");
         Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
-
-        Assertions.assertThat(usersList.getItems().isEmpty()).isTrue();
-        Assertions.assertThat(gamesList.getItems().isEmpty()).isTrue();
     }
 
     @Test

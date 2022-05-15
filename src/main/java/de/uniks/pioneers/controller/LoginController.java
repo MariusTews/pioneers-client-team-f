@@ -2,9 +2,10 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.LoginService;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import javafx.application.Platform;
+import de.uniks.pioneers.service.AuthService;
+import de.uniks.pioneers.service.UserService;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,9 +16,12 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+
 public class LoginController implements Controller {
     private final App app;
-    private final LoginService loginService;
+    private final AuthService authService;
+    private final UserService userService;
     private Provider<SignUpController> signUpController;
     private Provider<LobbyController> lobbyController;
     @FXML
@@ -34,11 +38,13 @@ public class LoginController implements Controller {
     public Label errorLabel;
 
     @Inject
-    public LoginController(App app, LoginService loginService,
+    public LoginController(App app, AuthService authService,
+                           UserService userService,
                            Provider<SignUpController> signUpController,
                            Provider<LobbyController> lobbyController) {
         this.app = app;
-        this.loginService = loginService;
+        this.authService = authService;
+        this.userService = userService;
         this.signUpController = signUpController;
         this.lobbyController = lobbyController;
     }
@@ -68,13 +74,28 @@ public class LoginController implements Controller {
 
         signUpHyperlink.setOnAction(this::signUPHyperlinkPressed);
 
+        final BooleanBinding length = Bindings.greaterThan(8, userPasswordField.lengthProperty());
+        final BooleanBinding usernameLengthMin = Bindings.greaterThan(1, usernameTextField.lengthProperty());
+        final BooleanBinding usernameLengthMax = Bindings.greaterThan(33, usernameTextField.lengthProperty());
+        loginButton.disableProperty().bind(length.or(usernameLengthMin.or(usernameLengthMax.not())));
+
         return parent;
     }
 
     public void login(String username, String password) {
-        loginService.login(username, password)
-                .observeOn(Schedulers.from(Platform::runLater))
-                .subscribe(result -> app.show(lobbyController.get()));
+        authService.login(username, password)
+                .observeOn(FX_SCHEDULER)
+                .doOnError(error -> {
+                    if ("HTTP 401 ".equals(error.getMessage())) {
+                        errorLabel.setText("Invalid username or password");
+                    }
+                })
+                .subscribe(result -> {
+                    userService.statusUpdate(result, "online")
+                                    .observeOn(FX_SCHEDULER)
+                                            .subscribe();
+                    app.show(lobbyController.get());
+                });
     }
 
     public void loginButtonPressed(ActionEvent event) {

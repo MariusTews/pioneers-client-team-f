@@ -17,24 +17,29 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class LoginServiceTest {
+class AuthServiceTest {
     @Spy
     TokenStorage tokenStorage;
+
+    @Spy
+    IDStorage idStorage;
 
     @Mock
     AuthApiService authApiService;
 
     @InjectMocks
-    LoginService loginService;
+    AuthService authService;
 
     @Test
     void loginTest() {
         when(authApiService.login(any())).thenReturn(Observable.just(new LoginResult("123", "name", "status", "avatar", "accessToken", "refreshToken")));
 
-        final String result = loginService.login("username", "password").blockingFirst();
-        assertEquals("name", result);
+        final String result = authService.login("username", "password").blockingFirst();
+        assertEquals("123", result);
 
         assertEquals("accessToken", tokenStorage.getToken());
+
+        assertEquals("123", idStorage.getID());
 
         verify(authApiService).login(new LoginDto("username", "password"));
     }
