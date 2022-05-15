@@ -100,7 +100,6 @@ public class EditUserController implements Controller {
                 userPicture.setImage(new Image(currUser.avatar()));
 
             }
-            newUserNameTextField.setText(currUser.name());
 
         });
 
@@ -113,15 +112,15 @@ public class EditUserController implements Controller {
     }
 
     public void confirmButtonPressed(ActionEvent event) {
+        updateAvatar();
 
-        if (newUserNameTextField.getText().equals("")) {
-            new Alert(Alert.AlertType.INFORMATION, "please enter a username!")
-                    .showAndWait();
+        if (newUserNameTextField.getText().equals("") && passwordField.getText().equals("")) {
+            updateUser(idStorage.getID(), null, null, null, avatar);
         } else if (passwordField.getText().equals("")) {
-            new Alert(Alert.AlertType.INFORMATION, "please enter a password to continue!")
-                    .showAndWait();
+            updateUser(idStorage.getID(), newUserNameTextField.getText(), null, null, avatar);
+        } else if (newUserNameTextField.getText().equals("")) {
+            updateUser(idStorage.getID(), null, passwordField.getText(), repeatPasswordFiled.getText(), avatar);
         } else {
-            updateAvatar();
             updateUser(idStorage.getID(), newUserNameTextField.getText(), passwordField.getText(), repeatPasswordFiled.getText(), avatar);
         }
     }
@@ -177,20 +176,34 @@ public class EditUserController implements Controller {
                 return;
             }
         }
-        if (!password.equals(repeatPassword)) {
-            new Alert(Alert.AlertType.INFORMATION, "passwords do not match!")
-                    .showAndWait();
+        if (password != null) {
+            if (!password.equals(repeatPassword)) {
+                new Alert(Alert.AlertType.INFORMATION, "passwords do not match!")
+                        .showAndWait();
+                return;
 
-        } else if (password.length() < 8) {
-            new Alert(Alert.AlertType.INFORMATION, "the password length must be at least 8!")
-                    .showAndWait();
-        } else {
-
-            userService.userUpdate(id, name, avatar, "online", password)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe(result -> app.show(lobbyController.get()));
+            } else if (password.length() < 8) {
+                new Alert(Alert.AlertType.INFORMATION, "the password length must be at least 8!")
+                        .showAndWait();
+                return;
+            }
         }
 
+        userService.userUpdate(id, name, avatar, "online", password)
+                .observeOn(FX_SCHEDULER)
+                .doOnError(error ->{
+                    if ("HTTP 409 ".equals(error.getMessage())) {
+                        new Alert(Alert.AlertType.INFORMATION, "username is already taken!")
+                                .showAndWait();
+                    }
+                    if ("HTTP 400 ".equals(error.getMessage())) {
+                        new Alert(Alert.AlertType.INFORMATION, "name must be shorter than or equal to 32 characters!")
+                                .showAndWait();
+                    }
+
+                })
+
+                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {} );
     }
 
 }
