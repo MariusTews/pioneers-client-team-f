@@ -95,6 +95,13 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.members::setAll);
 
+        //TODO: remove
+        System.out.println("After gameMemberService");
+        for (Member member :
+             members) {
+            System.out.println(member.userId());
+        }
+
         // get all messages
         messageService
                 .getAllMessages(GAMES, this.idStorage.getID())
@@ -112,6 +119,27 @@ public class GameLobbyController implements Controller {
                     }
                 });
 
+        eventListener
+                .listen("games." + idStorage.getID() + ".*.*.*", Member.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    final Member member = event.data();
+                    if (event.event().endsWith(CREATED)) {
+                        //TODO: solve problem why it gets called twice for every new member
+                        if (!members.contains(member)) {
+                            members.add(member);
+                        }
+                        //TODO: remove
+                        System.out.println("EVENT");
+                    }
+                });
+
+        //TODO: remove
+        System.out.println("After eventListener");
+        for (Member member :
+             members) {
+            System.out.println(member.userId());
+        }
     }
 
     @Override
@@ -136,7 +164,18 @@ public class GameLobbyController implements Controller {
         // load game members
         members.addListener((ListChangeListener<? super Member>) c -> {
             //this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
+
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
+            //TODO remove
+            System.out.println("After addListener");
+            for (Member member:
+                 members) {
+                System.out.println(member.userId());
+            }
+            /*int indexLastElem = c.getList().size() - 1;
+            idUserList.getChildren().add(renderMember(c.getList().get(indexLastElem)));
+            System.out.println("User joint: " + c.getList().get(indexLastElem).userId());*/
+
         });
 
         // load and update game lobby messages
@@ -210,7 +249,10 @@ public class GameLobbyController implements Controller {
     }
 
     private Node renderMember(Member member) {
+        //this.idUserList.getChildren().clear();
         MemberListSubcontroller memberListSubcontroller = new MemberListSubcontroller(this.app, member, this.userService);
+        //TODO remove
+        System.out.println("Call render");
         return memberListSubcontroller.render();
     }
 }
