@@ -35,8 +35,9 @@ public class LobbyController implements Controller {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<Game> games = FXCollections.observableArrayList();
-
     private final ObservableList<Group> groups = FXCollections.observableArrayList();
+    private final List<Message> messages = new ArrayList<>();
+    private final List<String> deletedMessages = new ArrayList<>();
     private final List<UserListSubController> userSubCons = new ArrayList<>();
     private final List<GameListSubController> gameSubCons = new ArrayList<>();
     private final List<DirectChatStorage> directChatStorages = new ArrayList<>();
@@ -176,13 +177,14 @@ public class LobbyController implements Controller {
         for (DirectChatStorage directChatStorage : directChatStorages) {
             if (directChatStorage.getTab().equals(newValue)) {
                 this.currentDirectStorage = directChatStorage;
+
                 tabDisposable = eventListener.listen("groups." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
                     if (messageEvent.event().endsWith(CREATED)) {
-                        renderMessage(directChatStorage,messageEvent.data());
+                        this.messages.add(messageEvent.data());
+                        renderNewMessage(directChatStorage,messageEvent.data());
                     } else if (messageEvent.event().endsWith(DELETED)) {
-                        //TODO:
-                    } else if (messageEvent.event().endsWith(UPDATED)) {
-                        //TODO:
+                        this.deletedMessages.add(messageEvent.data()._id());
+                        loadDirectMessages(directChatStorage.getGroupId(),directChatStorage.getUserId(),directChatStorage.getUserName(),newValue);
                     }
                 });
             }
@@ -395,13 +397,20 @@ public class LobbyController implements Controller {
 
     private void loadDirectMessages(String groupId, String userId,String username, Tab tab){
         this.messageService.getAllMessages(GROUPS,groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
-            for (Message message: messages){
-                if (message.sender().equals(idStorage.getID()))
-                {
-                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label( ownUsername +  ": " +message.body()));
+            this.messages.clear();
+            this.messages.addAll(messages);
+            ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
+
+            for (Message message: this.messages){
+                if (!this.deletedMessages.contains(message._id())) {
+                    if (message.sender().equals(idStorage.getID())) {
+                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label(ownUsername + ": " + message.body()));
+                    } else if (message.sender().equals(userId)) {
+                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label(username + ": " + message.body()));
+                    }
                 }
-                else if (message.sender().equals(userId)){
-                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label( username +  ": " +message.body()));
+                else {
+                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label("message was deleted"));
                 }
             }
         });
@@ -416,7 +425,7 @@ public class LobbyController implements Controller {
         this.directChatStorages.add(directChatStorage);
     }
 
-    private void renderMessage(DirectChatStorage storage, Message message) {
+    private void renderNewMessage(DirectChatStorage storage, Message message) {
         if (message.sender().equals(idStorage.getID())){
             ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( ownUsername +  ": " +message.body()));
         }
