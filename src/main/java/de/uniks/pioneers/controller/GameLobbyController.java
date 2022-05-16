@@ -84,8 +84,6 @@ public class GameLobbyController implements Controller {
 
     @Override
     public void init() {
-        //TODO: remove
-        System.out.println(this.gameIDStorage.getId());
         // get all game members
         gameMembersService
                 .getAllGameMembers(this.gameIDStorage.getId())
@@ -116,9 +114,9 @@ public class GameLobbyController implements Controller {
                 .subscribe(event -> {
                     final Message message = event.data();
                     if (event.event().endsWith(CREATED)) {
-                        messages.add(message);
+                        renderMessage(message, true);
                     } else if (event.event().endsWith(DELETED)) {
-                        messages.remove(message);
+                        renderMessage(message, false);
                     }
                 });
     }
@@ -153,13 +151,34 @@ public class GameLobbyController implements Controller {
         });
 
         // load and update game lobby messages
-        messages.addListener((ListChangeListener<? super Message>) c -> {
-            int indexLastElem = c.getList().size() - 1;
+        //messages.addListener((ListChangeListener<? super Message>) c -> {
+            // experiment
+            //this.idMessageView.getChildren().addAll(c.getList().stream().map(this::renderMessage).toList());
+
+            /*for(Message message : messages) {
+                Label label = new Label();
+                label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
+                this.initRightClick(label, message._id(), message.sender());
+                label.setOnMouseEntered(event -> {
+                    label.setStyle("-fx-background-color: LIGHTGREY");
+                });
+                label.setOnMouseExited(event -> {
+                    label.setStyle("-fx-background-color: DEFAULT");
+                });
+                userService.findOne(message.sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
+                    label.setText(result.name() + ": " + message.body());
+                    idMessageView.getChildren().add(label);
+                });
+            }
+            this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());*/
+            //
+
+            /*int indexLastElem = c.getList().size() - 1;
             Label label = new Label();
             label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
             // make message right clickable if current member is also the sender
             if (c.getList().get(indexLastElem).sender().equals(this.memberIDStorage.getId())) {
-                this.initRightClick(label);
+                this.initRightClick(label, c.getList().get(indexLastElem)._id());
             }
             label.setOnMouseEntered(event -> {
                 label.setStyle("-fx-background-color: LIGHTGREY");
@@ -171,8 +190,8 @@ public class GameLobbyController implements Controller {
                 label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
                 idMessageView.getChildren().add(label);
             });
-            this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
-        });
+            this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());*/
+        //});
 
         // disable start game button when entering the GameLobby
         idStartGameButton.disableProperty().set(true);
@@ -218,19 +237,56 @@ public class GameLobbyController implements Controller {
         return memberListSubcontroller.render();
     }
 
+    //TODO: observe
+    private void renderMessage(Message message, Boolean render) {
+        this.idMessageView.getChildren().clear();
+        if (render) {
+            this.messages.add(message);
+        } else {
+            this.messages.remove(message);
+        }
+        if (!messages.isEmpty()) {
+            for (Message m : messages) {
+                Label label = new Label();
+                label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
+                this.initRightClick(label, m._id(), m.sender());
+                label.setOnMouseEntered(event -> {
+                    label.setStyle("-fx-background-color: LIGHTGREY");
+                });
+                label.setOnMouseExited(event -> {
+                    label.setStyle("-fx-background-color: DEFAULT");
+                });
+            /*userService
+                    .findOne(m.sender())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                        label.setText(result.name() + ": " + m.body());
+                        this.idMessageView.getChildren().add(label);
+                    });*/
+                label.setText(m.sender() + ": " + m.body());
+                this.idMessageView.getChildren().add(label);
+            }
+        }
+    }
+
     //TODO: messageService delete
     // cut off username and delete threw service
     // maybe replace with new label and the text that this message where deleted
-    private void initRightClick(Label label) {
+    private void initRightClick(Label label, String messageId, String sender) {
         final ContextMenu contextMenu = new ContextMenu();
         final MenuItem menuItem = new MenuItem("delete");
 
         contextMenu.getItems().add(menuItem);
-
         label.setContextMenu(contextMenu);
 
         menuItem.setOnAction(event -> {
-            System.out.println(event.toString());
+            if (sender.equals(this.memberIDStorage.getId())) {
+                messageService
+                        .delete(GAMES, this.gameIDStorage.getId(), messageId)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+                this.idMessageView.getChildren().remove(label);
+            }
         });
 
     }
