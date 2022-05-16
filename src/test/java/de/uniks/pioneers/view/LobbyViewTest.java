@@ -6,11 +6,11 @@ import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
 import de.uniks.pioneers.service.GameService;
+import de.uniks.pioneers.service.GroupService;
+import de.uniks.pioneers.service.MessageService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +38,12 @@ public class LobbyViewTest extends ApplicationTest {
     GameService gameService;
 
     @Mock
+    GroupService groupService;
+
+    @Mock
+    MessageService messageService;
+
+    @Mock
     EventListener eventListener;
 
     @InjectMocks
@@ -53,6 +59,7 @@ public class LobbyViewTest extends ApplicationTest {
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(gameService.findAllGames()).thenReturn(Observable.empty());
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
+        when(groupService.getAll()).thenReturn(Observable.empty());
         this.stage = stage;
         this.app = new App(lobbyController);
         this.app.start(stage);
@@ -83,45 +90,5 @@ public class LobbyViewTest extends ApplicationTest {
         clickOn(chatMessage);
         write("test");
         Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
-    }
-
-    @Test
-    public void testSendButton() {
-        Button send = lookup("#sendButton").query();
-        TextField chatMessage = lookup("#chatMessageField").query();
-
-        TabPane tabPane = lookup("#tabPane").query();
-        Tab allTab = tabPane.getTabs().get(0);
-        VBox chat = ((VBox) ((ScrollPane) allTab.getContent()).getContent());
-
-
-        Assertions.assertThat(chat.getChildren().isEmpty()).isTrue();
-        clickOn(chatMessage);
-        write("test");
-
-        clickOn(send);
-        Assertions.assertThat(chat.getChildren().size()).isEqualTo(1);
-        Label message = (Label) chat.getChildren().get(0);
-        Assertions.assertThat(chatMessage.getText()).isEqualTo("");
-        Assertions.assertThat(message.getText()).isEqualTo("username: test");
-    }
-
-    @Test
-    public void testSendviaEnter() {
-        TextField chatMessage = lookup("#chatMessageField").query();
-
-        TabPane tabPane = lookup("#tabPane").query();
-        Tab allTab = tabPane.getTabs().get(0);
-        VBox chat = ((VBox) ((ScrollPane) allTab.getContent()).getContent());
-
-        Assertions.assertThat(chat.getChildren().isEmpty()).isTrue();
-        clickOn(chatMessage);
-        write("test");
-
-        type(KeyCode.ENTER);
-        Assertions.assertThat(chat.getChildren().size()).isEqualTo(1);
-        Label message = (Label) chat.getChildren().get(0);
-        Assertions.assertThat(chatMessage.getText()).isEqualTo("");
-        Assertions.assertThat(message.getText()).isEqualTo("username: test");
     }
 }

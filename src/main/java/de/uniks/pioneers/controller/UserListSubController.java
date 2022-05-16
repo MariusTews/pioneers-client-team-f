@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.IDStorage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,17 +29,21 @@ public class UserListSubController implements Controller {
 	@FXML
 	public Button chatButton;
 	private App app;
+	private LobbyController lobbyController;
 	private final User user;
+	private IDStorage idStorage;
 
 	private Parent parent;
 
 	private String id;
 
 	@Inject
-	public UserListSubController(App app, User user){
+	public UserListSubController(App app, LobbyController lobbyController, User user, IDStorage idStorage){
 
 		this.app = app;
+		this.lobbyController = lobbyController;
 		this.user = user;
+		this.idStorage = idStorage;
 	}
 
 	@Override
@@ -79,7 +84,7 @@ public class UserListSubController implements Controller {
 				this.userImageView.setImage(new Image(this.user.avatar().toString()));
 			}
 
-			if(this.user.status().equals("offline")){
+			if(this.user.status().equals("offline") || user._id().equals(idStorage.getID())){
 				HBox box = (HBox) this.chatButton.getParent();
 				box.getChildren().removeIf(node -> node.equals(chatButton));
 			}
@@ -90,6 +95,7 @@ public class UserListSubController implements Controller {
 	}
 
 	public void chatButtonPressed(ActionEvent event) {
+		this.lobbyController.openDirectChat(this.user);
 	}
 
 	public Parent getParent() {
