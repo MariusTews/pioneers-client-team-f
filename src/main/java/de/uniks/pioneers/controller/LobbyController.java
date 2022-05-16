@@ -6,9 +6,11 @@ import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Group;
+import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -76,6 +78,12 @@ public class LobbyController implements Controller {
     private final Provider<EditUserController> editUserController;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
+
+    private Disposable tabDisposable;
+
+    private DirectChatStorage currentDirectStorage;
+
+    String ownUsername = "";
 
     @Inject
     public LobbyController(App app,
@@ -149,8 +157,32 @@ public class LobbyController implements Controller {
             ((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList());
         });
 
+        this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleTabSwitching(oldValue, newValue));
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
         return parent;
+    }
+
+    private void handleTabSwitching(Tab oldValue, Tab newValue) {
+        for (DirectChatStorage directChatStorage : directChatStorages) {
+            if (directChatStorage.getTab().equals(oldValue) && tabDisposable != null) {
+
+                tabDisposable.dispose();
+            }
+        }
+        for (DirectChatStorage directChatStorage : directChatStorages) {
+            if (directChatStorage.getTab().equals(newValue)) {
+                this.currentDirectStorage = directChatStorage;
+                tabDisposable = eventListener.listen("groups." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
+                    if (messageEvent.event().endsWith(CREATED)) {
+                        renderMessage(directChatStorage,messageEvent.data());
+                    } else if (messageEvent.event().endsWith(DELETED)) {
+                        //TODO:
+                    } else if (messageEvent.event().endsWith(UPDATED)) {
+                        //TODO:
+                    }
+                });
+            }
+        }
     }
 
     public void rulesButtonPressed(ActionEvent ignoredEvent) {
@@ -194,8 +226,11 @@ public class LobbyController implements Controller {
 
     private void checkMessageField() {
         if (!chatMessageField.getText().isEmpty()) {
-            ((VBox) ((ScrollPane) this.allTab.getContent()).getContent()).getChildren().add(new Label("username: " + chatMessageField.getText()));
-            chatMessageField.setText("");
+            if(currentDirectStorage != null) {
+                this.messageService.send(GROUPS, currentDirectStorage.getGroupId(), chatMessageField.getText())
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+            }
         }
     }
 
@@ -205,7 +240,7 @@ public class LobbyController implements Controller {
                 return subCon.getParent();
             }
         }
-        UserListSubController userCon = new UserListSubController(this.app, this, user);
+        UserListSubController userCon = new UserListSubController(this.app, this, user, idStorage);
         userSubCons.add(userCon);
         return userCon.render();
     }
@@ -301,6 +336,10 @@ public class LobbyController implements Controller {
         Tab tab = new Tab();
         tab.setText(DirectMessage + user.name());
         tab.setClosable(true);
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(new VBox(3));
+        tab.setContent(scrollPane);
+
         checkGroups(user, tab);
         this.tabPane.getTabs().add(tab);
     }
@@ -309,14 +348,14 @@ public class LobbyController implements Controller {
 
         for (Group group: this.groups){
             if (group.members().size() == 2 && group.members().contains(user._id()) && group.members().contains(this.idStorage.getID())) {
-                for (DirectChatStorage storage: directChatStorages)
-                {
+                for (DirectChatStorage storage: directChatStorages) {
                     if(storage.getGroupId().equals(group._id()) && storage.getUserId().equals(user._id()))
                     {
                         return;
                     }
-                    addToDirectChatStorage(group._id(),user._id(), tab);
                 }
+                addToDirectChatStorage(group._id(),user._id(),user.name(), tab);
+                loadDirectMessages(group._id(), user._id(),user.name(), tab);
                 return;
             }
         }
@@ -327,12 +366,19 @@ public class LobbyController implements Controller {
         toAdd.add(user._id());
 
         this.groupService.createGroup(toAdd).observeOn(FX_SCHEDULER).subscribe(group -> {
-            addToDirectChatStorage(group._id(),user._id(), tab);
+            addToDirectChatStorage(group._id(),user._id(),user.name(), tab);
+            loadDirectMessages(group._id(), user._id(),user.name(), tab);
             this.groups.add(group);
         });
     }
 
     private void loadUsers(List<User> users) {
+        for (User user: users){
+            if (user._id().equals(this.idStorage.getID())){
+                this.ownUsername = user.name();
+            }
+        }
+
         List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
         List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
         this.users.addAll(online);
@@ -343,11 +389,35 @@ public class LobbyController implements Controller {
         this.groups.addAll(groups);
     }
 
-    private void addToDirectChatStorage( String groupId, String userId, Tab tab) {
+    private void loadDirectMessages(String groupId, String userId,String username, Tab tab){
+        this.messageService.getAllMessages(GROUPS,groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
+            for (Message message: messages){
+                if (message.sender().equals(idStorage.getID()))
+                {
+                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label( ownUsername +  ": " +message.body()));
+                }
+                else if (message.sender().equals(userId)){
+                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label( username +  ": " +message.body()));
+                }
+            }
+        });
+    }
+
+    private void addToDirectChatStorage( String groupId, String userId, String userName, Tab tab) {
         DirectChatStorage directChatStorage = new DirectChatStorage();
         directChatStorage.setGroupId(groupId);
         directChatStorage.setUserId(userId);
+        directChatStorage.setUserName(userName);
         directChatStorage.setTab(tab);
         this.directChatStorages.add(directChatStorage);
+    }
+
+    private void renderMessage(DirectChatStorage storage, Message message) {
+        if (message.sender().equals(idStorage.getID())){
+            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( ownUsername +  ": " +message.body()));
+        }
+        else if (message.sender().equals(storage.getUserId())){
+            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( storage.getUserName() +  ": " +message.body()));
+        }
     }
 }
