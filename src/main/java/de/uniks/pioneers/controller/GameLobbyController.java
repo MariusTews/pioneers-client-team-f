@@ -62,6 +62,7 @@ public class GameLobbyController implements Controller {
     private final GameMembersService gameMembersService;
     private final UserService userService;
     private final MessageService messageService;
+    private final GameService gameService;
     private final Provider<LobbyController> lobbyController;
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
@@ -72,6 +73,7 @@ public class GameLobbyController implements Controller {
                                GameMembersService gameMembersService,
                                UserService userService,
                                MessageService messageService,
+                               GameService gameService,
                                Provider<LobbyController> lobbyController,
                                EventListener eventListener,
                                GameIDStorage gameIDStorage,
@@ -80,6 +82,7 @@ public class GameLobbyController implements Controller {
         this.gameMembersService = gameMembersService;
         this.userService = userService;
         this.messageService = messageService;
+        this.gameService = gameService;
         this.lobbyController = lobbyController;
         this.eventListener = eventListener;
         this.gameIDStorage = gameIDStorage;
@@ -155,6 +158,12 @@ public class GameLobbyController implements Controller {
             e.printStackTrace();
             return null;
         }
+
+        // load game title
+        gameService
+                .findOneGame(this.gameIDStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> this.idTitleLabel.setText("Welcome to " + result.name()));
 
         // load game members
         members.addListener((ListChangeListener<? super Member>) c -> {
