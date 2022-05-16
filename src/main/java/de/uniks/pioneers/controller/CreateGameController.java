@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -78,10 +79,17 @@ public class CreateGameController implements Controller {
 
     public void createGameButtonPressed(ActionEvent event) {
 
-        Observable<Game> gameObservable = gameService.create(gameNameTextField.getText(), passwordTextField.getText());
+        if (gameNameTextField.getText().length() > 32 || gameNameTextField.getText().length() < 1) {
+            new Alert(Alert.AlertType.INFORMATION, "the name of the game must be between 1 and 32 characters long!")
+                    .showAndWait();
+        } else if (passwordTextField.getText().length() < 1) {
+            new Alert(Alert.AlertType.INFORMATION, "password cant be empty!")
+                    .showAndWait();
+        } else {
+            gameService.create(gameNameTextField.getText(), passwordTextField.getText())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(onSuccess -> app.show(gameLobbyController.get()), onError -> {});
+        }
 
-        // create game and pass gameId
-        gameObservable.observeOn(FX_SCHEDULER)
-                .subscribe(result -> app.show(gameLobbyController.get()));
     }
 }

@@ -28,8 +28,8 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.stage = primaryStage;
-        stage.setWidth(640);
-        stage.setHeight(480);
+        stage.setWidth(800);
+        stage.setHeight(600);
         stage.setTitle("Pioneers");
 
         final Scene scene = new Scene(new Label("Loading ... "));
