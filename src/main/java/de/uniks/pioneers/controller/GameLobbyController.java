@@ -17,10 +17,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
@@ -278,6 +276,9 @@ public class GameLobbyController implements Controller {
                         .observeOn(FX_SCHEDULER)
                         .subscribe();
                 this.idMessageView.getChildren().remove(label);
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
+                        .showAndWait();
             }
         });
     }
