@@ -39,7 +39,6 @@ public class LobbyController implements Controller {
     private final ObservableList<Group> groups = FXCollections.observableArrayList();
     private final List<UserListSubController> userSubCons = new ArrayList<>();
     private final List<GameListSubController> gameSubCons = new ArrayList<>();
-
     private final List<DirectChatStorage> directChatStorages = new ArrayList<>();
 
     @FXML
@@ -72,6 +71,7 @@ public class LobbyController implements Controller {
     private final GroupService groupService;
     private final MessageService messageService;
     private final AuthService authService;
+    private final MemberService memberService;
     private final EventListener eventListener;
     private final Provider <LoginController> loginController;
     private final Provider<RulesScreenController> rulesScreenController;
@@ -82,6 +82,8 @@ public class LobbyController implements Controller {
     private final CompositeDisposable disposable = new CompositeDisposable();
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
+
+    String ownUsername = "";
 
     @Inject
     public LobbyController(App app,
@@ -421,6 +423,7 @@ public class LobbyController implements Controller {
         else if (message.sender().equals(storage.getUserId())){
             ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( storage.getUserName() +  ": " +message.body()));
         }
+    }
       
     public void joinGame(Game game) {
         TextInputDialog dialog = new TextInputDialog();
