@@ -5,29 +5,27 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
-import de.uniks.pioneers.service.GameMembersService;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.MessageService;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-
+import javafx.scene.text.Font;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -35,6 +33,8 @@ public class GameLobbyController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
+    private final List<String> deletedMessages = new ArrayList<>();
+    private final HashMap<String, String> memberHash = new HashMap<>();
 
     @FXML
     public Label idTitleLabel;
@@ -42,8 +42,6 @@ public class GameLobbyController implements Controller {
     public Button idLeaveButton;
     @FXML
     public ScrollPane idUserInLobby;
-    @FXML
-    public AnchorPane idMessageArea;
     @FXML
     public TextField idMessageField;
     @FXML
@@ -60,60 +58,95 @@ public class GameLobbyController implements Controller {
     public ScrollPane idChatScrollPane;
 
     private final App app;
-    private final GameMembersService gameMembersService;
+    private final MemberService memberService;
     private final UserService userService;
     private final MessageService messageService;
+    private final GameService gameService;
     private final Provider<LobbyController> lobbyController;
     private final EventListener eventListener;
-    private final IDStorage idStorage;
+    private final GameIDStorage gameIDStorage;
+    private final MemberIDStorage memberIDStorage;
 
     @Inject
     public GameLobbyController(App app,
-                               GameMembersService gameMembersService,
+                               MemberService memberService,
                                UserService userService,
                                MessageService messageService,
+                               GameService gameService,
                                Provider<LobbyController> lobbyController,
                                EventListener eventListener,
-                               IDStorage idStorage) {
+                               GameIDStorage gameIDStorage,
+                               MemberIDStorage memberIDStorage) {
         this.app = app;
-        this.gameMembersService = gameMembersService;
+        this.memberService = memberService;
         this.userService = userService;
         this.messageService = messageService;
+        this.gameService = gameService;
         this.lobbyController = lobbyController;
         this.eventListener = eventListener;
-        this.idStorage = idStorage;
+        this.gameIDStorage = gameIDStorage;
+        this.memberIDStorage = memberIDStorage;
     }
 
     @Override
     public void init() {
         // get all game members
-        gameMembersService
-                .getAllGameMembers(this.idStorage.getID())
+        memberService
+                .getAllGameMembers(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.members::setAll);
 
+        // init memberHash
+        userService
+                .findAllUsers()
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    for(User user : result) {
+                        this.memberHash.put(user._id(), user.name());
+                    }
+                });
+
         // get all messages
         messageService
-                .getAllMessages(GAMES, this.idStorage.getID())
+                .getAllMessages(GAMES, this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.messages::setAll);
 
+        // listen to members
+        eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    final Member member = event.data();
+                    if (event.event().endsWith(CREATED)) {
+                        members.add(member);
+                    } else if (event.event().endsWith(DELETED)) {
+                        members.remove(member);
+                    }
+                });
+
         // listen to game lobby messages
         eventListener
-                .listen("games." + idStorage.getID() + ".*.*.*", Message.class)
+                .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Message message = event.data();
-                   if (event.event().endsWith(CREATED)) {
-                       messages.add(message);
-                   }
+                    if (event.event().endsWith(CREATED)) {
+                        renderMessage(message, true);
+                    } else if (event.event().endsWith(DELETED)) {
+                        renderMessage(message, false);
+                    }
                 });
-
     }
 
     @Override
     public void destroy() {
-
+        eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
+                .unsubscribeOn(FX_SCHEDULER);
+        eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
+                .unsubscribeOn(FX_SCHEDULER);
     }
 
     @Override
@@ -130,24 +163,17 @@ public class GameLobbyController implements Controller {
             return null;
         }
 
+        // load game title
+        gameService
+                .findOneGame(this.gameIDStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> this.idTitleLabel.setText("Welcome to " + result.name()));
+
         // load game members
         members.addListener((ListChangeListener<? super Member>) c -> {
-            this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderUser).toList());
+            this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
         });
 
-        // load and update game lobby messages
-        messages.addListener((ListChangeListener<? super Message>) c -> {
-            int indexLastElem = c.getList().size() - 1;
-            Label label = new Label();
-            userService.findOne(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
-                label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
-                idMessageView.getChildren().add(label);
-                System.out.println("Send: " + label.getText());
-            });
-            this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
-        });
-
-        // disable start game button when entering the GameLobby
         idStartGameButton.disableProperty().set(true);
 
         return parent;
@@ -176,28 +202,80 @@ public class GameLobbyController implements Controller {
     }
 
     // private methods
-
     // checkMessageField
     private void checkMessageField() {
         if (!this.idMessageField.getText().isEmpty()) {
             messageService
-                    .send(GAMES, idStorage.getID(), idMessageField.getText())
+                    .send(GAMES, this.gameIDStorage.getId(), idMessageField.getText())
                     .subscribe();
             this.idMessageField.clear();
         }
     }
 
-    // render user by id
-    private Label renderUser(Member member) {
-        Label label = new Label();
+    private Node renderMember(Member member) {
+        MemberListSubcontroller memberListSubcontroller = new MemberListSubcontroller(this.app, member, this.userService);
+        return memberListSubcontroller.render();
+    }
 
-        userService
-                .findOne(member.userId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    label.setText(result.name() + " - ready: " + member.ready());
-                });
+    /*
+    * Render message for add and delete
+    * save id in deleted messages
+    * if deleted messages contains id, create different label
+    * and make label not right clickable
+    * */
+    private void renderMessage(Message message, Boolean render) {
+        this.idMessageView.getChildren().clear();
 
-        return label;
+        if (render) {
+            this.messages.add(message);
+        } else {
+            this.deletedMessages.add(message._id());
+        }
+
+        if (!messages.isEmpty()) {
+            for (Message m : messages) {
+                if (this.deletedMessages.contains(m._id())) {
+                    Label label = new Label(this.memberHash.get(m.sender()) + ": - message deleted - ");
+                    label.setFont(Font.font("Italic"));
+                    this.idMessageView.getChildren().add(label);
+                } else {
+                    Label label = new Label();
+                    label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
+                    this.initRightClick(label, m._id(), m.sender());
+                    label.setOnMouseEntered(event -> {
+                        label.setStyle("-fx-background-color: LIGHTGREY");
+                    });
+                    label.setOnMouseExited(event -> {
+                        label.setStyle("-fx-background-color: DEFAULT");
+                    });
+
+                    label.setText(memberHash.get(m.sender()) + ": " + m.body());
+                    this.idMessageView.getChildren().add(label);
+                }
+            }
+        }
+        // scroll automatically to bottom
+        this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
+    }
+
+    private void initRightClick(Label label, String messageId, String sender) {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem menuItem = new MenuItem("delete");
+
+        contextMenu.getItems().add(menuItem);
+        label.setContextMenu(contextMenu);
+
+        menuItem.setOnAction(event -> {
+            if (sender.equals(this.memberIDStorage.getId())) {
+                messageService
+                        .delete(GAMES, this.gameIDStorage.getId(), messageId)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+                this.idMessageView.getChildren().remove(label);
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
+                        .showAndWait();
+            }
+        });
     }
 }
