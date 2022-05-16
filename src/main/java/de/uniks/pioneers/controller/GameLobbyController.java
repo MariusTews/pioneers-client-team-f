@@ -123,7 +123,12 @@ public class GameLobbyController implements Controller {
 
     @Override
     public void destroy() {
-
+        eventListener
+                .listen("games." + idStorage.getID() + ".members.*.*", Member.class)
+                .unsubscribeOn(FX_SCHEDULER);
+        eventListener
+                .listen("games." + idStorage.getID() + ".messages.*.*", Message.class)
+                .unsubscribeOn(FX_SCHEDULER);
     }
 
     @Override
@@ -157,7 +162,6 @@ public class GameLobbyController implements Controller {
             label.setOnMouseExited(event -> {
                 label.setStyle("-fx-background-color: DEFAULT");
             });
-            // when second member joins, a message gets send with null as sender
             userService.findOne(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
                 label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
                 idMessageView.getChildren().add(label);
