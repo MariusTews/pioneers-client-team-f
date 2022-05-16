@@ -28,7 +28,7 @@
          <children>
             <ScrollPane fx:id="userScrollPane" prefHeight="200.0" prefWidth="300.0">
                <content>
-                  <VBox prefHeight="480.0" prefWidth="300.0" spacing="6.0" />
+                  <VBox prefHeight="480.0" prefWidth="290.0" spacing="6.0" />
                </content>
             </ScrollPane>
             <VBox minWidth="240.0" prefHeight="200.0" prefWidth="240.0">
@@ -55,7 +55,7 @@
             </VBox>
             <ScrollPane fx:id="gamesScrollPane" prefHeight="200.0" prefWidth="250.0">
                <content>
-                  <VBox prefHeight="480.0" prefWidth="250.0" spacing="6.0" />
+                  <VBox prefHeight="480.0" prefWidth="240.0" spacing="6.0" />
                </content>
             </ScrollPane>
          </children>
