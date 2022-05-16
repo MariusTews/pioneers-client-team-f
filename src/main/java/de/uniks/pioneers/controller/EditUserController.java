@@ -126,6 +126,8 @@ public class EditUserController implements Controller {
     }
 
     public void deleteButtonPressed(ActionEvent event) {
+        new Alert(Alert.AlertType.INFORMATION, "accont was successfully deleted!")
+                .showAndWait();
         userService.delete(idStorage.getID())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> app.show(loginController.get()));
@@ -191,7 +193,7 @@ public class EditUserController implements Controller {
 
         userService.userUpdate(id, name, avatar, "online", password)
                 .observeOn(FX_SCHEDULER)
-                .doOnError(error ->{
+                .doOnError(error -> {
                     if ("HTTP 409 ".equals(error.getMessage())) {
                         new Alert(Alert.AlertType.INFORMATION, "username is already taken!")
                                 .showAndWait();
@@ -203,7 +205,7 @@ public class EditUserController implements Controller {
 
                 })
 
-                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {} );
+                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
     }
 
 }
