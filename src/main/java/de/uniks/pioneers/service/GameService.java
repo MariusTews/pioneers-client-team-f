@@ -12,13 +12,13 @@ import java.util.List;
 public class GameService {
 
     private final GamesApiService gamesApiService;
-    private final IDStorage idStorage;
+    private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
 
     @Inject
-    public GameService(GamesApiService gamesApiService, IDStorage idStorage, MemberIDStorage memberIDStorage) {
+    public GameService(GamesApiService gamesApiService, GameIDStorage gameIDStorage, MemberIDStorage memberIDStorage) {
         this.gamesApiService = gamesApiService;
-        this.idStorage = idStorage;
+        this.gameIDStorage = gameIDStorage;
         this.memberIDStorage = memberIDStorage;
     }
 
@@ -26,7 +26,7 @@ public class GameService {
         return gamesApiService
                 .create(new CreateGameDto(gameName, password))
                 .doOnNext(result -> {
-                    this.idStorage.setID(result._id());
+                    this.gameIDStorage.setId(result._id());
                     this.memberIDStorage.setId(result.owner());
                 });
     }
