@@ -4,10 +4,7 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.controller.LobbyController;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.MemberService;
-import de.uniks.pioneers.service.MessageService;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -43,7 +40,10 @@ public class GameLobbyViewTest extends ApplicationTest {
     EventListener eventListener;
 
     @Spy
-    IDStorage idStorage;
+    GameIDStorage gameIDStorage;
+
+    @Spy
+    MemberIDStorage memberIDStorage;
 
     @InjectMocks
     GameLobbyController gameLobbyController;
