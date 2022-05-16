@@ -403,10 +403,14 @@ public class LobbyController implements Controller {
 
             for (Message message: this.messages){
                 if (!this.deletedMessages.contains(message._id())) {
+                    Label label = new Label();
+                    initRightClick(label,message._id(),message.sender(),groupId);
                     if (message.sender().equals(idStorage.getID())) {
-                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label(ownUsername + ": " + message.body()));
+                        label.setText(ownUsername + ": " + message.body());
+                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(label);
                     } else if (message.sender().equals(userId)) {
-                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label(username + ": " + message.body()));
+                        label.setText(username + ": " + message.body());
+                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(label);
                     }
                 }
                 else {
@@ -452,5 +456,25 @@ public class LobbyController implements Controller {
                                 app.show(gameLobbyController.get());
                             });
                 });
+    }
+
+    private void initRightClick(Label label, String messageId, String sender, String groupId) {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem menuItem = new MenuItem("delete");
+
+        contextMenu.getItems().add(menuItem);
+        label.setContextMenu(contextMenu);
+
+        menuItem.setOnAction(event -> {
+            if (sender.equals(this.idStorage.getID())) {
+                messageService
+                        .delete(GROUPS, groupId, messageId)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
+                        .showAndWait();
+            }
+        });
     }
 }
