@@ -60,7 +60,7 @@ public class GameLobbyController implements Controller {
     private final MessageService messageService;
     private final Provider<LobbyController> lobbyController;
     private final EventListener eventListener;
-    private final IDStorage idStorage;
+    private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
 
     @Inject
@@ -70,7 +70,7 @@ public class GameLobbyController implements Controller {
                                MessageService messageService,
                                Provider<LobbyController> lobbyController,
                                EventListener eventListener,
-                               IDStorage idStorage,
+                               GameIDStorage gameIDStorage,
                                MemberIDStorage memberIDStorage) {
         this.app = app;
         this.gameMembersService = gameMembersService;
@@ -78,29 +78,29 @@ public class GameLobbyController implements Controller {
         this.messageService = messageService;
         this.lobbyController = lobbyController;
         this.eventListener = eventListener;
-        this.idStorage = idStorage;
+        this.gameIDStorage = gameIDStorage;
         this.memberIDStorage = memberIDStorage;
     }
 
     @Override
     public void init() {
         //TODO: remove
-        System.out.println(idStorage.getID());
+        System.out.println(this.gameIDStorage.getId());
         // get all game members
         gameMembersService
-                .getAllGameMembers(this.idStorage.getID())
+                .getAllGameMembers(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.members::setAll);
 
         // get all messages
         messageService
-                .getAllMessages(GAMES, this.idStorage.getID())
+                .getAllMessages(GAMES, this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.messages::setAll);
 
         // listen to members
         eventListener
-                .listen("games." + idStorage.getID() + ".members.*.*", Member.class)
+                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Member member = event.data();
@@ -111,7 +111,7 @@ public class GameLobbyController implements Controller {
 
         // listen to game lobby messages
         eventListener
-                .listen("games." + idStorage.getID() + ".messages.*.*", Message.class)
+                .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Message message = event.data();
@@ -126,10 +126,10 @@ public class GameLobbyController implements Controller {
     @Override
     public void destroy() {
         eventListener
-                .listen("games." + idStorage.getID() + ".members.*.*", Member.class)
+                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
                 .unsubscribeOn(FX_SCHEDULER);
         eventListener
-                .listen("games." + idStorage.getID() + ".messages.*.*", Message.class)
+                .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
                 .unsubscribeOn(FX_SCHEDULER);
     }
 
@@ -207,7 +207,7 @@ public class GameLobbyController implements Controller {
     private void checkMessageField() {
         if (!this.idMessageField.getText().isEmpty()) {
             messageService
-                    .send(GAMES, idStorage.getID(), idMessageField.getText())
+                    .send(GAMES, this.gameIDStorage.getId(), idMessageField.getText())
                     .subscribe();
             this.idMessageField.clear();
         }
@@ -230,7 +230,7 @@ public class GameLobbyController implements Controller {
         label.setContextMenu(contextMenu);
 
         menuItem.setOnAction(event -> {
-            System.out.println(label.getText());
+            System.out.println(event.toString());
         });
 
     }
