@@ -4,6 +4,8 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
@@ -11,12 +13,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import kong.unirest.json.JSONObject;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 public class LoginController implements Controller {
     private final App app;
@@ -72,6 +75,11 @@ public class LoginController implements Controller {
             return null;
         }
 
+        JSONObject loadConfig = ResourceManager.loadConfig();
+        if (loadConfig.get(JSON_REMEMBER_ME).equals(true)) {
+            usernameTextField.setText(loadConfig.getString(JSON_NAME));
+        }
+
         signUpHyperlink.setOnAction(this::signUPHyperlinkPressed);
 
         final BooleanBinding length = Bindings.greaterThan(8, userPasswordField.lengthProperty());
@@ -99,6 +107,11 @@ public class LoginController implements Controller {
     }
 
     public void loginButtonPressed(ActionEvent event) {
+        if (rememberMeCheckBox.isSelected()) {
+            ResourceManager.saveConfig(JsonUtil.createRememberMeConfig(usernameTextField.getText()));
+        } else {
+            ResourceManager.saveConfig(JsonUtil.createDefaultConfig());
+        }
         login(usernameTextField.getText(), userPasswordField.getText());
     }
 

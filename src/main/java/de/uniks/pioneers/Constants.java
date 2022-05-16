@@ -43,4 +43,9 @@ public class Constants {
 
     //Tabname
     public static final String DirectMessage = "DirectMessage ";
+
+    //JSON
+    public static final String JSON_REMEMBER_ME = "rememberMe";
+    public static final String JSON_NAME = "name";
+
 }
