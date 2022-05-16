@@ -19,10 +19,14 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -30,6 +34,8 @@ public class GameLobbyController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
+    private final List<String> deletedMessages = new ArrayList<>();
+    private final HashMap<String, String> memberHash = new HashMap<>();
 
     @FXML
     public Label idTitleLabel;
@@ -37,8 +43,6 @@ public class GameLobbyController implements Controller {
     public Button idLeaveButton;
     @FXML
     public ScrollPane idUserInLobby;
-    @FXML
-    public AnchorPane idMessageArea;
     @FXML
     public TextField idMessageField;
     @FXML
@@ -84,6 +88,9 @@ public class GameLobbyController implements Controller {
 
     @Override
     public void init() {
+        // init memberHash
+        addMemberHash(this.memberIDStorage.getId());
+
         // get all game members
         gameMembersService
                 .getAllGameMembers(this.gameIDStorage.getId())
@@ -104,6 +111,10 @@ public class GameLobbyController implements Controller {
                     final Member member = event.data();
                     if (event.event().endsWith(CREATED)) {
                         members.add(member);
+                        addMemberHash(member.userId());
+                    } else if (event.event().endsWith(DELETED)) {
+                        members.remove(member);
+                        memberHash.remove(member.userId());
                     }
                 });
 
@@ -150,50 +161,6 @@ public class GameLobbyController implements Controller {
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
         });
 
-        // load and update game lobby messages
-        //messages.addListener((ListChangeListener<? super Message>) c -> {
-            // experiment
-            //this.idMessageView.getChildren().addAll(c.getList().stream().map(this::renderMessage).toList());
-
-            /*for(Message message : messages) {
-                Label label = new Label();
-                label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
-                this.initRightClick(label, message._id(), message.sender());
-                label.setOnMouseEntered(event -> {
-                    label.setStyle("-fx-background-color: LIGHTGREY");
-                });
-                label.setOnMouseExited(event -> {
-                    label.setStyle("-fx-background-color: DEFAULT");
-                });
-                userService.findOne(message.sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
-                    label.setText(result.name() + ": " + message.body());
-                    idMessageView.getChildren().add(label);
-                });
-            }
-            this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());*/
-            //
-
-            /*int indexLastElem = c.getList().size() - 1;
-            Label label = new Label();
-            label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
-            // make message right clickable if current member is also the sender
-            if (c.getList().get(indexLastElem).sender().equals(this.memberIDStorage.getId())) {
-                this.initRightClick(label, c.getList().get(indexLastElem)._id());
-            }
-            label.setOnMouseEntered(event -> {
-                label.setStyle("-fx-background-color: LIGHTGREY");
-            });
-            label.setOnMouseExited(event -> {
-                label.setStyle("-fx-background-color: DEFAULT");
-            });
-            userService.findOne(c.getList().get(indexLastElem).sender()).observeOn(FX_SCHEDULER).subscribe(result -> {
-                label.setText(result.name() + ": " + c.getList().get(indexLastElem).body());
-                idMessageView.getChildren().add(label);
-            });
-            this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());*/
-        //});
-
-        // disable start game button when entering the GameLobby
         idStartGameButton.disableProperty().set(true);
 
         return parent;
@@ -222,6 +189,16 @@ public class GameLobbyController implements Controller {
     }
 
     // private methods
+    // add member to memberHash
+    private void addMemberHash(String memberId) {
+        userService
+                .findOne(memberId)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    this.memberHash.put(memberId, result.name());
+                });
+    }
+
     // checkMessageField
     private void checkMessageField() {
         if (!this.idMessageField.getText().isEmpty()) {
@@ -237,41 +214,47 @@ public class GameLobbyController implements Controller {
         return memberListSubcontroller.render();
     }
 
-    //TODO: observe
+    /*
+    * Render message for add and delete
+    * save id in deleted messages
+    * if deleted messages contains id, create different label
+    * and make label not right clickable
+    * */
     private void renderMessage(Message message, Boolean render) {
         this.idMessageView.getChildren().clear();
+
         if (render) {
             this.messages.add(message);
         } else {
-            this.messages.remove(message);
+            this.deletedMessages.add(message._id());
         }
+
         if (!messages.isEmpty()) {
             for (Message m : messages) {
-                Label label = new Label();
-                label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
-                this.initRightClick(label, m._id(), m.sender());
-                label.setOnMouseEntered(event -> {
-                    label.setStyle("-fx-background-color: LIGHTGREY");
-                });
-                label.setOnMouseExited(event -> {
-                    label.setStyle("-fx-background-color: DEFAULT");
-                });
-            /*userService
-                    .findOne(m.sender())
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                        label.setText(result.name() + ": " + m.body());
-                        this.idMessageView.getChildren().add(label);
-                    });*/
-                label.setText(m.sender() + ": " + m.body());
-                this.idMessageView.getChildren().add(label);
+                if (this.deletedMessages.contains(m._id())) {
+                    Label label = new Label(this.memberHash.get(m.sender()) + ": - message deleted - ");
+                    label.setFont(Font.font("Italic"));
+                    this.idMessageView.getChildren().add(label);
+                } else {
+                    Label label = new Label();
+                    label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
+                    this.initRightClick(label, m._id(), m.sender());
+                    label.setOnMouseEntered(event -> {
+                        label.setStyle("-fx-background-color: LIGHTGREY");
+                    });
+                    label.setOnMouseExited(event -> {
+                        label.setStyle("-fx-background-color: DEFAULT");
+                    });
+
+                    label.setText(memberHash.get(m.sender()) + ": " + m.body());
+                    this.idMessageView.getChildren().add(label);
+                }
             }
         }
+        // scroll automatically to bottom
+        this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
     }
 
-    //TODO: messageService delete
-    // cut off username and delete threw service
-    // maybe replace with new label and the text that this message where deleted
     private void initRightClick(Label label, String messageId, String sender) {
         final ContextMenu contextMenu = new ContextMenu();
         final MenuItem menuItem = new MenuItem("delete");
@@ -288,6 +271,5 @@ public class GameLobbyController implements Controller {
                 this.idMessageView.getChildren().remove(label);
             }
         });
-
     }
 }
