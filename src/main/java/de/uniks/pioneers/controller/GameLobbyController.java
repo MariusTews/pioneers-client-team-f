@@ -5,6 +5,7 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -89,8 +90,6 @@ public class GameLobbyController implements Controller {
 
     @Override
     public void init() {
-
-
         // get all game members
         memberService
                 .getAllGameMembers(this.gameIDStorage.getId())
@@ -98,10 +97,14 @@ public class GameLobbyController implements Controller {
                 .subscribe(this.members::setAll);
 
         // init memberHash
-        //addMemberHash(this.memberIDStorage.getId());
-        for (Member member : members) {
-            addMemberHash(member.userId());
-        }
+        userService
+                .findAllUsers()
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    for(User user : result) {
+                        this.memberHash.put(user._id(), user.name());
+                    }
+                });
 
         // get all messages
         messageService
@@ -117,10 +120,8 @@ public class GameLobbyController implements Controller {
                     final Member member = event.data();
                     if (event.event().endsWith(CREATED)) {
                         members.add(member);
-                        addMemberHash(member.userId());
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
-                        memberHash.remove(member.userId());
                     }
                 });
 
@@ -201,16 +202,6 @@ public class GameLobbyController implements Controller {
     }
 
     // private methods
-    // add member to memberHash
-    private void addMemberHash(String memberId) {
-        userService
-                .findOne(memberId)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    this.memberHash.put(memberId, result.name());
-                });
-    }
-
     // checkMessageField
     private void checkMessageField() {
         if (!this.idMessageField.getText().isEmpty()) {
