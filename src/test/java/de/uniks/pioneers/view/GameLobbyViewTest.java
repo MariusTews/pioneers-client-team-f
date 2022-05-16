@@ -34,6 +34,9 @@ public class GameLobbyViewTest extends ApplicationTest {
     MessageService messageService;
 
     @Mock
+    GameService gameService;
+
+    @Mock
     LobbyController lobbyController;
 
     @Mock
@@ -58,6 +61,8 @@ public class GameLobbyViewTest extends ApplicationTest {
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(messageService.getAllMessages(any(), any())).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
+        when(gameService.findOneGame(any())).thenReturn(Observable.empty());
+
         // start application
         this.stage = stage;
         this.app = new App(gameLobbyController);
