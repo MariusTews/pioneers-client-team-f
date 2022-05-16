@@ -64,6 +64,7 @@ public class LobbyController implements Controller {
     public Button editUserButton;
     @FXML
     public Button createGameButton;
+
     private final App app;
     private final IDStorage idStorage;
     private final UserService userService;
@@ -76,14 +77,11 @@ public class LobbyController implements Controller {
     private final Provider<RulesScreenController> rulesScreenController;
     private final Provider<CreateGameController> createGameController;
     private final Provider<EditUserController> editUserController;
+    private final Provider<GameLobbyController> gameLobbyController;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
-
     private Disposable tabDisposable;
-
     private DirectChatStorage currentDirectStorage;
-
-    String ownUsername = "";
 
     @Inject
     public LobbyController(App app,
@@ -93,11 +91,13 @@ public class LobbyController implements Controller {
                            GroupService groupService,
                            MessageService messageService,
                            AuthService authService,
+                           MemberService memberService,
                            EventListener eventListener,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
-                           Provider<EditUserController> editUserController) {
+                           Provider<EditUserController> editUserController,
+                           Provider<GameLobbyController> gameLobbyController) {
 
         this.app = app;
         this.idStorage = idStorage;
@@ -106,11 +106,13 @@ public class LobbyController implements Controller {
         this.groupService = groupService;
         this.messageService = messageService;
         this.authService = authService;
+        this.memberService = memberService;
         this.eventListener = eventListener;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
         this.createGameController = createGameController;
         this.editUserController = editUserController;
+        this.gameLobbyController = gameLobbyController;
     }
 
     @Override
@@ -251,7 +253,7 @@ public class LobbyController implements Controller {
                 return subCon.getParent();
             }
         }
-        GameListSubController gameCon = new GameListSubController(this.app,game);
+        GameListSubController gameCon = new GameListSubController(this.app,game, this);
         gameSubCons.add(gameCon);
         return gameCon.render();
     }
@@ -419,5 +421,24 @@ public class LobbyController implements Controller {
         else if (message.sender().equals(storage.getUserId())){
             ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( storage.getUserName() +  ": " +message.body()));
         }
+      
+    public void joinGame(Game game) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Enter the password");
+        dialog.setHeaderText("password");
+        dialog.showAndWait()
+                .ifPresent(password -> {
+                    this.memberService.join(game._id(), password)
+                            .observeOn(FX_SCHEDULER)
+                            .doOnError(error -> {
+                                if ("HTTP 401 ".equals(error.getMessage())) {
+                                    new Alert(Alert.AlertType.ERROR, "wrong password")
+                                            .showAndWait();
+                                }
+                            })
+                            .subscribe(result -> {
+                                app.show(gameLobbyController.get());
+                            });
+                });
     }
 }
