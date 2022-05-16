@@ -43,11 +43,4 @@ public class Constants {
 
     //Tabname
     public static final String DirectMessage = "DirectMessage ";
-
-    //Namespace
-    public static final String GROUPS = "groups";
-
-    public static final String GAMES = "games";
-
-
 }
