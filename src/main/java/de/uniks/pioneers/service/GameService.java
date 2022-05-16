@@ -13,17 +13,22 @@ public class GameService {
 
     private final GamesApiService gamesApiService;
     private final IDStorage idStorage;
+    private final MemberIDStorage memberIDStorage;
 
     @Inject
-    public GameService(GamesApiService gamesApiService, IDStorage idStorage) {
+    public GameService(GamesApiService gamesApiService, IDStorage idStorage, MemberIDStorage memberIDStorage) {
         this.gamesApiService = gamesApiService;
         this.idStorage = idStorage;
+        this.memberIDStorage = memberIDStorage;
     }
 
     public Observable<Game> create(String gameName, String password) {
         return gamesApiService
                 .create(new CreateGameDto(gameName, password))
-                .doOnNext(result -> this.idStorage.setID(result._id()));
+                .doOnNext(result -> {
+                    this.idStorage.setID(result._id());
+                    this.memberIDStorage.setId(result.owner());
+                });
     }
 
     public Observable<List<Game>> findAllGames() {
