@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.shape.Circle?>
 
-<HBox alignment="CENTER" maxHeight="50.0" maxWidth="220.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="280.0" spacing="10.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.UserListSubController">
+<HBox alignment="CENTER_LEFT" maxHeight="50.0" maxWidth="220.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="280.0" spacing="10.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.UserListSubController">
    <children>
       <ImageView fx:id="userImageView" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" />
       <Circle fx:id="userStatusCircle" fill="WHITE" radius="7.5" stroke="BLACK" strokeType="INSIDE" />
