@@ -9,17 +9,26 @@ import javax.inject.Inject;
 
 public class MemberService {
 
-    private GameMembersApiService gameMembersApiService;
+    private final GameMembersApiService gameMembersApiService;
+
+    // id of game and member needed when joining
+    private final GameIDStorage gameIDStorage;
+    private final MemberIDStorage memberIDStorage;
 
     @Inject
-    public MemberService(GameMembersApiService gameMembersApiService) {
-
+    public MemberService(GameMembersApiService gameMembersApiService, GameIDStorage gameIDStorage, MemberIDStorage memberIDStorage) {
         this.gameMembersApiService = gameMembersApiService;
+        this.gameIDStorage = gameIDStorage;
+        this.memberIDStorage = memberIDStorage;
     }
 
     public Observable<Member> join(String gameID, String password) {
         return gameMembersApiService
-                .create(gameID, new CreateMemberDto(false,  password));
+                .create(gameID, new CreateMemberDto(false,  password))
+                .doOnNext(result -> {
+                    this.gameIDStorage.setId(result.gameId());
+                    this.memberIDStorage.setId(result.userId());
+                });
 
     }
 }
