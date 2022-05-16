@@ -20,14 +20,16 @@ public class GameListSubController implements Controller {
 	@FXML
 	public Button joinButton;
 	private final Game game;
+	private LobbyController lobbyController;
 	private App app;
 
 	private Parent parent;
 
 	@Inject
-	public GameListSubController(App app, Game game){
+	public GameListSubController(App app, Game game, LobbyController lobbyController){
 		this.app = app;
 		this.game = game;
+		this.lobbyController = lobbyController;
 	}
 
 	@Override
@@ -62,6 +64,9 @@ public class GameListSubController implements Controller {
 	}
 
 	public void joinButtonPressed(ActionEvent event) {
+		if ((int)game.members() < 6) {
+			this.lobbyController.joinGame(this.game);
+		}
 	}
 
 	public String getId() {

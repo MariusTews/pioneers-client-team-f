@@ -3,7 +3,6 @@ package de.uniks.pioneers;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.User;
 import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.application.Platform;
 
@@ -41,4 +40,7 @@ public class Constants {
     public static final Comparator<User> userComparator = Comparator.comparing(User::status).reversed().thenComparing(User::name);
 
     public static final Comparator<Game> gameComparator = Comparator.comparing(Game::name);
+
+    //Tabname
+    public static final String DirectMessage = "DirectMessage ";
 }
