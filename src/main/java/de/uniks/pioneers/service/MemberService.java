@@ -6,6 +6,7 @@ import de.uniks.pioneers.rest.GameMembersApiService;
 import io.reactivex.rxjava3.core.Observable;
 
 import javax.inject.Inject;
+import java.util.List;
 
 public class MemberService {
 
@@ -20,6 +21,10 @@ public class MemberService {
         this.gameMembersApiService = gameMembersApiService;
         this.gameIDStorage = gameIDStorage;
         this.memberIDStorage = memberIDStorage;
+    }
+
+    public Observable<List<Member>> getAllGameMembers(String gameId) {
+        return gameMembersApiService.findAll(gameId);
     }
 
     public Observable<Member> join(String gameID, String password) {

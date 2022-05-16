@@ -4,8 +4,8 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.controller.LobbyController;
-import de.uniks.pioneers.service.GameMembersService;
 import de.uniks.pioneers.service.IDStorage;
+import de.uniks.pioneers.service.MemberService;
 import de.uniks.pioneers.service.MessageService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class GameLobbyViewTest extends ApplicationTest {
     @Mock
-    GameMembersService gameMembersService;
+    MemberService memberService;
 
     @Mock
     UserService userService;
@@ -54,7 +54,7 @@ public class GameLobbyViewTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         // empty init
-        when(gameMembersService.getAllGameMembers(any())).thenReturn(Observable.empty());
+        when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         when(messageService.getAllMessages(any(), any())).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         // start application

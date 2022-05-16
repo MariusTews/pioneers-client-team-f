@@ -57,7 +57,7 @@ public class GameLobbyController implements Controller {
     public ScrollPane idChatScrollPane;
 
     private final App app;
-    private final GameMembersService gameMembersService;
+    private final MemberService memberService;
     private final UserService userService;
     private final MessageService messageService;
     private final GameService gameService;
@@ -68,7 +68,7 @@ public class GameLobbyController implements Controller {
 
     @Inject
     public GameLobbyController(App app,
-                               GameMembersService gameMembersService,
+                               MemberService memberService,
                                UserService userService,
                                MessageService messageService,
                                GameService gameService,
@@ -77,7 +77,7 @@ public class GameLobbyController implements Controller {
                                GameIDStorage gameIDStorage,
                                MemberIDStorage memberIDStorage) {
         this.app = app;
-        this.gameMembersService = gameMembersService;
+        this.memberService = memberService;
         this.userService = userService;
         this.messageService = messageService;
         this.gameService = gameService;
@@ -89,14 +89,19 @@ public class GameLobbyController implements Controller {
 
     @Override
     public void init() {
-        // init memberHash
-        addMemberHash(this.memberIDStorage.getId());
+
 
         // get all game members
-        gameMembersService
+        memberService
                 .getAllGameMembers(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.members::setAll);
+
+        // init memberHash
+        //addMemberHash(this.memberIDStorage.getId());
+        for (Member member : members) {
+            addMemberHash(member.userId());
+        }
 
         // get all messages
         messageService
