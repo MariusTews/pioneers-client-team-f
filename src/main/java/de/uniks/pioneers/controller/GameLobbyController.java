@@ -5,10 +5,7 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
-import de.uniks.pioneers.service.GameMembersService;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.MessageService;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -64,6 +61,7 @@ public class GameLobbyController implements Controller {
     private final Provider<LobbyController> lobbyController;
     private final EventListener eventListener;
     private final IDStorage idStorage;
+    private final MemberIDStorage memberIDStorage;
 
     @Inject
     public GameLobbyController(App app,
@@ -72,7 +70,8 @@ public class GameLobbyController implements Controller {
                                MessageService messageService,
                                Provider<LobbyController> lobbyController,
                                EventListener eventListener,
-                               IDStorage idStorage) {
+                               IDStorage idStorage,
+                               MemberIDStorage memberIDStorage) {
         this.app = app;
         this.gameMembersService = gameMembersService;
         this.userService = userService;
@@ -80,6 +79,7 @@ public class GameLobbyController implements Controller {
         this.lobbyController = lobbyController;
         this.eventListener = eventListener;
         this.idStorage = idStorage;
+        this.memberIDStorage = memberIDStorage;
     }
 
     @Override
@@ -117,6 +117,8 @@ public class GameLobbyController implements Controller {
                     final Message message = event.data();
                     if (event.event().endsWith(CREATED)) {
                         messages.add(message);
+                    } else if (event.event().endsWith(DELETED)) {
+                        messages.remove(message);
                     }
                 });
     }
@@ -155,7 +157,10 @@ public class GameLobbyController implements Controller {
             int indexLastElem = c.getList().size() - 1;
             Label label = new Label();
             label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
-            this.initRightClick(label);
+            // make message right clickable if current member is also the sender
+            if (c.getList().get(indexLastElem).sender().equals(this.memberIDStorage.getId())) {
+                this.initRightClick(label);
+            }
             label.setOnMouseEntered(event -> {
                 label.setStyle("-fx-background-color: LIGHTGREY");
             });
