@@ -4,10 +4,7 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.controller.LobbyController;
-import de.uniks.pioneers.service.GameMembersService;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.MessageService;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -28,7 +25,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class GameLobbyViewTest extends ApplicationTest {
     @Mock
-    GameMembersService gameMembersService;
+    MemberService memberService;
 
     @Mock
     UserService userService;
@@ -37,13 +34,19 @@ public class GameLobbyViewTest extends ApplicationTest {
     MessageService messageService;
 
     @Mock
+    GameService gameService;
+
+    @Mock
     LobbyController lobbyController;
 
     @Mock
     EventListener eventListener;
 
     @Spy
-    IDStorage idStorage;
+    GameIDStorage gameIDStorage;
+
+    @Spy
+    MemberIDStorage memberIDStorage;
 
     @InjectMocks
     GameLobbyController gameLobbyController;
@@ -54,9 +57,12 @@ public class GameLobbyViewTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         // empty init
-        when(gameMembersService.getAllGameMembers(any())).thenReturn(Observable.empty());
+        when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
+        when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(messageService.getAllMessages(any(), any())).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
+        when(gameService.findOneGame(any())).thenReturn(Observable.empty());
+
         // start application
         this.stage = stage;
         this.app = new App(gameLobbyController);

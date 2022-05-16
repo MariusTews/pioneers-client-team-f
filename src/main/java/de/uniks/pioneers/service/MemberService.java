@@ -6,20 +6,34 @@ import de.uniks.pioneers.rest.GameMembersApiService;
 import io.reactivex.rxjava3.core.Observable;
 
 import javax.inject.Inject;
+import java.util.List;
 
 public class MemberService {
 
-    private GameMembersApiService gameMembersApiService;
+    private final GameMembersApiService gameMembersApiService;
+
+    // id of game and member needed when joining
+    private final GameIDStorage gameIDStorage;
+    private final MemberIDStorage memberIDStorage;
 
     @Inject
-    public MemberService(GameMembersApiService gameMembersApiService) {
-
+    public MemberService(GameMembersApiService gameMembersApiService, GameIDStorage gameIDStorage, MemberIDStorage memberIDStorage) {
         this.gameMembersApiService = gameMembersApiService;
+        this.gameIDStorage = gameIDStorage;
+        this.memberIDStorage = memberIDStorage;
+    }
+
+    public Observable<List<Member>> getAllGameMembers(String gameId) {
+        return gameMembersApiService.findAll(gameId);
     }
 
     public Observable<Member> join(String gameID, String password) {
         return gameMembersApiService
-                .create(gameID, new CreateMemberDto(false,  password));
+                .create(gameID, new CreateMemberDto(false,  password))
+                .doOnNext(result -> {
+                    this.gameIDStorage.setId(result.gameId());
+                    this.memberIDStorage.setId(result.userId());
+                });
 
     }
 }
