@@ -64,6 +64,9 @@ dependencies {
     implementation 'com.google.dagger:dagger:2.41'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.41'
     testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.41'
+
+     //konghq
+    implementation group: 'com.konghq' , name: 'unirest-java', version: '3.11.09'
 }
 
 javafx {
