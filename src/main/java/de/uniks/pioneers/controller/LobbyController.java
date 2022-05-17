@@ -249,6 +249,8 @@ public class LobbyController implements Controller {
             if (user.avatar() != null){
                 this.ownAvatar = user.avatar();
             }
+            this.ownUsername = user.name();
+            this.userWelcomeLabel.setText(WELCOME + user.name() + "!");
         }
         for(UserListSubController subCon: this.userSubCons) {
             if (subCon.getId().equals(user._id())){

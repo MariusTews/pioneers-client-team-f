@@ -48,4 +48,7 @@ public class Constants {
     public static final String JSON_REMEMBER_ME = "rememberMe";
     public static final String JSON_NAME = "name";
 
+    //Welcome Message
+    public static final String WELCOME = "Nice to see you again, ";
+
 }
