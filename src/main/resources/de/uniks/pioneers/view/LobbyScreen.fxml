@@ -16,7 +16,7 @@
       <HBox alignment="CENTER" maxHeight="40.0" prefWidth="200.0" spacing="120.0">
          <children>
             <Button fx:id="rulesButton" mnemonicParsing="false" onAction="#rulesButtonPressed" text="Rules" />
-            <Label fx:id="userWelcomeLabel" prefHeight="40.0" prefWidth="300.0" text="Nice to see you again, username!">
+            <Label fx:id="userWelcomeLabel" prefHeight="40.0" prefWidth="300.0" text="Nice to see you again, ">
                <font>
                   <Font size="18.0" />
                </font>

@@ -241,6 +241,10 @@ public class LobbyController implements Controller {
     }
 
     private Node renderUser(User user){
+        if (user._id().equals(this.idStorage.getID())){
+            this.ownUsername = user.name();
+            this.userWelcomeLabel.setText(WELCOME + user.name() + "!");
+        }
         for(UserListSubController subCon: this.userSubCons) {
             if (subCon.getId().equals(user._id())){
                 return subCon.getParent();
