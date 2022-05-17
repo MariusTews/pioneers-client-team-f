@@ -35,8 +35,9 @@ public class LobbyController implements Controller {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<Game> games = FXCollections.observableArrayList();
-
     private final ObservableList<Group> groups = FXCollections.observableArrayList();
+    private final List<Message> messages = new ArrayList<>();
+    private final List<String> deletedMessages = new ArrayList<>();
     private final List<UserListSubController> userSubCons = new ArrayList<>();
     private final List<GameListSubController> gameSubCons = new ArrayList<>();
     private final List<DirectChatStorage> directChatStorages = new ArrayList<>();
@@ -176,13 +177,14 @@ public class LobbyController implements Controller {
         for (DirectChatStorage directChatStorage : directChatStorages) {
             if (directChatStorage.getTab().equals(newValue)) {
                 this.currentDirectStorage = directChatStorage;
+
                 tabDisposable = eventListener.listen("groups." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
                     if (messageEvent.event().endsWith(CREATED)) {
-                        renderMessage(directChatStorage,messageEvent.data());
+                        this.messages.add(messageEvent.data());
+                        renderNewMessage(directChatStorage,messageEvent.data());
                     } else if (messageEvent.event().endsWith(DELETED)) {
-                        //TODO:
-                    } else if (messageEvent.event().endsWith(UPDATED)) {
-                        //TODO:
+                        this.deletedMessages.add(messageEvent.data()._id());
+                        loadDirectMessages(directChatStorage.getGroupId(),directChatStorage.getUserId(),directChatStorage.getUserName(),newValue);
                     }
                 });
             }
@@ -395,13 +397,24 @@ public class LobbyController implements Controller {
 
     private void loadDirectMessages(String groupId, String userId,String username, Tab tab){
         this.messageService.getAllMessages(GROUPS,groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
-            for (Message message: messages){
-                if (message.sender().equals(idStorage.getID()))
-                {
-                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label( ownUsername +  ": " +message.body()));
+            this.messages.clear();
+            this.messages.addAll(messages);
+            ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
+
+            for (Message message: this.messages){
+                if (!this.deletedMessages.contains(message._id())) {
+                    Label label = new Label();
+                    initRightClick(label,message._id(),message.sender(),groupId);
+                    if (message.sender().equals(idStorage.getID())) {
+                        label.setText(ownUsername + ": " + message.body());
+                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(label);
+                    } else if (message.sender().equals(userId)) {
+                        label.setText(username + ": " + message.body());
+                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(label);
+                    }
                 }
-                else if (message.sender().equals(userId)){
-                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label( username +  ": " +message.body()));
+                else {
+                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label("message was deleted"));
                 }
             }
         });
@@ -416,12 +429,16 @@ public class LobbyController implements Controller {
         this.directChatStorages.add(directChatStorage);
     }
 
-    private void renderMessage(DirectChatStorage storage, Message message) {
+    private void renderNewMessage(DirectChatStorage storage, Message message) {
+        Label label = new Label();
+        initRightClick(label, message._id(), message.sender(), storage.getGroupId());
         if (message.sender().equals(idStorage.getID())){
-            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( ownUsername +  ": " +message.body()));
+            label.setText(ownUsername +  ": " +message.body());
+            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(label);
         }
         else if (message.sender().equals(storage.getUserId())){
-            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( storage.getUserName() +  ": " +message.body()));
+            label.setText(storage.getUserName() +  ": " +message.body());
+            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(label);
         }
     }
       
@@ -443,5 +460,25 @@ public class LobbyController implements Controller {
                                 app.show(gameLobbyController.get());
                             });
                 });
+    }
+
+    private void initRightClick(Label label, String messageId, String sender, String groupId) {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem menuItem = new MenuItem("delete");
+
+        contextMenu.getItems().add(menuItem);
+        label.setContextMenu(contextMenu);
+
+        menuItem.setOnAction(event -> {
+            if (sender.equals(this.idStorage.getID())) {
+                messageService
+                        .delete(GROUPS, groupId, messageId)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
+                        .showAndWait();
+            }
+        });
     }
 }
