@@ -430,11 +430,15 @@ public class LobbyController implements Controller {
     }
 
     private void renderNewMessage(DirectChatStorage storage, Message message) {
+        Label label = new Label();
+        initRightClick(label, message._id(), message.sender(), storage.getGroupId());
         if (message.sender().equals(idStorage.getID())){
-            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( ownUsername +  ": " +message.body()));
+            label.setText(ownUsername +  ": " +message.body());
+            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(label);
         }
         else if (message.sender().equals(storage.getUserId())){
-            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(new Label( storage.getUserName() +  ": " +message.body()));
+            label.setText(storage.getUserName() +  ": " +message.body());
+            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(label);
         }
     }
       
