@@ -78,6 +78,7 @@ public class LoginController implements Controller {
         JSONObject loadConfig = ResourceManager.loadConfig();
         if (loadConfig.get(JSON_REMEMBER_ME).equals(true)) {
             usernameTextField.setText(loadConfig.getString(JSON_NAME));
+            rememberMeCheckBox.setSelected(true);
         }
 
         signUpHyperlink.setOnAction(this::signUPHyperlinkPressed);
