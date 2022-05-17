@@ -239,7 +239,9 @@ public class LobbyController implements Controller {
             if(currentDirectStorage != null) {
                 this.messageService.send(GROUPS, currentDirectStorage.getGroupId(), chatMessageField.getText())
                         .observeOn(FX_SCHEDULER)
-                        .subscribe();
+                        .subscribe(result -> {
+                            this.chatMessageField.setText("");
+                        });
             }
         }
     }
