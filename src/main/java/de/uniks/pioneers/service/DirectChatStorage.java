@@ -12,6 +12,8 @@ public class DirectChatStorage {
 
 	private String userName;
 
+	private String userAvatar;
+
 	private Tab tab;
 
 	@Inject
@@ -48,5 +50,13 @@ public class DirectChatStorage {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getUserAvatar() {
+		return userAvatar;
+	}
+
+	public void setUserAvatar(String userAvatar) {
+		this.userAvatar = userAvatar;
 	}
 }
