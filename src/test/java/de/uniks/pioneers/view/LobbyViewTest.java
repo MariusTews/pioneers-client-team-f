@@ -83,7 +83,7 @@ public class LobbyViewTest extends ApplicationTest {
         Assertions.assertThat(createGame.getText()).isEqualTo("Create Game");
         Assertions.assertThat(send.getText()).isEqualTo("send");
 
-        Assertions.assertThat(welcomeLabel.getText()).isEqualTo("Nice to see you again, username!");
+        Assertions.assertThat(welcomeLabel.getText()).isEqualTo("Nice to see you again, ");
 
         Assertions.assertThat(chatMessage.getText()).isEqualTo("");
 
