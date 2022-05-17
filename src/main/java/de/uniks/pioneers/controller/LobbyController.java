@@ -20,8 +20,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -85,6 +88,7 @@ public class LobbyController implements Controller {
     private DirectChatStorage currentDirectStorage;
 
     String ownUsername = "";
+    String ownAvatar = null;
 
     @Inject
     public LobbyController(App app,
@@ -184,7 +188,7 @@ public class LobbyController implements Controller {
                         renderNewMessage(directChatStorage,messageEvent.data());
                     } else if (messageEvent.event().endsWith(DELETED)) {
                         this.deletedMessages.add(messageEvent.data()._id());
-                        loadDirectMessages(directChatStorage.getGroupId(),directChatStorage.getUserId(),directChatStorage.getUserName(),newValue);
+                        loadDirectMessages(directChatStorage.getGroupId(),directChatStorage.getUserId(),directChatStorage.getUserName(),directChatStorage.getUserAvatar(),newValue);
                     }
                 });
             }
@@ -242,6 +246,9 @@ public class LobbyController implements Controller {
 
     private Node renderUser(User user){
         if (user._id().equals(this.idStorage.getID())){
+            if (user.avatar() != null){
+                this.ownAvatar = user.avatar();
+            }
             this.ownUsername = user.name();
             this.userWelcomeLabel.setText(WELCOME + user.name() + "!");
         }
@@ -364,8 +371,8 @@ public class LobbyController implements Controller {
                         return;
                     }
                 }
-                addToDirectChatStorage(group._id(),user._id(),user.name(), tab);
-                loadDirectMessages(group._id(), user._id(),user.name(), tab);
+                addToDirectChatStorage(group._id(),user._id(),user.name(), user.avatar(), tab);
+                loadDirectMessages(group._id(), user._id(),user.name(), user.avatar(), tab);
                 return;
             }
         }
@@ -376,8 +383,8 @@ public class LobbyController implements Controller {
         toAdd.add(user._id());
 
         this.groupService.createGroup(toAdd).observeOn(FX_SCHEDULER).subscribe(group -> {
-            addToDirectChatStorage(group._id(),user._id(),user.name(), tab);
-            loadDirectMessages(group._id(), user._id(),user.name(), tab);
+            addToDirectChatStorage(group._id(),user._id(),user.name(),user.avatar(),tab);
+            loadDirectMessages(group._id(), user._id(),user.name(),user.avatar(), tab);
             this.groups.add(group);
         });
     }
@@ -399,7 +406,7 @@ public class LobbyController implements Controller {
         this.groups.addAll(groups);
     }
 
-    private void loadDirectMessages(String groupId, String userId,String username, Tab tab){
+    private void loadDirectMessages(String groupId, String userId,String username, String avatar, Tab tab){
         this.messageService.getAllMessages(GROUPS,groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
             this.messages.clear();
             this.messages.addAll(messages);
@@ -407,42 +414,72 @@ public class LobbyController implements Controller {
 
             for (Message message: this.messages){
                 if (!this.deletedMessages.contains(message._id())) {
+                    HBox box = new HBox(3);
+                    ImageView imageView = new ImageView();
+                    imageView.setFitWidth(20);
+                    imageView.setFitHeight(20);
                     Label label = new Label();
                     initRightClick(label,message._id(),message.sender(),groupId);
                     if (message.sender().equals(idStorage.getID())) {
-                        label.setText(ownUsername + ": " + message.body());
-                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(label);
+                        if (this.ownAvatar != null){
+                            imageView.setImage(new Image(this.ownAvatar));
+                        }
+                        box.getChildren().add(imageView);
+
+                        label.setText(ownUsername +  ": " +message.body());
+                        box.getChildren().add(label);
+                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
                     } else if (message.sender().equals(userId)) {
+                        if (avatar != null) {
+                            imageView.setImage(new Image(avatar));
+                        }
+                        box.getChildren().add(imageView);
+
                         label.setText(username + ": " + message.body());
-                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(label);
+                        box.getChildren().add(label);
+                        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
                     }
-                }
-                else {
-                    ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(new Label("message was deleted"));
                 }
             }
         });
     }
 
-    private void addToDirectChatStorage( String groupId, String userId, String userName, Tab tab) {
+    private void addToDirectChatStorage(String groupId, String userId, String userName, String avatar, Tab tab) {
         DirectChatStorage directChatStorage = new DirectChatStorage();
         directChatStorage.setGroupId(groupId);
         directChatStorage.setUserId(userId);
         directChatStorage.setUserName(userName);
         directChatStorage.setTab(tab);
+        directChatStorage.setUserAvatar(avatar);
         this.directChatStorages.add(directChatStorage);
     }
 
     private void renderNewMessage(DirectChatStorage storage, Message message) {
+        HBox box = new HBox(3);
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(20);
+        imageView.setFitHeight(20);
         Label label = new Label();
         initRightClick(label, message._id(), message.sender(), storage.getGroupId());
         if (message.sender().equals(idStorage.getID())){
+            if (this.ownAvatar != null){
+                imageView.setImage(new Image(this.ownAvatar));
+            }
+            box.getChildren().add(imageView);
+
             label.setText(ownUsername +  ": " +message.body());
-            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(label);
+            box.getChildren().add(label);
+            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(box);
         }
         else if (message.sender().equals(storage.getUserId())){
+            if (storage.getUserAvatar() != null){
+                imageView.setImage(new Image(storage.getUserAvatar()));
+            }
+            box.getChildren().add(imageView);
+
             label.setText(storage.getUserName() +  ": " +message.body());
-            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(label);
+            box.getChildren().add(label);
+            ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(box);
         }
     }
       
@@ -471,6 +508,12 @@ public class LobbyController implements Controller {
         final MenuItem menuItem = new MenuItem("delete");
 
         contextMenu.getItems().add(menuItem);
+        label.setOnMouseEntered(event -> {
+            label.setStyle("-fx-background-color: LIGHTGREY");
+        });
+        label.setOnMouseExited(event -> {
+            label.setStyle("-fx-background-color: DEFAULT");
+        });
         label.setContextMenu(contextMenu);
 
         menuItem.setOnAction(event -> {
