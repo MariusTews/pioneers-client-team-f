@@ -7,6 +7,7 @@ import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -70,6 +71,7 @@ public class GameLobbyController implements Controller {
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     public GameLobbyController(App app,
@@ -117,7 +119,7 @@ public class GameLobbyController implements Controller {
                 .subscribe(this.messages::setAll);
 
         // listen to members
-        eventListener
+        disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
@@ -127,10 +129,10 @@ public class GameLobbyController implements Controller {
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
                     }
-                });
+                }));
 
         // listen to game lobby messages
-        eventListener
+        disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
@@ -140,7 +142,7 @@ public class GameLobbyController implements Controller {
                     } else if (event.event().endsWith(DELETED)) {
                         renderMessage(message, false);
                     }
-                });
+                }));
     }
 
     @Override
@@ -151,6 +153,7 @@ public class GameLobbyController implements Controller {
         eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
                 .unsubscribeOn(FX_SCHEDULER);
+        disposable.dispose();
     }
 
     @Override
