@@ -66,6 +66,7 @@ public class GameLobbyController implements Controller {
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
+    private IDStorage idStorage;
 
     @Inject
     public GameLobbyController(App app,
@@ -76,7 +77,8 @@ public class GameLobbyController implements Controller {
                                Provider<LobbyController> lobbyController,
                                EventListener eventListener,
                                GameIDStorage gameIDStorage,
-                               MemberIDStorage memberIDStorage) {
+                               MemberIDStorage memberIDStorage,
+                               IDStorage idStorage) {
         this.app = app;
         this.memberService = memberService;
         this.userService = userService;
@@ -86,6 +88,7 @@ public class GameLobbyController implements Controller {
         this.eventListener = eventListener;
         this.gameIDStorage = gameIDStorage;
         this.memberIDStorage = memberIDStorage;
+        this.idStorage = idStorage;
     }
 
     @Override
@@ -122,6 +125,9 @@ public class GameLobbyController implements Controller {
                         members.add(member);
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
+                        if (member.userId().equals(idStorage.getID())) {
+                            app.show(lobbyController.get());
+                        }
                     }
                 });
 
@@ -180,8 +186,23 @@ public class GameLobbyController implements Controller {
     }
 
     public void leave(ActionEvent event) {
-        final LobbyController controller = lobbyController.get();
-        app.show(controller);
+        gameService
+                .findOneGame(gameIDStorage.getId())
+                        .observeOn(FX_SCHEDULER)
+                                .subscribe(result -> {
+                                    if ((int)result.members() == 1 || result.owner().equals(idStorage.getID())) {
+                                        gameService
+                                                .deleteGame(gameIDStorage.getId())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe();
+                                    } else {
+                                        memberService
+                                                .leave(gameIDStorage.getId(), idStorage.getID())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe();
+                                    }
+                                });
+        app.show(lobbyController.get());
     }
 
     public void send(ActionEvent event) {
