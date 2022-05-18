@@ -173,7 +173,7 @@ public class EditUserController implements Controller {
 
         if (avatar != null) {
             if (avatar.length() > 16384) {
-                new Alert(Alert.AlertType.INFORMATION, "the chosen image is to big!")
+                new Alert(Alert.AlertType.INFORMATION, "the chosen image is to big \nplease choose a picture which is smaller than 10kb ")
                         .showAndWait();
                 return;
             }
