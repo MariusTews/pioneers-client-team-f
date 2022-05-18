@@ -7,6 +7,8 @@ import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -66,6 +68,7 @@ public class GameLobbyController implements Controller {
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
+    private final IDStorage idStorage;
 
     @Inject
     public GameLobbyController(App app,
@@ -75,6 +78,7 @@ public class GameLobbyController implements Controller {
                                GameService gameService,
                                Provider<LobbyController> lobbyController,
                                EventListener eventListener,
+                               IDStorage idStorage,
                                GameIDStorage gameIDStorage,
                                MemberIDStorage memberIDStorage) {
         this.app = app;
@@ -86,6 +90,7 @@ public class GameLobbyController implements Controller {
         this.eventListener = eventListener;
         this.gameIDStorage = gameIDStorage;
         this.memberIDStorage = memberIDStorage;
+        this.idStorage = idStorage;
     }
 
     @Override
@@ -122,6 +127,25 @@ public class GameLobbyController implements Controller {
                         members.add(member);
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
+                    } else if (event.event().endsWith(UPDATED)) {
+                        for (Member updatedMember : this.members) {
+                            if (updatedMember.userId().equals(member.userId())) {
+                                this.members.set(this.members.indexOf(updatedMember),member);
+                                break;
+                            }
+                        }
+                        int readyMembers = 0;
+                        for (Member members : this.members) {
+                            if (members.ready()) {
+                               readyMembers +=1;
+                            }
+                        }
+                        if(readyMembers >= 4 && readyMembers ==members.size()){
+                            this.idStartGameButton.disableProperty().set(false);
+                        } else {
+                            this.idStartGameButton.disableProperty().set(true);
+                        }
+
                     }
                 });
 
@@ -196,6 +220,16 @@ public class GameLobbyController implements Controller {
     }
 
     public void ready(ActionEvent event) {
+
+        Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
+        if(member.ready()){
+            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false).subscribe();
+            this.idReadyButton.setText("Ready");
+        }else {
+            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true).subscribe();
+            this.idReadyButton.setText("Not Ready");
+        }
+
     }
 
     public void startGame(ActionEvent event) {

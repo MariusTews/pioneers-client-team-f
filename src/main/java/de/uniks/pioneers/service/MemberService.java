@@ -1,6 +1,7 @@
 package de.uniks.pioneers.service;
 
 import de.uniks.pioneers.dto.CreateMemberDto;
+import de.uniks.pioneers.dto.UpdateMemberDto;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.rest.GameMembersApiService;
 import io.reactivex.rxjava3.core.Observable;
@@ -36,4 +37,13 @@ public class MemberService {
                 });
 
     }
+
+    public Observable<Member> statusUpdate(String gameId, String userId, boolean status){
+        return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status));
+    }
+
+    public Observable<Member> findOne(String gameId, String userId){
+        return gameMembersApiService.findOne(gameId, userId);
+    }
+
 }
