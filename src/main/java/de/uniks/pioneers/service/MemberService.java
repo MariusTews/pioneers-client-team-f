@@ -36,4 +36,9 @@ public class MemberService {
                 });
 
     }
+
+    public Observable<Member> leave(String gameId, String userID) {
+        return gameMembersApiService
+                .delete(gameId, userID);
+    }
 }
