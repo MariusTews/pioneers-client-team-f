@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="55.0" prefWidth="173.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MemberListSubcontroller">
+<HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="55.0" prefWidth="173.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MemberListSubcontroller">
    <children>
       <ImageView fx:id="idAvatar" fitHeight="55.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true" />
       <VBox alignment="CENTER" prefHeight="60.0" prefWidth="119.0">

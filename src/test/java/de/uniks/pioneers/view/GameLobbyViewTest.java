@@ -59,7 +59,6 @@ public class GameLobbyViewTest extends ApplicationTest {
         // empty init
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         when(userService.findAllUsers()).thenReturn(Observable.empty());
-        when(messageService.getAllMessages(any(), any())).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameService.findOneGame(any())).thenReturn(Observable.empty());
 
