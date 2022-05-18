@@ -126,7 +126,7 @@ public class EditUserController implements Controller {
     }
 
     public void deleteButtonPressed(ActionEvent event) {
-        new Alert(Alert.AlertType.INFORMATION, "accont was successfully deleted!")
+        new Alert(Alert.AlertType.INFORMATION, "Account was successfully deleted!")
                 .showAndWait();
         userService.delete(idStorage.getID())
                 .observeOn(FX_SCHEDULER)

@@ -67,4 +67,5 @@ class UserServiceTest {
         User user = userService.findOne("10").blockingFirst();
         assertEquals("User[_id=10, name=Alice, status=online, avatar=null]", user.toString());
     }
+
 }
