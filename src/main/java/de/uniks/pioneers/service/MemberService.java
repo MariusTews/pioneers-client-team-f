@@ -30,7 +30,7 @@ public class MemberService {
 
     public Observable<Member> join(String userId, String gameID, String password) {
 
-        findOne(gameID,userId).subscribe(user -> delete(gameID,userId).subscribe(),onError ->{});
+        findOne(gameID,userId).subscribe(user -> leave(gameID,userId).subscribe(),onError ->{});
 
         return gameMembersApiService
                 .create(gameID, new CreateMemberDto(false,  password))
@@ -41,6 +41,7 @@ public class MemberService {
 
     }
 
+
     public Observable<Member> statusUpdate(String gameId, String userId, boolean status){
         return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status));
     }
@@ -49,8 +50,10 @@ public class MemberService {
         return gameMembersApiService.findOne(gameId, userId);
     }
 
-    public Observable<Member> delete(String gameId, String userId){
-        return gameMembersApiService.delete(gameId,userId);
+
+    public Observable<Member> leave(String gameId, String userID) {
+        return gameMembersApiService
+                .delete(gameId, userID);
     }
 
 }

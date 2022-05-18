@@ -7,8 +7,7 @@ import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -18,10 +17,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
@@ -36,7 +39,7 @@ public class GameLobbyController implements Controller {
     private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
     private final List<String> deletedMessages = new ArrayList<>();
-    private final HashMap<String, String> memberHash = new HashMap<>();
+    private final HashMap<String, User> memberHash = new HashMap<>();
 
     @FXML
     public Label idTitleLabel;
@@ -69,6 +72,9 @@ public class GameLobbyController implements Controller {
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
     private final IDStorage idStorage;
+    private final CompositeDisposable disposable = new CompositeDisposable();
+
+
 
     @Inject
     public GameLobbyController(App app,
@@ -80,7 +86,8 @@ public class GameLobbyController implements Controller {
                                EventListener eventListener,
                                IDStorage idStorage,
                                GameIDStorage gameIDStorage,
-                               MemberIDStorage memberIDStorage) {
+                               MemberIDStorage memberIDStorage,
+                               IDStorage idStorage) {
         this.app = app;
         this.memberService = memberService;
         this.userService = userService;
@@ -106,8 +113,8 @@ public class GameLobbyController implements Controller {
                 .findAllUsers()
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
-                    for(User user : result) {
-                        this.memberHash.put(user._id(), user.name());
+                    for (User user : result) {
+                        this.memberHash.put(user._id(), user);
                     }
                 });
 
@@ -118,7 +125,7 @@ public class GameLobbyController implements Controller {
                 .subscribe(this.messages::setAll);
 
         // listen to members
-        eventListener
+        disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
@@ -127,6 +134,7 @@ public class GameLobbyController implements Controller {
                         members.add(member);
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
+
                     } else if (event.event().endsWith(UPDATED)) {
                         for (Member updatedMember : this.members) {
                             if (updatedMember.userId().equals(member.userId())) {
@@ -146,11 +154,16 @@ public class GameLobbyController implements Controller {
                             this.idStartGameButton.disableProperty().set(true);
                         }
 
+
+                        if (member.userId().equals(idStorage.getID())) {
+                            app.show(lobbyController.get());
+                        }
+
                     }
-                });
+                }));
 
         // listen to game lobby messages
-        eventListener
+        disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
@@ -160,7 +173,7 @@ public class GameLobbyController implements Controller {
                     } else if (event.event().endsWith(DELETED)) {
                         renderMessage(message, false);
                     }
-                });
+                }));
     }
 
     @Override
@@ -171,6 +184,7 @@ public class GameLobbyController implements Controller {
         eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
                 .unsubscribeOn(FX_SCHEDULER);
+        disposable.dispose();
     }
 
     @Override
@@ -198,14 +212,30 @@ public class GameLobbyController implements Controller {
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
         });
 
+        // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
         return parent;
     }
 
     public void leave(ActionEvent event) {
-        final LobbyController controller = lobbyController.get();
-        app.show(controller);
+        gameService
+                .findOneGame(gameIDStorage.getId())
+                        .observeOn(FX_SCHEDULER)
+                                .subscribe(result -> {
+                                    if ((int)result.members() == 1 || result.owner().equals(idStorage.getID())) {
+                                        gameService
+                                                .deleteGame(gameIDStorage.getId())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe();
+                                    } else {
+                                        memberService
+                                                .leave(gameIDStorage.getId(), idStorage.getID())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe();
+                                    }
+                                });
+        app.show(lobbyController.get());
     }
 
     public void send(ActionEvent event) {
@@ -241,6 +271,7 @@ public class GameLobbyController implements Controller {
         if (!this.idMessageField.getText().isEmpty()) {
             messageService
                     .send(GAMES, this.gameIDStorage.getId(), idMessageField.getText())
+                    .observeOn(FX_SCHEDULER)
                     .subscribe();
             this.idMessageField.clear();
         }
@@ -252,11 +283,11 @@ public class GameLobbyController implements Controller {
     }
 
     /*
-    * Render message for add and delete
-    * save id in deleted messages
-    * if deleted messages contains id, create different label
-    * and make label not right clickable
-    * */
+     * Render message for add and delete
+     * save id in deleted messages
+     * if deleted messages contains id, create different label
+     * and make label not right clickable
+     * */
     private void renderMessage(Message message, Boolean render) {
         this.idMessageView.getChildren().clear();
 
@@ -268,23 +299,26 @@ public class GameLobbyController implements Controller {
 
         if (!messages.isEmpty()) {
             for (Message m : messages) {
+                HBox box = new HBox(3);
+                ImageView imageView = new ImageView();
+                imageView.setFitWidth(20);
+                imageView.setFitHeight(20);
+                if (this.memberHash.get(m.sender()).avatar() != null) {
+                    imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
+                }
+                box.getChildren().add(imageView);
                 if (this.deletedMessages.contains(m._id())) {
-                    Label label = new Label(this.memberHash.get(m.sender()) + ": - message deleted - ");
+                    Label label = new Label(this.memberHash.get(m.sender()).name() + ": - message deleted - ");
                     label.setFont(Font.font("Italic"));
-                    this.idMessageView.getChildren().add(label);
+                    box.getChildren().add(label);
+                    this.idMessageView.getChildren().add(box);
                 } else {
                     Label label = new Label();
                     label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
                     this.initRightClick(label, m._id(), m.sender());
-                    label.setOnMouseEntered(event -> {
-                        label.setStyle("-fx-background-color: LIGHTGREY");
-                    });
-                    label.setOnMouseExited(event -> {
-                        label.setStyle("-fx-background-color: DEFAULT");
-                    });
-
-                    label.setText(memberHash.get(m.sender()) + ": " + m.body());
-                    this.idMessageView.getChildren().add(label);
+                    label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
+                    box.getChildren().add(label);
+                    this.idMessageView.getChildren().add(box);
                 }
             }
         }
@@ -297,6 +331,13 @@ public class GameLobbyController implements Controller {
         final MenuItem menuItem = new MenuItem("delete");
 
         contextMenu.getItems().add(menuItem);
+
+        label.setOnMouseEntered(event -> {
+            label.setStyle("-fx-background-color: LIGHTGREY");
+        });
+        label.setOnMouseExited(event -> {
+            label.setStyle("-fx-background-color: DEFAULT");
+        });
         label.setContextMenu(contextMenu);
 
         menuItem.setOnAction(event -> {
