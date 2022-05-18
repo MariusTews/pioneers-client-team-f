@@ -491,17 +491,16 @@ public class LobbyController implements Controller {
         dialog.setHeaderText("password");
         dialog.showAndWait()
                 .ifPresent(password -> {
-                    this.memberService.join(game._id(), password)
+                    this.memberService.join(idStorage.getID(), game._id(), password)
                             .observeOn(FX_SCHEDULER)
                             .doOnError(error -> {
                                 if ("HTTP 401 ".equals(error.getMessage())) {
                                     new Alert(Alert.AlertType.ERROR, "wrong password")
                                             .showAndWait();
                                 }
+
                             })
-                            .subscribe(result -> {
-                                app.show(gameLobbyController.get());
-                            });
+                            .subscribe(result -> app.show(gameLobbyController.get()), onError -> {});
                 });
     }
 

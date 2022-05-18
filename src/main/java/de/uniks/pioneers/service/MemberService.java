@@ -28,7 +28,10 @@ public class MemberService {
         return gameMembersApiService.findAll(gameId);
     }
 
-    public Observable<Member> join(String gameID, String password) {
+    public Observable<Member> join(String userId, String gameID, String password) {
+
+        findOne(gameID,userId).subscribe(user -> delete(gameID,userId).subscribe(),onError ->{});
+
         return gameMembersApiService
                 .create(gameID, new CreateMemberDto(false,  password))
                 .doOnNext(result -> {
@@ -44,6 +47,10 @@ public class MemberService {
 
     public Observable<Member> findOne(String gameId, String userId){
         return gameMembersApiService.findOne(gameId, userId);
+    }
+
+    public Observable<Member> delete(String gameId, String userId){
+        return gameMembersApiService.delete(gameId,userId);
     }
 
 }
