@@ -16,10 +16,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
@@ -34,7 +38,7 @@ public class GameLobbyController implements Controller {
     private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
     private final List<String> deletedMessages = new ArrayList<>();
-    private final HashMap<String, String> memberHash = new HashMap<>();
+    private final HashMap<String, User> memberHash = new HashMap<>();
 
     @FXML
     public Label idTitleLabel;
@@ -104,8 +108,8 @@ public class GameLobbyController implements Controller {
                 .findAllUsers()
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
-                    for(User user : result) {
-                        this.memberHash.put(user._id(), user.name());
+                    for (User user : result) {
+                        this.memberHash.put(user._id(), user);
                     }
                 });
 
@@ -180,6 +184,7 @@ public class GameLobbyController implements Controller {
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
         });
 
+        // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
         return parent;
@@ -228,6 +233,7 @@ public class GameLobbyController implements Controller {
         if (!this.idMessageField.getText().isEmpty()) {
             messageService
                     .send(GAMES, this.gameIDStorage.getId(), idMessageField.getText())
+                    .observeOn(FX_SCHEDULER)
                     .subscribe();
             this.idMessageField.clear();
         }
@@ -239,11 +245,11 @@ public class GameLobbyController implements Controller {
     }
 
     /*
-    * Render message for add and delete
-    * save id in deleted messages
-    * if deleted messages contains id, create different label
-    * and make label not right clickable
-    * */
+     * Render message for add and delete
+     * save id in deleted messages
+     * if deleted messages contains id, create different label
+     * and make label not right clickable
+     * */
     private void renderMessage(Message message, Boolean render) {
         this.idMessageView.getChildren().clear();
 
@@ -255,23 +261,26 @@ public class GameLobbyController implements Controller {
 
         if (!messages.isEmpty()) {
             for (Message m : messages) {
+                HBox box = new HBox(3);
+                ImageView imageView = new ImageView();
+                imageView.setFitWidth(20);
+                imageView.setFitHeight(20);
+                if (this.memberHash.get(m.sender()).avatar() != null) {
+                    imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
+                }
+                box.getChildren().add(imageView);
                 if (this.deletedMessages.contains(m._id())) {
-                    Label label = new Label(this.memberHash.get(m.sender()) + ": - message deleted - ");
+                    Label label = new Label(this.memberHash.get(m.sender()).name() + ": - message deleted - ");
                     label.setFont(Font.font("Italic"));
-                    this.idMessageView.getChildren().add(label);
+                    box.getChildren().add(label);
+                    this.idMessageView.getChildren().add(box);
                 } else {
                     Label label = new Label();
                     label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
                     this.initRightClick(label, m._id(), m.sender());
-                    label.setOnMouseEntered(event -> {
-                        label.setStyle("-fx-background-color: LIGHTGREY");
-                    });
-                    label.setOnMouseExited(event -> {
-                        label.setStyle("-fx-background-color: DEFAULT");
-                    });
-
-                    label.setText(memberHash.get(m.sender()) + ": " + m.body());
-                    this.idMessageView.getChildren().add(label);
+                    label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
+                    box.getChildren().add(label);
+                    this.idMessageView.getChildren().add(box);
                 }
             }
         }
@@ -284,6 +293,13 @@ public class GameLobbyController implements Controller {
         final MenuItem menuItem = new MenuItem("delete");
 
         contextMenu.getItems().add(menuItem);
+
+        label.setOnMouseEntered(event -> {
+            label.setStyle("-fx-background-color: LIGHTGREY");
+        });
+        label.setOnMouseExited(event -> {
+            label.setStyle("-fx-background-color: DEFAULT");
+        });
         label.setContextMenu(contextMenu);
 
         menuItem.setOnAction(event -> {
