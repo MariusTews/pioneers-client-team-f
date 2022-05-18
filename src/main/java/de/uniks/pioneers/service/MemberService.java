@@ -1,6 +1,7 @@
 package de.uniks.pioneers.service;
 
 import de.uniks.pioneers.dto.CreateMemberDto;
+import de.uniks.pioneers.dto.UpdateMemberDto;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.rest.GameMembersApiService;
 import io.reactivex.rxjava3.core.Observable;
@@ -27,7 +28,10 @@ public class MemberService {
         return gameMembersApiService.findAll(gameId);
     }
 
-    public Observable<Member> join(String gameID, String password) {
+    public Observable<Member> join(String userId, String gameID, String password) {
+
+        findOne(gameID,userId).subscribe(user -> leave(gameID,userId).subscribe(),onError ->{});
+
         return gameMembersApiService
                 .create(gameID, new CreateMemberDto(false,  password))
                 .doOnNext(result -> {
@@ -36,4 +40,20 @@ public class MemberService {
                 });
 
     }
+
+
+    public Observable<Member> statusUpdate(String gameId, String userId, boolean status){
+        return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status));
+    }
+
+    public Observable<Member> findOne(String gameId, String userId){
+        return gameMembersApiService.findOne(gameId, userId);
+    }
+
+
+    public Observable<Member> leave(String gameId, String userID) {
+        return gameMembersApiService
+                .delete(gameId, userID);
+    }
+
 }
