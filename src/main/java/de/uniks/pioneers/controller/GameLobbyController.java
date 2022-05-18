@@ -86,8 +86,8 @@ public class GameLobbyController implements Controller {
                                EventListener eventListener,
                                IDStorage idStorage,
                                GameIDStorage gameIDStorage,
-                               MemberIDStorage memberIDStorage,
-                               IDStorage idStorage) {
+                               MemberIDStorage memberIDStorage
+                               ) {
         this.app = app;
         this.memberService = memberService;
         this.userService = userService;
