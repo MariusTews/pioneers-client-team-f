@@ -24,7 +24,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
@@ -116,13 +115,16 @@ public class GameLobbyController implements Controller {
                     for (User user : result) {
                         this.memberHash.put(user._id(), user);
                     }
-                });
 
-        // get all messages
-        messageService
-                .getAllMessages(GAMES, this.gameIDStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(this.messages::setAll);
+                    // get all messages and initial load
+                    messageService
+                            .getAllMessages(GAMES, this.gameIDStorage.getId())
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(col -> {
+                                this.messages.setAll(col);
+                                this.initAllMessages();
+                            });
+                });
 
         // listen to members
         disposable.add(eventListener
@@ -174,16 +176,11 @@ public class GameLobbyController implements Controller {
                         renderMessage(message, false);
                     }
                 }));
+
     }
 
     @Override
     public void destroy() {
-        eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
-                .unsubscribeOn(FX_SCHEDULER);
-        eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
-                .unsubscribeOn(FX_SCHEDULER);
         disposable.dispose();
     }
 
@@ -280,6 +277,25 @@ public class GameLobbyController implements Controller {
     private Node renderMember(Member member) {
         MemberListSubcontroller memberListSubcontroller = new MemberListSubcontroller(this.app, member, this.userService);
         return memberListSubcontroller.render();
+    }
+
+    private void initAllMessages() {
+        for (Message m : this.messages) {
+            HBox box = new HBox(3);
+            Label label = new Label();
+            ImageView imageView = new ImageView();
+            imageView.setFitWidth(20);
+            imageView.setFitHeight(20);
+            if (this.memberHash.get(m.sender()).avatar() != null) {
+                imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
+            }
+            box.getChildren().add(imageView);
+            label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
+            this.initRightClick(label, m._id(), m.sender());
+            label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
+            box.getChildren().add(label);
+            this.idMessageView.getChildren().add(box);
+        }
     }
 
     /*
