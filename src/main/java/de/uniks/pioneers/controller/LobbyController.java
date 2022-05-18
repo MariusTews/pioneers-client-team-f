@@ -39,7 +39,7 @@ public class LobbyController implements Controller {
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<Game> games = FXCollections.observableArrayList();
     private final ObservableList<Group> groups = FXCollections.observableArrayList();
-    private final List<Message> messages = new ArrayList<>();
+    private final ObservableList<Message> messages = FXCollections.observableArrayList();
     private final List<String> deletedMessages = new ArrayList<>();
     private final List<UserListSubController> userSubCons = new ArrayList<>();
     private final List<GameListSubController> gameSubCons = new ArrayList<>();
@@ -140,9 +140,6 @@ public class LobbyController implements Controller {
         this.gameSubCons.clear();
         this.directChatStorages.clear();
 
-        eventListener.listen("users.*.*", User.class).unsubscribeOn(FX_SCHEDULER);
-        eventListener.listen("games.*.*",Game.class).unsubscribeOn(FX_SCHEDULER);
-
         disposable.dispose();
     }
 
@@ -181,6 +178,9 @@ public class LobbyController implements Controller {
         for (DirectChatStorage directChatStorage : directChatStorages) {
             if (directChatStorage.getTab().equals(newValue)) {
                 this.currentDirectStorage = directChatStorage;
+                User user = currentDirectStorage.getUser();
+                this.loadDirectMessages(currentDirectStorage.getGroupId(),user ,currentDirectStorage.getTab());
+
 
                 tabDisposable = eventListener.listen("groups." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
                     if (messageEvent.event().endsWith(CREATED)) {
@@ -188,7 +188,7 @@ public class LobbyController implements Controller {
                         renderNewMessage(directChatStorage,messageEvent.data());
                     } else if (messageEvent.event().endsWith(DELETED)) {
                         this.deletedMessages.add(messageEvent.data()._id());
-                        loadDirectMessages(directChatStorage.getGroupId(),directChatStorage.getUserId(),directChatStorage.getUserName(),directChatStorage.getUserAvatar(),newValue);
+                        loadDirectMessages(directChatStorage.getGroupId() ,user ,newValue);
                     }
                 });
             }
@@ -288,6 +288,11 @@ public class LobbyController implements Controller {
         }
 
         else if (userEvent.event().endsWith(UPDATED)) {
+            for(DirectChatStorage directChatStorage: directChatStorages){
+                if(directChatStorage.getUser()._id().equals(user._id())){
+                    directChatStorage.setUser(user);
+                }
+            }
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
                     removeUserSubCon(user);
@@ -355,6 +360,14 @@ public class LobbyController implements Controller {
         Tab tab = new Tab();
         tab.setText(DirectMessage + user.name());
         tab.setClosable(true);
+        tab.setOnClosed(event -> {
+            for (DirectChatStorage storage: this.directChatStorages){
+
+                if (storage != null && storage.getTab().equals(tab)){
+                    storage.setTab(null);
+                }
+            }
+        });
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(new VBox(3));
         tab.setContent(scrollPane);
@@ -368,13 +381,16 @@ public class LobbyController implements Controller {
         for (Group group: this.groups){
             if (group.members().size() == 2 && group.members().contains(user._id()) && group.members().contains(this.idStorage.getID())) {
                 for (DirectChatStorage storage: directChatStorages) {
-                    if(storage.getGroupId().equals(group._id()) && storage.getUserId().equals(user._id()))
+                    User stoageUser = storage.getUser();
+                    if(storage.getGroupId().equals(group._id()) && stoageUser._id().equals(user._id()))
                     {
+                        storage.setTab(tab);
+                        loadDirectMessages(storage.getGroupId(), stoageUser, storage.getTab());
                         return;
                     }
                 }
-                addToDirectChatStorage(group._id(),user._id(),user.name(), user.avatar(), tab);
-                loadDirectMessages(group._id(), user._id(),user.name(), user.avatar(), tab);
+                addToDirectChatStorage(group._id(),user , tab);
+                loadDirectMessages(group._id(), user, tab);
                 return;
             }
         }
@@ -385,8 +401,8 @@ public class LobbyController implements Controller {
         toAdd.add(user._id());
 
         this.groupService.createGroup(toAdd).observeOn(FX_SCHEDULER).subscribe(group -> {
-            addToDirectChatStorage(group._id(),user._id(),user.name(),user.avatar(),tab);
-            loadDirectMessages(group._id(), user._id(),user.name(),user.avatar(), tab);
+            addToDirectChatStorage(group._id(),user ,tab);
+            loadDirectMessages(group._id(), user, tab);
             this.groups.add(group);
         });
     }
@@ -408,7 +424,7 @@ public class LobbyController implements Controller {
         this.groups.addAll(groups);
     }
 
-    private void loadDirectMessages(String groupId, String userId,String username, String avatar, Tab tab){
+    private void loadDirectMessages(String groupId, User user, Tab tab){
         this.messageService.getAllMessages(GROUPS,groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
             this.messages.clear();
             this.messages.addAll(messages);
@@ -431,13 +447,13 @@ public class LobbyController implements Controller {
                         label.setText(ownUsername +  ": " +message.body());
                         box.getChildren().add(label);
                         ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
-                    } else if (message.sender().equals(userId)) {
-                        if (avatar != null) {
-                            imageView.setImage(new Image(avatar));
+                    } else if (message.sender().equals(user._id())) {
+                        if (user.avatar() != null) {
+                            imageView.setImage(new Image(user.avatar()));
                         }
                         box.getChildren().add(imageView);
 
-                        label.setText(username + ": " + message.body());
+                        label.setText(user.name() + ": " + message.body());
                         box.getChildren().add(label);
                         ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
                     }
@@ -446,17 +462,16 @@ public class LobbyController implements Controller {
         });
     }
 
-    private void addToDirectChatStorage(String groupId, String userId, String userName, String avatar, Tab tab) {
+    private void addToDirectChatStorage(String groupId, User user, Tab tab) {
         DirectChatStorage directChatStorage = new DirectChatStorage();
         directChatStorage.setGroupId(groupId);
-        directChatStorage.setUserId(userId);
-        directChatStorage.setUserName(userName);
+        directChatStorage.setUser(user);
         directChatStorage.setTab(tab);
-        directChatStorage.setUserAvatar(avatar);
         this.directChatStorages.add(directChatStorage);
     }
 
     private void renderNewMessage(DirectChatStorage storage, Message message) {
+        User user = storage.getUser();
         HBox box = new HBox(3);
         ImageView imageView = new ImageView();
         imageView.setFitWidth(20);
@@ -473,13 +488,13 @@ public class LobbyController implements Controller {
             box.getChildren().add(label);
             ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(box);
         }
-        else if (message.sender().equals(storage.getUserId())){
-            if (storage.getUserAvatar() != null){
-                imageView.setImage(new Image(storage.getUserAvatar()));
+        else if (message.sender().equals(user._id())){
+            if (user.avatar() != null){
+                imageView.setImage(new Image(user.avatar()));
             }
             box.getChildren().add(imageView);
 
-            label.setText(storage.getUserName() +  ": " +message.body());
+            label.setText(user.name() +  ": " +message.body());
             box.getChildren().add(label);
             ((VBox) ((ScrollPane) storage.getTab().getContent()).getContent()).getChildren().add(box);
         }

@@ -1,5 +1,6 @@
 package de.uniks.pioneers.service;
 
+import de.uniks.pioneers.model.User;
 import javafx.scene.control.Tab;
 
 import javax.inject.Inject;
@@ -8,11 +9,7 @@ public class DirectChatStorage {
 
 	private String groupId;
 
-	private String userId;
-
-	private String userName;
-
-	private String userAvatar;
+	private User user;
 
 	private Tab tab;
 
@@ -28,14 +25,6 @@ public class DirectChatStorage {
 		this.groupId = groupId;
 	}
 
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
 	public Tab getTab() {
 		return tab;
 	}
@@ -44,19 +33,11 @@ public class DirectChatStorage {
 		this.tab = tab;
 	}
 
-	public String getUserName() {
-		return userName;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getUserAvatar() {
-		return userAvatar;
-	}
-
-	public void setUserAvatar(String userAvatar) {
-		this.userAvatar = userAvatar;
+	public void setUser(User user) {
+		this.user = user;
 	}
 }
