@@ -136,6 +136,9 @@ public class GameLobbyController implements Controller {
                         members.add(member);
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
+                        if (member.userId().equals(idStorage.getID())) {
+                            app.show(lobbyController.get());
+                        }
 
                     } else if (event.event().endsWith(UPDATED)) {
                         for (Member updatedMember : this.members) {
@@ -150,16 +153,8 @@ public class GameLobbyController implements Controller {
                                readyMembers +=1;
                             }
                         }
-                        if(readyMembers >= 4 && readyMembers ==members.size()){
-                            this.idStartGameButton.disableProperty().set(false);
-                        } else {
-                            this.idStartGameButton.disableProperty().set(true);
-                        }
+                        this.idStartGameButton.disableProperty().set(readyMembers < 4 || readyMembers != members.size());
 
-
-                        if (member.userId().equals(idStorage.getID())) {
-                            app.show(lobbyController.get());
-                        }
 
                     }
                 }));
