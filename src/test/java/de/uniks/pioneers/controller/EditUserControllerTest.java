@@ -98,7 +98,6 @@ class EditUserControllerTest extends ApplicationTest {
 
         verify(userService).userUpdate("01","Alice",avatar,"online","12345678");
 
-
         write("\tAlice\t");
         type(KeyCode.BACK_SPACE);
         write("\t");
@@ -106,9 +105,7 @@ class EditUserControllerTest extends ApplicationTest {
         write("\t\t\t");
         type(KeyCode.SPACE);
         verify(userService).userUpdate("01","Alice",avatar,"online","12345678");
-        editUserController.setAvatar(avatar.repeat(100));
 
         type(KeyCode.SPACE);
-
     }
 }
