@@ -56,15 +56,6 @@ class EditUserControllerTest extends ApplicationTest {
     }
 
 
-
-
-    @Test
-    void changePicture() {
-        clickOn(editUserController.userPicture);
-        type(KeyCode.ESCAPE);
-    }
-
-
     @Test
     void updateUser() {
         File file = new File(Main.class.getResource("defaultPicture.png").getFile());

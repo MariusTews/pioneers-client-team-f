@@ -218,7 +218,7 @@ public class EditUserController implements Controller {
                     }
                 })
 
-                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {} );
+                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
     }
 
 }
