@@ -105,3 +105,16 @@ test {
             '--add-opens', 'javafx.graphics/com.sun.javafx.application=ALL-UNNAMED',
     ]
 }
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': 'de.uniks.pioneers.Main'
+    }
+    from {
+        compileJava.classpath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+}
