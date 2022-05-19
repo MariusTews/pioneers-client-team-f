@@ -66,13 +66,9 @@ public class EditUserController implements Controller {
 
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
 
     @Override
     public void init() {
-
 
     }
 
@@ -92,7 +88,6 @@ public class EditUserController implements Controller {
             e.printStackTrace();
             return null;
         }
-
         user = this.userService.findOne(idStorage.getID());
 
         user.subscribe(currUser -> {
