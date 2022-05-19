@@ -35,6 +35,7 @@ class SignUpControllerTest extends ApplicationTest {
     public void start(Stage stage) throws Exception {
         new App(signUpController).start(stage);
     }
+
     @Test
     void register() {
         when(userService.register("Bob", null, "bobbob111")).thenReturn(Observable.just(new User("123", "Bob", "status", null)));
