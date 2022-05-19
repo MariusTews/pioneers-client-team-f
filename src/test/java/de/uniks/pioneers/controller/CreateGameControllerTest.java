@@ -3,9 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.service.GameService;
-import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
-import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
@@ -18,9 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.testfx.api.FxAssert.verifyThat;
 
@@ -33,30 +28,13 @@ class CreateGameControllerTest extends ApplicationTest {
     @InjectMocks
     CreateGameController createGameController;
 
-    private Stage stage;
-    private App app;
-
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
         // start application
-        this.stage = stage;
-        this.app = new App(createGameController);
-        this.app.start(stage);
+        App app = new App(createGameController);
+        app.start(stage);
     }
 
-
-    @Test
-    void render() {
-
-    }
-
-    @Test
-    void backToLobbyButtonPressed() {
-        //when(app.show(any(createGameController.getClass()))).thenReturn(null);
-        //write("\t\t");
-        //type(KeyCode.SPACE);
-
-    }
 
     @Test
     void createGameButtonPressed() {
