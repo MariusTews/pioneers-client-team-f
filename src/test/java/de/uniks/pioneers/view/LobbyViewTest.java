@@ -1,17 +1,18 @@
 package de.uniks.pioneers.view;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.uniks.pioneers.*;
 
+import de.uniks.pioneers.Websocket.ClientEndpoint;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
 import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.model.Group;
+import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.GameService;
-import de.uniks.pioneers.service.GroupService;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -24,16 +25,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.service.query.PointQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +48,9 @@ public class LobbyViewTest extends ApplicationTest {
 
     @Mock
     UserService userService;
+
+    @Mock
+    MessageService messageService;
 
     @Mock
     GameService gameService;
@@ -66,10 +71,10 @@ public class LobbyViewTest extends ApplicationTest {
     public void start(Stage stage) throws Exception {
         when(idStorage.getID()).thenReturn("4");
         when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "12", "testGame","1", 2))));
-        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1","test","online",null), new User("2","testus","online",null), new User("3","testtest","offline",null))));
-        when(groupService.getAll()).thenReturn(Observable.empty());
-
+        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1","test","online",null), new User("4","testus","online",null), new User("3","testtest","offline",null))));
+        when(groupService.getAll()).thenReturn(Observable.just(List.of(new Group("1","1","12",List.of("1","4")))));
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
+        when(messageService.getAllMessages("groups","12")).thenReturn(Observable.just(List.of(new Message("1","1","5","1","Test Message"),new Message("1","1","5","4","Test Message2"),new Message("1","1","5","1","Test Message3"))));
 
 
         final App app = new App(null);
@@ -96,7 +101,7 @@ public class LobbyViewTest extends ApplicationTest {
         Assertions.assertThat(createGame.getText()).isEqualTo("Create Game");
         Assertions.assertThat(send.getText()).isEqualTo("send");
 
-        Assertions.assertThat(welcomeLabel.getText()).isEqualTo("Nice to see you again, ");
+        Assertions.assertThat(welcomeLabel.getText()).isEqualTo("Nice to see you again, testus!");
 
         Assertions.assertThat(chatMessage.getText()).isEqualTo("");
 
@@ -142,5 +147,29 @@ public class LobbyViewTest extends ApplicationTest {
 
         Assertions.assertThat(label3.getText()).isEqualTo("testGame (2/6)");
         Assertions.assertThat(join.getText()).isEqualTo("join");
+
+        clickOn(chat);
+
+        TabPane tabPane = lookup("#tabPane").query();
+        Assertions.assertThat(tabPane.getTabs().size()).isEqualTo(2);
+
+        Tab chatTab = tabPane.getTabs().get(1);
+
+        ScrollPane chatScrollPane = (ScrollPane) chatTab.getContent();
+        VBox chatVBox = (VBox) chatScrollPane.getContent();
+
+        Assertions.assertThat(chatVBox.getChildren().size()).isEqualTo(3);
+
+        HBox firstMessage = (HBox) chatVBox.getChildren().get(0);
+        HBox secondMessage = (HBox) chatVBox.getChildren().get(1);
+        HBox thirdMessage = (HBox) chatVBox.getChildren().get(2);
+
+        Label firstChatMessage = (Label) firstMessage.getChildren().get(1);
+        Label secondChatMessage = (Label) secondMessage.getChildren().get(1);
+        Label thirdChatMessage = (Label) thirdMessage.getChildren().get(1);
+
+        Assertions.assertThat(firstChatMessage.getText()).isEqualTo("test: Test Message");
+        Assertions.assertThat(secondChatMessage.getText()).isEqualTo("testus: Test Message2");
+        Assertions.assertThat(thirdChatMessage.getText()).isEqualTo("test: Test Message3");
     }
 }
