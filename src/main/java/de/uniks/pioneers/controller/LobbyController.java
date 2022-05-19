@@ -210,10 +210,8 @@ public class LobbyController implements Controller {
                                 .subscribe();
         authService.logout()
                         .subscribeOn(FX_SCHEDULER)
-                                .subscribe();
-        app.show(loginController.get());
+                                .subscribe(onSuccess -> app.show(loginController.get()), onError -> {});
     }
-
     public void sendButtonPressed(ActionEvent ignoredEvent) {
         checkMessageField();
     }
