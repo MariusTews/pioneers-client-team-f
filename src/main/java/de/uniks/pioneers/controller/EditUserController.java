@@ -137,7 +137,7 @@ public class EditUserController implements Controller {
                 .subscribe(result -> app.show(loginController.get()));
     }
 
-    public void changePicture(MouseEvent event) throws Exception {
+    public void changePicture(MouseEvent event) {
         if(event.getButton() == MouseButton.PRIMARY) {
 
             FileChooser fileChooser = new FileChooser();

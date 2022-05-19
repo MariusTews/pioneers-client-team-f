@@ -62,8 +62,6 @@ class EditUserControllerTest extends ApplicationTest {
         type(KeyCode.ESCAPE);
         rightClickOn("#userPicture");
         type(KeyCode.SPACE);
-
-        System.out.println();
     }
 
     @Test
