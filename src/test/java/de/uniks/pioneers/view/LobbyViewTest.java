@@ -1,13 +1,13 @@
 package de.uniks.pioneers.view;
 
-import de.uniks.pioneers.App;
+import de.uniks.pioneers.*;
+
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
 import de.uniks.pioneers.service.GameService;
 import de.uniks.pioneers.service.GroupService;
-import de.uniks.pioneers.service.MessageService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
@@ -22,6 +22,7 @@ import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 public class LobbyViewTest extends ApplicationTest {
@@ -41,28 +42,23 @@ public class LobbyViewTest extends ApplicationTest {
     GroupService groupService;
 
     @Mock
-    MessageService messageService;
-
-    @Mock
     EventListener eventListener;
 
     @InjectMocks
     LobbyController lobbyController;
 
-    private Stage stage;
-    private App app;
-
     @Override
-    public void start(Stage stage) {
-        // start application
-        //init calls need to be mocked here
-        when(userService.findAllUsers()).thenReturn(Observable.empty());
+    public void start(Stage stage) throws Exception {
         when(gameService.findAllGames()).thenReturn(Observable.empty());
-        when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
+        when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(groupService.getAll()).thenReturn(Observable.empty());
-        this.stage = stage;
-        this.app = new App(lobbyController);
-        this.app.start(stage);
+
+        when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
+
+        final App app = new App(null);
+        MainComponent testComponent = DaggerTestComponent.builder().mainapp(app).build();
+        app.start(stage);
+        app.show(lobbyController);
     }
 
     @Test
