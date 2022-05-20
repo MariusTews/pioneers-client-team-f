@@ -39,7 +39,7 @@ dependencies {
 
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.3'
 
 
     // rxjava
@@ -61,12 +61,12 @@ dependencies {
 
 
     // Dagger
-    implementation 'com.google.dagger:dagger:2.41'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.41'
-    testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.41'
+    implementation 'com.google.dagger:dagger:2.42'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.42'
+    testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.42'
 
      //konghq
-    implementation group: 'com.konghq' , name: 'unirest-java', version: '3.11.09'
+    implementation group: 'com.konghq' , name: 'unirest-java', version: '3.13.8'
 }
 
 javafx {

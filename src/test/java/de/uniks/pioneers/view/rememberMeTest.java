@@ -19,7 +19,7 @@ public class rememberMeTest extends ApplicationTest {
     }
 
     @Test
-    public void rememberMeTest() {
+    public void rememberMeButtonTest() {
 
     }
 

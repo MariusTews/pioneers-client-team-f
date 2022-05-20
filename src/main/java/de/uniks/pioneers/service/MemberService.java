@@ -29,15 +29,12 @@ public class MemberService {
     }
 
     public Observable<Member> join(String userId, String gameID, String password) {
-
-
         return gameMembersApiService
                 .create(gameID, new CreateMemberDto(false,  password))
                 .doOnNext(result -> {
                     this.gameIDStorage.setId(result.gameId());
                     this.memberIDStorage.setId(result.userId());
                 });
-
     }
 
 
