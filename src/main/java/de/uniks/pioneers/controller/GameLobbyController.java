@@ -24,7 +24,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
@@ -75,6 +74,7 @@ public class GameLobbyController implements Controller {
     private final CompositeDisposable disposable = new CompositeDisposable();
 
 
+
     @Inject
     public GameLobbyController(App app,
                                MemberService memberService,
@@ -86,7 +86,7 @@ public class GameLobbyController implements Controller {
                                IDStorage idStorage,
                                GameIDStorage gameIDStorage,
                                MemberIDStorage memberIDStorage
-    ) {
+                               ) {
         this.app = app;
         this.memberService = memberService;
         this.userService = userService;
@@ -143,14 +143,14 @@ public class GameLobbyController implements Controller {
                     } else if (event.event().endsWith(UPDATED)) {
                         for (Member updatedMember : this.members) {
                             if (updatedMember.userId().equals(member.userId())) {
-                                this.members.set(this.members.indexOf(updatedMember), member);
+                                this.members.set(this.members.indexOf(updatedMember),member);
                                 break;
                             }
                         }
                         int readyMembers = 0;
                         for (Member members : this.members) {
                             if (members.ready()) {
-                                readyMembers += 1;
+                               readyMembers +=1;
                             }
                         }
                         this.idStartGameButton.disableProperty().set(readyMembers < 4 || readyMembers != members.size());
@@ -213,21 +213,20 @@ public class GameLobbyController implements Controller {
     public void leave(ActionEvent event) {
         gameService
                 .findOneGame(gameIDStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    if ((int) result.members() == 1 || result.owner().equals(idStorage.getID())) {
-                        gameService
-                                .deleteGame(gameIDStorage.getId())
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe();
-                    } else {
-                        memberService
-                                .leave(gameIDStorage.getId(), idStorage.getID())
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe();
-                    }
-                });
-        app.show(lobbyController.get());
+                        .observeOn(FX_SCHEDULER)
+                                .subscribe(result -> {
+                                    if ((int)result.members() == 1 || result.owner().equals(idStorage.getID())) {
+                                        gameService
+                                                .deleteGame(gameIDStorage.getId())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
+                                    } else {
+                                        memberService
+                                                .leave(gameIDStorage.getId(), idStorage.getID())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
+                                                }
+                                    });
     }
 
     public void send(ActionEvent event) {
@@ -244,11 +243,11 @@ public class GameLobbyController implements Controller {
     public void ready(ActionEvent event) {
 
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
-        if (member.ready()) {
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false).subscribe();
+        if(member.ready()){
+            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false).subscribe();
             this.idReadyButton.setText("Ready");
-        } else {
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true).subscribe();
+        }else {
+            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true).subscribe();
             this.idReadyButton.setText("Not Ready");
         }
 

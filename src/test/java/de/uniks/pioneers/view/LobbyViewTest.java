@@ -1,27 +1,42 @@
 package de.uniks.pioneers.view;
 
-import de.uniks.pioneers.App;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import de.uniks.pioneers.*;
+
+import de.uniks.pioneers.Websocket.ClientEndpoint;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.controller.LoginController;
 import de.uniks.pioneers.controller.RulesScreenController;
-import de.uniks.pioneers.service.GameService;
-import de.uniks.pioneers.service.GroupService;
-import de.uniks.pioneers.service.MessageService;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.model.Group;
+import de.uniks.pioneers.model.Message;
+import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.service.query.PointQuery;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 public class LobbyViewTest extends ApplicationTest {
@@ -35,34 +50,37 @@ public class LobbyViewTest extends ApplicationTest {
     UserService userService;
 
     @Mock
+    MessageService messageService;
+
+    @Mock
     GameService gameService;
 
     @Mock
     GroupService groupService;
 
     @Mock
-    MessageService messageService;
-
-    @Mock
     EventListener eventListener;
+
+    @Spy
+    IDStorage idStorage;
 
     @InjectMocks
     LobbyController lobbyController;
 
-    private Stage stage;
-    private App app;
-
     @Override
-    public void start(Stage stage) {
-        // start application
-        //init calls need to be mocked here
-        when(userService.findAllUsers()).thenReturn(Observable.empty());
-        when(gameService.findAllGames()).thenReturn(Observable.empty());
+    public void start(Stage stage) throws Exception {
+        when(idStorage.getID()).thenReturn("4");
+        when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "12", "testGame","1", 2))));
+        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1","test","online",null), new User("4","testus","online",null), new User("3","testtest","offline",null))));
+        when(groupService.getAll()).thenReturn(Observable.just(List.of(new Group("1","1","12",List.of("1","4")))));
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
-        when(groupService.getAll()).thenReturn(Observable.empty());
-        this.stage = stage;
-        this.app = new App(lobbyController);
-        this.app.start(stage);
+        when(messageService.getAllMessages("groups","12")).thenReturn(Observable.just(List.of(new Message("1","1","5","1","Test Message"),new Message("1","1","5","4","Test Message2"),new Message("1","1","5","1","Test Message3"))));
+
+
+        final App app = new App(null);
+        MainComponent testComponent = DaggerTestComponent.builder().mainapp(app).build();
+        app.start(stage);
+        app.show(lobbyController);
     }
 
     @Test
@@ -83,12 +101,75 @@ public class LobbyViewTest extends ApplicationTest {
         Assertions.assertThat(createGame.getText()).isEqualTo("Create Game");
         Assertions.assertThat(send.getText()).isEqualTo("send");
 
-        Assertions.assertThat(welcomeLabel.getText()).isEqualTo("Nice to see you again, ");
+        Assertions.assertThat(welcomeLabel.getText()).isEqualTo("Nice to see you again, testus!");
 
         Assertions.assertThat(chatMessage.getText()).isEqualTo("");
 
         clickOn(chatMessage);
         write("test");
         Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
+
+        ScrollPane scrollPane = lookup("#userScrollPane").query();
+        VBox vBox = (VBox) scrollPane.getContent();
+
+        Assertions.assertThat(vBox.getChildren().size()).isEqualTo(3);
+
+        HBox hBox = (HBox) vBox.getChildren().get(0);
+
+        ImageView imageView = (ImageView) hBox.getChildren().get(0);
+        Circle circle = (Circle) hBox.getChildren().get(1);
+        Label label = (Label) hBox.getChildren().get(2);
+        Button chat = (Button) hBox.getChildren().get(3);
+
+        Assertions.assertThat(imageView.getImage()).isNull();
+        Assertions.assertThat(circle.getFill()).isEqualTo(Color.GREEN);
+        Assertions.assertThat(label.getText()).isEqualTo("test");
+        Assertions.assertThat(chat.getText()).isEqualTo("chat");
+
+        HBox hBox2 = (HBox) vBox.getChildren().get(2);
+
+        ImageView imageView2 = (ImageView) hBox2.getChildren().get(0);
+        Circle circle2 = (Circle) hBox2.getChildren().get(1);
+        Label label2 = (Label) hBox2.getChildren().get(2);
+
+        Assertions.assertThat(imageView2.getImage()).isNull();
+        Assertions.assertThat(circle2.getFill()).isEqualTo(Color.RED);
+        Assertions.assertThat(label2.getText()).isEqualTo("testtest");
+
+        ScrollPane scrollPane2 = lookup("#gamesScrollPane").query();
+        VBox vBox2 = (VBox) scrollPane2.getContent();
+
+        Assertions.assertThat(vBox2.getChildren().size()).isEqualTo(1);
+
+        HBox hBox3 = (HBox) vBox2.getChildren().get(0);
+        Label label3 = (Label) hBox3.getChildren().get(0);
+        Button join = (Button) hBox3.getChildren().get(1);
+
+        Assertions.assertThat(label3.getText()).isEqualTo("testGame (2/6)");
+        Assertions.assertThat(join.getText()).isEqualTo("join");
+
+        clickOn(chat);
+
+        TabPane tabPane = lookup("#tabPane").query();
+        Assertions.assertThat(tabPane.getTabs().size()).isEqualTo(2);
+
+        Tab chatTab = tabPane.getTabs().get(1);
+
+        ScrollPane chatScrollPane = (ScrollPane) chatTab.getContent();
+        VBox chatVBox = (VBox) chatScrollPane.getContent();
+
+        Assertions.assertThat(chatVBox.getChildren().size()).isEqualTo(3);
+
+        HBox firstMessage = (HBox) chatVBox.getChildren().get(0);
+        HBox secondMessage = (HBox) chatVBox.getChildren().get(1);
+        HBox thirdMessage = (HBox) chatVBox.getChildren().get(2);
+
+        Label firstChatMessage = (Label) firstMessage.getChildren().get(1);
+        Label secondChatMessage = (Label) secondMessage.getChildren().get(1);
+        Label thirdChatMessage = (Label) thirdMessage.getChildren().get(1);
+
+        Assertions.assertThat(firstChatMessage.getText()).isEqualTo("test: Test Message");
+        Assertions.assertThat(secondChatMessage.getText()).isEqualTo("testus: Test Message2");
+        Assertions.assertThat(thirdChatMessage.getText()).isEqualTo("test: Test Message3");
     }
 }

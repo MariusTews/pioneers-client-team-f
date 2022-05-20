@@ -2,8 +2,10 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.input.KeyCode;
@@ -21,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class GameLobbyControllerTest extends ApplicationTest {
+class LobbyControllerTest extends ApplicationTest {
 
     @Mock
     UserService userService;
@@ -32,57 +34,49 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Mock
     GameService gameService;
 
+    @Mock
+    GroupService groupService;
+
+    @Mock
+    AuthService authService;
+
 
     @Mock
     EventListener eventListener;
 
     @Spy
-    GameIDStorage gameIDStorage;
-
-    @Spy
     IDStorage idStorage;
 
     @InjectMocks
-    GameLobbyController gameLobbyController;
+    LobbyController lobbyController;
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
         // empty init
-        when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
+        when(groupService.getAll()).thenReturn(Observable.empty());
         when(userService.findAllUsers()).thenReturn(Observable.empty());
+        when(gameService.findAllGames()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
-        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 2)));
-        when(gameIDStorage.getId()).thenReturn("id");
 
 
         // start application
-        final App app = new App(gameLobbyController);
+        final App app = new App(lobbyController);
         app.start(stage);
 
     }
 
 
     @Test
-    void leave() {
+    void logout() {
         when(idStorage.getID()).thenReturn("4");
-        when(memberService.leave("id", "4")).thenReturn(Observable.just(new Member("0:00", "0:30", "id", "4", false)));
+        when(userService.statusUpdate("4", "offline")).thenReturn(Observable.just(new User("id","name", "status", "avatar")));
+        when(authService.logout()).thenReturn(Observable.just(new ErrorResponse(123, "error", "message")));
 
-        write("\t\t\t\t");
+
+        write("\t");
         type(KeyCode.SPACE);
 
-        verify(memberService).leave("id", "4");
-    }
-
-    @Test
-    void leaveLastMember() {
-        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 1)));
-        when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 1)));
-
-        write("\t\t\t\t");
-        type(KeyCode.SPACE);
-
-        verify(gameService).deleteGame("id");
-
-
+        verify(userService).statusUpdate("4", "offline");
+        verify(authService).logout();
     }
 }
