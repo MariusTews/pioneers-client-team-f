@@ -153,7 +153,7 @@ public class GameLobbyController implements Controller {
                                readyMembers +=1;
                             }
                         }
-                        this.idStartGameButton.disableProperty().set(readyMembers < 4 || readyMembers != members.size());
+                        this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
 
 
                     }
@@ -242,7 +242,6 @@ public class GameLobbyController implements Controller {
     }
 
     public void ready(ActionEvent event) {
-
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
         if(member.ready()){
             memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false).subscribe();
