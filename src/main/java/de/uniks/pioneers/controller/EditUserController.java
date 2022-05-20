@@ -152,8 +152,6 @@ public class EditUserController implements Controller {
                 avatar = null;
             }
         }
-
-
     }
 
     public String encodeFileToBase64Binary(File file) {

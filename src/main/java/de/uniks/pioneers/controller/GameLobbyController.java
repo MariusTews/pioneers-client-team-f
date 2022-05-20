@@ -210,7 +210,7 @@ public class GameLobbyController implements Controller {
         return parent;
     }
 
-    public void leave(ActionEvent ignoredEvent) {
+    public void leave(ActionEvent event) {
         gameService
                 .findOneGame(gameIDStorage.getId())
                         .observeOn(FX_SCHEDULER)
