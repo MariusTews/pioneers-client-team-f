@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.rest.UserApiService;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
@@ -10,12 +11,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
@@ -23,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.*;
 import java.util.Base64;
+import java.util.Optional;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
@@ -66,9 +66,9 @@ public class EditUserController implements Controller {
 
     }
 
+
     @Override
     public void init() {
-
 
     }
 
@@ -88,7 +88,6 @@ public class EditUserController implements Controller {
             e.printStackTrace();
             return null;
         }
-
         user = this.userService.findOne(idStorage.getID());
 
         user.subscribe(currUser -> {
@@ -133,19 +132,29 @@ public class EditUserController implements Controller {
                 .subscribe(result -> app.show(loginController.get()));
     }
 
-    public void changePicture(MouseEvent event) throws Exception {
+    public void changePicture(MouseEvent event) {
+        if(event.getButton() == MouseButton.PRIMARY) {
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll();
-        File selectedFile = fileChooser.showOpenDialog(null);
-        this.pictureFile = selectedFile;
-
-        userPicture.setImage(new Image(selectedFile.toURI().toString()));
-
-
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll();
+            File selectedFile = fileChooser.showOpenDialog(null);
+            if(selectedFile!= null) {
+                this.pictureFile = selectedFile;
+                userPicture.setImage(new Image(selectedFile.toURI().toString()));
+            }
+        } else if (event.getButton() == MouseButton.SECONDARY) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Deleting userPicture");
+            alert.setContentText("do you really want to delete your User picture?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
+                avatar = null;
+            }
+        }
     }
 
-    private static String encodeFileToBase64Binary(File file) {
+    public String encodeFileToBase64Binary(File file) {
         String encodedFile = null;
         try {
             FileInputStream fileInputStreamReader = new FileInputStream(file);
@@ -170,10 +179,9 @@ public class EditUserController implements Controller {
     }
 
     public void updateUser(String id, String name, String password, String repeatPassword, String avatar) {
-
         if (avatar != null) {
             if (avatar.length() > 16384) {
-                new Alert(Alert.AlertType.INFORMATION, "the chosen image is to big \nplease choose a picture which is smaller than 10kb ")
+                new Alert(Alert.AlertType.INFORMATION, "the chosen image is to big! \nplease choose a picture which is smaller than 10kb")
                         .showAndWait();
                 return;
             }
@@ -190,10 +198,9 @@ public class EditUserController implements Controller {
                 return;
             }
         }
-
         userService.userUpdate(id, name, avatar, "online", password)
                 .observeOn(FX_SCHEDULER)
-                .doOnError(error -> {
+                .doOnError(error ->{
                     if ("HTTP 409 ".equals(error.getMessage())) {
                         new Alert(Alert.AlertType.INFORMATION, "username is already taken!")
                                 .showAndWait();
@@ -202,7 +209,6 @@ public class EditUserController implements Controller {
                         new Alert(Alert.AlertType.INFORMATION, "name must be shorter than or equal to 32 characters!")
                                 .showAndWait();
                     }
-
                 })
 
                 .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
