@@ -91,7 +91,7 @@ public class EditUserController implements Controller {
         user = this.userService.findOne(idStorage.getID());
 
         user.subscribe(currUser -> {
-            if (currUser.avatar() == null) {
+            if (currUser.avatar() == null || currUser.avatar().equals("data:image/png;base64,")) {
 
                 this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
 
@@ -149,7 +149,7 @@ public class EditUserController implements Controller {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
                 this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
-                avatar = null;
+                avatar = "data:image/png;base64,";
             }
         }
     }
