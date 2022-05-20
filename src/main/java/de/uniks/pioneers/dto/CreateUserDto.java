@@ -6,8 +6,4 @@ public record CreateUserDto(
 		String name,
 		String avatar,
 		String password
-) {
-	Optional<String> getAvatar(){
-		return Optional.ofNullable(avatar());
-	}
-}
+) {}

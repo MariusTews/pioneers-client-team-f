@@ -219,15 +219,14 @@ public class GameLobbyController implements Controller {
                                         gameService
                                                 .deleteGame(gameIDStorage.getId())
                                                 .observeOn(FX_SCHEDULER)
-                                                .subscribe();
+                                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
                                     } else {
                                         memberService
                                                 .leave(gameIDStorage.getId(), idStorage.getID())
                                                 .observeOn(FX_SCHEDULER)
-                                                .subscribe();
-                                    }
-                                });
-        app.show(lobbyController.get());
+                                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
+                                                }
+                                    });
     }
 
     public void send(ActionEvent event) {
