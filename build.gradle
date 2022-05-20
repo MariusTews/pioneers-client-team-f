@@ -39,7 +39,7 @@ dependencies {
 
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.3'
 
 
     // rxjava
@@ -56,17 +56,17 @@ dependencies {
     compileOnly group: 'javax.websocket', name: 'javax.websocket-api', version: '1.1'
     compileOnly group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
     implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
-    implementation group: 'org.glassfish.tyrus', name: 'tyrus-client', version: '1.15'
-    implementation group: 'org.glassfish.tyrus', name: 'tyrus-container-grizzly-client', version: '1.15'
+    implementation group: 'org.glassfish.tyrus', name: 'tyrus-client', version: '2.0.2'
+    implementation group: 'org.glassfish.tyrus', name: 'tyrus-container-grizzly-client', version: '2.0.2'
 
 
     // Dagger
-    implementation 'com.google.dagger:dagger:2.41'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.41'
-    testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.41'
+    implementation 'com.google.dagger:dagger:2.42'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.42'
+    testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.42'
 
      //konghq
-    implementation group: 'com.konghq' , name: 'unirest-java', version: '3.11.09'
+    implementation group: 'com.konghq' , name: 'unirest-java', version: '3.13.8'
 }
 
 javafx {
