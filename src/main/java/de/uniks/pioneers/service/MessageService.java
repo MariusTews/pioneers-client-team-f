@@ -24,4 +24,8 @@ public class MessageService {
     public Observable<Message> send(String namespace, String parent, String message) {
         return messageApiService.create(namespace, parent, new CreateMessageDto(message));
     }
+
+    public Observable<Message> delete(String namespace, String parent, String id) {
+        return messageApiService.delete(namespace, parent, id);
+    }
 }
