@@ -51,6 +51,8 @@ public class EditUserController implements Controller {
     private Observable<User> user;
     private String avatar;
 
+    private String username;
+
 
     @Inject
     public EditUserController(App app,
@@ -90,6 +92,7 @@ public class EditUserController implements Controller {
         }
         user = this.userService.findOne(idStorage.getID());
 
+
         user.subscribe(currUser -> {
             if (currUser.avatar() == null || currUser.avatar().equals("data:image/png;base64,")) {
 
@@ -99,6 +102,7 @@ public class EditUserController implements Controller {
                 userPicture.setImage(new Image(currUser.avatar()));
 
             }
+            username = currUser.name();
 
         });
 
@@ -125,11 +129,15 @@ public class EditUserController implements Controller {
     }
 
     public void deleteButtonPressed(ActionEvent event) {
-        new Alert(Alert.AlertType.INFORMATION, "Account was successfully deleted!")
-                .showAndWait();
-        userService.delete(idStorage.getID())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> app.show(loginController.get()));
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Deleting userPicture");
+        alert.setContentText("Are you sure you want to delete " + username + "?" );
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            userService.delete(idStorage.getID())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(suc -> app.show(loginController.get()));
+        }
     }
 
     public void changePicture(MouseEvent event) {
