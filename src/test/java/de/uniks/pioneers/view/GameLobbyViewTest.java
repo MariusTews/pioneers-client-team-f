@@ -61,7 +61,7 @@ public class GameLobbyViewTest extends ApplicationTest {
         Message x1 = new Message("0", "0", "me1", "u1", "test1");
         Message x2 = new Message("1", "1", "me2", "u2", "test2");
 
-        Game g = new Game("0", "0", "g1", "g", "u1",  2);
+        Game g = new Game("0", "0", "g1", "g", "u1",  2, true);
 
         when(gameIDStorage.getId()).thenReturn("g1");
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(m1, m2).buffer(2));

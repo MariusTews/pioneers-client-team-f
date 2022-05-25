@@ -70,7 +70,7 @@ public class LobbyViewTest extends ApplicationTest {
     @Override
     public void start(Stage stage) throws Exception {
         when(idStorage.getID()).thenReturn("4");
-        when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "12", "testGame","1", 2))));
+        when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "12", "testGame","1", 2, false))));
         when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1","test","online",null), new User("4","testus","online",null), new User("3","testtest","offline",null))));
         when(groupService.getAll()).thenReturn(Observable.just(List.of(new Group("1","1","12",List.of("1","4")))));
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());

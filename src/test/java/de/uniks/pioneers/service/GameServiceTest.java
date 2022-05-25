@@ -37,9 +37,9 @@ class GameServiceTest {
 
     @Test
     void create() {
-        when(gamesApiService.create(any())).thenReturn(Observable.just(new Game("0:30","15:50","1337","testGame","01",3 )));
+        when(gamesApiService.create(any())).thenReturn(Observable.just(new Game("0:30","15:50","1337","testGame","01",3, false)));
         Game game = gameService.create("testGame", "123").blockingFirst();
-        assertEquals("Game[createdAt=0:30, updatedAt=15:50, _id=1337, name=testGame, owner=01, members=3]", game.toString());
+        assertEquals("Game[createdAt=0:30, updatedAt=15:50, _id=1337, name=testGame, owner=01, members=3, started=false]", game.toString());
         assertEquals("1337", gameIDStorage.getId());
         assertEquals("01", memberIDStorage.getId());
 
@@ -48,36 +48,36 @@ class GameServiceTest {
 
     @Test
     void findAllGames() {
-        when(gamesApiService.findAll()).thenReturn(Observable.just(new Game("28.08.2000","18.05.2022","37","myGame","45",3),new Game("01.01.1990","24.12.2020", "1","first", "2", 6)).buffer(2));
+        when(gamesApiService.findAll()).thenReturn(Observable.just(new Game("28.08.2000","18.05.2022","37","myGame","45",3, false), new Game("01.01.1990","24.12.2020", "1","first", "2", 6, false)).buffer(2));
         List<Game> games = gameService.findAllGames().blockingFirst();
-        assertEquals("[Game[createdAt=28.08.2000, updatedAt=18.05.2022, _id=37, name=myGame, owner=45, members=3], Game[createdAt=01.01.1990, updatedAt=24.12.2020, _id=1, name=first, owner=2, members=6]]", games.toString());
+        assertEquals("[Game[createdAt=28.08.2000, updatedAt=18.05.2022, _id=37, name=myGame, owner=45, members=3, started=false], Game[createdAt=01.01.1990, updatedAt=24.12.2020, _id=1, name=first, owner=2, members=6, started=false]]", games.toString());
 
         verify(gamesApiService).findAll();
     }
 
     @Test
     void findOneGame() {
-        when(gamesApiService.findOne(any())).thenReturn(Observable.just(new Game("5","6","7","8","9",4)));
+        when(gamesApiService.findOne(any())).thenReturn(Observable.just(new Game("5","6","7","8","9",4,false)));
         Game game = gameService.findOneGame("7").blockingFirst();
-        assertEquals("Game[createdAt=5, updatedAt=6, _id=7, name=8, owner=9, members=4]", game.toString());
+        assertEquals("Game[createdAt=5, updatedAt=6, _id=7, name=8, owner=9, members=4, started=false]", game.toString());
 
         verify(gamesApiService).findOne("7");
     }
 
     @Test
     void updateGame() {
-        when(gamesApiService.patch(any(),any())).thenReturn(Observable.just(new Game("0:00","0:01","420","chill","69",1)));
-        Game game = gameService.updateGame("420","chill","password","69").blockingFirst();
-        assertEquals("Game[createdAt=0:00, updatedAt=0:01, _id=420, name=chill, owner=69, members=1]", game.toString());
+        when(gamesApiService.patch(any(),any())).thenReturn(Observable.just(new Game("0:00","0:01","420","chill","69",1,false)));
+        Game game = gameService.updateGame("420","chill","password", false, "69").blockingFirst();
+        assertEquals("Game[createdAt=0:00, updatedAt=0:01, _id=420, name=chill, owner=69, members=1, started=false]", game.toString());
 
-        verify(gamesApiService).patch("420", new UpdateGameDto("chill", "69","password"));
+        verify(gamesApiService).patch("420", new UpdateGameDto("chill", "69", false, "password"));
     }
 
     @Test
     void deleteGame() {
-        when(gamesApiService.delete(any())).thenReturn(Observable.just(new Game("yesterday","now","404","sad","00",1)));
+        when(gamesApiService.delete(any())).thenReturn(Observable.just(new Game("yesterday","now","404","sad","00",1, false)));
         Game game = gameService.deleteGame("404").blockingFirst();
-        assertEquals("Game[createdAt=yesterday, updatedAt=now, _id=404, name=sad, owner=00, members=1]",game.toString());
+        assertEquals("Game[createdAt=yesterday, updatedAt=now, _id=404, name=sad, owner=00, members=1, started=false]",game.toString());
 
         verify(gamesApiService).delete("404");
     }

@@ -51,7 +51,7 @@ class GameLobbyControllerTest extends ApplicationTest {
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
-        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 2)));
+        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 2, false)));
         when(gameIDStorage.getId()).thenReturn("id");
 
 
@@ -75,8 +75,8 @@ class GameLobbyControllerTest extends ApplicationTest {
 
     @Test
     void leaveLastMember() {
-        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 1)));
-        when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 1)));
+        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 1, false)));
+        when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 1, false)));
 
         write("\t\t\t\t");
         type(KeyCode.SPACE);
