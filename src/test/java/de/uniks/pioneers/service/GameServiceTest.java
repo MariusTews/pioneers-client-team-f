@@ -43,7 +43,7 @@ class GameServiceTest {
         assertEquals("1337", gameIDStorage.getId());
         assertEquals("01", memberIDStorage.getId());
 
-        verify(gamesApiService).create(new CreateGameDto("testGame", "123"));
+        verify(gamesApiService).create(new CreateGameDto("testGame", false, "123"));
     }
 
     @Test

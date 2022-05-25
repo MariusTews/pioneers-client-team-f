@@ -24,7 +24,7 @@ public class GameService {
 
     public Observable<Game> create(String gameName, String password) {
         return gamesApiService
-                .create(new CreateGameDto(gameName, password))
+                .create(new CreateGameDto(gameName, false, password))
                 .doOnNext(result -> {
                     this.gameIDStorage.setId(result._id());
                     this.memberIDStorage.setId(result.owner());
