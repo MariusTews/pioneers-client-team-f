@@ -5,6 +5,7 @@ import de.uniks.pioneers.dto.UpdateMemberDto;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.rest.GameMembersApiService;
 import io.reactivex.rxjava3.core.Observable;
+import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,7 +42,7 @@ public class MemberServiceTest {
         assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false]", member.toString());
         assertEquals("01",gameIDStorage.getId());
         assertEquals("02", memberIDStorage.getId());
-        verify(gameMembersApiService).create("testGame", new CreateMemberDto(false,"testPassword"));
+        verify(gameMembersApiService).create("testGame", new CreateMemberDto(false, Color.BLACK,"testPassword"));
     }
 
     @Test
