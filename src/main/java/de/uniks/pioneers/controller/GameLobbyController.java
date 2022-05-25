@@ -67,6 +67,7 @@ public class GameLobbyController implements Controller {
     private final MessageService messageService;
     private final GameService gameService;
     private final Provider<LobbyController> lobbyController;
+    private final Provider<GameScreenController> gameScreenController;
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
@@ -82,6 +83,7 @@ public class GameLobbyController implements Controller {
                                MessageService messageService,
                                GameService gameService,
                                Provider<LobbyController> lobbyController,
+                               Provider<GameScreenController>gameScreenController,
                                EventListener eventListener,
                                IDStorage idStorage,
                                GameIDStorage gameIDStorage,
@@ -93,6 +95,7 @@ public class GameLobbyController implements Controller {
         this.messageService = messageService;
         this.gameService = gameService;
         this.lobbyController = lobbyController;
+        this.gameScreenController = gameScreenController;
         this.eventListener = eventListener;
         this.gameIDStorage = gameIDStorage;
         this.memberIDStorage = memberIDStorage;
@@ -253,6 +256,9 @@ public class GameLobbyController implements Controller {
     }
 
     public void startGame(ActionEvent event) {
+        gameService.updateGame(gameIDStorage.getId(),null,null,null,true).subscribe();
+        final GameScreenController controller = gameScreenController.get();
+        this.app.show(controller);
     }
 
     // private methods
