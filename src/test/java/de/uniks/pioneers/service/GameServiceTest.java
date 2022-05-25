@@ -67,10 +67,10 @@ class GameServiceTest {
     @Test
     void updateGame() {
         when(gamesApiService.patch(any(),any())).thenReturn(Observable.just(new Game("0:00","0:01","420","chill","69",1)));
-        Game game = gameService.updateGame("420","chill","password","69").blockingFirst();
+        Game game = gameService.updateGame("420","chill","password","69", true).blockingFirst();
         assertEquals("Game[createdAt=0:00, updatedAt=0:01, _id=420, name=chill, owner=69, members=1]", game.toString());
 
-        verify(gamesApiService).patch("420", new UpdateGameDto("chill", "69","password"));
+        verify(gamesApiService).patch("420", new UpdateGameDto("chill", "69","password", true));
     }
 
     @Test
