@@ -162,6 +162,19 @@ public class GameLobbyController implements Controller {
                     }
                 }));
 
+
+        //listen to the game
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".*.*",Message.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event->{
+                    final Message message = event.data();
+                    if(event.event().endsWith("state" + CREATED)){
+                        final GameScreenController controller = gameScreenController.get();
+                        this.app.show(controller);
+                    }
+                }));
+
         // listen to game lobby messages
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
