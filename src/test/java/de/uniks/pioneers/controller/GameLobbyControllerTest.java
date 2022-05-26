@@ -82,7 +82,5 @@ class GameLobbyControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
 
         verify(gameService).deleteGame("id");
-
-
     }
 }
