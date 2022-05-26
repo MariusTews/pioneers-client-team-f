@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.Polygon?>
 
 
-<Pane maxHeight="900.0" maxWidth="900.0" minHeight="900.0" minWidth="900.0" prefHeight="900.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameFieldSubController_Factory">
+<Pane maxHeight="900.0" maxWidth="900.0" minHeight="900.0" minWidth="900.0" prefHeight="900.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameFieldSubController">
    <children>
       <Group layoutX="120.0" layoutY="130.0" scaleX="1.5" scaleY="1.5" scaleZ="1.5">
          <children>
