@@ -1,6 +1,7 @@
 package de.uniks.pioneers;
 
 import de.uniks.pioneers.controller.Controller;
+import de.uniks.pioneers.controller.GameScreenController;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -28,8 +29,8 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.stage = primaryStage;
-        stage.setWidth(800);
-        stage.setHeight(600);
+        stage.setWidth(1600);
+        stage.setHeight(900);
         stage.setTitle("Pioneers");
 
         final Scene scene = new Scene(new Label("Loading ... "));
