@@ -10,10 +10,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.EditUserController">
-   <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="318.0" spacing="10.0">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.EditUserController">
+   <VBox alignment="TOP_CENTER" prefHeight="550.0" prefWidth="546.0" spacing="10.0">
       <HBox.margin>
-         <Insets top="50.0" />
+         <Insets top="20.0" />
       </HBox.margin>
       <Label text="new username" />
       <TextField fx:id="newUserNameTextField">
@@ -35,11 +35,14 @@
       </PasswordField>
       <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteButtonPressed" text="Delete">
          <VBox.margin>
-            <Insets right="200.0" top="120.0" />
+            <Insets right="200.0" top="150.0" />
          </VBox.margin>
       </Button>
+      <padding>
+         <Insets top="50.0" />
+      </padding>
    </VBox>
-   <VBox alignment="TOP_RIGHT" prefHeight="400.0" prefWidth="284.0" spacing="10.0">
+   <VBox alignment="TOP_CENTER" prefHeight="580.0" prefWidth="481.0" spacing="10.0">
       <padding>
          <Insets right="20.0" />
       </padding>
@@ -47,14 +50,19 @@
          <Insets top="20.0" />
       </HBox.margin>
       <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelButtonPressed" text="Cancel" />
-      <HBox alignment="TOP_CENTER" minHeight="262.0" minWidth="263.0" prefHeight="290.0" prefWidth="263.0">
-         <ImageView fx:id="userPicture" fitHeight="251.0" fitWidth="263.0" onMouseClicked="#changePicture"
-                    pickOnBounds="true" preserveRatio="true">
-            <viewport>
-               <Rectangle2D/>
-            </viewport>
-         </ImageView>
-      </HBox>
-      <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#confirmButtonPressed" text="Confim" />
+      <VBox alignment="CENTER" minHeight="263.0" minWidth="263.0" prefHeight="290.0" prefWidth="263.0" spacing="10.0">
+         <children>
+            <ImageView fx:id="userPicture" fitHeight="251.0" fitWidth="263.0" onMouseClicked="#changePicture" pickOnBounds="true" preserveRatio="true">
+               <viewport>
+                  <Rectangle2D />
+               </viewport>
+            </ImageView>
+            <Button fx:id="editButton" mnemonicParsing="false" onAction="#editPicture" text="Edit" />
+         </children>
+      </VBox>
+      <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#confirmButtonPressed" text="Confim">
+         <VBox.margin>
+            <Insets top="50.0" />
+         </VBox.margin></Button>
    </VBox>
 </HBox>
