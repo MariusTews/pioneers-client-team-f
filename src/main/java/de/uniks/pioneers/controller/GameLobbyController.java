@@ -269,9 +269,20 @@ public class GameLobbyController implements Controller {
     }
 
     public void startGame(ActionEvent event) {
-        gameService.updateGame(gameIDStorage.getId(),null,null,null,true).subscribe();
-        final GameScreenController controller = gameScreenController.get();
-        this.app.show(controller);
+
+        gameService.updateGame(gameIDStorage.getId(),null,null,null,true)
+                .observeOn(FX_SCHEDULER)
+                .doOnError(error->{
+                    if ("HTTP 403 ".equals(error.getMessage())) {
+                        new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!")
+                                .showAndWait();
+                    }
+                })
+                .subscribe(onSuccess->{
+                    final GameScreenController controller = gameScreenController.get();
+                    this.app.show(controller);
+                }, onError->{});
+
     }
 
     // private methods
