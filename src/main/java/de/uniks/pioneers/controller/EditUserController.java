@@ -21,6 +21,7 @@ import javafx.stage.FileChooser;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -50,6 +51,7 @@ public class EditUserController implements Controller {
     private final UserService userService;
     private Observable<User> user;
     private String avatar;
+    private ArrayList<String> friends = new ArrayList<>();
 
 
     @Inject
@@ -198,7 +200,7 @@ public class EditUserController implements Controller {
                 return;
             }
         }
-        userService.userUpdate(id, name, avatar, "online", password)
+        userService.userUpdate(id, name, avatar, friends, "online", password)
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error ->{
                     if ("HTTP 409 ".equals(error.getMessage())) {
