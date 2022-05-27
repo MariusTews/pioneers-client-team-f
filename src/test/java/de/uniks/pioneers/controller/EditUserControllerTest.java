@@ -63,40 +63,42 @@ class EditUserControllerTest extends ApplicationTest {
         String avatar = editUserController.encodeFileToBase64Binary(file);
 
         when(userService.userUpdate(any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("01","Alice","offline",avatar)));
-        write("\t\t\t\t\t");
+        write("\t\t\t\t\t\t");
+        //check if all textfields are empty
+        type(KeyCode.SPACE);
+        write("\t\t1234567\t\t\t\t\t");
         type(KeyCode.SPACE);
 
-        write("\t\t1234567\t\t\t\t");
-        type(KeyCode.SPACE);
-
+        //check if password do not match
         verifyThat("OK", NodeMatchers.isVisible());
         type(KeyCode.SPACE);
-        write("\t\t1234567\t1234567\t\t\t");
+        write("\t\t1234567\t1234567\t\t\t\t");
+
+        //check if password is not 8 characters long
         type(KeyCode.SPACE);
         verifyThat("OK", NodeMatchers.isVisible());
         type(KeyCode.SPACE);
+        write("\tAlice\t12345678\t12345678\t\t\t\t");
 
-        write("\tAlice\t12345678\t12345678\t\t\t");
+        //check if username and password are changed
         type(KeyCode.SPACE);
-
         verify(userService).userUpdate("01","Alice",avatar,"online","12345678");
-
         write("\t");
         type(KeyCode.BACK_SPACE);
-        write("\t\t\t\t\t");
+        write("\t\t\t\t\t\t");
 
+        //check if only password changed
         type(KeyCode.SPACE);
-
         verify(userService).userUpdate("01","Alice",avatar,"online","12345678");
-
         write("\tAlice\t");
         type(KeyCode.BACK_SPACE);
         write("\t");
         type(KeyCode.BACK_SPACE);
-        write("\t\t\t");
+        write("\t\t\t\t");
+
+        //check if only username changed
         type(KeyCode.SPACE);
         verify(userService).userUpdate("01","Alice",avatar,"online","12345678");
-
         type(KeyCode.SPACE);
     }
 }

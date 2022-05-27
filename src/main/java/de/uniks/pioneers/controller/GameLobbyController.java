@@ -67,6 +67,7 @@ public class GameLobbyController implements Controller {
     private final MessageService messageService;
     private final GameService gameService;
     private final Provider<LobbyController> lobbyController;
+    private final Provider<GameScreenController> gameScreenController;
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
@@ -82,6 +83,7 @@ public class GameLobbyController implements Controller {
                                MessageService messageService,
                                GameService gameService,
                                Provider<LobbyController> lobbyController,
+                               Provider<GameScreenController>gameScreenController,
                                EventListener eventListener,
                                IDStorage idStorage,
                                GameIDStorage gameIDStorage,
@@ -93,6 +95,7 @@ public class GameLobbyController implements Controller {
         this.messageService = messageService;
         this.gameService = gameService;
         this.lobbyController = lobbyController;
+        this.gameScreenController = gameScreenController;
         this.eventListener = eventListener;
         this.gameIDStorage = gameIDStorage;
         this.memberIDStorage = memberIDStorage;
@@ -156,6 +159,19 @@ public class GameLobbyController implements Controller {
                         this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
 
 
+                    }
+                }));
+
+
+        //listen to the game
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".*.*",Message.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event->{
+                    final Message message = event.data();
+                    if(event.event().endsWith("state" + CREATED)){
+                        final GameScreenController controller = gameScreenController.get();
+                        this.app.show(controller);
                     }
                 }));
 
@@ -253,6 +269,20 @@ public class GameLobbyController implements Controller {
     }
 
     public void startGame(ActionEvent event) {
+
+        gameService.updateGame(gameIDStorage.getId(),null,null,null,true)
+                .observeOn(FX_SCHEDULER)
+                .doOnError(error->{
+                    if ("HTTP 403 ".equals(error.getMessage())) {
+                        new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!")
+                                .showAndWait();
+                    }
+                })
+                .subscribe(onSuccess->{
+                    final GameScreenController controller = gameScreenController.get();
+                    this.app.show(controller);
+                }, onError->{});
+
     }
 
     // private methods
