@@ -7,6 +7,7 @@ import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +52,8 @@ class GameLobbyControllerTest extends ApplicationTest {
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
-        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 2, false)));
+        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
+                                                        "id", "name", "owner", 2, false)));
         when(gameIDStorage.getId()).thenReturn("id");
 
 
@@ -65,7 +67,8 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Test
     void leave() {
         when(idStorage.getID()).thenReturn("4");
-        when(memberService.leave("id", "4")).thenReturn(Observable.just(new Member("0:00", "0:30", "id", "4", false)));
+        when(memberService.leave("id", "4")).thenReturn(Observable.just(new Member("0:00",
+                                                            "0:30", "id", "4", false, Color.BLACK)));
 
         write("\t\t\t\t");
         type(KeyCode.SPACE);
@@ -75,8 +78,10 @@ class GameLobbyControllerTest extends ApplicationTest {
 
     @Test
     void leaveLastMember() {
-        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 1, false)));
-        when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30", "id", "name", "owner", 1, false)));
+        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
+                                                    "id", "name", "owner", 1, false)));
+        when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30",
+                                                        "id", "name", "owner", 1, false)));
 
         write("\t\t\t\t");
         type(KeyCode.SPACE);

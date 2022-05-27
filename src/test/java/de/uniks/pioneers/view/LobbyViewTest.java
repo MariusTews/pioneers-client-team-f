@@ -74,7 +74,9 @@ public class LobbyViewTest extends ApplicationTest {
         when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "12", "testGame","1", 2, false),
                                                                             new Game("1", "1", "14", "testGame","3", MAX_MEMBERS, false),
                                                                             new Game("1", "1", "13", "testGame","2", 2, true))));
-        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1","test","online",null), new User("4","testus","online",null), new User("3","testtest","offline",null))));
+        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1","test","online",null, new ArrayList<>()),
+                                                                            new User("4","testus","online",null, new ArrayList<>()),
+                                                                            new User("3","testtest","offline",null, new ArrayList<>()))));
         when(groupService.getAll()).thenReturn(Observable.just(List.of(new Group("1","1","12",List.of("1","4")))));
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
         when(messageService.getAllMessages("groups","12")).thenReturn(Observable.just(List.of(new Message("1","1","5","1","Test Message"),new Message("1","1","5","4","Test Message2"),new Message("1","1","5","1","Test Message3"))));

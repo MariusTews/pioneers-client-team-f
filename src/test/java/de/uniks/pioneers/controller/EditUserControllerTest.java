@@ -18,6 +18,7 @@ import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 
 import java.io.File;
+import java.util.ArrayList;
 
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +48,8 @@ class EditUserControllerTest extends ApplicationTest {
         File file = new File(Main.class.getResource("defaultPicture.png").getFile());
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
-        when(userService.findOne(any())).thenReturn(Observable.just(new User("01", "Alice","offline",avatar)));
+        when(userService.findOne(any())).thenReturn(Observable.just(new User("01", "Alice","offline",
+                                                                                            avatar, new ArrayList<>())));
         when(idStorage.getID()).thenReturn(("01"));
 
         App app = new App(editUserController);
@@ -62,7 +64,8 @@ class EditUserControllerTest extends ApplicationTest {
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
 
-        when(userService.userUpdate(any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("01","Alice","offline",avatar)));
+        when(userService.userUpdate(any(),any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("01",
+                                                                    "Alice","offline",avatar,new ArrayList<>())));
         write("\t\t\t\t\t");
         type(KeyCode.SPACE);
 
@@ -79,7 +82,7 @@ class EditUserControllerTest extends ApplicationTest {
         write("\tAlice\t12345678\t12345678\t\t\t");
         type(KeyCode.SPACE);
 
-        verify(userService).userUpdate("01","Alice",avatar,"online","12345678");
+        verify(userService).userUpdate("01","Alice",avatar,new ArrayList<>(),"online","12345678");
 
         write("\t");
         type(KeyCode.BACK_SPACE);
@@ -87,7 +90,7 @@ class EditUserControllerTest extends ApplicationTest {
 
         type(KeyCode.SPACE);
 
-        verify(userService).userUpdate("01","Alice",avatar,"online","12345678");
+        verify(userService).userUpdate("01","Alice",avatar,new ArrayList<>(),"online","12345678");
 
         write("\tAlice\t");
         type(KeyCode.BACK_SPACE);
@@ -95,7 +98,7 @@ class EditUserControllerTest extends ApplicationTest {
         type(KeyCode.BACK_SPACE);
         write("\t\t\t");
         type(KeyCode.SPACE);
-        verify(userService).userUpdate("01","Alice",avatar,"online","12345678");
+        verify(userService).userUpdate("01","Alice",avatar,new ArrayList<>(),"online","12345678");
 
         type(KeyCode.SPACE);
     }
