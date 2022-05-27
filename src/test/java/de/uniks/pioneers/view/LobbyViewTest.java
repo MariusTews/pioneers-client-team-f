@@ -34,6 +34,7 @@ import org.testfx.service.query.PointQuery;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.uniks.pioneers.Constants.MAX_MEMBERS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -70,7 +71,9 @@ public class LobbyViewTest extends ApplicationTest {
     @Override
     public void start(Stage stage) throws Exception {
         when(idStorage.getID()).thenReturn("4");
-        when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "12", "testGame","1", 2, false))));
+        when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "12", "testGame","1", 2, false),
+                                                                            new Game("1", "1", "14", "testGame","3", MAX_MEMBERS, false),
+                                                                            new Game("1", "1", "13", "testGame","2", 2, true))));
         when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1","test","online",null), new User("4","testus","online",null), new User("3","testtest","offline",null))));
         when(groupService.getAll()).thenReturn(Observable.just(List.of(new Group("1","1","12",List.of("1","4")))));
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
@@ -85,6 +88,7 @@ public class LobbyViewTest extends ApplicationTest {
 
     @Test
     public void testViewParameters() {
+        // Assert that all initial elements are displayed
         Button rules = lookup("#rulesButton").query();
         Button logout = lookup("#logoutButton").query();
         Button editUser = lookup("#editUserButton").query();
@@ -105,10 +109,12 @@ public class LobbyViewTest extends ApplicationTest {
 
         Assertions.assertThat(chatMessage.getText()).isEqualTo("");
 
+        // Assert that a message can be wrote
         clickOn(chatMessage);
         write("test");
         Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
 
+        // Assert that the elements of every user in the userlist are placed for offline and online
         ScrollPane scrollPane = lookup("#userScrollPane").query();
         VBox vBox = (VBox) scrollPane.getContent();
 
@@ -136,18 +142,37 @@ public class LobbyViewTest extends ApplicationTest {
         Assertions.assertThat(circle2.getFill()).isEqualTo(Color.RED);
         Assertions.assertThat(label2.getText()).isEqualTo("testtest");
 
+        // Assert that all elements of a game in the gamelist are displayed
         ScrollPane scrollPane2 = lookup("#gamesScrollPane").query();
         VBox vBox2 = (VBox) scrollPane2.getContent();
 
-        Assertions.assertThat(vBox2.getChildren().size()).isEqualTo(1);
+        Assertions.assertThat(vBox2.getChildren().size()).isEqualTo(3);
 
+        // Assert that the first game of the list is accessible and right amount of members is displayed
         HBox hBox3 = (HBox) vBox2.getChildren().get(0);
+        Assertions.assertThat(hBox3.getChildren().size()).isEqualTo(2);
+
         Label label3 = (Label) hBox3.getChildren().get(0);
         Button join = (Button) hBox3.getChildren().get(1);
 
         Assertions.assertThat(label3.getText()).isEqualTo("testGame (2/6)");
         Assertions.assertThat(join.getText()).isEqualTo("join");
 
+        // Assert that the third game of the list has no "join" button, because max. members are reached
+        HBox hBox4 = (HBox) vBox2.getChildren().get(1);
+        Assertions.assertThat(hBox4.getChildren().size()).isEqualTo(1);
+
+        Label label4 = (Label) hBox4.getChildren().get(0);
+        Assertions.assertThat(label4.getText()).isEqualTo("testGame (" + MAX_MEMBERS + "/6)");
+
+        // Assert that the second game of the list has no "join" button, because started = true
+        HBox hBox5 = (HBox) vBox2.getChildren().get(2);
+        Assertions.assertThat(hBox5.getChildren().size()).isEqualTo(1);
+
+        Label label5 = (Label) hBox5.getChildren().get(0);
+        Assertions.assertThat(label5.getText()).isEqualTo("testGame (2/6)");
+
+        // Assert that the text messages are displayed correctly
         clickOn(chat);
 
         TabPane tabPane = lookup("#tabPane").query();
