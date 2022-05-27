@@ -1,5 +1,8 @@
 package de.uniks.pioneers.dto;
 
+import javafx.scene.paint.Color;
+
 public record UpdateMemberDto(
-		boolean ready
+		boolean ready,
+		Color color
 ) {}

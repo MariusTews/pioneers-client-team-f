@@ -39,8 +39,8 @@ public class MemberService {
     }
 
 
-    public Observable<Member> statusUpdate(String gameId, String userId, boolean status){
-        return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status));
+    public Observable<Member> statusUpdate(String gameId, String userId, boolean status, Color color){
+        return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status, color));
     }
 
     public Observable<Member> findOne(String gameId, String userId){
