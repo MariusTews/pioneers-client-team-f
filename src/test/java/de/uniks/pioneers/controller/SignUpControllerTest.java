@@ -17,6 +17,8 @@ import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 import org.testfx.matcher.control.LabeledMatchers;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -38,7 +40,8 @@ class SignUpControllerTest extends ApplicationTest {
 
     @Test
     void register() {
-        when(userService.register("Bob", null, "bobbob111")).thenReturn(Observable.just(new User("123", "Bob", "status", null)));
+        when(userService.register("Bob", null, "bobbob111")).thenReturn(Observable
+                                .just(new User("123", "Bob", "status", null, new ArrayList<>())));
 
         write("Bob\t");
         write("bob111\t");

@@ -5,6 +5,8 @@ import javafx.scene.control.Tab;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 class DirectChatStorageTest {
 
 	private DirectChatStorage storage = new DirectChatStorage();
@@ -33,7 +35,7 @@ class DirectChatStorageTest {
 	void testUser() {
 		Assertions.assertNull(storage.getUser());
 
-		User user = new User("id","name","status","avatar");
+		User user = new User("id","name","status","avatar", new ArrayList<>());
 		storage.setUser(user);
 
 		Assertions.assertEquals(storage.getUser(),user);

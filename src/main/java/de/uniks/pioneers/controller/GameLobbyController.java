@@ -259,10 +259,10 @@ public class GameLobbyController implements Controller {
     public void ready(ActionEvent event) {
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
         if(member.ready()){
-            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false).subscribe();
+            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false, member.color()).subscribe();
             this.idReadyButton.setText("Ready");
         }else {
-            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true).subscribe();
+            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true, member.color()).subscribe();
             this.idReadyButton.setText("Not Ready");
         }
 

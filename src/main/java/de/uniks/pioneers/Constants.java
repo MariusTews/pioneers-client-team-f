@@ -39,7 +39,7 @@ public class Constants {
     //Sorting
     public static final Comparator<User> userComparator = Comparator.comparing(User::status).reversed().thenComparing(User::name);
 
-    public static final Comparator<Game> gameComparator = Comparator.comparing(Game::name);
+    public static final Comparator<Game> gameComparator = Comparator.comparing(Game::started).thenComparing(Game::name);
 
     //Tabname
     public static final String DirectMessage = "DirectMessage ";
@@ -50,5 +50,8 @@ public class Constants {
 
     //Welcome Message
     public static final String WELCOME = "Nice to see you again, ";
+
+    // Game
+    public static final int MAX_MEMBERS = 6;
 
 }

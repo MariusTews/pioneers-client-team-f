@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
+
+import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -52,16 +55,16 @@ public class GameLobbyViewTest extends ApplicationTest {
 
     @Override
     public void start(Stage stage) {
-        Member m1 = new Member("0", "0", "g1", "u1", false);
-        Member m2 = new Member("1", "1", "g1", "u2", false);
+        Member m1 = new Member("0", "0", "g1", "u1", false, Color.BLACK);
+        Member m2 = new Member("1", "1", "g1", "u2", false, Color.BLACK);
 
-        User u1 = new User("u1", "a", "on", null);
-        User u2 = new User("u2", "b", "on", null);
+        User u1 = new User("u1", "a", "on", null, new ArrayList<>());
+        User u2 = new User("u2", "b", "on", null, new ArrayList<>());
 
         Message x1 = new Message("0", "0", "me1", "u1", "test1");
         Message x2 = new Message("1", "1", "me2", "u2", "test2");
 
-        Game g = new Game("0", "0", "g1", "g", "u1",  2);
+        Game g = new Game("0", "0", "g1", "g", "u1",  2, true);
 
         when(gameIDStorage.getId()).thenReturn("g1");
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(m1, m2).buffer(2));

@@ -9,9 +9,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 
 import javax.inject.Inject;
 import java.io.IOException;
+
+import static de.uniks.pioneers.Constants.*;
 
 public class GameListSubController implements Controller {
 	private String id;
@@ -55,8 +58,13 @@ public class GameListSubController implements Controller {
 		}
 
 		if(game != null) {
-			this.gameNameLabel.setText(this.game.name() + " (" + game.members() + "/6)");
+			this.gameNameLabel.setText(this.game.name() + " (" + game.members() + "/" + MAX_MEMBERS + ")");
 			this.id = game._id();
+
+			if(game.started() || (int)game.members() == MAX_MEMBERS) {
+				HBox box = (HBox) this.joinButton.getParent();
+				box.getChildren().removeIf(node -> node.equals(joinButton));
+			}
 		}
 
 		this.parent = parent;
@@ -64,7 +72,7 @@ public class GameListSubController implements Controller {
 	}
 
 	public void joinButtonPressed(ActionEvent event) {
-		if ((int)game.members() < 6) {
+		if ((int)game.members() < MAX_MEMBERS) {
 			this.lobbyController.joinGame(this.game);
 		}
 	}
