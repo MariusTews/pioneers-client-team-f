@@ -18,10 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 
-import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,23 +29,14 @@ import static org.testfx.api.FxAssert.verifyThat;
 @ExtendWith(MockitoExtension.class)
 class EditUserControllerTest extends ApplicationTest {
 
-
     @Mock
     UserService userService;
 
     @Spy
     IDStorage idStorage;
 
-
-
-
-
-
     @InjectMocks
     EditUserController editUserController;
-
-
-
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
@@ -74,7 +63,6 @@ class EditUserControllerTest extends ApplicationTest {
     Image image = new Image(String.valueOf(Main.class.getResource("defaultPicture.png")));
 
     assertEquals(image.getUrl(), this.editUserController.userPicture.getImage().getUrl());
-
     }
 
     @Test
@@ -86,7 +74,6 @@ class EditUserControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
         verify(userService).delete("01");
     }
-
 
     @Test
     void updateUser() {
