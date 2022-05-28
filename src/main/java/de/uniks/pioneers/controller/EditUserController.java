@@ -134,13 +134,13 @@ public class EditUserController implements Controller {
 
     public void deleteButtonPressed(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Deleting userPicture");
+        alert.setTitle("Deleting Account");
         alert.setContentText("Are you sure you want to delete " + username + "?" );
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
             userService.delete(idStorage.getID())
                     .observeOn(FX_SCHEDULER)
-                    .subscribe(suc -> app.show(loginController.get()));
+                    .subscribe(suc -> app.show(loginController.get()), error->{});
         }
     }
 
