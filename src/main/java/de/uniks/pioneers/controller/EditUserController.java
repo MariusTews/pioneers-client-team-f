@@ -45,12 +45,15 @@ public class EditUserController implements Controller {
     public Button confirmButton;
     @FXML
     public ImageView userPicture;
-    public File pictureFile;
+    @FXML
+    public Button editButton;
 
+    public File pictureFile;
     private final App app;
     private final UserService userService;
     private Observable<User> user;
     private String avatar;
+    private String username;
     private ArrayList<String> friends = new ArrayList<>();
 
 
@@ -92,6 +95,7 @@ public class EditUserController implements Controller {
         }
         user = this.userService.findOne(idStorage.getID());
 
+
         user.subscribe(currUser -> {
             if (currUser.avatar() == null || currUser.avatar().equals("data:image/png;base64,")) {
 
@@ -101,6 +105,7 @@ public class EditUserController implements Controller {
                 userPicture.setImage(new Image(currUser.avatar()));
 
             }
+            username = currUser.name();
 
         });
 
@@ -127,24 +132,19 @@ public class EditUserController implements Controller {
     }
 
     public void deleteButtonPressed(ActionEvent event) {
-        new Alert(Alert.AlertType.INFORMATION, "Account was successfully deleted!")
-                .showAndWait();
-        userService.delete(idStorage.getID())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> app.show(loginController.get()));
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Deleting userPicture");
+        alert.setContentText("Are you sure you want to delete " + username + "?" );
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            userService.delete(idStorage.getID())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(suc -> app.show(loginController.get()));
+        }
     }
 
     public void changePicture(MouseEvent event) {
-        if(event.getButton() == MouseButton.PRIMARY) {
-
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll();
-            File selectedFile = fileChooser.showOpenDialog(null);
-            if(selectedFile!= null) {
-                this.pictureFile = selectedFile;
-                userPicture.setImage(new Image(selectedFile.toURI().toString()));
-            }
-        } else if (event.getButton() == MouseButton.SECONDARY) {
+        if (event.getButton() == MouseButton.SECONDARY) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Deleting userPicture");
             alert.setContentText("do you really want to delete your User picture?");
@@ -216,5 +216,14 @@ public class EditUserController implements Controller {
                 .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
     }
 
+    public void editPicture(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll();
+        File selectedFile = fileChooser.showOpenDialog(null);
+        if(selectedFile!= null) {
+            this.pictureFile = selectedFile;
+            userPicture.setImage(new Image(selectedFile.toURI().toString()));
+        }
+    }
 }
 

@@ -39,8 +39,8 @@ public class GameService {
         return this.gamesApiService.findOne(id);
     }
 
-    public Observable<Game> updateGame(String id, String name, String password, boolean started, String owner) {
-        return this.gamesApiService.patch(id, new UpdateGameDto(name, owner, started, password));
+    public Observable<Game> updateGame(String id, String name, String password, String owner, boolean started) {
+        return this.gamesApiService.patch(id, new UpdateGameDto(name, owner, password, started));
     }
 
     public Observable<Game> deleteGame(String id) {
