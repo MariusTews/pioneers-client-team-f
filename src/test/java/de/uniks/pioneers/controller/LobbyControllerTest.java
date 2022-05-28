@@ -44,6 +44,7 @@ class LobbyControllerTest extends ApplicationTest {
     @Mock
     EventListener eventListener;
 
+
     @Spy
     IDStorage idStorage;
 

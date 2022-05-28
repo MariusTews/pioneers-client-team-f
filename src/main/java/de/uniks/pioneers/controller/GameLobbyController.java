@@ -23,6 +23,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -73,7 +74,7 @@ public class GameLobbyController implements Controller {
     private final MemberIDStorage memberIDStorage;
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
-
+    public ComboBox<String> colorPicker = new ComboBox<>();
 
 
     @Inject
@@ -187,6 +188,8 @@ public class GameLobbyController implements Controller {
                         renderMessage(message, false);
                     }
                 }));
+        
+        
 
     }
 
@@ -222,6 +225,9 @@ public class GameLobbyController implements Controller {
 
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
+        
+        //call colormethod
+        addColorOnComboBox(colorPicker);
 
         return parent;
     }
@@ -315,7 +321,7 @@ public class GameLobbyController implements Controller {
             box.getChildren().add(imageView);
             label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
             this.initRightClick(label, m._id(), m.sender());
-            label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
+            label.setText(memberHash.get(m.sender()).name() + ":" + m.body());
             box.getChildren().add(label);
             this.idMessageView.getChildren().add(box);
         }
@@ -338,7 +344,7 @@ public class GameLobbyController implements Controller {
 
         if (!messages.isEmpty()) {
             for (Message m : messages) {
-                HBox box = new HBox(3);
+                HBox box = new HBox(30);
                 ImageView imageView = new ImageView();
                 imageView.setFitWidth(20);
                 imageView.setFitHeight(20);
@@ -355,8 +361,15 @@ public class GameLobbyController implements Controller {
                     Label label = new Label();
                     label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
                     this.initRightClick(label, m._id(), m.sender());
-                    label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
-                    box.getChildren().add(label);
+                    //this is responsible for showing messages
+                    Label label2 = new Label();
+                    label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
+                    label2.setText(memberHash.get(m.sender()).name());
+                    //label2.setTextFill(Color.GREEN);
+                    label.setText(":" + m.body());
+                    //label.setTextFill(Color.GREEN);
+                    box.getChildren().addAll(label2,label);
+                    //box.getChildren().add(label2);
                     this.idMessageView.getChildren().add(box);
                 }
             }
@@ -391,5 +404,17 @@ public class GameLobbyController implements Controller {
                         .showAndWait();
             }
         });
+    }
+
+
+    public void addColorOnComboBox(ComboBox comboBox){
+        comboBox.getItems().addAll(
+                "RED",
+                "GREEN",
+                "BLUE");
+    }
+
+    //color event
+    public void colorPicked(ActionEvent event) {
     }
 }

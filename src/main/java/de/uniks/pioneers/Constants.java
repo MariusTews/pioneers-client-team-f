@@ -48,6 +48,9 @@ public class Constants {
     public static final String JSON_REMEMBER_ME = "rememberMe";
     public static final String JSON_NAME = "name";
 
+    //Lobby ID for listening and sending Messages
+    public static final String LOBBY_ID = "627cf3c93496bc00158f3859";
+
     //Welcome Message
     public static final String WELCOME = "Nice to see you again, ";
 
