@@ -418,5 +418,6 @@ public class GameLobbyController implements Controller {
 
     //color event
     public void colorPicked(ActionEvent event) {
+
     }
 }
