@@ -6,6 +6,7 @@ import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ import org.testfx.matcher.base.NodeMatchers;
 import java.io.File;
 import java.util.ArrayList;
 
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.testfx.api.FxAssert.verifyThat;
@@ -28,19 +29,14 @@ import static org.testfx.api.FxAssert.verifyThat;
 @ExtendWith(MockitoExtension.class)
 class EditUserControllerTest extends ApplicationTest {
 
-
     @Mock
     UserService userService;
 
     @Spy
     IDStorage idStorage;
 
-
     @InjectMocks
     EditUserController editUserController;
-
-
-
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
@@ -57,6 +53,27 @@ class EditUserControllerTest extends ApplicationTest {
 
     }
 
+    @Test
+    void changePicture(){
+    write("\t\t\t\t\t");
+    type(KeyCode.SPACE);
+    type(KeyCode.RIGHT);
+    type(KeyCode.SPACE);
+
+    Image image = new Image(String.valueOf(Main.class.getResource("defaultPicture.png")));
+
+    assertEquals(image.getUrl(), this.editUserController.userPicture.getImage().getUrl());
+    }
+
+    @Test
+    void deleteUser(){
+        when(userService.delete(any())).thenReturn(Observable.just(new User("01","Alice","offline",null,new ArrayList<>())));
+
+        write("\t\t\t");
+        type(KeyCode.SPACE);
+        type(KeyCode.SPACE);
+        verify(userService).delete("01");
+    }
 
     @Test
     void updateUser() {
