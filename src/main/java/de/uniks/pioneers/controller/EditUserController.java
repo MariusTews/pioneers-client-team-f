@@ -3,7 +3,6 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.rest.UserApiService;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
@@ -14,8 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -48,6 +45,8 @@ public class EditUserController implements Controller {
     public ImageView userPicture;
     @FXML
     public Button editButton;
+    @FXML
+    public Label usernameLabel;
 
     public File pictureFile;
     private final App app;
@@ -97,7 +96,7 @@ public class EditUserController implements Controller {
         user = this.userService.findOne(idStorage.getID());
 
 
-        user.subscribe(currUser -> {
+        user.observeOn(FX_SCHEDULER).subscribe(currUser -> {
             if (currUser.avatar() == null || currUser.avatar().equals("data:image/png;base64,")) {
 
                 this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
@@ -107,6 +106,7 @@ public class EditUserController implements Controller {
 
             }
             username = currUser.name();
+            this.usernameLabel.setText("edit " + username);
 
         });
 
