@@ -63,10 +63,6 @@ class EditUserControllerTest extends ApplicationTest {
         File file = new File(Main.class.getResource("defaultPicture.png").getFile());
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
-
-        when(userService.userUpdate(any(),any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("01",
-                                                                    "Alice","offline",avatar,new ArrayList<>())));
-        write("\t\t\t\t\t");
         when(userService.userUpdate(any(),any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("01","Alice","offline",avatar,new ArrayList<>())));
         write("\t\t\t\t\t\t");
         //check if all textfields are empty
