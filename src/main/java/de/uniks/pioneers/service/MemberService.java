@@ -5,6 +5,7 @@ import de.uniks.pioneers.dto.UpdateMemberDto;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.rest.GameMembersApiService;
 import io.reactivex.rxjava3.core.Observable;
+import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -30,7 +31,7 @@ public class MemberService {
 
     public Observable<Member> join(String userId, String gameID, String password) {
         return gameMembersApiService
-                .create(gameID, new CreateMemberDto(false,  password))
+                .create(gameID, new CreateMemberDto(false, Color.BLACK, password))
                 .doOnNext(result -> {
                     this.gameIDStorage.setId(result.gameId());
                     this.memberIDStorage.setId(result.userId());
@@ -38,8 +39,8 @@ public class MemberService {
     }
 
 
-    public Observable<Member> statusUpdate(String gameId, String userId, boolean status){
-        return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status));
+    public Observable<Member> statusUpdate(String gameId, String userId, boolean status, Color color){
+        return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status, color));
     }
 
     public Observable<Member> findOne(String gameId, String userId){

@@ -18,6 +18,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 
+import java.util.ArrayList;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,7 +72,8 @@ class LobbyControllerTest extends ApplicationTest {
     @Test
     void logout() {
         when(idStorage.getID()).thenReturn("4");
-        when(userService.statusUpdate("4", "offline")).thenReturn(Observable.just(new User("id","name", "status", "avatar")));
+        when(userService.statusUpdate("4", "offline")).thenReturn(Observable.just(new User("id",
+                                                    "name", "status", "avatar", new ArrayList<>())));
         when(authService.logout()).thenReturn(Observable.just(new ErrorResponse(123, "error", "message")));
 
 

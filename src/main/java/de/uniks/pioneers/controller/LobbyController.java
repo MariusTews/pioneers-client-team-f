@@ -135,7 +135,7 @@ public class LobbyController implements Controller {
 
 	@Override
 	public void init() {
-		gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this.games::addAll);
+		gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
 		userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
 		groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this::loadGroups);
 
@@ -509,6 +509,14 @@ public class LobbyController implements Controller {
 		this.users.addAll(offline);
 	}
 
+	private void loadGames(List<Game> games) {
+		List<Game> accessible = games.stream().filter(game -> (!game.started() && (int) game.members() < MAX_MEMBERS)).toList();
+		List<Game> notAccessible = games.stream().filter(game -> (game.started() || game.members().equals(MAX_MEMBERS))).toList();
+
+		this.games.addAll(accessible);
+		this.games.addAll(notAccessible);
+	}
+
 	//load alll messages
 	private void initAllMessages() {
 		for (Message m : this.lobby_messages) {
@@ -568,6 +576,7 @@ public class LobbyController implements Controller {
 		//627xx3c93496bc00158f3859
 		this.groups.addAll(groups);
 	}
+
 
 	private void loadDirectMessages(String groupId, User user, Tab tab) {
 		this.messageService.getAllMessages(GROUPS, groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
