@@ -74,7 +74,9 @@ public class GameLobbyController implements Controller {
     private final MemberIDStorage memberIDStorage;
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
-    public ComboBox<String> colorPicker = new ComboBox<>();
+
+    @FXML
+    public ComboBox<String> colorPicker;
 
 
     @Inject
