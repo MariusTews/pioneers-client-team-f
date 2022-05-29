@@ -1,6 +1,5 @@
 package de.uniks.pioneers.rest;
 
-import de.uniks.pioneers.dto.CreateBuildingDto;
 import de.uniks.pioneers.dto.CreateMoveDto;
 import de.uniks.pioneers.model.*;
 import io.reactivex.rxjava3.core.Observable;
