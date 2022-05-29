@@ -65,6 +65,8 @@ public class MemberListSubcontroller implements Controller {
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                         this.idUsername.setText(result.name());
+                        //this.idUsername.setTextFill(Color.GREEN);
+
 
                         if (result.avatar() != null) {
                             this.idAvatar.setImage(new Image(result.avatar()));

@@ -26,11 +26,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
@@ -41,10 +43,17 @@ public class LobbyController implements Controller {
 	private final ObservableList<Game> games = FXCollections.observableArrayList();
 	private final ObservableList<Group> groups = FXCollections.observableArrayList();
 	private final ObservableList<Message> messages = FXCollections.observableArrayList();
+
+	//message for Lobby
+	private final ObservableList<Message> lobby_messages = FXCollections.observableArrayList();
+
+	private final List<String> lobby_deletedMessages = new ArrayList<>();
 	private final List<String> deletedMessages = new ArrayList<>();
 	private final List<UserListSubController> userSubCons = new ArrayList<>();
 	private final List<GameListSubController> gameSubCons = new ArrayList<>();
 	private final List<DirectChatStorage> directChatStorages = new ArrayList<>();
+	//store id and user
+	private final HashMap<String, User> memberHash = new HashMap<>();
 
 	@FXML
 	public ScrollPane gamesScrollPane;
@@ -71,6 +80,7 @@ public class LobbyController implements Controller {
 
 	private final App app;
 	private final IDStorage idStorage;
+
 	private final UserService userService;
 	private final GameService gameService;
 	private final GroupService groupService;
@@ -131,7 +141,67 @@ public class LobbyController implements Controller {
 
 		disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
 		disposable.add(eventListener.listen("games.*.*", Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
+
+		//listen to messages on lobby
+		disposable.add(eventListener
+				.listen("groups." + LOBBY_ID + ".messages.*.*", Message.class)
+				.observeOn(FX_SCHEDULER)
+				.subscribe(event -> {
+					final Message message = event.data();
+					if (event.event().endsWith(CREATED)) {
+						renderMessage(message, true);
+					} else if (event.event().endsWith(DELETED)) {
+						renderMessage(message, false);
+					}
+				}));
+
+
 	}
+
+	//render messages for all lobby
+	private void renderMessage(Message message, boolean render) {
+		//this.idMessageView.getChildren().clear();
+		((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().clear();
+
+		if (render) {
+			this.lobby_messages.add(message);
+		} else {
+			this.lobby_deletedMessages.add(message._id());
+		}
+
+		if (!lobby_messages.isEmpty()) {
+			for (Message m : lobby_messages) {
+				HBox box = new HBox(20);
+				ImageView imageView = new ImageView();
+				imageView.setFitWidth(20);
+				imageView.setFitHeight(20);
+				if (this.memberHash.get(m.sender()).avatar() != null) {
+					imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
+				}
+				box.getChildren().add(imageView);
+				if (this.lobby_deletedMessages.contains(m._id())) {
+					Label label = new Label(this.memberHash.get(m.sender()).name() + ": - message deleted - ");
+					label.setFont(Font.font("Italic"));
+					box.getChildren().add(label);
+					//this.idMessageView.getChildren().add(box);
+					((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
+				} else {
+					System.out.println("3");
+					Label label = new Label();
+					label.setMinWidth(100);
+					this.initRightClickForAllMessages(label, m._id(), m.sender());
+					label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
+					box.getChildren().add(label);
+					((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
+
+				}
+			}
+		}
+		//this helps the messages to be scrolled down
+		((ScrollPane)allTab.getContent()).vvalueProperty().bind(((VBox)((ScrollPane) allTab.getContent()).getContent()).heightProperty());
+
+	}
+
 
 	@Override
 	public void destroy() {
@@ -164,15 +234,18 @@ public class LobbyController implements Controller {
 			((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList());
 		});
 
-		this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleTabSwitching(oldValue, newValue));
+
+		this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+					handleTabSwitching(oldValue, newValue));
 		tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
 		return parent;
 	}
 
 	private void handleTabSwitching(Tab oldValue, Tab newValue) {
+
 		for (DirectChatStorage directChatStorage : directChatStorages) {
 			if (directChatStorage.getTab().equals(oldValue) && tabDisposable != null) {
-
+				this.currentDirectStorage = null;
 				tabDisposable.dispose();
 			}
 		}
@@ -241,6 +314,11 @@ public class LobbyController implements Controller {
 						.subscribe(result -> {
 							this.chatMessageField.setText("");
 						});
+			} else{
+				this.messageService.send(GROUPS, LOBBY_ID, chatMessageField.getText())
+						.observeOn(FX_SCHEDULER)
+						.subscribe();
+				this.chatMessageField.clear();
 			}
 		}
 	}
@@ -283,8 +361,10 @@ public class LobbyController implements Controller {
 			removeUserSubCon(user);
 			this.users.removeIf(u -> u._id().equals(user._id()));
 		} else if (userEvent.event().endsWith(UPDATED)) {
+
 			for (DirectChatStorage directChatStorage : directChatStorages) {
 				if (directChatStorage.getUser()._id().equals(user._id())) {
+
 					directChatStorage.setUser(user);
 				}
 			}
@@ -396,11 +476,24 @@ public class LobbyController implements Controller {
 	}
 
 	private void loadUsers(List<User> users) {
+
 		for (User user : users) {
+			memberHash.put(user._id(),user);
 			if (user._id().equals(this.idStorage.getID())) {
 				this.ownUsername = user.name();
 			}
 		}
+
+		//get all messages from the user that are in lobby
+		messageService
+				.getAllMessages(GROUPS, LOBBY_ID)
+				.observeOn(FX_SCHEDULER)
+				.subscribe(col -> {
+					this.lobby_messages.setAll(col);
+					this.initAllMessages();
+				});
+
+
 
 		List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
 		List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
@@ -416,7 +509,63 @@ public class LobbyController implements Controller {
 		this.games.addAll(notAccessible);
 	}
 
+	//load alll messages
+	private void initAllMessages() {
+		for (Message m : this.lobby_messages) {
+			HBox box = new HBox(3);
+			Label label = new Label();
+			ImageView imageView = new ImageView();
+			imageView.setFitWidth(20);
+			imageView.setFitHeight(20);
+			if (this.memberHash.get(m.sender()).avatar() != null) {
+				imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
+			}
+			box.getChildren().add(imageView);
+			label.setMinWidth(100);
+			this.initRightClickForAllMessages(label, m._id(), m.sender());
+			label.setText(memberHash.get(m.sender()).name() + ":" + m.body());
+			box.getChildren().add(label);
+			//this attaches messages to alltab
+			((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
+
+			//this.idMessageView.getChildren().add(box);
+		}
+	}
+
+	//this delete messages on right click or gives warning
+	// if the code doesnot belong to the user
+	private void initRightClickForAllMessages(Label label, String messageId, String sender) {
+		final ContextMenu contextMenu = new ContextMenu();
+		final MenuItem menuItem = new MenuItem("delete");
+
+		contextMenu.getItems().add(menuItem);
+
+		label.setOnMouseEntered(event -> {
+			label.setStyle("-fx-background-color: LIGHTGREY");
+		});
+		label.setOnMouseExited(event -> {
+			label.setStyle("-fx-background-color: DEFAULT");
+		});
+		label.setContextMenu(contextMenu);
+
+		menuItem.setOnAction(event -> {
+			if (sender.equals(this.idStorage.getID())) {
+				messageService
+						.delete(GROUPS, LOBBY_ID, messageId)
+						.observeOn(FX_SCHEDULER)
+						.subscribe();
+				((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().remove(label);
+			} else {
+				new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
+						.showAndWait();
+			}
+		});
+
+
+	}
+
 	private void loadGroups(List<Group> groups) {
+		//627xx3c93496bc00158f3859
 		this.groups.addAll(groups);
 	}
 

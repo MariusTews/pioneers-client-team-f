@@ -71,15 +71,15 @@ public class LobbyViewTest extends ApplicationTest {
     @Override
     public void start(Stage stage) throws Exception {
         when(idStorage.getID()).thenReturn("4");
-        when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "12", "testGame","1", 2, false),
+        when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "627cf3c93496bc00158f3859", "testGame","1", 2, false),
                                                                             new Game("1", "1", "14", "testGame","3", MAX_MEMBERS, false),
                                                                             new Game("1", "1", "13", "testGame","2", 2, true))));
         when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1","test","online",null, new ArrayList<>()),
                                                                             new User("4","testus","online",null, new ArrayList<>()),
                                                                             new User("3","testtest","offline",null, new ArrayList<>()))));
-        when(groupService.getAll()).thenReturn(Observable.just(List.of(new Group("1","1","12",List.of("1","4")))));
+        when(groupService.getAll()).thenReturn(Observable.just(List.of(new Group("1","1","627cf3c93496bc00158f3859",List.of("1","4")))));
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
-        when(messageService.getAllMessages("groups","12")).thenReturn(Observable.just(List.of(new Message("1","1","5","1","Test Message"),new Message("1","1","5","4","Test Message2"),new Message("1","1","5","1","Test Message3"))));
+        when(messageService.getAllMessages("groups","627cf3c93496bc00158f3859")).thenReturn(Observable.just(List.of(new Message("1","1","5","1","Test Message"),new Message("1","1","5","4","Test Message2"),new Message("1","1","5","1","Test Message3"))));
 
 
         final App app = new App(null);
