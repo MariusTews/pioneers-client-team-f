@@ -79,7 +79,7 @@ public class LobbyViewTest extends ApplicationTest {
                                                                             new User("3","testtest","offline",null, new ArrayList<>()))));
         when(groupService.getAll()).thenReturn(Observable.just(List.of(new Group("1","1","627cf3c93496bc00158f3859",List.of("1","4")))));
         when(eventListener.listen(any(),any())).thenReturn(Observable.empty());
-        when(messageService.getAllMessages("groups","627cf3c93496bc00158f3859")).thenReturn(Observable.just(List.of(new Message("1","1","5","1","Test Message"),new Message("1","1","5","4","Test Message2"),new Message("1","1","5","1","Test Message3"))));
+        when(messageService.getAllMessages("global","627cf3c93496bc00158f3859")).thenReturn(Observable.just(List.of(new Message("1","1","5","1","Test Message"),new Message("1","1","5","4","Test Message2"),new Message("1","1","5","1","Test Message3"))));
 
 
         final App app = new App(null);

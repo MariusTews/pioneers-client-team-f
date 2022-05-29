@@ -346,7 +346,7 @@ public class GameLobbyController implements Controller {
 
         if (!messages.isEmpty()) {
             for (Message m : messages) {
-                HBox box = new HBox(20);
+                HBox box = new HBox(3);
                 ImageView imageView = new ImageView();
                 imageView.setFitWidth(20);
                 imageView.setFitHeight(20);
@@ -368,7 +368,7 @@ public class GameLobbyController implements Controller {
                     label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
                     label2.setText(memberHash.get(m.sender()).name());
                     //label2.setTextFill(Color.GREEN);
-                    label.setText(":" + m.body());
+                    label.setText(": " + m.body());
                     //label.setTextFill(Color.GREEN);
                     box.getChildren().addAll(label2,label);
                     //box.getChildren().add(label2);
