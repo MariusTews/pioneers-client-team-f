@@ -432,8 +432,20 @@ public class GameLobbyController implements Controller {
 
     private void addColorOnComboBox(ComboBox comboBox){
         comboBox.setPromptText("Select Color");
-
+        //get key and value
+        colorToHexcode(color());
         comboBox.getItems().addAll(color());
+    }
+
+    //This maps every color to its hexcode #RED:#0000FF
+    private HashMap<String, String> colorToHexcode(List<String> list){
+        HashMap<String,String> color_to_hexcode = new HashMap<>();
+        for (String E:list) {
+            Color c =  Color.web(E.toLowerCase());
+            String pickedColor = "#"+c.toString().substring(2,8);
+            color_to_hexcode.put(E,pickedColor);
+        }
+        return color_to_hexcode;
     }
 
 
@@ -444,7 +456,8 @@ public class GameLobbyController implements Controller {
         color.add("BLUE");
         color.add("GREEN");
         color.add("BLACK");
-        color.add("BLUE");
+        color.add("YELLOW");
+        color.add("VIOLET");
 
         return color;
     }
