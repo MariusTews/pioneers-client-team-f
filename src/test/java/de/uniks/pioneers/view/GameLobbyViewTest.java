@@ -55,8 +55,8 @@ public class GameLobbyViewTest extends ApplicationTest {
 
     @Override
     public void start(Stage stage) {
-        Member m1 = new Member("0", "0", "g1", "u1", false, Color.BLACK);
-        Member m2 = new Member("1", "1", "g1", "u2", false, Color.BLACK);
+        Member m1 = new Member("0", "0", "g1", "u1", false, "#000000");
+        Member m2 = new Member("1", "1", "g1", "u2", false, "#000000");
 
         User u1 = new User("u1", "a", "on", null, new ArrayList<>());
         User u2 = new User("u2", "b", "on", null, new ArrayList<>());

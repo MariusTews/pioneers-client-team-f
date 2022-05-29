@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.application.Platform;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class Constants {
     public static final String VERSION_PREFIX = "/v2";
@@ -56,5 +57,6 @@ public class Constants {
 
     // Game
     public static final int MAX_MEMBERS = 6;
+
 
 }

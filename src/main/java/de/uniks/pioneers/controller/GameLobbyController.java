@@ -77,6 +77,8 @@ public class GameLobbyController implements Controller {
 
     @FXML
     public ComboBox<String> colorPicker;
+    //this will allow change the if status is ready or not
+    public boolean ready_button = false;
 
 
     @Inject
@@ -231,6 +233,8 @@ public class GameLobbyController implements Controller {
         //call colormethod
         addColorOnComboBox(colorPicker);
 
+
+
         return parent;
     }
 
@@ -267,10 +271,14 @@ public class GameLobbyController implements Controller {
     public void ready(ActionEvent event) {
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
         if(member.ready()){
+
             memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false, member.color()).subscribe();
+            System.out.println(member.color());
             this.idReadyButton.setText("Ready");
         }else {
+            ready_button = false;
             memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true, member.color()).subscribe();
+            System.out.println(member.color());
             this.idReadyButton.setText("Not Ready");
         }
 
@@ -366,7 +374,20 @@ public class GameLobbyController implements Controller {
                     //this is responsible for showing messages
                     Label label2 = new Label();
                     label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
-                    label2.setText(memberHash.get(m.sender()).name());
+                    String color = null;
+                    for (Member member: members ) {
+                        if(member.userId().equals(m.sender())){
+                            color = member.color();
+                            break;
+                        }
+                    }
+                    if(color != null){
+                        label2.setText(memberHash.get(m.sender()).name());
+                        label2.setTextFill(Color.web(color));
+                    }else {
+                        label2.setText(memberHash.get(m.sender()).name());
+                    }
+
                     //label2.setTextFill(Color.GREEN);
                     label.setText(":" + m.body());
                     //label.setTextFill(Color.GREEN);
@@ -409,15 +430,34 @@ public class GameLobbyController implements Controller {
     }
 
 
-    public void addColorOnComboBox(ComboBox comboBox){
-        comboBox.getItems().addAll(
-                "RED",
-                "GREEN",
-                "BLUE");
+    private void addColorOnComboBox(ComboBox comboBox){
+        comboBox.setPromptText("Select Color");
+
+        comboBox.getItems().addAll(color());
+    }
+
+
+    //List of colors
+    private List<String> color(){
+        List<String> color = new ArrayList<>();
+        color.add("RED");
+        color.add("BLUE");
+        color.add("GREEN");
+        color.add("BLACK");
+        color.add("BLUE");
+
+        return color;
     }
 
     //color event
     public void colorPicked(ActionEvent event) {
 
+        Color c =  Color.web(colorPicker.getSelectionModel().getSelectedItem().toLowerCase());
+        String pickedColor = "#"+c.toString().substring(2,8);
+
+        Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
+
+        memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), pickedColor).subscribe();
+        
     }
 }

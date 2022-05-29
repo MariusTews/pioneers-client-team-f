@@ -31,7 +31,7 @@ public class MemberService {
 
     public Observable<Member> join(String userId, String gameID, String password) {
         return gameMembersApiService
-                .create(gameID, new CreateMemberDto(false, Color.BLACK, password))
+                .create(gameID, new CreateMemberDto(false, "#000000", password))
                 .doOnNext(result -> {
                     this.gameIDStorage.setId(result.gameId());
                     this.memberIDStorage.setId(result.userId());
@@ -39,7 +39,7 @@ public class MemberService {
     }
 
 
-    public Observable<Member> statusUpdate(String gameId, String userId, boolean status, Color color){
+    public Observable<Member> statusUpdate(String gameId, String userId, boolean status, String color){
         return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status, color));
     }
 

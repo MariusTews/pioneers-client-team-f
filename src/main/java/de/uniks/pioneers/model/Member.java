@@ -8,5 +8,5 @@ public record Member(
 		String gameId,
 		String userId,
 		boolean ready,
-		Color color
+		String color
 ) {}
