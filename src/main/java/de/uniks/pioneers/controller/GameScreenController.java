@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 
 public class GameScreenController implements Controller {
@@ -17,10 +18,16 @@ public class GameScreenController implements Controller {
 
     @FXML
     public Pane mapPane;
+    private App app;
+    private Game game;
+    private Provider<GameLobbyController> gameLobbyController;
 
 
     @Inject
-    public GameScreenController(){
+    public GameScreenController(App app, Game game, Provider<GameLobbyController> gameLobbyController){
+        this.app = app;
+        this.game = game;
+        this.gameLobbyController = gameLobbyController;
     }
 
 
@@ -46,7 +53,7 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        this.gameFieldSubController = new GameFieldSubController();
+        this.gameFieldSubController = new GameFieldSubController(app, game);
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
         return parent;

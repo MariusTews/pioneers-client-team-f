@@ -5,20 +5,18 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Game;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import java.io.IOException;
 
-public class GameFieldSubController implements Controller{
+public class CircleSubController implements Controller{
 
     private Parent parent;
-    private App app;
-    private Game game;
 
     @Inject
-    public GameFieldSubController(App app, Game game){
-        this.app = app;
-        this.game = game;
+    public CircleSubController(){
     }
 
     @Override
@@ -42,9 +40,10 @@ public class GameFieldSubController implements Controller{
             e.printStackTrace();
             return null;
         }
-        
+
 
         this.parent = parent;
         return parent;
     }
+
 }
