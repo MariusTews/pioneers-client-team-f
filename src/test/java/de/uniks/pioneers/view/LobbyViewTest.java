@@ -178,6 +178,7 @@ public class LobbyViewTest extends ApplicationTest {
         clickOn(chat);
 
         TabPane tabPane = lookup("#tabPane").query();
+        System.out.println(tabPane.getTabs().size());
         Assertions.assertThat(tabPane.getTabs().size()).isEqualTo(2);
 
         Tab chatTab = tabPane.getTabs().get(1);
