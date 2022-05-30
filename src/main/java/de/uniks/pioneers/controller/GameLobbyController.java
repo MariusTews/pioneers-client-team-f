@@ -228,10 +228,10 @@ public class GameLobbyController implements Controller {
         // load game members
         members.addListener((ListChangeListener<? super Member>) c -> {
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
-            addColorOnComboBox(colorPicker);
+
         });
 
-
+        addColorOnComboBox(colorPicker);
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
@@ -453,8 +453,8 @@ public class GameLobbyController implements Controller {
         //get key and value
         HashMap<String,String> color_to_hex = colorToHexcode(color());
         List<String> leftColor = remainingColor(color_to_hex);
-        addToCombox(comboBox,leftColor);
-        //comboBox.getItems().addAll(leftColor);
+        //addToCombox(comboBox,leftColor);
+        comboBox.getItems().addAll(color());
     }
 
     //this makes sure duplicate dones not come
@@ -506,7 +506,7 @@ public class GameLobbyController implements Controller {
         color.add("RED");
         color.add("BLUE");
         color.add("GREEN");
-        color.add("BLACK");
+        color.add("ORANGE");
         color.add("YELLOW");
         color.add("VIOLET");
 
@@ -524,7 +524,6 @@ public class GameLobbyController implements Controller {
             //this make sure wenn duplicate color is chosen, the last color is taken
             //in default it will be black
             if (m.color() != null && m.color().equals(pickedColor)){
-                System.out.println("123");
                 memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), member.color()).
                         observeOn(FX_SCHEDULER).subscribe();
                 chose = false;
@@ -534,7 +533,6 @@ public class GameLobbyController implements Controller {
 
 
         if(chose) {
-            System.out.println("hallo");
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), pickedColor).
                     observeOn(FX_SCHEDULER).subscribe();
         }
