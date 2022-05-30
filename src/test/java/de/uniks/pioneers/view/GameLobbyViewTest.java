@@ -15,7 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,9 +24,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
-
 import java.util.ArrayList;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,8 +52,8 @@ public class GameLobbyViewTest extends ApplicationTest {
 
     @Override
     public void start(Stage stage) {
-        Member m1 = new Member("0", "0", "g1", "u1", false, Color.BLACK);
-        Member m2 = new Member("1", "1", "g1", "u2", false, Color.BLACK);
+        Member m1 = new Member("0", "0", "g1", "u1", false, "#000000");
+        Member m2 = new Member("1", "1", "g1", "u2", false, "#000000");
 
         User u1 = new User("u1", "a", "on", null, new ArrayList<>());
         User u2 = new User("u2", "b", "on", null, new ArrayList<>());
@@ -115,7 +112,7 @@ public class GameLobbyViewTest extends ApplicationTest {
         HBox messages = (HBox) box.getChildren().get(0);
         Label label = (Label) messages.getChildren().get(1);
 
-        Assertions.assertEquals("a: test1", label.getText());
+        Assertions.assertEquals("a", label.getText());
 
         verify(messageService).getAllMessages("games", "g1");
     }

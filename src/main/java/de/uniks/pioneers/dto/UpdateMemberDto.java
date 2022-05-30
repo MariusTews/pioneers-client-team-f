@@ -4,5 +4,5 @@ import javafx.scene.paint.Color;
 
 public record UpdateMemberDto(
 		boolean ready,
-		Color color
+		String color
 ) {}
