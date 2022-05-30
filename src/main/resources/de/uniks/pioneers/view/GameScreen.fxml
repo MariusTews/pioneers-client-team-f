@@ -6,8 +6,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<VBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
+<VBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="150.0" prefWidth="1600.0">
          <children>
@@ -31,7 +30,7 @@
          <children>
             <Pane prefHeight="233.0" prefWidth="420.0" />
             <Pane prefHeight="235.0" prefWidth="680.0" />
-            <VBox prefHeight="233.0" prefWidth="500.0" />
+            <VBox fx:id="chatView" prefHeight="233.0" prefWidth="500.0" />
          </children>
       </HBox>
    </children>
