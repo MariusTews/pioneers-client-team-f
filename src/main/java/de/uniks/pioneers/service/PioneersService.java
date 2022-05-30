@@ -18,7 +18,7 @@ public class PioneersService {
         this.pioneersApiService = pioneersApiService;
     }
 
-    public Observable<List<Tile>> findAllTiles(String gameId) {
+    public Observable<Map> findAllTiles(String gameId) {
         return this.pioneersApiService.findAllTiles(gameId);
     }
 
