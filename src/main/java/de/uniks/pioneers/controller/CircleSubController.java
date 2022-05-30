@@ -2,11 +2,11 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.model.Game;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -14,14 +14,20 @@ import java.io.IOException;
 public class CircleSubController implements Controller{
 
     private Parent parent;
+    private App app;
+    private Circle view;
 
     @Inject
-    public CircleSubController(){
+    public CircleSubController(App app, Circle view){
+        this.app = app;
+        this.view = view;
     }
 
     @Override
     public void init() {
-
+        // Add mouse listeners
+        this.view.setOnMouseEntered(this::onFieldMouseHoverEnter);
+        this.view.setOnMouseExited(this::onFieldMouseHoverExit);
     }
 
     @Override
@@ -46,4 +52,17 @@ public class CircleSubController implements Controller{
         return parent;
     }
 
+    // Mouse hovers over field
+    private void onFieldMouseHoverEnter(MouseEvent event) {
+        // Change the view
+            this.view.setFill(Color.GRAY);
+            this.view.setRadius(10.0);
+    }
+
+    // Mouse leaves the field
+    private void onFieldMouseHoverExit(MouseEvent event) {
+        // Change the view
+            this.view.setFill(Color.WHITE);
+            this.view.setRadius(10.0);
+    }
 }
