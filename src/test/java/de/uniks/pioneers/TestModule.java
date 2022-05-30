@@ -197,4 +197,43 @@ public class TestModule {
 			}
 		};
 	}
+	@Provides
+	static  PioneersApiService pioneersApiService() {
+		return new PioneersApiService() {
+			@Override
+			public Observable<Map> findAllTiles(String gameId) {
+				return null;
+			}
+
+			@Override
+			public Observable<List<Player>> findAllPlayers(String gameId) {
+				return null;
+			}
+
+			@Override
+			public Observable<Player> findOnePlayer(String gameId, String userId) {
+				return null;
+			}
+
+			@Override
+			public Observable<State> findOneState(String gameId) {
+				return null;
+			}
+
+			@Override
+			public Observable<List<Building>> findAllBuildings(String gameId) {
+				return null;
+			}
+
+			@Override
+			public Observable<Building> findOneBuilding(String gameId, String buildingId) {
+				return null;
+			}
+
+			@Override
+			public Observable<Move> create(String gameId, CreateMoveDto dto) {
+				return null;
+			}
+		};
+	}
 }
