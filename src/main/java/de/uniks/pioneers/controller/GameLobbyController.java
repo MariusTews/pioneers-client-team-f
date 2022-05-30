@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameLobbyController implements Controller {
 
@@ -192,8 +193,10 @@ public class GameLobbyController implements Controller {
                         renderMessage(message, false);
                     }
                 }));
-        
-        
+
+
+
+
 
     }
 
@@ -225,15 +228,14 @@ public class GameLobbyController implements Controller {
         // load game members
         members.addListener((ListChangeListener<? super Member>) c -> {
             this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
+            addColorOnComboBox(colorPicker);
         });
+
 
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
-        
+
         //call colormethod
-        addColorOnComboBox(colorPicker);
-
-
 
         return parent;
     }
@@ -271,14 +273,10 @@ public class GameLobbyController implements Controller {
     public void ready(ActionEvent event) {
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
         if(member.ready()){
-
             memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false, member.color()).subscribe();
-            System.out.println(member.color());
             this.idReadyButton.setText("Ready");
         }else {
-            ready_button = false;
             memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true, member.color()).subscribe();
-            System.out.println(member.color());
             this.idReadyButton.setText("Not Ready");
         }
 
@@ -329,10 +327,32 @@ public class GameLobbyController implements Controller {
                 imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
             }
             box.getChildren().add(imageView);
-            label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
             this.initRightClick(label, m._id(), m.sender());
-            label.setText(memberHash.get(m.sender()).name() + ":" + m.body());
-            box.getChildren().add(label);
+            //label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
+            //this.initRightClick(label, m._id(), m.sender());
+            //label.setText(memberHash.get(m.sender()).name() + ":" + m.body());
+            //box.getChildren().add(label);
+            Label label2 = new Label();
+            label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
+            String color = null;
+            for (Member member: members ) {
+                if(member.userId().equals(m.sender())){
+                    color = member.color();
+                    break;
+                }
+            }
+            if(color != null){
+                label2.setText(memberHash.get(m.sender()).name());
+                label2.setTextFill(Color.web(color));
+            }else {
+                label2.setText(memberHash.get(m.sender()).name());
+            }
+
+            //label2.setTextFill(Color.GREEN);
+            label.setText(":" + m.body());
+            //label.setTextFill(Color.GREEN);
+            box.getChildren().addAll(label2,label);
+            //box.getChildren().add(label2);
             this.idMessageView.getChildren().add(box);
         }
     }
@@ -433,8 +453,46 @@ public class GameLobbyController implements Controller {
     private void addColorOnComboBox(ComboBox comboBox){
         comboBox.setPromptText("Select Color");
         //get key and value
-        colorToHexcode(color());
-        comboBox.getItems().addAll(color());
+        HashMap<String,String> color_to_hex = colorToHexcode(color());
+        //System.out.println(color_to_hex);
+        //returns
+        List<String> leftColor = remainingColor(color_to_hex);
+        addToCombox(comboBox,leftColor);
+        //comboBox.getItems().addAll(leftColor);
+    }
+
+    private void addToCombox(ComboBox comboBox, List<String> leftColor) {
+        for (String color:leftColor ) {
+            if(!comboBox.getItems().contains(color)){
+                comboBox.getItems().add(color);
+            }
+
+        }
+    }
+
+    //GEt all the color from members
+    private List<String> remainingColor(HashMap<String,String> colortoHex){
+        List<String> remaining_color= new ArrayList<>();
+
+        List<String> setOfColors = color();
+
+        for (Member member: members) {
+            //System.out.println("hallo");
+            //System.out.println(member.color());
+            if (colortoHex.containsKey(member.color())) {
+                //System.out.println(member.color());
+                remaining_color.add(colortoHex.get(member.color()));
+            }
+        }
+
+        for (String color: remaining_color) {
+            if (setOfColors.contains(color)){
+                setOfColors.remove(color);
+            }
+        }
+        //System.out.println(setOfColors);
+
+        return setOfColors;
     }
 
     //This maps every color to its hexcode #RED:#0000FF
@@ -443,7 +501,7 @@ public class GameLobbyController implements Controller {
         for (String E:list) {
             Color c =  Color.web(E.toLowerCase());
             String pickedColor = "#"+c.toString().substring(2,8);
-            color_to_hexcode.put(E,pickedColor);
+            color_to_hexcode.put(pickedColor,E);
         }
         return color_to_hexcode;
     }
@@ -464,13 +522,23 @@ public class GameLobbyController implements Controller {
 
     //color event
     public void colorPicked(ActionEvent event) {
-
+        //this.colorPicker.getItems().clear();
         Color c =  Color.web(colorPicker.getSelectionModel().getSelectedItem().toLowerCase());
         String pickedColor = "#"+c.toString().substring(2,8);
 
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
+        for (Member m: members) {
+            if  (m.color() != null && m.color().equals(pickedColor)){
+                System.out.println("123");
+                memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), member.color()).subscribe();
+                break;
+            }else {
+                System.out.println("hallo");
+                memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), pickedColor).subscribe();
+                break;
+            }
+        }
 
-        memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), pickedColor).subscribe();
         
     }
 }
