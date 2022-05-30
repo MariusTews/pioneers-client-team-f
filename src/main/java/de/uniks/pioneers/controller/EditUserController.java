@@ -3,7 +3,6 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.rest.UserApiService;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
@@ -14,13 +13,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -44,12 +43,18 @@ public class EditUserController implements Controller {
     public Button confirmButton;
     @FXML
     public ImageView userPicture;
-    public File pictureFile;
+    @FXML
+    public Button editButton;
+    @FXML
+    public Label usernameLabel;
 
+    public File pictureFile;
     private final App app;
     private final UserService userService;
     private Observable<User> user;
     private String avatar;
+    private String username;
+    private ArrayList<String> friends = new ArrayList<>();
 
 
     @Inject
@@ -90,7 +95,8 @@ public class EditUserController implements Controller {
         }
         user = this.userService.findOne(idStorage.getID());
 
-        user.subscribe(currUser -> {
+
+        user.observeOn(FX_SCHEDULER).subscribe(currUser -> {
             if (currUser.avatar() == null || currUser.avatar().equals("data:image/png;base64,")) {
 
                 this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
@@ -99,6 +105,8 @@ public class EditUserController implements Controller {
                 userPicture.setImage(new Image(currUser.avatar()));
 
             }
+            username = currUser.name();
+            this.usernameLabel.setText("edit " + username);
 
         });
 
@@ -125,34 +133,17 @@ public class EditUserController implements Controller {
     }
 
     public void deleteButtonPressed(ActionEvent event) {
-        new Alert(Alert.AlertType.INFORMATION, "Account was successfully deleted!")
-                .showAndWait();
-        userService.delete(idStorage.getID())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> app.show(loginController.get()));
-    }
-
-    public void changePicture(MouseEvent event) {
-        if(event.getButton() == MouseButton.PRIMARY) {
-
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll();
-            File selectedFile = fileChooser.showOpenDialog(null);
-            if(selectedFile!= null) {
-                this.pictureFile = selectedFile;
-                userPicture.setImage(new Image(selectedFile.toURI().toString()));
-            }
-        } else if (event.getButton() == MouseButton.SECONDARY) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Deleting userPicture");
-            alert.setContentText("do you really want to delete your User picture?");
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK){
-                this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
-                avatar = "data:image/png;base64,";
-            }
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Deleting Account");
+        alert.setContentText("Are you sure you want to delete " + username + "?" );
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            userService.delete(idStorage.getID())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(suc -> app.show(loginController.get()), error->{});
         }
     }
+
 
     public String encodeFileToBase64Binary(File file) {
         String encodedFile = null;
@@ -198,7 +189,7 @@ public class EditUserController implements Controller {
                 return;
             }
         }
-        userService.userUpdate(id, name, avatar, "online", password)
+        userService.userUpdate(id, name, avatar, friends, "online", password)
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error ->{
                     if ("HTTP 409 ".equals(error.getMessage())) {
@@ -214,5 +205,31 @@ public class EditUserController implements Controller {
                 .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
     }
 
+    public void editPicture(ActionEvent event) {
+
+        Alert alert =new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeaderText("what you want to do?");
+        alert.getButtonTypes().set(0,new ButtonType("change Picture"));
+        alert.getButtonTypes().set(1,new ButtonType("delete Picture"));
+        Window window = alert.getDialogPane().getScene().getWindow();
+        window.setOnCloseRequest(e -> alert.close());
+
+        Optional<ButtonType> result = alert.showAndWait();
+        result.ifPresent(res-> {
+            if (res.getText().equals("change Picture")) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.getExtensionFilters().addAll();
+                File selectedFile = fileChooser.showOpenDialog(null);
+                if (selectedFile != null) {
+                    this.pictureFile = selectedFile;
+                    userPicture.setImage(new Image(selectedFile.toURI().toString()));
+                }
+            } else if (res.getText().equals("delete Picture")) {
+                this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
+                avatar = "data:image/png;base64,";
+            }
+        });
+
+    }
 }
 

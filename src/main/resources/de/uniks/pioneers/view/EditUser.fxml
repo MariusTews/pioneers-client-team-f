@@ -9,52 +9,101 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.EditUserController">
-   <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="318.0" spacing="10.0">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.EditUserController">
+   <VBox alignment="CENTER" prefHeight="550.0" prefWidth="546.0" spacing="10.0">
       <HBox.margin>
-         <Insets top="50.0" />
+         <Insets />
       </HBox.margin>
-      <Label text="new username" />
-      <TextField fx:id="newUserNameTextField">
+      <Label fx:id="usernameLabel" text="edit %username">
          <VBox.margin>
-            <Insets left="50.0" right="50.0" />
+            <Insets />
          </VBox.margin>
-      </TextField>
-      <Label text="change password" />
-      <PasswordField fx:id="passwordField">
+         <font>
+            <Font name="Arial Bold" size="25.0" />
+         </font>
+      </Label>
+      <VBox alignment="CENTER" prefHeight="415.0" prefWidth="433.0" spacing="40.0">
          <VBox.margin>
-            <Insets left="50.0" right="50.0" />
+            <Insets />
          </VBox.margin>
-      </PasswordField>
-      <Label text="repeat new password" />
-      <PasswordField fx:id="repeatPasswordFiled">
+         <TextField fx:id="newUserNameTextField" alignment="CENTER" promptText="new username">
+            <VBox.margin>
+               <Insets bottom="20.0" left="50.0" right="50.0" />
+            </VBox.margin>
+            <font>
+               <Font name="Arial Bold" size="16.0" />
+            </font>
+         </TextField>
+         <PasswordField fx:id="passwordField" alignment="CENTER" promptText="new password">
+            <VBox.margin>
+               <Insets left="50.0" right="50.0" />
+            </VBox.margin>
+            <font>
+               <Font name="Arial Bold" size="16.0" />
+            </font>
+         </PasswordField>
+         <PasswordField fx:id="repeatPasswordFiled" alignment="CENTER" promptText="confirm password">
+            <VBox.margin>
+               <Insets left="50.0" right="50.0" />
+            </VBox.margin>
+            <font>
+               <Font name="Arial Bold" size="16.0" />
+            </font>
+         </PasswordField>
+      </VBox>
+      <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteButtonPressed" style="-fx-background-color: #f82d2d; -fx-background-radius: 10;" text="Delete" textFill="WHITE">
          <VBox.margin>
-            <Insets left="50.0" right="50.0" />
+            <Insets right="200.0" />
          </VBox.margin>
-      </PasswordField>
-      <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteButtonPressed" text="Delete">
-         <VBox.margin>
-            <Insets right="200.0" top="120.0" />
-         </VBox.margin>
+         <font>
+            <Font name="Arial Bold" size="19.0" />
+         </font>
       </Button>
    </VBox>
-   <VBox alignment="TOP_RIGHT" prefHeight="400.0" prefWidth="284.0" spacing="10.0">
-      <padding>
-         <Insets right="20.0" />
-      </padding>
+   <VBox alignment="CENTER" prefHeight="580.0" prefWidth="481.0" spacing="10.0">
       <HBox.margin>
-         <Insets top="20.0" />
+         <Insets />
       </HBox.margin>
-      <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelButtonPressed" text="Cancel" />
-      <HBox alignment="TOP_CENTER" minHeight="262.0" minWidth="263.0" prefHeight="290.0" prefWidth="263.0">
-         <ImageView fx:id="userPicture" fitHeight="251.0" fitWidth="263.0" onMouseClicked="#changePicture"
-                    pickOnBounds="true" preserveRatio="true">
+      <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelButtonPressed" style="-fx-background-color: #008cff; -fx-background-radius: 10;" text="Cancel" textFill="WHITE">
+         <VBox.margin>
+            <Insets bottom="50.0" />
+         </VBox.margin>
+         <font>
+            <Font name="Arial Bold" size="19.0" />
+         </font></Button>
+      <VBox alignment="CENTER" minHeight="263.0" minWidth="263.0" prefHeight="355.0" prefWidth="350.0">
+         <Label text="avatar">
+            <font>
+               <Font name="System Bold" size="16.0" />
+            </font>
+         </Label>
+         <ImageView fx:id="userPicture" fitHeight="220.0" fitWidth="263.0" pickOnBounds="true" preserveRatio="true">
             <viewport>
-               <Rectangle2D/>
+               <Rectangle2D />
             </viewport>
+            <VBox.margin>
+               <Insets />
+            </VBox.margin>
          </ImageView>
-      </HBox>
-      <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#confirmButtonPressed" text="Confim" />
+         <Button fx:id="editButton" mnemonicParsing="false" onAction="#editPicture" style="-fx-background-color: #008cff; -fx-background-radius: 10;" text="Edit" textFill="WHITE">
+            <VBox.margin>
+               <Insets top="10.0" />
+            </VBox.margin>
+            <font>
+               <Font name="System Bold" size="16.0" />
+            </font></Button>
+         <padding>
+            <Insets bottom="40.0" />
+         </padding>
+      </VBox>
+      <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#confirmButtonPressed" style="-fx-background-color: #008cff; -fx-background-radius: 10;" text="Confirm" textFill="WHITE">
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <font>
+            <Font name="Arial Bold" size="19.0" />
+         </font></Button>
    </VBox>
 </HBox>

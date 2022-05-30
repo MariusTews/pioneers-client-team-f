@@ -23,6 +23,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -74,6 +75,8 @@ public class GameLobbyController implements Controller {
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
+    @FXML
+    public ComboBox<String> colorPicker;
 
 
     @Inject
@@ -187,6 +190,8 @@ public class GameLobbyController implements Controller {
                         renderMessage(message, false);
                     }
                 }));
+        
+        
 
     }
 
@@ -222,6 +227,9 @@ public class GameLobbyController implements Controller {
 
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
+        
+        //call colormethod
+        addColorOnComboBox(colorPicker);
 
         return parent;
     }
@@ -259,19 +267,30 @@ public class GameLobbyController implements Controller {
     public void ready(ActionEvent event) {
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
         if(member.ready()){
-            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false).subscribe();
+            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false, member.color()).subscribe();
             this.idReadyButton.setText("Ready");
         }else {
-            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true).subscribe();
+            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true, member.color()).subscribe();
             this.idReadyButton.setText("Not Ready");
         }
 
     }
 
     public void startGame(ActionEvent event) {
-        gameService.updateGame(gameIDStorage.getId(),null,null,null,true).subscribe();
-        final GameScreenController controller = gameScreenController.get();
-        this.app.show(controller);
+
+        gameService.updateGame(gameIDStorage.getId(),null,null,null,true)
+                .observeOn(FX_SCHEDULER)
+                .doOnError(error->{
+                    if ("HTTP 403 ".equals(error.getMessage())) {
+                        new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!")
+                                .showAndWait();
+                    }
+                })
+                .subscribe(onSuccess->{
+                    final GameScreenController controller = gameScreenController.get();
+                    this.app.show(controller);
+                }, onError->{});
+
     }
 
     // private methods
@@ -344,8 +363,15 @@ public class GameLobbyController implements Controller {
                     Label label = new Label();
                     label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
                     this.initRightClick(label, m._id(), m.sender());
-                    label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
-                    box.getChildren().add(label);
+                    //this is responsible for showing messages
+                    Label label2 = new Label();
+                    label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
+                    label2.setText(memberHash.get(m.sender()).name());
+                    //label2.setTextFill(Color.GREEN);
+                    label.setText(": " + m.body());
+                    //label.setTextFill(Color.GREEN);
+                    box.getChildren().addAll(label2,label);
+                    //box.getChildren().add(label2);
                     this.idMessageView.getChildren().add(box);
                 }
             }
@@ -380,5 +406,18 @@ public class GameLobbyController implements Controller {
                         .showAndWait();
             }
         });
+    }
+
+
+    public void addColorOnComboBox(ComboBox comboBox){
+        comboBox.getItems().addAll(
+                "RED",
+                "GREEN",
+                "BLUE");
+    }
+
+    //color event
+    public void colorPicked(ActionEvent event) {
+
     }
 }

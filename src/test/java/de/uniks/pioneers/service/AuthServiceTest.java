@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -32,7 +34,10 @@ class AuthServiceTest {
 
     @Test
     void loginTest() {
-        when(authApiService.login(any())).thenReturn(Observable.just(new LoginResult("123", "name", "status", "avatar", "accessToken", "refreshToken")));
+        when(authApiService.login(any())).thenReturn(Observable.just(new LoginResult("01.01.2022-0:00",
+                                                                "now","123", "name",
+                                                                    "status", "avatar", new ArrayList<>(),
+                                                                "accessToken", "refreshToken")));
 
         final String result = authService.login("username", "password").blockingFirst();
         assertEquals("123", result);

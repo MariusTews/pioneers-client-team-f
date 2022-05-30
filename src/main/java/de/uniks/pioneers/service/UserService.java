@@ -24,9 +24,10 @@ public class UserService {
                 .createUser(new CreateUserDto(username, avatar, password));
     }
 
-    public Observable<User> userUpdate(String id, String name, String avatar, String status, String password) {
+    public Observable<User> userUpdate(String id, String name, String avatar, List<String> friends,
+                                                                            String status, String password) {
         return userApiService
-                .updateUser(id, new UpdateUserDto(name, status, avatar, password));
+                .updateUser(id, new UpdateUserDto(name, status, avatar, friends, password));
     }
 
     public Observable<User> statusUpdate(String id, String status) {

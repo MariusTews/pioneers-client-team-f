@@ -38,7 +38,7 @@ class CreateGameControllerTest extends ApplicationTest {
 
     @Test
     void createGameButtonPressed() {
-        when(gameService.create(anyString(),anyString())).thenReturn(Observable.just(new Game("0:00","now", "01", "Test game","Alice",1)));
+        when(gameService.create(anyString(),anyString())).thenReturn(Observable.just(new Game("0:00","now", "01", "Test game","Alice",1, false)));
 
         write("\t\t \t");
         type(KeyCode.SPACE);

@@ -73,6 +73,10 @@ public class App extends Application {
         this.controller = controller;
         controller.init();
         stage.getScene().setRoot(controller.render());
+        if (controller.getClass().equals(GameScreenController.class)) {
+            stage.setWidth(1600);
+            stage.setHeight(900);
+        }
     }
 
     private void cleanup() {

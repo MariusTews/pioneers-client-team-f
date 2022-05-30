@@ -39,7 +39,7 @@ public class Constants {
     //Sorting
     public static final Comparator<User> userComparator = Comparator.comparing(User::status).reversed().thenComparing(User::name);
 
-    public static final Comparator<Game> gameComparator = Comparator.comparing(Game::name);
+    public static final Comparator<Game> gameComparator = Comparator.comparing(Game::started).thenComparing(Game::name);
 
     //Tabname
     public static final String DirectMessage = "DirectMessage ";
@@ -48,7 +48,16 @@ public class Constants {
     public static final String JSON_REMEMBER_ME = "rememberMe";
     public static final String JSON_NAME = "name";
 
+    //Lobby ID for listening and sending Messages
+    public static final String LOBBY_ID = "627cf3c93496bc00158f3859";
+
+    //Name for Global
+    public static final String GLOBAL = "global";
+
     //Welcome Message
     public static final String WELCOME = "Nice to see you again, ";
+
+    // Game
+    public static final int MAX_MEMBERS = 6;
 
 }
