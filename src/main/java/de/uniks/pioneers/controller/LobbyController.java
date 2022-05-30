@@ -253,7 +253,7 @@ public class LobbyController implements Controller {
 				this.currentDirectStorage = directChatStorage;
 				User user = currentDirectStorage.getUser();
 				this.loadDirectMessages(currentDirectStorage.getGroupId(), user, currentDirectStorage.getTab());
-				tabDisposable = eventListener.listen("global." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
+				tabDisposable = eventListener.listen("groups." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
 					if (messageEvent.event().endsWith(CREATED)) {
 						this.messages.add(messageEvent.data());
 						renderSingleMessage(directChatStorage.getUser(), directChatStorage.getGroupId(), directChatStorage.getTab(), messageEvent.data());
@@ -308,7 +308,7 @@ public class LobbyController implements Controller {
 	private void checkMessageField() {
 		if (!chatMessageField.getText().isEmpty()) {
 			if (currentDirectStorage != null) {
-				this.messageService.send(GLOBAL, currentDirectStorage.getGroupId(), chatMessageField.getText())
+				this.messageService.send(GROUPS, currentDirectStorage.getGroupId(), chatMessageField.getText())
 						.observeOn(FX_SCHEDULER)
 						.subscribe(result -> {
 							this.chatMessageField.setText("");
@@ -527,7 +527,6 @@ public class LobbyController implements Controller {
 			//this attaches messages to alltab
 			((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
 
-			//this.idMessageView.getChildren().add(box);
 		}
 	}
 
@@ -570,7 +569,7 @@ public class LobbyController implements Controller {
 
 
 	private void loadDirectMessages(String groupId, User user, Tab tab) {
-		this.messageService.getAllMessages(GLOBAL, groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
+		this.messageService.getAllMessages(GROUPS, groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
 			this.messages.clear();
 			this.messages.addAll(messages);
 			((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
@@ -655,7 +654,7 @@ public class LobbyController implements Controller {
 		menuItem.setOnAction(event -> {
 			if (sender.equals(this.idStorage.getID())) {
 				messageService
-						.delete(GLOBAL, groupId, messageId)
+						.delete(GROUPS, groupId, messageId)
 						.observeOn(FX_SCHEDULER)
 						.subscribe();
 			} else {
