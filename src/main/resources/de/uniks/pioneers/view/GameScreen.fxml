@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
+<VBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="150.0" prefWidth="1600.0">
          <children>
@@ -17,7 +17,7 @@
       <HBox prefHeight="600.0" prefWidth="1600.0" spacing="150.0">
          <children>
             <VBox prefHeight="600.0" prefWidth="373.0" />
-            <Pane fx:id="mapPane" prefHeight="600.0" prefWidth="600.0" />
+            <Pane fx:id="mapPane" minHeight="600.0" minWidth="600.0" prefHeight="600.0" prefWidth="600.0" />
             <VBox alignment="CENTER" prefHeight="503.0" prefWidth="200.0" spacing="144.0">
                <children>
                   <Label text="NEXT MOVE" />
@@ -28,9 +28,9 @@
       </HBox>
       <HBox prefHeight="150.0" prefWidth="1600.0">
          <children>
-            <Pane prefHeight="233.0" prefWidth="420.0" />
-            <Pane prefHeight="235.0" prefWidth="680.0" />
-            <VBox fx:id="chatView" prefHeight="233.0" prefWidth="500.0" />
+            <Pane prefHeight="150.0" prefWidth="420.0" />
+            <Pane prefHeight="150.0" prefWidth="680.0" />
+            <VBox prefHeight="150.0" prefWidth="500.0" />
          </children>
       </HBox>
    </children>
