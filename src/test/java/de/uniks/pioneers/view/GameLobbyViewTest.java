@@ -115,7 +115,7 @@ public class GameLobbyViewTest extends ApplicationTest {
         HBox messages = (HBox) box.getChildren().get(0);
         Label label = (Label) messages.getChildren().get(1);
 
-        Assertions.assertEquals("a: test1", label.getText());
+        Assertions.assertEquals("a", label.getText());
 
         verify(messageService).getAllMessages("games", "g1");
     }
