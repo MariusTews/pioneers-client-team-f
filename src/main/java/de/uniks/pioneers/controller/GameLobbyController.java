@@ -33,8 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
-
 public class GameLobbyController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
@@ -193,11 +191,6 @@ public class GameLobbyController implements Controller {
                         renderMessage(message, false);
                     }
                 }));
-
-
-
-
-
     }
 
     @Override
@@ -464,14 +457,12 @@ public class GameLobbyController implements Controller {
             if(!comboBox.getItems().contains(color)){
                 comboBox.getItems().add(color);
             }
-
         }
     }
 
     //GEt all the color from members
     private List<String> remainingColor(HashMap<String,String> colortoHex){
         List<String> remaining_color= new ArrayList<>();
-
         List<String> setOfColors = color();
 
         for (Member member: members) {

@@ -60,6 +60,4 @@ public class Constants {
 
     // Game
     public static final int MAX_MEMBERS = 6;
-
-
 }

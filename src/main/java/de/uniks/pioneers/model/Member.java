@@ -1,7 +1,5 @@
 package de.uniks.pioneers.model;
 
-import javafx.scene.paint.Color;
-
 public record Member(
 		String createdAt,
 		String updatedAt,

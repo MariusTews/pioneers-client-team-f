@@ -5,7 +5,6 @@ import de.uniks.pioneers.dto.UpdateMemberDto;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.rest.GameMembersApiService;
 import io.reactivex.rxjava3.core.Observable;
-import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import java.util.List;
