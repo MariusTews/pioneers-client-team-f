@@ -142,9 +142,9 @@ public class LobbyController implements Controller {
 		disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
 		disposable.add(eventListener.listen("games.*.*", Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
 
-		//listen to messages on lobby
+		//listen to messages on lobby on Global channel
 		disposable.add(eventListener
-				.listen("groups." + LOBBY_ID + ".messages.*.*", Message.class)
+				.listen("global." + LOBBY_ID + ".messages.*.*", Message.class)
 				.observeOn(FX_SCHEDULER)
 				.subscribe(event -> {
 					final Message message = event.data();
@@ -160,7 +160,6 @@ public class LobbyController implements Controller {
 
 	//render messages for all lobby
 	private void renderMessage(Message message, boolean render) {
-		//this.idMessageView.getChildren().clear();
 		((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().clear();
 
 		if (render) {
@@ -171,7 +170,7 @@ public class LobbyController implements Controller {
 
 		if (!lobby_messages.isEmpty()) {
 			for (Message m : lobby_messages) {
-				HBox box = new HBox(20);
+				HBox box = new HBox(3);
 				ImageView imageView = new ImageView();
 				imageView.setFitWidth(20);
 				imageView.setFitHeight(20);
@@ -315,7 +314,7 @@ public class LobbyController implements Controller {
 							this.chatMessageField.setText("");
 						});
 			} else{
-				this.messageService.send(GROUPS, LOBBY_ID, chatMessageField.getText())
+				this.messageService.send(GLOBAL, LOBBY_ID, chatMessageField.getText())
 						.observeOn(FX_SCHEDULER)
 						.subscribe();
 				this.chatMessageField.clear();
@@ -486,7 +485,7 @@ public class LobbyController implements Controller {
 
 		//get all messages from the user that are in lobby
 		messageService
-				.getAllMessages(GROUPS, LOBBY_ID)
+				.getAllMessages(GLOBAL, LOBBY_ID)
 				.observeOn(FX_SCHEDULER)
 				.subscribe(col -> {
 					this.lobby_messages.setAll(col);
@@ -523,12 +522,11 @@ public class LobbyController implements Controller {
 			box.getChildren().add(imageView);
 			label.setMinWidth(100);
 			this.initRightClickForAllMessages(label, m._id(), m.sender());
-			label.setText(memberHash.get(m.sender()).name() + ":" + m.body());
+			label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
 			box.getChildren().add(label);
 			//this attaches messages to alltab
 			((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
 
-			//this.idMessageView.getChildren().add(box);
 		}
 	}
 
@@ -551,7 +549,7 @@ public class LobbyController implements Controller {
 		menuItem.setOnAction(event -> {
 			if (sender.equals(this.idStorage.getID())) {
 				messageService
-						.delete(GROUPS, LOBBY_ID, messageId)
+						.delete(GLOBAL, LOBBY_ID, messageId)
 						.observeOn(FX_SCHEDULER)
 						.subscribe();
 				((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().remove(label);
