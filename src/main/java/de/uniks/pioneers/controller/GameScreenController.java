@@ -1,12 +1,11 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.model.Game;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -14,13 +13,15 @@ import java.io.IOException;
 public class GameScreenController implements Controller {
 
     private GameFieldSubController gameFieldSubController;
+    private MessageViewSubController messageViewSubController;
 
     @FXML
     public Pane mapPane;
-
+    @FXML
+    public VBox chatView;
 
     @Inject
-    public GameScreenController(){
+    public GameScreenController() {
     }
 
 
@@ -48,6 +49,10 @@ public class GameScreenController implements Controller {
 
         this.gameFieldSubController = new GameFieldSubController();
         mapPane.getChildren().setAll(gameFieldSubController.render());
+
+        // Include ingame chat
+        this.messageViewSubController = new MessageViewSubController();
+        chatView.getChildren().setAll(messageViewSubController.render());
 
         return parent;
     }
