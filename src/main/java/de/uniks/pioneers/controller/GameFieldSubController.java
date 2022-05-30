@@ -3,26 +3,19 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Game;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.layout.Pane;
 
 import javax.inject.Inject;
 import java.io.IOException;
 
-public class GameScreenController implements Controller {
+public class GameFieldSubController implements Controller{
 
-    private GameFieldSubController gameFieldSubController;
-
-    @FXML
-    public Pane mapPane;
-
+    private Parent parent;
 
     @Inject
-    public GameScreenController(){
+    public GameFieldSubController(){
     }
-
 
     @Override
     public void init() {
@@ -36,7 +29,7 @@ public class GameScreenController implements Controller {
 
     @Override
     public Parent render() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameScreen.fxml"));
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameFieldSubView.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
         try {
@@ -45,10 +38,9 @@ public class GameScreenController implements Controller {
             e.printStackTrace();
             return null;
         }
+        
 
-        this.gameFieldSubController = new GameFieldSubController();
-        mapPane.getChildren().setAll(gameFieldSubController.render());
-
+        this.parent = parent;
         return parent;
     }
 }
