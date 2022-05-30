@@ -235,8 +235,6 @@ public class GameLobbyController implements Controller {
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
-        //call colormethod
-
         return parent;
     }
 
@@ -454,13 +452,13 @@ public class GameLobbyController implements Controller {
         comboBox.setPromptText("Select Color");
         //get key and value
         HashMap<String,String> color_to_hex = colorToHexcode(color());
-        //System.out.println(color_to_hex);
-        //returns
         List<String> leftColor = remainingColor(color_to_hex);
         addToCombox(comboBox,leftColor);
         //comboBox.getItems().addAll(leftColor);
     }
 
+    //this makes sure duplicate dones not come
+    //into combox
     private void addToCombox(ComboBox comboBox, List<String> leftColor) {
         for (String color:leftColor ) {
             if(!comboBox.getItems().contains(color)){
@@ -477,10 +475,7 @@ public class GameLobbyController implements Controller {
         List<String> setOfColors = color();
 
         for (Member member: members) {
-            //System.out.println("hallo");
-            //System.out.println(member.color());
             if (colortoHex.containsKey(member.color())) {
-                //System.out.println(member.color());
                 remaining_color.add(colortoHex.get(member.color()));
             }
         }
@@ -490,8 +485,6 @@ public class GameLobbyController implements Controller {
                 setOfColors.remove(color);
             }
         }
-        //System.out.println(setOfColors);
-
         return setOfColors;
     }
 
@@ -522,23 +515,29 @@ public class GameLobbyController implements Controller {
 
     //color event
     public void colorPicked(ActionEvent event) {
-        //this.colorPicker.getItems().clear();
         Color c =  Color.web(colorPicker.getSelectionModel().getSelectedItem().toLowerCase());
         String pickedColor = "#"+c.toString().substring(2,8);
 
+        boolean chose = true;
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
         for (Member m: members) {
-            if  (m.color() != null && m.color().equals(pickedColor)){
+            //this make sure wenn duplicate color is chosen, the last color is taken
+            //in default it will be black
+            if (m.color() != null && m.color().equals(pickedColor)){
                 System.out.println("123");
-                memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), member.color()).subscribe();
-                break;
-            }else {
-                System.out.println("hallo");
-                memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), pickedColor).subscribe();
+                memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), member.color()).
+                        observeOn(FX_SCHEDULER).subscribe();
+                chose = false;
                 break;
             }
         }
 
+
+        if(chose) {
+            System.out.println("hallo");
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), pickedColor).
+                    observeOn(FX_SCHEDULER).subscribe();
+        }
 
     }
 }
