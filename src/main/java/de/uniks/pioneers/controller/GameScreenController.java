@@ -2,25 +2,41 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.model.Game;
+
+import de.uniks.pioneers.service.GameIDStorage;
+import de.uniks.pioneers.service.PioneersService;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 
 import javax.inject.Inject;
+
 import java.io.IOException;
+
 
 public class GameScreenController implements Controller {
 
-    private GameFieldSubController gameFieldSubController;
+
+
 
     @FXML
     public Pane mapPane;
+    private App app;
+    private GameIDStorage gameIDStorage;
+    private PioneersService pioneersService;
+
+    private GameFieldSubController gameFieldSubController;
 
 
     @Inject
-    public GameScreenController(){
+    public GameScreenController(App app,
+                                GameIDStorage gameIDStorage,
+                                PioneersService pioneersService){
+        this.app = app;
+        this.gameIDStorage = gameIDStorage;
+        this.pioneersService = pioneersService;
     }
 
 
@@ -28,6 +44,9 @@ public class GameScreenController implements Controller {
     public void init() {
 
     }
+
+
+
 
     @Override
     public void destroy() {
@@ -46,9 +65,11 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        this.gameFieldSubController = new GameFieldSubController();
+        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService);
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
         return parent;
     }
+
+
 }
