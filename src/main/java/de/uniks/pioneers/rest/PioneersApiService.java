@@ -10,7 +10,7 @@ import java.util.List;
 public interface PioneersApiService {
 
     @GET("games/{gameId}/map")
-    Observable<List<Tile>> findAllTiles(@Path("gameId") String gameId);
+    Observable<Map> findAllTiles(@Path("gameId") String gameId);
 
     @GET("games/{gameId}/players")
     Observable<List<Player>> findAllPlayers(@Path("gameId") String gameId);
