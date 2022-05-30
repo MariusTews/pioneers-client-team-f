@@ -64,7 +64,12 @@ public class MemberListSubcontroller implements Controller {
                     .findOne(this.member.userId())
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
-                        this.idUsername.setText(result.name());
+                        if(member.color() != null) {
+                            this.idUsername.setText(result.name());
+                            this.idUsername.setTextFill(Color.web(member.color()));
+                        }else {
+                            this.idUsername.setText(result.name());
+                        }
                         //this.idUsername.setTextFill(Color.GREEN);
 
 

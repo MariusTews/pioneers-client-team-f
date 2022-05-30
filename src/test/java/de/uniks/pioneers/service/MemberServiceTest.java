@@ -38,48 +38,48 @@ public class MemberServiceTest {
     @Test
     void join() {
         when(gameMembersApiService.create(any(), any())).thenReturn(Observable.just(new Member("0:30",
-                                                "15:50", "01", "02", false, Color.BLACK)));
+                                                "15:50", "01", "02", false, "#000000")));
         Member member = memberService.join("testUser", "testGame","testPassword").blockingFirst();
-        assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=0x000000ff]", member.toString());
+        assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000]", member.toString());
         assertEquals("01",gameIDStorage.getId());
         assertEquals("02", memberIDStorage.getId());
-        verify(gameMembersApiService).create("testGame", new CreateMemberDto(false, Color.BLACK,"testPassword"));
+        verify(gameMembersApiService).create("testGame", new CreateMemberDto(false, "#000000","testPassword"));
     }
 
     @Test
     void leave() {
         when(gameMembersApiService.delete(any(),any())).thenReturn(Observable.just(new Member("0:30", "15:50",
-                                                                            "01", "02", false, Color.BLACK)));
+                                                                            "01", "02", false, "#000000")));
         Member member = memberService.leave("testGame","testUser").blockingFirst();
-        assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=0x000000ff]", member.toString());
+        assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000]", member.toString());
         verify(gameMembersApiService).delete("testGame", "testUser");
     }
 
     @Test
     void findOne() {
         when(gameMembersApiService.findOne(any(),any())).thenReturn(Observable.just(new Member("0:30",
-                                                "15:50", "01", "02", false, Color.BLACK)));
+                                                "15:50", "01", "02", false, "#000000")));
         Member member = memberService.findOne("testGame","testUser").blockingFirst();
-        assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=0x000000ff]", member.toString());
+        assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000]", member.toString());
         verify(gameMembersApiService).findOne("testGame", "testUser");
     }
 
     @Test
     void getAllGameMembers() {
         when(gameMembersApiService.findAll(any())).thenReturn(Observable.just(new ArrayList<>(Collections
-                .singleton(new Member("0:30", "15:50", "01", "02", false, Color.BLACK)))));
+                .singleton(new Member("0:30", "15:50", "01", "02", false, "#000000")))));
         ArrayList<Member> member = (ArrayList<Member>) memberService.getAllGameMembers("testGame").blockingFirst();
-        assertEquals("[Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=0x000000ff]]", member.toString());
+        assertEquals("[Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000]]", member.toString());
         verify(gameMembersApiService).findAll("testGame");
     }
 
     @Test
     void statusUpdate() {
         when(gameMembersApiService.patch(any(),any(),any())).thenReturn(Observable.just(new Member("0:30",
-                                                "15:50", "01", "02", false, Color.BLACK)));
-        Member member = memberService.statusUpdate("testGame", "testUser", false, Color.BLACK).blockingFirst();
-        assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=0x000000ff]",member.toString());
-        verify(gameMembersApiService).patch("testGame", "testUser", new UpdateMemberDto(false,Color.BLACK));
+                                                "15:50", "01", "02", false, "#000000")));
+        Member member = memberService.statusUpdate("testGame", "testUser", false, "#000000").blockingFirst();
+        assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000]",member.toString());
+        verify(gameMembersApiService).patch("testGame", "testUser", new UpdateMemberDto(false,"#000000"));
     }
 
 }
