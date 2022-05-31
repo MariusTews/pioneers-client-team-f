@@ -30,7 +30,7 @@
          <children>
             <Pane prefHeight="150.0" prefWidth="420.0" />
             <Pane prefHeight="150.0" prefWidth="680.0" />
-            <VBox prefHeight="150.0" prefWidth="500.0" />
+            <VBox fx:id="chatView" prefHeight="150.0" prefWidth="500.0" />
          </children>
       </HBox>
    </children>

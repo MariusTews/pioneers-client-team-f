@@ -5,13 +5,12 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" style="-fx-background-color: #ffff;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" style="-fx-background-color: #ffff;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
    <children>
       <HBox alignment="CENTER_RIGHT" prefHeight="90.0" prefWidth="640.0">
          <children>
@@ -37,41 +36,21 @@
       </HBox>
       <HBox prefHeight="335.0" prefWidth="640.0">
          <children>
-            <ScrollPane fx:id="idUserInLobby" prefHeight="323.0" prefWidth="175.0" style="-fx-background-color: white;">
+            <ScrollPane fx:id="idUserInLobby" prefHeight="330.0" prefWidth="190.0" style="-fx-background-color: white;">
                <HBox.margin>
                   <Insets left="40.0" right="5.0" />
                </HBox.margin>
                <content>
-                  <VBox fx:id="idUserList" prefHeight="321.0" prefWidth="173.0">
+                  <VBox fx:id="idUserList" prefHeight="322.0" prefWidth="186.0">
                      <children>
                         <fx:include source="MemberListSubView.fxml" />
                      </children></VBox>
                </content>
             </ScrollPane>
-            <VBox prefHeight="323.0" prefWidth="294.0">
-               <children>
-                  <ScrollPane fx:id="idChatScrollPane" prefHeight="323.0" prefWidth="294.0" style="-fx-background-color: white;">
-                     <content>
-                        <VBox fx:id="idMessageView" prefHeight="250.0" prefWidth="260.0" />
-                     </content>
-                  </ScrollPane>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <TextField fx:id="idMessageField" onKeyPressed="#enterKeyPressed" prefHeight="35.0" prefWidth="240.0" promptText="Type message">
-                           <style>-fx-background-radius: 10px;</style>
-                           <HBox.margin>
-                              <Insets right="5.0" />
-                           </HBox.margin>
-                        </TextField>
-                        <Button fx:id="idSendButton" mnemonicParsing="false" onAction="#send" prefHeight="35.0" prefWidth="50.0" text="Send" textFill="WHITE">
-                           <style>-fx-background-color: #008cff; -fx-background-radius: 10px;</style>
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Button>
-                     </children>
-                  </HBox>
-               </children>
+            <VBox fx:id="idMessageView" prefHeight="320.0" prefWidth="501.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
             </VBox>
          </children>
       </HBox>
