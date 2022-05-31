@@ -3,8 +3,8 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 
-import de.uniks.pioneers.service.GameIDStorage;
-import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.service.*;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,6 +25,10 @@ public class GameScreenController implements Controller {
     private App app;
     private GameIDStorage gameIDStorage;
     private PioneersService pioneersService;
+    private final EventListener eventListener;
+    private final MemberIDStorage memberIDStorage;
+    private final UserService userService;
+    private final MessageService messageService;
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
@@ -32,12 +36,19 @@ public class GameScreenController implements Controller {
     @Inject
     public GameScreenController(App app,
                                 GameIDStorage gameIDStorage,
-                                PioneersService pioneersService){
+                                PioneersService pioneersService,
+                                EventListener eventListener,
+                                MemberIDStorage memberIDStorage,
+                                UserService userService,
+                                MessageService messageService){
         this.app = app;
         this.gameIDStorage = gameIDStorage;
         this.pioneersService = pioneersService;
+        this.eventListener = eventListener;
+        this.userService = userService;
+        this.messageService = messageService;
+        this.memberIDStorage = memberIDStorage;
     }
-
 
     @Override
     public void init() {
@@ -46,7 +57,7 @@ public class GameScreenController implements Controller {
 
     @Override
     public void destroy() {
-
+        this.messageViewSubController.destroy();
     }
 
     @Override
@@ -64,8 +75,9 @@ public class GameScreenController implements Controller {
         this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService);
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
-        // Include ingame chat
-        this.messageViewSubController = new MessageViewSubController();
+        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+                userService, messageService, memberIDStorage);
+        messageViewSubController.init();
         chatView.getChildren().setAll(messageViewSubController.render());
 
         return parent;
