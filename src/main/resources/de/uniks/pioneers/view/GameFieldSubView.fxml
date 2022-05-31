@@ -5,9 +5,9 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Polygon?>
 
-<Pane maxHeight="900.0" maxWidth="900.0" minHeight="630.0" minWidth="600.0" prefHeight="630.0" prefWidth="684.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameFieldSubController">
+<Pane minHeight="600.0" minWidth="650.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameFieldSubController">
    <children>
-      <Group layoutX="120.0" layoutY="130.0" scaleX="1.4" scaleY="1.4" scaleZ="1.4">
+      <Group layoutX="106.0" layoutY="119.0" scaleX="1.4" scaleY="1.4" scaleZ="1.4">
          <children>
             <Polygon fill="DODGERBLUE" layoutX="194.85571670532227" layoutY="137.5" points="0.0, 0.0, 50.0, 0.0, 75.0, 43.30127018922193, 50.0, 86.60254037844386, 0.0, 86.60254037844386, -25.0, 43.30127018922193" rotate="30.0" stroke="BLACK" strokeType="INSIDE" fx:id="x0y0z0" />
             <Polygon fill="DODGERBLUE" layoutX="64.95190811157227" layoutY="62.5" points="0.0, 0.0, 50.0, 0.0, 75.0, 43.30127018922193, 50.0, 86.60254037844386, 0.0, 86.60254037844386, -25.0, 43.30127018922193" rotate="30.0" stroke="BLACK" strokeType="INSIDE" fx:id="xM1yM1z2" />
