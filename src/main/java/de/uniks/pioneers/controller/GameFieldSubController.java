@@ -26,7 +26,7 @@ public class GameFieldSubController implements Controller{
 
     private final ObservableList<Tile> tiles = FXCollections.observableArrayList();
 
-
+    private final IDStorage idStorage;
 
     private Parent parent;
     private App app;
@@ -41,10 +41,12 @@ public class GameFieldSubController implements Controller{
     @Inject
     public GameFieldSubController(App app,
                                   GameIDStorage gameIDStorage,
-                                  PioneersService pioneersService){
+                                  PioneersService pioneersService,
+                                  IDStorage idStorage){
         this.app = app;
         this.gameIDStorage = gameIDStorage;
         this.pioneersService = pioneersService;
+        this.idStorage = idStorage;
     }
 
     @Override
@@ -120,7 +122,7 @@ public class GameFieldSubController implements Controller{
 
         for (int i=0; i < hexaCoords.size(); i++) {
             for (int j=0; j < cirleCoords.size(); j++) {
-                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage, new IDStorage());
+                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage, idStorage);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
                 //System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
