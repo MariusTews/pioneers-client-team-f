@@ -1,5 +1,6 @@
 package de.uniks.pioneers.controller;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 
@@ -8,6 +9,7 @@ import de.uniks.pioneers.dto.CreateMoveDto;
 import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.service.GameIDStorage;
+import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -43,17 +45,20 @@ public class GameScreenController implements Controller {
     private GameFieldSubController gameFieldSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
     private final EventListener eventListener;
+    private IDStorage idStorage;
 
 
     @Inject
     public GameScreenController(App app,
                                 GameIDStorage gameIDStorage,
                                 PioneersService pioneersService,
-                                EventListener eventListener){
+                                EventListener eventListener,
+                                IDStorage idStorage){
         this.app = app;
         this.gameIDStorage = gameIDStorage;
         this.pioneersService = pioneersService;
         this.eventListener = eventListener;
+        this.idStorage = idStorage;
     }
 
 
@@ -99,7 +104,7 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService);
+        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,idStorage);
         mapPane.getChildren().setAll(gameFieldSubController.render());
         System.out.println(gameIDStorage.getId());
 
