@@ -5,6 +5,7 @@ import de.uniks.pioneers.Main;
 
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.CreateMoveDto;
+import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.PioneersService;
@@ -66,6 +67,15 @@ public class GameScreenController implements Controller {
                     System.out.println(event.event());
                 }));
 
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + "buildings.*.*", Building.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event->{
+                    Building building = event.data();
+                    System.out.println(event.event());
+                    System.out.println(building.type());
+                }));
+
     }
 
 
@@ -73,6 +83,7 @@ public class GameScreenController implements Controller {
 
     @Override
     public void destroy() {
+        disposable.dispose();
 
     }
 

@@ -115,7 +115,7 @@ public class GameFieldSubController implements Controller{
 
         for (int i=0; i < hexaCoords.size(); i++) {
             for (int j=0; j < cirleCoords.size(); j++) {
-                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)));
+                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage);
                 circleSubController.init();
                 System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
             }
