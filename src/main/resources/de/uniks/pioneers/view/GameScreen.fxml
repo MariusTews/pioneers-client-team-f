@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -15,7 +17,11 @@
          <children>
             <Pane prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: #808080;" />
             <Pane fx:id="mapPane" minHeight="600.0" minWidth="650.0" style="-fx-background-color: #B22222;" />
-            <Pane prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: #008000;" />
+            <Pane prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: #008000;">
+               <children>
+                  <Button fx:id="rollButton" layoutX="437.0" layoutY="75.0" mnemonicParsing="false" onAction="#rollDice" text="roll" />
+                  <Label fx:id="diceLabel" layoutX="199.0" layoutY="79.0" text="Label" />
+               </children></Pane>
          </children>
       </VBox>
       <VBox prefHeight="900.0" prefWidth="450.0">
