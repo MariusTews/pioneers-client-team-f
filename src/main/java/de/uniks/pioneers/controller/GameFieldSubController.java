@@ -19,6 +19,7 @@ import javafx.scene.shape.Polygon;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,8 @@ public class GameFieldSubController implements Controller{
     public void destroy() {
         hexSubControllers.forEach(HexSubController::destroy);
         hexSubControllers.clear();
+        circleSubControllers.forEach(CircleSubController::destroy);
+        circleSubControllers.clear();
     }
 
     @Override
@@ -82,6 +85,11 @@ public class GameFieldSubController implements Controller{
     }
 
     private void loadMap(Map map) {
+        List<String> waterTilesCircles = Arrays.asList("xM2yM1z3_3", "xM1yM2z3_6", "xM1yM2z3_3", "x0yM3z3_6", "x1yM3z2_6",
+                "x1yM3z2_7", "x2yM3z1_6", "x2yM3z1_7", "x3yM3z0_7", "x3yM3z0_6", "x3yM2yM1_7", "x3yM2yM1_6", "x3yM1zM2_7",
+                "x3yM1zM2_6", "x2y1zM3_0", "x2y1zM3_11", "x1y2zM3_0", "x1y2zM3_11", "x0y3zM3_0", "x0y3zM3_11", "xM1y3zM2_0",
+                "xM1y3zM2_11", "xM2y3zM1_0", "xM2y3zM1_11", "xM3y3z0_0", "xM3y2z1_3", "xM3y2z1_0", "xM3y0z3_3", "xM2yM1z3_6",
+                "xM3y1z2_3", "xM3y1z2_0");
         List<String> hexaCoords = new ArrayList<>();
         List<Integer> cirleCoords = new ArrayList<>();
         cirleCoords.add(0);
@@ -117,8 +125,14 @@ public class GameFieldSubController implements Controller{
             for (int j=0; j < cirleCoords.size(); j++) {
                 CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)));
                 circleSubController.init();
+                this.circleSubControllers.add(circleSubController);
                 //System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
             }
+        }
+        for (String string: waterTilesCircles) {
+            CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup("#" + string));
+            circleSubController.init();
+            this.circleSubControllers.add(circleSubController);
         }
     }
 }
