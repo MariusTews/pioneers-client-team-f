@@ -4,15 +4,23 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 
 import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.dto.ErrorResponse;
+import de.uniks.pioneers.model.ExpectedMove;
+import de.uniks.pioneers.model.State;
 import de.uniks.pioneers.service.*;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
+
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameScreenController implements Controller {
 
@@ -20,6 +28,8 @@ public class GameScreenController implements Controller {
     public Pane mapPane;
     @FXML
     public Pane chatPane;
+    @FXML
+    public Label diceSumLabel;
 
     private final App app;
     private final GameIDStorage gameIDStorage;
@@ -86,5 +96,23 @@ public class GameScreenController implements Controller {
         chatPane.getChildren().setAll(messageViewSubController.render());
 
         return parent;
+    }
+
+    public void onMouseClicked(MouseEvent mouseEvent) {
+        State state = pioneersService.findOneState(gameIDStorage.getId()).blockingFirst();
+        List<ExpectedMove> expectedMove = state.expectedMoves();
+        ExpectedMove currentExpectedMove = expectedMove.get(0);
+        String action = currentExpectedMove.action();
+        List<String> players = currentExpectedMove.players();
+
+        if (action.endsWith("roll")) {
+            pioneersService.move(gameIDStorage.getId(), action, null, null, null, null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                        diceSumLabel.setText(Integer.toString(result.roll()));
+                    }, onError -> {
+                        onError.printStackTrace();
+                    });
+        }
     }
 }
