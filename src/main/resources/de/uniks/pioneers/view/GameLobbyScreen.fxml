@@ -10,76 +10,70 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" style="-fx-background-color: #ffff;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
-   <children>
-      <HBox alignment="CENTER_RIGHT" prefHeight="90.0" prefWidth="640.0">
-         <children>
-            <Label fx:id="idTitleLabel" text="">
-               <font>
-                  <Font name="Arial Bold" size="24.0" />
-               </font>
-            </Label>
-            <Pane prefHeight="78.0" prefWidth="86.0" />
-            <Button fx:id="idLeaveButton" mnemonicParsing="false" onAction="#leave" prefHeight="45.0" prefWidth="110.0" text="Leave" textFill="WHITE">
-               <style>-fx-background-color: #008cff; -fx-background-radius: 10px;</style>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <HBox.margin>
-                  <Insets right="20.0" />
-               </HBox.margin>
-               <font>
-                  <Font name="Arial Bold" size="19.0" />
-               </font>
-            </Button>
-         </children>
-      </HBox>
-      <HBox prefHeight="335.0" prefWidth="640.0">
-         <children>
-            <ScrollPane fx:id="idUserInLobby" prefHeight="330.0" prefWidth="190.0" style="-fx-background-color: white;">
-               <HBox.margin>
-                  <Insets left="40.0" right="5.0" />
-               </HBox.margin>
-               <content>
-                  <VBox fx:id="idUserList" prefHeight="322.0" prefWidth="186.0">
-                     <children>
-                        <fx:include source="MemberListSubView.fxml" />
-                     </children></VBox>
-               </content>
-            </ScrollPane>
-            <VBox fx:id="idMessageView" prefHeight="320.0" prefWidth="501.0">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
-            </VBox>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_RIGHT" prefHeight="92.0" prefWidth="640.0">
-         <children>
-            <ComboBox fx:id="colorPicker" onAction="#colorPicked" prefWidth="150.0" promptText="Choose color">
-               <HBox.margin>
-                  <Insets right="190.0" />
-               </HBox.margin>
-            </ComboBox>
-            <Button fx:id="idReadyButton" mnemonicParsing="false" onAction="#ready" prefHeight="35.0" prefWidth="130.0" text="Ready" textFill="WHITE">
-               <style>-fx-background-color: #008cff; -fx-background-radius: 10px;</style>
-               <font>
-                  <Font name="Arial Bold" size="19.0" />
-               </font>
-               <HBox.margin>
-                  <Insets right="10.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="idStartGameButton" mnemonicParsing="false" onAction="#startGame" prefHeight="35.0" prefWidth="129.0" text="Start Game" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
-               <style>-fx-background-color: #008cff; -fx-background-radius: 10px;</style>
-               <font>
-                  <Font name="Arial Bold" size="19.0" />
-               </font>
-               <HBox.margin>
-                  <Insets right="20.0" />
-               </HBox.margin>
-            </Button>
-         </children>
-      </HBox>
-   </children>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0"
+      prefWidth="800.0" style="-fx-background-color: #ffff;" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
+   <HBox alignment="CENTER_RIGHT" prefHeight="90.0" prefWidth="640.0">
+      <Label fx:id="idTitleLabel">
+         <font>
+            <Font name="Arial Bold" size="24.0"/>
+         </font>
+      </Label>
+      <Pane prefHeight="78.0" prefWidth="86.0"/>
+      <Button fx:id="idLeaveButton" mnemonicParsing="false" onAction="#leave" prefHeight="45.0" prefWidth="110.0"
+              text="Leave" textFill="WHITE">
+         <style>-fx-background-color: #008cff; -fx-background-radius: 10px;</style>
+         <opaqueInsets>
+            <Insets/>
+         </opaqueInsets>
+         <HBox.margin>
+            <Insets right="20.0"/>
+         </HBox.margin>
+         <font>
+            <Font name="Arial Bold" size="19.0"/>
+         </font>
+      </Button>
+   </HBox>
+   <HBox prefHeight="335.0" prefWidth="640.0">
+      <ScrollPane fx:id="idUserInLobby" prefHeight="330.0" prefWidth="190.0" style="-fx-background-color: white;">
+         <HBox.margin>
+            <Insets left="40.0" right="5.0"/>
+         </HBox.margin>
+         <VBox fx:id="idUserList" prefHeight="322.0" prefWidth="186.0">
+            <fx:include source="MemberListSubView.fxml"/>
+         </VBox>
+      </ScrollPane>
+      <VBox fx:id="idChatContainer" prefHeight="320.0" prefWidth="501.0">
+         <HBox.margin>
+            <Insets left="10.0"/>
+         </HBox.margin>
+      </VBox>
+   </HBox>
+   <HBox alignment="CENTER_RIGHT" prefHeight="92.0" prefWidth="640.0">
+      <ComboBox fx:id="colorPicker" onAction="#colorPicked" prefWidth="150.0" promptText="Choose color">
+         <HBox.margin>
+            <Insets right="190.0"/>
+         </HBox.margin>
+      </ComboBox>
+      <Button fx:id="idReadyButton" mnemonicParsing="false" onAction="#ready" prefHeight="35.0" prefWidth="130.0"
+              text="Ready" textFill="WHITE">
+         <style>-fx-background-color: #008cff; -fx-background-radius: 10px;</style>
+         <font>
+            <Font name="Arial Bold" size="19.0"/>
+         </font>
+         <HBox.margin>
+            <Insets right="10.0"/>
+         </HBox.margin>
+      </Button>
+      <Button fx:id="idStartGameButton" mnemonicParsing="false" onAction="#startGame" prefHeight="35.0"
+              prefWidth="129.0" text="Start Game" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+         <style>-fx-background-color: #008cff; -fx-background-radius: 10px;</style>
+         <font>
+            <Font name="Arial Bold" size="19.0"/>
+         </font>
+         <HBox.margin>
+            <Insets right="20.0"/>
+         </HBox.margin>
+      </Button>
+   </HBox>
 </VBox>

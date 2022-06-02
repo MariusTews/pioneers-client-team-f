@@ -5,7 +5,6 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
-import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -46,7 +45,7 @@ public class GameLobbyController implements Controller {
     @FXML
     public VBox idUserList;
     @FXML
-    public VBox idMessageView;
+    public VBox idChatContainer;
 
     private final App app;
     private final MemberService memberService;
@@ -64,7 +63,7 @@ public class GameLobbyController implements Controller {
 
     @FXML
     public ComboBox<String> colorPicker;
-    //this will allow change the if status is ready or not
+    //this will allow change the status if user is ready
     public boolean ready_button = false;
 
 
@@ -133,28 +132,26 @@ public class GameLobbyController implements Controller {
                     }
                 }));
 
-
         //listen to the game
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
-                    final Message message = event.data();
                     if (event.event().endsWith("state" + CREATED)) {
                         final GameScreenController controller = gameScreenController.get();
                         this.app.show(controller);
                     }
                 }));
 
-        // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
-        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
-                userService, messageService, memberIDStorage);
-        messageViewSubController.init();
     }
 
     @Override
     public void destroy() {
-        this.messageViewSubController.destroy();
+        // destroy sub controller, otherwise the messages are displayed twice in-game, because the game controller
+        // creates a new messageViewSubController
+        if (this.messageViewSubController != null) {
+            this.messageViewSubController.destroy();
+        }
         disposable.dispose();
     }
 
@@ -179,22 +176,24 @@ public class GameLobbyController implements Controller {
                 .subscribe(result -> this.idTitleLabel.setText("Welcome to " + result.name()));
 
         // load game members
-        members.addListener((ListChangeListener<? super Member>) c -> {
-            this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
-
-        });
+        members.addListener((ListChangeListener<? super Member>) c -> this.idUserList.getChildren()
+                .setAll(c.getList().stream().map(this::renderMember).toList()));
 
         addColorOnComboBox(colorPicker);
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
+        // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
+        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+                userService, messageService, memberIDStorage, memberService);
+        messageViewSubController.init();
         // show chat and load the messages
-        idMessageView.getChildren().setAll(messageViewSubController.render());
+        idChatContainer.getChildren().setAll(messageViewSubController.render());
 
         return parent;
     }
 
-    public void leave(ActionEvent event) {
+    public void leave(ActionEvent ignoredEvent) {
         gameService
                 .findOneGame(gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
@@ -215,7 +214,7 @@ public class GameLobbyController implements Controller {
                 });
     }
 
-    public void ready(ActionEvent event) {
+    public void ready(ActionEvent ignoredEvent) {
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
         if (member.ready()) {
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color()).subscribe();
@@ -227,7 +226,7 @@ public class GameLobbyController implements Controller {
 
     }
 
-    public void startGame(ActionEvent event) {
+    public void startGame(ActionEvent ignoredEvent) {
 
         gameService.updateGame(gameIDStorage.getId(), null, null, null, true)
                 .observeOn(FX_SCHEDULER)
@@ -269,7 +268,7 @@ public class GameLobbyController implements Controller {
         }
     }
 
-    //GEt all the color from members
+    //Get all the color from members
     private List<String> remainingColor(HashMap<String, String> colortoHex) {
         List<String> remaining_color = new ArrayList<>();
         List<String> setOfColors = color();
@@ -288,7 +287,7 @@ public class GameLobbyController implements Controller {
         return setOfColors;
     }
 
-    //This maps every color to its hexcode #RED:#0000FF
+    //This maps every color to its hexcode BLUE:#0000FF
     private HashMap<String, String> colorToHexcode(List<String> list) {
         HashMap<String, String> color_to_hexcode = new HashMap<>();
         for (String E : list) {
@@ -313,14 +312,14 @@ public class GameLobbyController implements Controller {
     }
 
     //color event
-    public void colorPicked(ActionEvent event) {
+    public void colorPicked(ActionEvent ignoredEvent) {
         Color c = Color.web(colorPicker.getSelectionModel().getSelectedItem().toLowerCase());
         String pickedColor = "#" + c.toString().substring(2, 8);
 
         boolean chose = true;
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
         for (Member m : members) {
-            //this make sure wenn duplicate color is chosen, the last color is taken
+            //this makes sure when duplicate color is chosen, the last color is taken
             //in default it will be black
             if (m.color() != null && m.color().equals(pickedColor)) {
                 memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), member.color()).
