@@ -55,6 +55,7 @@ public class GameLobbyController implements Controller {
     private final Provider<LobbyController> lobbyController;
     private final Provider<GameScreenController> gameScreenController;
     private MessageViewSubController messageViewSubController;
+    private MemberListSubcontroller memberListSubcontroller;
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
@@ -108,7 +109,9 @@ public class GameLobbyController implements Controller {
                 .subscribe(event -> {
                     final Member member = event.data();
                     if (event.event().endsWith(CREATED)) {
-                        members.add(member);
+                        if (!members.contains(member)) {
+                            members.add(member);
+                        }
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
                         if (member.userId().equals(idStorage.getID())) {
@@ -169,7 +172,7 @@ public class GameLobbyController implements Controller {
             return null;
         }
 
-        // load game title
+        //TODO: load game title WIP SERVERREQUEST LIMIT
         gameService
                 .findOneGame(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
@@ -215,15 +218,17 @@ public class GameLobbyController implements Controller {
     }
 
     public void ready(ActionEvent ignoredEvent) {
-        Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
-        if (member.ready()) {
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color()).subscribe();
-            this.idReadyButton.setText("Ready");
-        } else {
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, member.color()).subscribe();
-            this.idReadyButton.setText("Not Ready");
+        for (Member member: this.members) {
+            if (member.userId().equals(idStorage.getID())){
+                if (member.ready()) {
+                    memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color()).subscribe();
+                    this.idReadyButton.setText("Ready");
+                } else {
+                    memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, member.color()).subscribe();
+                    this.idReadyButton.setText("Not Ready");
+                }
+            }
         }
-
     }
 
     public void startGame(ActionEvent ignoredEvent) {
@@ -245,7 +250,7 @@ public class GameLobbyController implements Controller {
     }
 
     private Node renderMember(Member member) {
-        MemberListSubcontroller memberListSubcontroller = new MemberListSubcontroller(this.app, member, this.userService);
+        this.memberListSubcontroller = new MemberListSubcontroller(this.app, member, this.userService);
         return memberListSubcontroller.render();
     }
 
@@ -317,23 +322,19 @@ public class GameLobbyController implements Controller {
         String pickedColor = "#" + c.toString().substring(2, 8);
 
         boolean chose = true;
-        Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
-        for (Member m : members) {
-            //this makes sure when duplicate color is chosen, the last color is taken
-            //in default it will be black
-            if (m.color() != null && m.color().equals(pickedColor)) {
-                memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), member.color()).
-                        observeOn(FX_SCHEDULER).subscribe();
+        boolean ready = false;
+        List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        for (Member member: memberList) {
+            if (member.color() != null && member.color().equals(pickedColor)) {
                 chose = false;
-                break;
+            }
+            if (member.userId().equals(idStorage.getID())) {
+                ready = member.ready();
             }
         }
-
-
         if (chose) {
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), pickedColor).
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), ready, pickedColor).
                     observeOn(FX_SCHEDULER).subscribe();
         }
-
     }
 }
