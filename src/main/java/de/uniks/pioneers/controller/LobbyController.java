@@ -185,7 +185,6 @@ public class LobbyController implements Controller {
 					//this.idMessageView.getChildren().add(box);
 					((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
 				} else {
-					System.out.println("3");
 					Label label = new Label();
 					label.setMinWidth(100);
 					this.initRightClickForAllMessages(label, m._id(), m.sender());
@@ -225,13 +224,11 @@ public class LobbyController implements Controller {
 			return null;
 		}
 
-		this.users.addListener((ListChangeListener<? super User>) c -> {
-			((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
-		});
+		this.users.addListener((ListChangeListener<? super User>) c -> ((VBox) this.userScrollPane.getContent())
+					.getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList()));
 
-		this.games.addListener((ListChangeListener<? super Game>) c -> {
-			((VBox) this.gamesScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList());
-		});
+		this.games.addListener((ListChangeListener<? super Game>) c -> ((VBox) this.gamesScrollPane.getContent())
+					.getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList()));
 
 
 		this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
@@ -243,13 +240,13 @@ public class LobbyController implements Controller {
 	private void handleTabSwitching(Tab oldValue, Tab newValue) {
 
 		for (DirectChatStorage directChatStorage : directChatStorages) {
-			if (directChatStorage.getTab().equals(oldValue) && tabDisposable != null) {
+			if (directChatStorage.getTab() != null && directChatStorage.getTab().equals(oldValue) && tabDisposable != null) {
 				this.currentDirectStorage = null;
 				tabDisposable.dispose();
 			}
 		}
 		for (DirectChatStorage directChatStorage : directChatStorages) {
-			if (directChatStorage.getTab().equals(newValue)) {
+			if (directChatStorage.getTab() != null && directChatStorage.getTab().equals(newValue)) {
 				this.currentDirectStorage = directChatStorage;
 				User user = currentDirectStorage.getUser();
 				this.loadDirectMessages(currentDirectStorage.getGroupId(), user, currentDirectStorage.getTab());
@@ -431,7 +428,7 @@ public class LobbyController implements Controller {
 		tab.setOnClosed(event -> {
 			for (DirectChatStorage storage : this.directChatStorages) {
 
-				if (storage != null && storage.getTab().equals(tab)) {
+				if (storage != null && storage.getTab() != null && storage.getTab().equals(tab)) {
 					storage.setTab(null);
 				}
 			}
@@ -449,10 +446,10 @@ public class LobbyController implements Controller {
 		for (Group group : this.groups) {
 			if (group.members().size() == 2 && group.members().contains(user._id()) && group.members().contains(this.idStorage.getID())) {
 				for (DirectChatStorage storage : directChatStorages) {
-					User stoageUser = storage.getUser();
-					if (storage.getGroupId().equals(group._id()) && stoageUser._id().equals(user._id())) {
+					User storageUser = storage.getUser();
+					if (storage.getGroupId().equals(group._id()) && storageUser._id().equals(user._id())) {
 						storage.setTab(tab);
-						loadDirectMessages(storage.getGroupId(), stoageUser, storage.getTab());
+						loadDirectMessages(storage.getGroupId(), storageUser, storage.getTab());
 						return;
 					}
 				}
@@ -508,7 +505,7 @@ public class LobbyController implements Controller {
 		this.games.addAll(notAccessible);
 	}
 
-	//load alll messages
+	//load all messages
 	private void initAllMessages() {
 		for (Message m : this.lobby_messages) {
 			HBox box = new HBox(3);
@@ -530,20 +527,16 @@ public class LobbyController implements Controller {
 		}
 	}
 
-	//this delete messages on right click or gives warning
-	// if the code doesnot belong to the user
+	//this deletes messages on right click or gives warning
+	// if the code does not belong to the user
 	private void initRightClickForAllMessages(Label label, String messageId, String sender) {
 		final ContextMenu contextMenu = new ContextMenu();
 		final MenuItem menuItem = new MenuItem("delete");
 
 		contextMenu.getItems().add(menuItem);
 
-		label.setOnMouseEntered(event -> {
-			label.setStyle("-fx-background-color: LIGHTGREY");
-		});
-		label.setOnMouseExited(event -> {
-			label.setStyle("-fx-background-color: DEFAULT");
-		});
+		label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: LIGHTGREY"));
+		label.setOnMouseExited(event -> label.setStyle("-fx-background-color: TRANSPARENT"));
 		label.setContextMenu(contextMenu);
 
 		menuItem.setOnAction(event -> {
@@ -623,19 +616,17 @@ public class LobbyController implements Controller {
 		dialog.setTitle("Enter the password");
 		dialog.setHeaderText("password");
 		dialog.showAndWait()
-				.ifPresent(password -> {
-					this.memberService.join(idStorage.getID(), game._id(), password)
-							.observeOn(FX_SCHEDULER)
-							.doOnError(error -> {
-								if ("HTTP 401 ".equals(error.getMessage())) {
-									new Alert(Alert.AlertType.ERROR, "wrong password")
-											.showAndWait();
-								}
+				.ifPresent(password -> this.memberService.join(idStorage.getID(), game._id(), password)
+						.observeOn(FX_SCHEDULER)
+						.doOnError(error -> {
+							if ("HTTP 401 ".equals(error.getMessage())) {
+								new Alert(Alert.AlertType.ERROR, "wrong password")
+										.showAndWait();
+							}
 
-							})
-							.subscribe(result -> app.show(gameLobbyController.get()), onError -> {
-							});
-				});
+						})
+						.subscribe(result -> app.show(gameLobbyController.get()), onError -> {
+						}));
 	}
 
 	private void initRightClick(Label label, String messageId, String sender, String groupId) {
@@ -643,12 +634,8 @@ public class LobbyController implements Controller {
 		final MenuItem menuItem = new MenuItem("delete");
 
 		contextMenu.getItems().add(menuItem);
-		label.setOnMouseEntered(event -> {
-			label.setStyle("-fx-background-color: LIGHTGREY");
-		});
-		label.setOnMouseExited(event -> {
-			label.setStyle("-fx-background-color: DEFAULT");
-		});
+		label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: LIGHTGREY"));
+		label.setOnMouseExited(event -> label.setStyle("-fx-background-color: DEFAULT"));
 		label.setContextMenu(contextMenu);
 
 		menuItem.setOnAction(event -> {

@@ -22,7 +22,7 @@
          <children>
             <Pane prefHeight="100.0" prefWidth="500.0" style="-fx-background-color: #800080;" />
             <Pane prefHeight="480.0" prefWidth="500.0" style="-fx-background-color: #FF0000;" />
-            <Pane prefHeight="320.0" prefWidth="500.0" style="-fx-background-color: #0000FF;" />
+            <Pane fx:id="chatPane" prefHeight="320.0" prefWidth="500.0" style="-fx-background-color: #0000FF;" />
          </children>
       </VBox>
    </children>
