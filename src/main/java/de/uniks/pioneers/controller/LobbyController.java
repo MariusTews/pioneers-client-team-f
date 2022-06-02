@@ -185,7 +185,6 @@ public class LobbyController implements Controller {
 					//this.idMessageView.getChildren().add(box);
 					((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
 				} else {
-					System.out.println("3");
 					Label label = new Label();
 					label.setMinWidth(100);
 					this.initRightClickForAllMessages(label, m._id(), m.sender());
@@ -542,7 +541,7 @@ public class LobbyController implements Controller {
 			label.setStyle("-fx-background-color: LIGHTGREY");
 		});
 		label.setOnMouseExited(event -> {
-			label.setStyle("-fx-background-color: DEFAULT");
+			label.setStyle("-fx-background-color: TRANSPARENT");
 		});
 		label.setContextMenu(contextMenu);
 
