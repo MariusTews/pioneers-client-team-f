@@ -5,7 +5,6 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
-import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -17,14 +16,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
@@ -33,12 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
+
 public class GameLobbyController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
-    private final ObservableList<Message> messages = FXCollections.observableArrayList();
-    private final List<String> deletedMessages = new ArrayList<>();
-    private final HashMap<String, User> memberHash = new HashMap<>();
 
     @FXML
     public Label idTitleLabel;
@@ -47,19 +39,13 @@ public class GameLobbyController implements Controller {
     @FXML
     public ScrollPane idUserInLobby;
     @FXML
-    public TextField idMessageField;
-    @FXML
-    public Button idSendButton;
-    @FXML
     public Button idReadyButton;
     @FXML
     public Button idStartGameButton;
     @FXML
     public VBox idUserList;
     @FXML
-    public VBox idMessageView;
-    @FXML
-    public ScrollPane idChatScrollPane;
+    public VBox idChatContainer;
 
     private final App app;
     private final MemberService memberService;
@@ -68,6 +54,7 @@ public class GameLobbyController implements Controller {
     private final GameService gameService;
     private final Provider<LobbyController> lobbyController;
     private final Provider<GameScreenController> gameScreenController;
+    private MessageViewSubController messageViewSubController;
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
@@ -76,7 +63,7 @@ public class GameLobbyController implements Controller {
 
     @FXML
     public ComboBox<String> colorPicker;
-    //this will allow change the if status is ready or not
+    //this will allow change the status if user is ready
     public boolean ready_button = false;
 
 
@@ -87,12 +74,12 @@ public class GameLobbyController implements Controller {
                                MessageService messageService,
                                GameService gameService,
                                Provider<LobbyController> lobbyController,
-                               Provider<GameScreenController>gameScreenController,
+                               Provider<GameScreenController> gameScreenController,
                                EventListener eventListener,
                                IDStorage idStorage,
                                GameIDStorage gameIDStorage,
                                MemberIDStorage memberIDStorage
-                               ) {
+    ) {
         this.app = app;
         this.memberService = memberService;
         this.userService = userService;
@@ -114,25 +101,6 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this.members::setAll);
 
-        // init memberHash
-        userService
-                .findAllUsers()
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    for (User user : result) {
-                        this.memberHash.put(user._id(), user);
-                    }
-
-                    // get all messages and initial load
-                    messageService
-                            .getAllMessages(GAMES, this.gameIDStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(col -> {
-                                this.messages.setAll(col);
-                                this.initAllMessages();
-                            });
-                });
-
         // listen to members
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
@@ -150,51 +118,40 @@ public class GameLobbyController implements Controller {
                     } else if (event.event().endsWith(UPDATED)) {
                         for (Member updatedMember : this.members) {
                             if (updatedMember.userId().equals(member.userId())) {
-                                this.members.set(this.members.indexOf(updatedMember),member);
+                                this.members.set(this.members.indexOf(updatedMember), member);
                                 break;
                             }
                         }
                         int readyMembers = 0;
                         for (Member members : this.members) {
                             if (members.ready()) {
-                               readyMembers +=1;
+                                readyMembers += 1;
                             }
                         }
                         this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
-
-
                     }
                 }));
 
-
         //listen to the game
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".*.*",Message.class)
+                .listen("games." + this.gameIDStorage.getId() + ".*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(event->{
-                    final Message message = event.data();
-                    if(event.event().endsWith("state" + CREATED)){
+                .subscribe(event -> {
+                    if (event.event().endsWith("state" + CREATED)) {
                         final GameScreenController controller = gameScreenController.get();
                         this.app.show(controller);
                     }
                 }));
 
-        // listen to game lobby messages
-        disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    final Message message = event.data();
-                    if (event.event().endsWith(CREATED)) {
-                        renderMessage(message, true);
-                    } else if (event.event().endsWith(DELETED)) {
-                        renderMessage(message, false);
-                    }
-                }));
     }
 
     @Override
     public void destroy() {
+        // destroy sub controller, otherwise the messages are displayed twice in-game, because the game controller
+        // creates a new messageViewSubController
+        if (this.messageViewSubController != null) {
+            this.messageViewSubController.destroy();
+        }
         disposable.dispose();
     }
 
@@ -219,87 +176,72 @@ public class GameLobbyController implements Controller {
                 .subscribe(result -> this.idTitleLabel.setText("Welcome to " + result.name()));
 
         // load game members
-        members.addListener((ListChangeListener<? super Member>) c -> {
-            this.idUserList.getChildren().setAll(c.getList().stream().map(this::renderMember).toList());
-
-        });
+        members.addListener((ListChangeListener<? super Member>) c -> this.idUserList.getChildren()
+                .setAll(c.getList().stream().map(this::renderMember).toList()));
 
         addColorOnComboBox(colorPicker);
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
+        // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
+        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+                userService, messageService, memberIDStorage, memberService);
+        messageViewSubController.init();
+        // show chat and load the messages
+        idChatContainer.getChildren().setAll(messageViewSubController.render());
+
         return parent;
     }
 
-    public void leave(ActionEvent event) {
+    public void leave(ActionEvent ignoredEvent) {
         gameService
                 .findOneGame(gameIDStorage.getId())
-                        .observeOn(FX_SCHEDULER)
-                                .subscribe(result -> {
-                                    if ((int)result.members() == 1 || result.owner().equals(idStorage.getID())) {
-                                        gameService
-                                                .deleteGame(gameIDStorage.getId())
-                                                .observeOn(FX_SCHEDULER)
-                                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
-                                    } else {
-                                        memberService
-                                                .leave(gameIDStorage.getId(), idStorage.getID())
-                                                .observeOn(FX_SCHEDULER)
-                                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
-                                                }
-                                    });
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    if ((int) result.members() == 1 || result.owner().equals(idStorage.getID())) {
+                        gameService
+                                .deleteGame(gameIDStorage.getId())
+                                .observeOn(FX_SCHEDULER)
+                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
+                                });
+                    } else {
+                        memberService
+                                .leave(gameIDStorage.getId(), idStorage.getID())
+                                .observeOn(FX_SCHEDULER)
+                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
+                                });
+                    }
+                });
     }
 
-    public void send(ActionEvent event) {
-        this.checkMessageField();
-    }
-
-    // enter key for sending message
-    public void enterKeyPressed(KeyEvent event) {
-        if (event.getCode().equals(KeyCode.ENTER)) {
-            this.checkMessageField();
-        }
-    }
-
-    public void ready(ActionEvent event) {
+    public void ready(ActionEvent ignoredEvent) {
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
-        if(member.ready()){
-            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(),false, member.color()).subscribe();
+        if (member.ready()) {
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color()).subscribe();
             this.idReadyButton.setText("Ready");
-        }else {
-            memberService.statusUpdate(gameIDStorage.getId(),idStorage.getID(), true, member.color()).subscribe();
+        } else {
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, member.color()).subscribe();
             this.idReadyButton.setText("Not Ready");
         }
 
     }
 
-    public void startGame(ActionEvent event) {
+    public void startGame(ActionEvent ignoredEvent) {
 
-        gameService.updateGame(gameIDStorage.getId(),null,null,null,true)
+        gameService.updateGame(gameIDStorage.getId(), null, null, null, true)
                 .observeOn(FX_SCHEDULER)
-                .doOnError(error->{
+                .doOnError(error -> {
                     if ("HTTP 403 ".equals(error.getMessage())) {
                         new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!")
                                 .showAndWait();
                     }
                 })
-                .subscribe(onSuccess->{
+                .subscribe(onSuccess -> {
                     final GameScreenController controller = gameScreenController.get();
                     this.app.show(controller);
-                }, onError->{});
+                }, onError -> {
+                });
 
-    }
-
-    // private methods
-    // checkMessageField
-    private void checkMessageField() {
-        if (!this.idMessageField.getText().isEmpty()) {
-            messageService
-                    .send(GAMES, this.gameIDStorage.getId(), idMessageField.getText())
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe();
-            this.idMessageField.clear();
-        }
     }
 
     private Node renderMember(Member member) {
@@ -307,144 +249,10 @@ public class GameLobbyController implements Controller {
         return memberListSubcontroller.render();
     }
 
-    private void initAllMessages() {
-        for (Message m : this.messages) {
-            HBox box = new HBox(3);
-            Label label = new Label();
-            ImageView imageView = new ImageView();
-            imageView.setFitWidth(20);
-            imageView.setFitHeight(20);
-            if (this.memberHash.get(m.sender()).avatar() != null) {
-                imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
-            }
-            box.getChildren().add(imageView);
-            this.initRightClick(label, m._id(), m.sender());
-            //label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
-            //this.initRightClick(label, m._id(), m.sender());
-            //label.setText(memberHash.get(m.sender()).name() + ":" + m.body());
-            //box.getChildren().add(label);
-            Label label2 = new Label();
-            label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
-            String color = null;
-            for (Member member: members ) {
-                if(member.userId().equals(m.sender())){
-                    color = member.color();
-                    break;
-                }
-            }
-            if(color != null){
-                label2.setText(memberHash.get(m.sender()).name());
-                label2.setTextFill(Color.web(color));
-            }else {
-                label2.setText(memberHash.get(m.sender()).name());
-            }
-
-            //label2.setTextFill(Color.GREEN);
-            label.setText(":" + m.body());
-            //label.setTextFill(Color.GREEN);
-            box.getChildren().addAll(label2,label);
-            //box.getChildren().add(label2);
-            this.idMessageView.getChildren().add(box);
-        }
-    }
-
-    /*
-     * Render message for add and delete
-     * save id in deleted messages
-     * if deleted messages contains id, create different label
-     * and make label not right clickable
-     * */
-    private void renderMessage(Message message, Boolean render) {
-        this.idMessageView.getChildren().clear();
-
-        if (render) {
-            this.messages.add(message);
-        } else {
-            this.deletedMessages.add(message._id());
-        }
-
-        if (!messages.isEmpty()) {
-            for (Message m : messages) {
-                HBox box = new HBox(3);
-                ImageView imageView = new ImageView();
-                imageView.setFitWidth(20);
-                imageView.setFitHeight(20);
-                if (this.memberHash.get(m.sender()).avatar() != null) {
-                    imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
-                }
-                box.getChildren().add(imageView);
-                if (this.deletedMessages.contains(m._id())) {
-                    Label label = new Label(this.memberHash.get(m.sender()).name() + ": - message deleted - ");
-                    label.setFont(Font.font("Italic"));
-                    box.getChildren().add(label);
-                    this.idMessageView.getChildren().add(box);
-                } else {
-                    Label label = new Label();
-                    label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
-                    this.initRightClick(label, m._id(), m.sender());
-                    //this is responsible for showing messages
-                    Label label2 = new Label();
-                    label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
-                    String color = null;
-                    for (Member member: members ) {
-                        if(member.userId().equals(m.sender())){
-                            color = member.color();
-                            break;
-                        }
-                    }
-                    if(color != null){
-                        label2.setText(memberHash.get(m.sender()).name());
-                        label2.setTextFill(Color.web(color));
-                    }else {
-                        label2.setText(memberHash.get(m.sender()).name());
-                    }
-
-                    //label2.setTextFill(Color.GREEN);
-                    label.setText(": " + m.body());
-                    //label.setTextFill(Color.GREEN);
-                    box.getChildren().addAll(label2,label);
-                    //box.getChildren().add(label2);
-                    this.idMessageView.getChildren().add(box);
-                }
-            }
-        }
-        // scroll automatically to bottom
-        this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
-    }
-
-    private void initRightClick(Label label, String messageId, String sender) {
-        final ContextMenu contextMenu = new ContextMenu();
-        final MenuItem menuItem = new MenuItem("delete");
-
-        contextMenu.getItems().add(menuItem);
-
-        label.setOnMouseEntered(event -> {
-            label.setStyle("-fx-background-color: LIGHTGREY");
-        });
-        label.setOnMouseExited(event -> {
-            label.setStyle("-fx-background-color: DEFAULT");
-        });
-        label.setContextMenu(contextMenu);
-
-        menuItem.setOnAction(event -> {
-            if (sender.equals(this.memberIDStorage.getId())) {
-                messageService
-                        .delete(GAMES, this.gameIDStorage.getId(), messageId)
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe();
-                this.idMessageView.getChildren().remove(label);
-            } else {
-                new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
-                        .showAndWait();
-            }
-        });
-    }
-
-
-    private void addColorOnComboBox(ComboBox comboBox){
+    private void addColorOnComboBox(ComboBox comboBox) {
         comboBox.setPromptText("Select Color");
         //get key and value
-        HashMap<String,String> color_to_hex = colorToHexcode(color());
+        HashMap<String, String> color_to_hex = colorToHexcode(color());
         List<String> leftColor = remainingColor(color_to_hex);
         //addToCombox(comboBox,leftColor);
         comboBox.getItems().addAll(color());
@@ -453,46 +261,45 @@ public class GameLobbyController implements Controller {
     //this makes sure duplicate dones not come
     //into combox
     private void addToCombox(ComboBox comboBox, List<String> leftColor) {
-        for (String color:leftColor ) {
-            if(!comboBox.getItems().contains(color)){
+        for (String color : leftColor) {
+            if (!comboBox.getItems().contains(color)) {
                 comboBox.getItems().add(color);
             }
         }
     }
 
-    //GEt all the color from members
-    private List<String> remainingColor(HashMap<String,String> colortoHex){
-        List<String> remaining_color= new ArrayList<>();
+    //Get all the color from members
+    private List<String> remainingColor(HashMap<String, String> colortoHex) {
+        List<String> remaining_color = new ArrayList<>();
         List<String> setOfColors = color();
 
-        for (Member member: members) {
+        for (Member member : members) {
             if (colortoHex.containsKey(member.color())) {
                 remaining_color.add(colortoHex.get(member.color()));
             }
         }
 
-        for (String color: remaining_color) {
-            if (setOfColors.contains(color)){
+        for (String color : remaining_color) {
+            if (setOfColors.contains(color)) {
                 setOfColors.remove(color);
             }
         }
         return setOfColors;
     }
 
-    //This maps every color to its hexcode #RED:#0000FF
-    private HashMap<String, String> colorToHexcode(List<String> list){
-        HashMap<String,String> color_to_hexcode = new HashMap<>();
-        for (String E:list) {
-            Color c =  Color.web(E.toLowerCase());
-            String pickedColor = "#"+c.toString().substring(2,8);
-            color_to_hexcode.put(pickedColor,E);
+    //This maps every color to its hexcode BLUE:#0000FF
+    private HashMap<String, String> colorToHexcode(List<String> list) {
+        HashMap<String, String> color_to_hexcode = new HashMap<>();
+        for (String E : list) {
+            Color c = Color.web(E.toLowerCase());
+            String pickedColor = "#" + c.toString().substring(2, 8);
+            color_to_hexcode.put(pickedColor, E);
         }
         return color_to_hexcode;
     }
 
-
     //List of colors
-    private List<String> color(){
+    private List<String> color() {
         List<String> color = new ArrayList<>();
         color.add("RED");
         color.add("BLUE");
@@ -505,16 +312,16 @@ public class GameLobbyController implements Controller {
     }
 
     //color event
-    public void colorPicked(ActionEvent event) {
-        Color c =  Color.web(colorPicker.getSelectionModel().getSelectedItem().toLowerCase());
-        String pickedColor = "#"+c.toString().substring(2,8);
+    public void colorPicked(ActionEvent ignoredEvent) {
+        Color c = Color.web(colorPicker.getSelectionModel().getSelectedItem().toLowerCase());
+        String pickedColor = "#" + c.toString().substring(2, 8);
 
         boolean chose = true;
         Member member = memberService.findOne(gameIDStorage.getId(), idStorage.getID()).blockingFirst();
-        for (Member m: members) {
-            //this make sure wenn duplicate color is chosen, the last color is taken
+        for (Member m : members) {
+            //this makes sure when duplicate color is chosen, the last color is taken
             //in default it will be black
-            if (m.color() != null && m.color().equals(pickedColor)){
+            if (m.color() != null && m.color().equals(pickedColor)) {
                 memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), member.color()).
                         observeOn(FX_SCHEDULER).subscribe();
                 chose = false;
@@ -523,7 +330,7 @@ public class GameLobbyController implements Controller {
         }
 
 
-        if(chose) {
+        if (chose) {
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), member.ready(), pickedColor).
                     observeOn(FX_SCHEDULER).subscribe();
         }

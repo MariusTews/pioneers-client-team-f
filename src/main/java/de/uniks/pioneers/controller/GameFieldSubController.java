@@ -126,7 +126,7 @@ public class GameFieldSubController implements Controller{
                 CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)));
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
-                System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
+                //System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
             }
         }
         for (String string: waterTilesCircles) {

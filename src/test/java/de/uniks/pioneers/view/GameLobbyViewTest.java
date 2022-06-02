@@ -3,7 +3,6 @@ package de.uniks.pioneers.view;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.controller.GameLobbyController;
-import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
@@ -13,8 +12,9 @@ import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,13 +47,10 @@ public class GameLobbyViewTest extends ApplicationTest {
     @InjectMocks
     GameLobbyController gameLobbyController;
 
-    private Stage stage;
-    private App app;
-
     @Override
     public void start(Stage stage) {
-        Member m1 = new Member("0", "0", "g1", "u1", false, "#000000");
-        Member m2 = new Member("1", "1", "g1", "u2", false, "#000000");
+        Member m1 = new Member("0", "0", "g1", "u1", false, "#0000FF");
+        Member m2 = new Member("1", "1", "g1", "u2", false, "#0000FF");
 
         User u1 = new User("u1", "a", "on", null, new ArrayList<>());
         User u2 = new User("u2", "b", "on", null, new ArrayList<>());
@@ -71,9 +68,8 @@ public class GameLobbyViewTest extends ApplicationTest {
         when(gameService.findOneGame(any())).thenReturn(Observable.just(g));
         when(messageService.getAllMessages(any(), any())).thenReturn(Observable.just(x1, x2).buffer(2));
 
-        this.stage = stage;
-        this.app = new App(gameLobbyController);
-        this.app.start(stage);
+        App app = new App(gameLobbyController);
+        app.start(stage);
     }
 
     @Test
@@ -108,11 +104,12 @@ public class GameLobbyViewTest extends ApplicationTest {
 
     @Test
     public void renderMessageTest() {
-        VBox box = lookup("#idMessageView").query();
+        FlowPane box = lookup("#idMessageView").query();
         HBox messages = (HBox) box.getChildren().get(0);
         Label label = (Label) messages.getChildren().get(1);
 
-        Assertions.assertEquals("a", label.getText());
+        Assertions.assertEquals("a:", label.getText());
+        Assertions.assertEquals(Color.BLUE, label.getTextFill());
 
         verify(messageService).getAllMessages("games", "g1");
     }

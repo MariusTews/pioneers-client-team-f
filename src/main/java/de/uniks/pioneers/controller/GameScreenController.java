@@ -3,8 +3,8 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 
-import de.uniks.pioneers.service.GameIDStorage;
-import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.service.*;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,45 +12,59 @@ import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 
 import javax.inject.Inject;
-
 import java.io.IOException;
-
 
 public class GameScreenController implements Controller {
 
-
-
-
     @FXML
     public Pane mapPane;
-    private App app;
-    private GameIDStorage gameIDStorage;
-    private PioneersService pioneersService;
+    @FXML
+    public Pane chatPane;
+
+    private final App app;
+    private final GameIDStorage gameIDStorage;
+    private final PioneersService pioneersService;
+    private final EventListener eventListener;
+    private final MemberIDStorage memberIDStorage;
+    private final UserService userService;
+    private final MessageService messageService;
+    private final MemberService memberService;
 
     private GameFieldSubController gameFieldSubController;
-
+    private MessageViewSubController messageViewSubController;
 
     @Inject
     public GameScreenController(App app,
                                 GameIDStorage gameIDStorage,
-                                PioneersService pioneersService){
+                                PioneersService pioneersService,
+                                EventListener eventListener,
+                                MemberIDStorage memberIDStorage,
+                                UserService userService,
+                                MessageService messageService,
+                                MemberService memberService) {
         this.app = app;
         this.gameIDStorage = gameIDStorage;
         this.pioneersService = pioneersService;
+        this.eventListener = eventListener;
+        this.userService = userService;
+        this.messageService = messageService;
+        this.memberIDStorage = memberIDStorage;
+        this.memberService = memberService;
     }
-
 
     @Override
     public void init() {
-
+        // Initialize sub controller for ingame chat, add listener and load all messages
+        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+                userService, messageService, memberIDStorage, memberService);
+        messageViewSubController.init();
     }
-
-
-
 
     @Override
     public void destroy() {
-
+        if (this.messageViewSubController != null) {
+            this.messageViewSubController.destroy();
+        }
     }
 
     @Override
@@ -68,8 +82,9 @@ public class GameScreenController implements Controller {
         this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService);
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
+        // Show chat and load the messages
+        chatPane.getChildren().setAll(messageViewSubController.render());
+
         return parent;
     }
-
-
 }
