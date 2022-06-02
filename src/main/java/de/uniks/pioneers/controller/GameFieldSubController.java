@@ -60,6 +60,8 @@ public class GameFieldSubController implements Controller{
     public void destroy() {
         hexSubControllers.forEach(HexSubController::destroy);
         hexSubControllers.clear();
+        circleSubControllers.forEach(CircleSubController::destroy);
+        circleSubControllers.clear();
     }
 
     @Override
@@ -123,12 +125,14 @@ public class GameFieldSubController implements Controller{
             for (int j=0; j < cirleCoords.size(); j++) {
                 CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)));
                 circleSubController.init();
+                this.circleSubControllers.add(circleSubController);
                 System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
             }
         }
         for (String string: waterTilesCircles) {
             CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup("#" + string));
             circleSubController.init();
+            this.circleSubControllers.add(circleSubController);
         }
     }
 }
