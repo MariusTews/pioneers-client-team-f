@@ -92,6 +92,7 @@ public class MessageViewSubController implements Controller {
                 });
 
         // init. memberHash to not request the color of the member via REST every single time the messages are loaded
+        //TODO: SERVERREQUEST LIMIT get list from GameLobbyController
         memberService
                 .getAllGameMembers(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
