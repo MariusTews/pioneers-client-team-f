@@ -5,10 +5,7 @@ import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.GameIDStorage;
-import de.uniks.pioneers.service.MemberIDStorage;
-import de.uniks.pioneers.service.MessageService;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,8 +18,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -38,15 +35,16 @@ import static de.uniks.pioneers.Constants.*;
 public class MessageViewSubController implements Controller {
 
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
-    private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final List<String> deletedMessages = new ArrayList<>();
     private final CompositeDisposable disposable = new CompositeDisposable();
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
     private final UserService userService;
+    private final MemberService memberService;
     private final MessageService messageService;
-    private final HashMap<String, User> memberHash = new HashMap<>();
+    private final HashMap<String, User> userHash = new HashMap<>();
+    private final HashMap<String, Member> memberHash = new HashMap<>();
 
     @FXML
     public ScrollPane idChatScrollPane;
@@ -55,32 +53,32 @@ public class MessageViewSubController implements Controller {
     @FXML
     public Button idSendButton;
     @FXML
-    public VBox idMessageView;
-
-    private Parent parent;
+    public FlowPane idMessageView;
 
     @Inject
     public MessageViewSubController(EventListener eventListener,
                                     GameIDStorage gameIDStorage,
                                     UserService userService,
                                     MessageService messageService,
-                                    MemberIDStorage memberIDStorage) {
+                                    MemberIDStorage memberIDStorage,
+                                    MemberService memberService) {
         this.eventListener = eventListener;
         this.gameIDStorage = gameIDStorage;
         this.userService = userService;
         this.messageService = messageService;
         this.memberIDStorage = memberIDStorage;
+        this.memberService = memberService;
     }
 
     @Override
     public void init() {
-        // init memberHash
+        // init userHash to access name and avatar by the given ID
         userService
                 .findAllUsers()
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                     for (User user : result) {
-                        this.memberHash.put(user._id(), user);
+                        this.userHash.put(user._id(), user);
                     }
 
                     // get all messages and initial load
@@ -93,6 +91,16 @@ public class MessageViewSubController implements Controller {
                             });
                 });
 
+        // init. memberHash to not request the color of the member via REST every single time the messages are loaded
+        memberService
+                .getAllGameMembers(this.gameIDStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    for (Member member : result) {
+                        this.memberHash.put(member.userId(), member);
+                    }
+                });
+
         // listen to game lobby messages
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
@@ -100,9 +108,27 @@ public class MessageViewSubController implements Controller {
                 .subscribe(event -> {
                     final Message message = event.data();
                     if (event.event().endsWith(CREATED)) {
-                        renderMessage(message, true);
+                        // New message will be added to the chat view
+                        this.messages.add(message);
+                        this.initAllMessages();
                     } else if (event.event().endsWith(DELETED)) {
-                        renderMessage(message, false);
+                        // Add message to list of deleted messages, so the message will not be rendered again
+                        this.deletedMessages.add(message._id());
+                        this.initAllMessages();
+                    }
+                }));
+
+        // listen to game members, only relevant for the game lobby chat where color is chosen
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    final Member member = event.data();
+                    if (event.event().endsWith(UPDATED)) {
+                        // refresh the member saved in memberHash, so the color is updated
+                        memberHash.put(member.userId(), member);
+                        // load all messages again for coloring the username label with the new color
+                        this.initAllMessages();
                     }
                 }));
     }
@@ -114,7 +140,8 @@ public class MessageViewSubController implements Controller {
 
     @Override
     public Parent render() {
-        // Show the chat with text field and send button
+        // Show the chat with text field and send button, maybe a flag is needed so the color of the button
+        // can be changed (different colors in lobby and in-game)
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/MessageSubView.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent parent;
@@ -125,11 +152,13 @@ public class MessageViewSubController implements Controller {
             return null;
         }
 
-        this.parent = parent;
+        this.idMessageView.setPrefWrapLength(270);
+        //this.initAllMessages();
+
         return parent;
     }
 
-    public void send(ActionEvent event) {
+    public void send(ActionEvent ignoredEvent) {
         this.checkMessageField();
     }
 
@@ -151,82 +180,49 @@ public class MessageViewSubController implements Controller {
         }
     }
 
-    /*
-     * Render message for add and delete
-     * save id in deleted messages
-     * if deleted messages contains id, create different label
-     * and make label not right clickable
-     * */
-    private void renderMessage(Message message, Boolean render) {
-        this.idMessageView.getChildren().clear();
-
-        if (render) {
-            this.messages.add(message);
-        } else {
-            this.deletedMessages.add(message._id());
+    // Renders one message by filling username with the chosen color, initializes mouse hover over message label
+    // and right click option for deleting messages. Also adds the image of the user next to the username.
+    private void renderOneMessage(Message m) {
+        HBox box = new HBox(10);
+        box.fillHeightProperty();
+        // maybe a flag is needed, so the user's image will not be added in the in-game chat
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(20);
+        imageView.setFitHeight(20);
+        if (this.userHash.get(m.sender()).avatar() != null) {
+            imageView.setImage(new Image(this.userHash.get(m.sender()).avatar()));
         }
+        box.getChildren().add(imageView);
+        if (!this.deletedMessages.contains(m._id())) {
+            // Label with message
+            Label label = new Label();
+            // Font shall be changed when design is implemented
+            label.setFont(new Font("Arial", 14));
+            // Format the message label and display the whole message with line breaks
+            label.setMinWidth(100);
+            label.setMaxWidth(250);
+            label.setWrapText(true);
+            label.setText(m.body());
+            this.initRightClick(label, m._id(), m.sender());
 
-        if (!messages.isEmpty()) {
-            for (Message m : messages) {
-                HBox box = new HBox(3);
-                ImageView imageView = new ImageView();
-                imageView.setFitWidth(20);
-                imageView.setFitHeight(20);
-                if (this.memberHash.get(m.sender()).avatar() != null) {
-                    imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
-                }
-                box.getChildren().add(imageView);
-                if (this.deletedMessages.contains(m._id())) {
-                    Label label = new Label(this.memberHash.get(m.sender()).name() + ": - message deleted - ");
-                    label.setFont(Font.font("Italic"));
-                    box.getChildren().add(label);
-                    this.idMessageView.getChildren().add(box);
-                } else {
-                    Label label = new Label();
-                    label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
-                    this.initRightClick(label, m._id(), m.sender());
-                    //this is responsible for showing messages
-                    Label label2 = new Label();
-                    label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
-                    String color = null;
-                    for (Member member: members ) {
-                        if(member.userId().equals(m.sender())){
-                            color = member.color();
-                            break;
-                        }
-                    }
-                    if(color != null) {
-                        label2.setText(memberHash.get(m.sender()).name());
-                        label2.setTextFill(Color.web(color));
-                    } else {
-                        label2.setText(memberHash.get(m.sender()).name());
-                    }
+            // Label with colored username
+            Label nameLabel = coloredUsername(m);
 
-                    //label2.setTextFill(Color.GREEN);
-                    label.setText(": " + m.body());
-                    //label.setTextFill(Color.GREEN);
-                    box.getChildren().addAll(label2,label);
-                    //box.getChildren().add(label2);
-                    this.idMessageView.getChildren().add(box);
-                }
-            }
+            box.getChildren().addAll(nameLabel, label);
+            this.idMessageView.getChildren().add(box);
         }
-        // scroll automatically to bottom
-        this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
     }
 
+    // Option to delete the own message by right clicking.
+    // Fails when not sender of the message.
     private void initRightClick(Label label, String messageId, String sender) {
         final ContextMenu contextMenu = new ContextMenu();
         final MenuItem menuItem = new MenuItem("delete");
 
         contextMenu.getItems().add(menuItem);
 
-        label.setOnMouseEntered(event -> {
-            label.setStyle("-fx-background-color: LIGHTGREY");
-        });
-        label.setOnMouseExited(event -> {
-            label.setStyle("-fx-background-color: DEFAULT");
-        });
+        label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: LIGHTGREY"));
+        label.setOnMouseExited(event -> label.setStyle("-fx-background-color: TRANSPARENT"));
         label.setContextMenu(contextMenu);
 
         menuItem.setOnAction(event -> {
@@ -235,7 +231,7 @@ public class MessageViewSubController implements Controller {
                         .delete(GAMES, this.gameIDStorage.getId(), messageId)
                         .observeOn(FX_SCHEDULER)
                         .subscribe();
-                this.idMessageView.getChildren().remove(label);
+                // the message is deleted from the chat view as soon as the listener detects DELETED in event
             } else {
                 new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
                         .showAndWait();
@@ -243,46 +239,38 @@ public class MessageViewSubController implements Controller {
         });
     }
 
-    // TODO: color the name of the user/member in the message
+    // Initializing all messages is needed,
+    // when the old messages have to be loaded again (f.e. change view to in-game)
+    // Because of the delete function the VBox of the chat has to be cleared and loaded again
+    // If the color of a user's name changes, the updated color will be displayed by loading all messages again
     private void initAllMessages() {
+        this.idMessageView.getChildren().clear();
         for (Message m : this.messages) {
-            HBox box = new HBox(3);
-            Label label = new Label();
-            ImageView imageView = new ImageView();
-            imageView.setFitWidth(20);
-            imageView.setFitHeight(20);
-            if (this.memberHash.get(m.sender()).avatar() != null) {
-                imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
+            if (m != null && !m.body().isEmpty()) {
+                this.renderOneMessage(m);
             }
-            box.getChildren().add(imageView);
-            this.initRightClick(label, m._id(), m.sender());
-            //label.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue());
-            //this.initRightClick(label, m._id(), m.sender());
-            //label.setText(memberHash.get(m.sender()).name() + ":" + m.body());
-            //box.getChildren().add(label);
-            Label label2 = new Label();
-            label2.setMinWidth(this.idChatScrollPane.widthProperty().doubleValue()/4);
-            String color = null;
-            for (Member member: members ) {
-                if(member.userId().equals(m.sender())){
-                    color = member.color();
-                    break;
-                }
-            }
-            if(color != null){
-                label2.setText(memberHash.get(m.sender()).name());
-                label2.setTextFill(Color.web(color));
-            }else {
-                label2.setText(memberHash.get(m.sender()).name());
-            }
-
-            //label2.setTextFill(Color.GREEN);
-            label.setText(":" + m.body());
-            //label.setTextFill(Color.GREEN);
-            box.getChildren().addAll(label2,label);
-            //box.getChildren().add(label2);
-            this.idMessageView.getChildren().add(box);
         }
+
+        // scroll automatically to bottom
+        this.idChatScrollPane.vvalueProperty().bind(idMessageView.heightProperty());
+    }
+
+    // Return the username label colored with the chosen color
+    private Label coloredUsername(Message m) {
+        Label username = new Label();
+        username.setMinWidth(50);
+        // Set username as text, default is black which shall be white later
+        username.setText(userHash.get(m.sender()).name() + ":");
+        username.setFont(new Font("Arial", 14));
+
+        // get the color of the game member from memberHash
+        String color = memberHash.get(m.sender()).color();
+
+        if (color != null) {
+            // set the color of the username on user's chosen color
+            username.setTextFill(Color.web(color));
+        }
+        return username;
     }
 
 }
