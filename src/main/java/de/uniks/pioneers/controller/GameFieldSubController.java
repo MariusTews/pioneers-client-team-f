@@ -4,11 +4,8 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Map;
 import de.uniks.pioneers.model.Tile;
-import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.rest.PioneersApiService;
 import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.PioneersService;
-import io.reactivex.rxjava3.core.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -21,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
