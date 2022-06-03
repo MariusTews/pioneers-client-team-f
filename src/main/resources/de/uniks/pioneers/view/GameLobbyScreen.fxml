@@ -49,7 +49,7 @@
          </HBox.margin>
       </VBox>
    </HBox>
-   <HBox alignment="CENTER_RIGHT" prefHeight="92.0" prefWidth="640.0">
+   <HBox  alignment="CENTER_RIGHT" prefHeight="92.0" prefWidth="640.0">
       <ComboBox fx:id="colorPicker" onAction="#colorPicked" prefWidth="150.0" promptText="Choose color">
          <HBox.margin>
             <Insets right="190.0"/>
