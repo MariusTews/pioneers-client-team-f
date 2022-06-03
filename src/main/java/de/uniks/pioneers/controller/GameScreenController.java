@@ -4,11 +4,12 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 
 import de.uniks.pioneers.Websocket.EventListener;
-import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.model.ExpectedMove;
+import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.model.State;
 import de.uniks.pioneers.service.*;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -42,6 +43,8 @@ public class GameScreenController implements Controller {
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
+    private final CompositeDisposable disposable = new CompositeDisposable();
+
 
     @Inject
     public GameScreenController(App app,
@@ -64,6 +67,18 @@ public class GameScreenController implements Controller {
 
     @Override
     public void init() {
+
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".moves.*." + "created", Move.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    Move move = event.data();
+                    if (move.action().endsWith("roll")) {
+                        diceSumLabel.setText(Integer.toString(move.roll()));
+                    }
+                }));
+
+
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
                 userService, messageService, memberIDStorage, memberService);
@@ -75,6 +90,7 @@ public class GameScreenController implements Controller {
         if (this.messageViewSubController != null) {
             this.messageViewSubController.destroy();
         }
+        disposable.dispose();
     }
 
     @Override
@@ -99,20 +115,20 @@ public class GameScreenController implements Controller {
     }
 
     public void onMouseClicked(MouseEvent mouseEvent) {
+        diceRoll();
+    }
+
+    public void diceRoll() {
         State state = pioneersService.findOneState(gameIDStorage.getId()).blockingFirst();
         List<ExpectedMove> expectedMove = state.expectedMoves();
         ExpectedMove currentExpectedMove = expectedMove.get(0);
         String action = currentExpectedMove.action();
-        List<String> players = currentExpectedMove.players();
 
         if (action.endsWith("roll")) {
             pioneersService.move(gameIDStorage.getId(), action, 0, 0, 0, 0, "settlement")
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
-                        diceSumLabel.setText(Integer.toString(result.roll()));
-                    }, onError -> {
-                        onError.printStackTrace();
-                    });
+                    }, Throwable::printStackTrace);
         }
     }
 }
