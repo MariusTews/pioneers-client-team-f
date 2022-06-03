@@ -5,11 +5,14 @@ import de.uniks.pioneers.Main;
 
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.ExpectedMove;
+import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.model.State;
 import de.uniks.pioneers.service.*;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -31,6 +34,8 @@ public class GameScreenController implements Controller {
     public Pane chatPane;
     @FXML
     public Label diceSumLabel;
+    @FXML
+    public Label nextMoveLabel;
 
     private final App app;
     private final GameIDStorage gameIDStorage;
@@ -67,17 +72,34 @@ public class GameScreenController implements Controller {
 
     @Override
     public void init() {
-
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".moves.*." + "created", Move.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     Move move = event.data();
-                    if (move.action().endsWith("roll")) {
+                    if (move.action().equals("roll")) {
                         diceSumLabel.setText(Integer.toString(move.roll()));
                     }
                 }));
 
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    State state = event.data();
+                    if (event.event().endsWith("updated")){
+                        nextMoveLabel.setText(state.expectedMoves().get(0).action());
+                    }
+                }));
+
+        pioneersService
+                .findOneState(gameIDStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe( result -> {
+                    if (result.expectedMoves().get(0).action().equals("founding-roll")) {
+                        foundingDiceRoll();
+                    }
+                });
 
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
@@ -119,16 +141,19 @@ public class GameScreenController implements Controller {
     }
 
     public void diceRoll() {
-        State state = pioneersService.findOneState(gameIDStorage.getId()).blockingFirst();
-        List<ExpectedMove> expectedMove = state.expectedMoves();
-        ExpectedMove currentExpectedMove = expectedMove.get(0);
-        String action = currentExpectedMove.action();
-
-        if (action.endsWith("roll")) {
-            pioneersService.move(gameIDStorage.getId(), action, 0, 0, 0, 0, "settlement")
+        if (nextMoveLabel.getText().endsWith("roll")) {
+            pioneersService.move(gameIDStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement")
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                     }, Throwable::printStackTrace);
         }
+    }
+
+    public void foundingDiceRoll() {
+        pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    diceSumLabel.setText(Integer.toString(result.roll()));
+                }, Throwable::printStackTrace);
     }
 }
