@@ -106,7 +106,7 @@ public class GameScreenController implements Controller {
         List<String> players = currentExpectedMove.players();
 
         if (action.endsWith("roll")) {
-            pioneersService.move(gameIDStorage.getId(), action, null, null, null, null, null)
+            pioneersService.move(gameIDStorage.getId(), action, 0, 0, 0, 0, "settlement")
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                         diceSumLabel.setText(Integer.toString(result.roll()));
