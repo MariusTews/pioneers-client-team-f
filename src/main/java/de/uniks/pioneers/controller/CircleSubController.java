@@ -28,12 +28,13 @@ public class CircleSubController implements Controller{
     private String myColor;
 
     @Inject
-    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage){
+    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, String color){
         this.app = app;
         this.view = view;
         this.pioneersService = pioneersService;
         this.gameIDStorage = gameIDStorage;
         this.idStorage = idStorage;
+        this.myColor = color;
 
     }
 
@@ -44,11 +45,11 @@ public class CircleSubController implements Controller{
         this.view.setOnMouseExited(this::onFieldMouseHoverExit);
         this.view.setOnMouseClicked(this::onFieldClicked);
 
-        pioneersService.findOnePlayer(gameIDStorage.getId(),idStorage.getID())
+        /*pioneersService.findOnePlayer(gameIDStorage.getId(),idStorage.getID())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(player -> {
                     this.myColor = player.color();
-                });
+                });*/
     }
 
     private void onFieldClicked(MouseEvent mouseEvent) {
@@ -72,17 +73,17 @@ public class CircleSubController implements Controller{
                     String action = move.expectedMoves().get(0).action();
                     if(side == 0 || side == 6){
 
-                        this.pioneersService.move(gameIDStorage.getId(), action, x ,y ,z ,side , "settlement")
+                        this.pioneersService.move(gameIDStorage.getId(), action, x ,z ,y ,side , "settlement")
                                 .observeOn(FX_SCHEDULER)
                                 .subscribe(suc->{
 
                                 });
-                        this.view.setFill(Paint.valueOf(myColor));
+                        this.view.setFill(Color.RED);
                     }else{
-                        this.pioneersService.move(gameIDStorage.getId(), action, x ,y ,z ,side , "road")
+                        this.pioneersService.move(gameIDStorage.getId(), action, x ,z ,y ,side , "road")
                                 .observeOn(FX_SCHEDULER)
                                 .subscribe();
-                        this.view.setFill(Paint.valueOf(myColor));
+                        this.view.setFill(Color.RED);
                     }
 
                 });
@@ -115,16 +116,17 @@ public class CircleSubController implements Controller{
     // Mouse hovers over field
     private void onFieldMouseHoverEnter(MouseEvent event) {
         // Change the view
-            this.view.setFill(Color.GRAY);
-            this.view.setRadius(10.0);
+        //System.out.println(myColor);
+        //this.view.setFill(Color.GRAY);
+        this.view.setRadius(10.0);
     }
 
     // Mouse leaves the field
     private void onFieldMouseHoverExit(MouseEvent event) {
         // Change the view
-            if(this.view.getFill().equals(Color.GRAY)) {
-                this.view.setFill(Color.WHITE);
-                this.view.setRadius(10.0);
+            if(!this.view.getFill().equals(Color.GRAY)) {
+                //this.view.setFill(Color.WHITE);
+                //this.view.setRadius(10.0);
             }
     }
 }

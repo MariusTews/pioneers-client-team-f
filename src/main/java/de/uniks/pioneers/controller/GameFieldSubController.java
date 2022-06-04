@@ -32,6 +32,7 @@ public class GameFieldSubController implements Controller{
     private App app;
     private GameIDStorage gameIDStorage;
     private PioneersService pioneersService;
+    private String color;
 
 
     // This variable is needed for the starting/stopping of the field controllers
@@ -119,10 +120,14 @@ public class GameFieldSubController implements Controller{
             hexSubController.init();
             this.hexSubControllers.add(hexSubController);
         }
+        /*pioneersService.findOnePlayer(gameIDStorage.getId(),idStorage.getID()).observeOn(FX_SCHEDULER).subscribe(player -> {
+            this.color = player.color();
+            System.out.println(color);
+        });*/
 
         for (int i=0; i < hexaCoords.size(); i++) {
             for (int j=0; j < cirleCoords.size(); j++) {
-                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage, idStorage);
+                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage, idStorage, color);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
                 //System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
