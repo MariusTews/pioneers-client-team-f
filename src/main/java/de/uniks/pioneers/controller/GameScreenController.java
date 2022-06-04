@@ -70,6 +70,14 @@ public class GameScreenController implements Controller {
                 .subscribe(event->{
                     final Message message = event.data();
                     System.out.println(event.event());
+                    pioneersService.findAllBuildings(gameIDStorage.getId())
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(allBuildings ->{
+                                System.out.println(allBuildings.toString());
+                                for(Building building : allBuildings){
+
+                                }
+                            });
                 }));
 
         disposable.add(eventListener
