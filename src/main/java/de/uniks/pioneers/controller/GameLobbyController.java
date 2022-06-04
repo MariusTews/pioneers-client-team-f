@@ -129,7 +129,7 @@ public class GameLobbyController implements Controller {
                                 readyMembers += 1;
                             }
                         }
-                        this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size());
+                        this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
                     }
                 }));
 
@@ -264,7 +264,7 @@ public class GameLobbyController implements Controller {
         }
 
         //give color to member that do not have colors
-        List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        List<Member> memberList = members;
         for (Member member: memberList) {
                 if (member.color() == null || member.color().equals("#000000") ) {
                     memberService.statusUpdate(member.gameId(), member.userId(),member.ready() ,allColors.get(0))

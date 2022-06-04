@@ -91,6 +91,10 @@ public class GameScreenController implements Controller {
                 }));
 
 
+        //event Lister for Resources
+
+
+
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
                 userService, messageService, memberIDStorage, memberService);
