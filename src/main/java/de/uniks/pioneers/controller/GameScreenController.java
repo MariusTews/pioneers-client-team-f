@@ -6,10 +6,13 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.ExpectedMove;
 import de.uniks.pioneers.model.Move;
+import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.State;
 import de.uniks.pioneers.service.*;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,6 +30,7 @@ import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameScreenController implements Controller {
 
+    private final ObservableList<Player> players = FXCollections.observableArrayList();
     @FXML
     public Pane mapPane;
     @FXML
@@ -80,6 +84,11 @@ public class GameScreenController implements Controller {
     @Override
     public void init() {
 
+        //listen to all theplayers
+        pioneersService.findAllPlayers(this.gameIDStorage.getId()).
+                            observeOn(FX_SCHEDULER)
+                            .subscribe(this.players::setAll);
+
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".moves.*." + "created", Move.class)
                 .observeOn(FX_SCHEDULER)
@@ -92,6 +101,21 @@ public class GameScreenController implements Controller {
 
 
         //event Lister for Resources
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".player.*.",Player.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    Player player = event.data();
+                    if(event.event().endsWith(UPDATED)){
+                        for (Player updatedPlayer: this.players) {
+                            if(updatedPlayer.userId().equals(player.userId())){
+                                this.players.set(this.players.indexOf(updatedPlayer),player);
+                            }
+                        }
+                    } else if (event.event().endsWith(DELETED)) {
+                        //DO something
+                    }
+                }));
 
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
