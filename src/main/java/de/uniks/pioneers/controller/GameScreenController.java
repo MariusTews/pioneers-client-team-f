@@ -4,6 +4,7 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 
 import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.ExpectedMove;
 import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.model.State;
@@ -13,6 +14,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -90,6 +92,15 @@ public class GameScreenController implements Controller {
                     }
                 }));
 
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".buildings.*." + "created", Building.class)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe(event ->{
+
+                            System.out.println(event.event());
+                            System.out.println(event.data().type());
+                        }));
+
 
         //event Lister for Resources
 
@@ -100,6 +111,7 @@ public class GameScreenController implements Controller {
 
         this.userSubView = new UserSubView(gameIDStorage,userService,idStorage,pioneersService);
         userSubView.init();
+        System.out.println(gameIDStorage.getId());
     }
 
 
@@ -123,7 +135,7 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService);
+        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,idStorage,eventListener);
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
         // Show chat and load the messages

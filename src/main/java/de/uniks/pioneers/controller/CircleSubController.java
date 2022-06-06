@@ -2,9 +2,12 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
@@ -26,15 +29,22 @@ public class CircleSubController implements Controller{
     private GameIDStorage gameIDStorage;
     private IDStorage idStorage;
     private String myColor;
+    private final EventListener eventListener;
+    private final CompositeDisposable disposable = new CompositeDisposable();
+
+    private int x;
+    private int y;
+    private int z;
+    private int side;
 
     @Inject
-    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, String color){
+    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, EventListener eventListener){
         this.app = app;
         this.view = view;
         this.pioneersService = pioneersService;
         this.gameIDStorage = gameIDStorage;
         this.idStorage = idStorage;
-        this.myColor = color;
+        this.eventListener = eventListener;
 
     }
 
@@ -50,19 +60,31 @@ public class CircleSubController implements Controller{
                 .subscribe(player -> {
                     this.myColor = player.color();
                 });*/
-    }
-
-    private void onFieldClicked(MouseEvent mouseEvent) {
         String id = this.view.getId();
+        System.out.println(id);
         id = (id.replace("M", "-"));
         id = id.substring(1);
         String[] split = id.split("y");
-        int x = Integer.parseInt(split[0]);
+        this.x = Integer.parseInt(split[0]);
         String[] split1 = split[1].split("z");
-        int y = Integer.parseInt( split1[0]);
+        this.y = Integer.parseInt( split1[0]);
         String[] split2 = split1[1].split("_");
-        int z =  Integer.parseInt(split2[0]);
-        int side = Integer.parseInt(split2[1]);
+        this.z =  Integer.parseInt(split2[0]);
+        this.side = Integer.parseInt(split2[1]);
+
+        /*disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".buildings.*." + "created", Building.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event ->{
+                    Building building = event.data();
+                    this.setColor((int) building.x(),(int) building.y(),(int) building.z(),(int) building.side());
+                    System.out.println(event.event());
+                    System.out.println(event.data().type());
+                }));*/
+    }
+
+    private void onFieldClicked(MouseEvent mouseEvent) {
+
 
         System.out.println(x + " " + y + " "+ z + " " + side);
 
@@ -85,8 +107,15 @@ public class CircleSubController implements Controller{
                                 .subscribe();
                         this.view.setFill(Color.RED);
                     }
-
+                    System.out.println(myColor);
                 });
+    }
+
+    public void setColor(int x, int y, int z, int side){
+        if(this.x == x && this.y == y && this.z == z && this.side == side){
+            this.view.setFill(Color.RED);
+        }
+
     }
 
 

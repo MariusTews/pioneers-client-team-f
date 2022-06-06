@@ -2,11 +2,14 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.Map;
 import de.uniks.pioneers.model.Tile;
 import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -33,25 +36,38 @@ public class GameFieldSubController implements Controller{
     private GameIDStorage gameIDStorage;
     private PioneersService pioneersService;
     private String color;
+    private final EventListener eventListener;
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
 
     // This variable is needed for the starting/stopping of the field controllers
     private List<HexSubController> hexSubControllers = new ArrayList<>();
-    private List<CircleSubController> circleSubControllers = new ArrayList<>();
+    private final List<CircleSubController> circleSubControllers = new ArrayList<>();
 
     @Inject
     public GameFieldSubController(App app,
                                   GameIDStorage gameIDStorage,
                                   PioneersService pioneersService,
-                                  IDStorage idStorage){
+                                  IDStorage idStorage,
+                                  EventListener eventListener){
         this.app = app;
         this.gameIDStorage = gameIDStorage;
         this.pioneersService = pioneersService;
         this.idStorage = idStorage;
+        this.eventListener = eventListener;
     }
 
     @Override
     public void init() {
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".buildings.*." + "created", Building.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event ->{
+                    Building building = event.data();
+                    this.updateBuildings((int) building.x(),(int) building.y(),(int) building.z(),(int) building.side());
+                    System.out.println(event.event()+ " kappa");
+                    System.out.println(event.data().type());
+                }));
     }
 
 
@@ -86,7 +102,7 @@ public class GameFieldSubController implements Controller{
 
     private void loadMap(Map map) {
         List<String> waterTilesCircles = Arrays.asList("xM2yM1z3_3", "xM1yM2z3_6", "xM1yM2z3_3", "x0yM3z3_6", "x1yM3z2_6",
-                "x1yM3z2_7", "x2yM3z1_6", "x2yM3z1_7", "x3yM3z0_7", "x3yM3z0_6", "x3yM2yM1_7", "x3yM2yM1_6", "x3yM1zM2_7",
+                "x1yM3z2_7", "x2yM3z1_6", "x2yM3z1_7", "x3yM3z0_7", "x3yM3z0_6", "x3yM2zM1_7", "x3yM2zM1_6", "x3yM1zM2_7",
                 "x3yM1zM2_6", "x2y1zM3_0", "x2y1zM3_11", "x1y2zM3_0", "x1y2zM3_11", "x0y3zM3_0", "x0y3zM3_11", "xM1y3zM2_0",
                 "xM1y3zM2_11", "xM2y3zM1_0", "xM2y3zM1_11", "xM3y3z0_0", "xM3y2z1_3", "xM3y2z1_0", "xM3y0z3_3", "xM2yM1z3_6",
                 "xM3y1z2_3", "xM3y1z2_0");
@@ -127,16 +143,25 @@ public class GameFieldSubController implements Controller{
 
         for (int i=0; i < hexaCoords.size(); i++) {
             for (int j=0; j < cirleCoords.size(); j++) {
-                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage, idStorage, color);
+                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage, idStorage, eventListener);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
                 //System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
             }
         }
         for (String string: waterTilesCircles) {
-            CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup("#" + string));
+            CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup("#" + string),pioneersService,gameIDStorage,idStorage, eventListener);
             circleSubController.init();
             this.circleSubControllers.add(circleSubController);
         }
+    }
+
+    private void updateBuildings(int x, int y, int z, int side){
+        /*for(CircleSubController c : circleSubControllers){
+            c.setColor(x, y, z, side);
+            System.out.println("test");
+        }*/
+        System.out.println(circleSubControllers.size());
+        System.out.println("ha");
     }
 }
