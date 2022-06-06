@@ -12,7 +12,7 @@
    <children>
       <VBox maxHeight="900.0" prefHeight="900.0" prefWidth="500.0">
          <children>
-            <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0" style="-fx-background-color: #FF0000;" />
+            <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0" style="-fx-background-color: #FFFFFF;" />
             <Pane fx:id="userPaneId" prefHeight="320.0" prefWidth="500.0" style="-fx-background-color: #00FF00;" />
          </children></VBox>
       <VBox prefHeight="900.0" prefWidth="650.0">
