@@ -98,19 +98,19 @@ public class GameScreenController implements Controller {
                     for (User user : result) {
                         this.userHash.put(user._id(), user);
                     }
-                });
 
-        // Get all members of the game for loading the opponents
-        // ATTENTION: it is not possible to pass the observable list of members via constructor!
-        memberService
-                .getAllGameMembers(this.gameIDStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    for (Member member : result) {
-                        if (!member.userId().equals(idStorage.getID())) {
-                            this.members.add(member);
-                        }
-                    }
+                    // Get all members of the game for loading the opponents
+                    // ATTENTION: it is not possible to pass the observable list of members via constructor!
+                    memberService
+                            .getAllGameMembers(this.gameIDStorage.getId())
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(memberResult -> {
+                                for (Member member : memberResult) {
+                                    if (!member.userId().equals(idStorage.getID())) {
+                                        this.members.add(member);
+                                    }
+                                }
+                            });
                 });
 
         disposable.add(eventListener
@@ -171,6 +171,7 @@ public class GameScreenController implements Controller {
 
         userPaneId.getChildren().setAll(userSubView.render());
 
+        // Render opponent loads the opponent view everytime the members list is changed
         this.members.addListener((ListChangeListener<? super Member>) c ->
                 this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
 
@@ -199,39 +200,21 @@ public class GameScreenController implements Controller {
                 break;
             }
         }
-        this.initAllOpponents();
     }
 
     // Load the opponent view with username and avatar
     private Node renderOpponent(Member member) {
-        // user's view loads the opponents without the user himself/herself,
-        // because user has own view with stats
-        if (!member.userId().equals(idStorage.getID())) {
-            // User as parameter for getting avatar and username
-            for (OpponentSubController subCon : this.opponentSubCons) {
-                if (subCon.getId().equals(member.userId())) {
-                    return subCon.getParent();
-                }
-            }
-
-            OpponentSubController opponentCon = new OpponentSubController(member, this.userHash.get(member.userId()));
-            opponentSubCons.add(opponentCon);
-            return opponentCon.render();
-        }
-        return new Label("Fail");
-    }
-
-    private void initAllOpponents() {
-        // If an opponent left, the whole view has to be loaded again
-        if (this.opponentsView.getChildren() != null) {
-            this.opponentsView.getChildren().clear();
-        }
-
-        for (Member member : this.members) {
-            if (!member.userId().equals(idStorage.getID())) {
-                this.opponentsView.getChildren().add(this.renderOpponent(member));
+        // user's view loads the opponents without the user himself/herself, because user has own view with stats
+        // User as parameter for getting avatar and username
+        for (OpponentSubController subCon : this.opponentSubCons) {
+            if (subCon.getId().equals(member.userId())) {
+                return subCon.getParent();
             }
         }
+
+        OpponentSubController opponentCon = new OpponentSubController(member, this.userHash.get(member.userId()));
+        opponentSubCons.add(opponentCon);
+        return opponentCon.render();
     }
 
     public void onMouseClicked(MouseEvent mouseEvent) {
