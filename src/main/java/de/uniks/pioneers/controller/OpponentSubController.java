@@ -74,6 +74,7 @@ public class OpponentSubController implements Controller {
             if (this.opponentAsUser.avatar() != null) {
                 this.avatarImageView.setImage(new Image(this.opponentAsUser.avatar()));
             }
+            this.victoryPointsLabel.setText("UP: " + " /10");
         }
 
         this.parent = parent;
