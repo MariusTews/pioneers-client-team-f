@@ -25,9 +25,7 @@ import javafx.scene.text.Font;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -35,7 +33,6 @@ import static de.uniks.pioneers.Constants.*;
 public class MessageViewSubController implements Controller {
 
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
-    private final List<String> deletedMessages = new ArrayList<>();
     private final CompositeDisposable disposable = new CompositeDisposable();
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
@@ -111,10 +108,10 @@ public class MessageViewSubController implements Controller {
                     if (event.event().endsWith(CREATED)) {
                         // New message will be added to the chat view
                         this.messages.add(message);
-                        this.initAllMessages();
+                        this.renderOneMessage(message);
                     } else if (event.event().endsWith(DELETED)) {
                         // Add message to list of deleted messages, so the message will not be rendered again
-                        this.deletedMessages.add(message._id());
+                        this.messages.removeIf(m -> m._id().equals(message._id()));
                         this.initAllMessages();
                     }
                 }));
@@ -125,7 +122,7 @@ public class MessageViewSubController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Member member = event.data();
-                    if (event.event().endsWith(UPDATED)) {
+                    if (event.event().endsWith(UPDATED) || event.event().endsWith(CREATED)) {
                         // refresh the member saved in memberHash, so the color is updated
                         memberHash.put(member.userId(), member);
                         // load all messages again for coloring the username label with the new color
@@ -154,7 +151,6 @@ public class MessageViewSubController implements Controller {
         }
 
         this.idMessageView.setPrefWrapLength(270);
-        //this.initAllMessages();
 
         return parent;
     }
@@ -194,24 +190,22 @@ public class MessageViewSubController implements Controller {
             imageView.setImage(new Image(this.userHash.get(m.sender()).avatar()));
         }
         box.getChildren().add(imageView);
-        if (!this.deletedMessages.contains(m._id())) {
-            // Label with message
-            Label label = new Label();
-            // Font shall be changed when design is implemented
-            label.setFont(new Font("Arial", 14));
-            // Format the message label and display the whole message with line breaks
-            label.setMinWidth(100);
-            label.setMaxWidth(250);
-            label.setWrapText(true);
-            label.setText(m.body());
-            this.initRightClick(label, m._id(), m.sender());
+        // Label with message
+        Label label = new Label();
+        // Font shall be changed when design is implemented
+        label.setFont(new Font("Arial", 14));
+        // Format the message label and display the whole message with line breaks
+        label.setMinWidth(100);
+        label.setMaxWidth(250);
+        label.setWrapText(true);
+        label.setText(m.body());
+        this.initRightClick(label, m._id(), m.sender());
 
-            // Label with colored username
-            Label nameLabel = coloredUsername(m);
+        // Label with colored username
+        Label nameLabel = coloredUsername(m);
 
-            box.getChildren().addAll(nameLabel, label);
-            this.idMessageView.getChildren().add(box);
-        }
+        box.getChildren().addAll(nameLabel, label);
+        this.idMessageView.getChildren().add(box);
     }
 
     // Option to delete the own message by right clicking.
@@ -245,7 +239,9 @@ public class MessageViewSubController implements Controller {
     // Because of the delete function the VBox of the chat has to be cleared and loaded again
     // If the color of a user's name changes, the updated color will be displayed by loading all messages again
     private void initAllMessages() {
-        this.idMessageView.getChildren().clear();
+        if (this.idMessageView.getChildren() != null) {
+            this.idMessageView.getChildren().clear();
+        }
         for (Message m : this.messages) {
             if (m != null && !m.body().isEmpty()) {
                 this.renderOneMessage(m);
