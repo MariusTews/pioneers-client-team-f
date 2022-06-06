@@ -23,7 +23,6 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameScreenController implements Controller {
 
@@ -51,8 +50,6 @@ public class GameScreenController implements Controller {
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
-
-
 
     private UserSubView userSubView;
 
@@ -90,7 +87,6 @@ public class GameScreenController implements Controller {
                     }
                 }));
 
-
         //event Lister for Resources
 
         // Initialize sub controller for ingame chat, add listener and load all messages
@@ -123,7 +119,8 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService);
+        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,idStorage,eventListener);
+        gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
         // Show chat and load the messages
