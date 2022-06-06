@@ -1,9 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.GameIDStorage;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.service.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -19,10 +17,11 @@ import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class UserSubView implements Controller {
 
-    private final GameIDStorage gameIDStorage;
+    //private final GameIDStorage gameIDStorage;
     private final UserService userService;
-    private final IDStorage idStorage;
-    private final PioneersService pioneersService;
+    private final Player player;
+    //private final IDStorage idStorage;
+    //private final PioneersService pioneersService;
     public Label name;
     public Label victoryPoints;
     public Label item1;
@@ -32,29 +31,23 @@ public class UserSubView implements Controller {
     public Label item5;
 
     @Inject
-    public UserSubView(GameIDStorage gameIDStorage, UserService userService, IDStorage idStorage, PioneersService pioneersService) {
+    public UserSubView(Player player, UserService userService) {
 
-        this.gameIDStorage = gameIDStorage;
+        this.player = player;
         this.userService = userService;
-        this.idStorage = idStorage;
-        this.pioneersService = pioneersService;
     }
+
 
     @Override
     public void init() {
-        pioneersService.findOnePlayer(gameIDStorage.getId(),idStorage.getID())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    this.attachTOSubview(result.userId(),result.color(),result.resources(),result.remainingBuildings());
-                    //VictoryPoins needs to be handled
-                });
+            attachTOSubview();
     }
 
-    private void attachTOSubview(String userId, String color, HashMap<String, Integer> resources, HashMap<String, Integer> remainingBuildings) {
-        userService.findOne(userId).observeOn(FX_SCHEDULER)
+    private void attachTOSubview() {
+        userService.findOne(player.userId()).observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
-                    this.attachName(result.name(),color);
-                    this.attachResources(resources);
+                    this.attachName(result.name(), player.color());
+                    this.attachResources(player.resources());
                     //TODO:Builidings needs to be calculated
                 });
     }

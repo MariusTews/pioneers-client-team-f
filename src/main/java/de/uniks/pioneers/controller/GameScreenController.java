@@ -4,17 +4,16 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 
 import de.uniks.pioneers.Websocket.EventListener;
-import de.uniks.pioneers.model.ExpectedMove;
-import de.uniks.pioneers.model.Move;
-import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.State;
+import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -24,9 +23,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
-
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 public class GameScreenController implements Controller {
 
@@ -100,7 +97,7 @@ public class GameScreenController implements Controller {
                 }));
 
 
-        //event Lister for Resources
+        //event Listener for Resources
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".player.*.",Player.class)
                 .observeOn(FX_SCHEDULER)
@@ -113,7 +110,8 @@ public class GameScreenController implements Controller {
                             }
                         }
                     } else if (event.event().endsWith(DELETED)) {
-                        //DO something
+                        players.remove(player);
+                        //needs more logic
                     }
                 }));
 
@@ -122,8 +120,6 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        this.userSubView = new UserSubView(gameIDStorage,userService,idStorage,pioneersService);
-        userSubView.init();
     }
 
 
@@ -153,9 +149,18 @@ public class GameScreenController implements Controller {
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
 
-        userPaneId.getChildren().setAll(userSubView.render());
+
+        players.addListener((ListChangeListener<? super Player>) c -> this.userPaneId.getChildren()
+                .setAll(c.getList().stream().map(this::updateAndShowResources).toList()));
 
         return parent;
+    }
+
+    private Node updateAndShowResources(Player result) {
+        if(result.userId().equals(idStorage.getID()))
+            this.userSubView = new UserSubView(result,userService);
+            this.userSubView.init();
+            return this.userSubView.render();
     }
 
     public void onMouseClicked(MouseEvent mouseEvent) {

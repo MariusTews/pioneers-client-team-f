@@ -18,13 +18,11 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
@@ -129,7 +127,7 @@ public class GameLobbyController implements Controller {
                                 readyMembers += 1;
                             }
                         }
-                        this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
+                        this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size());
                     }
                 }));
 
