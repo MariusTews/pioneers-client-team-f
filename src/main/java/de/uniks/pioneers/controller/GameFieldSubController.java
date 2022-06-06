@@ -5,6 +5,7 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.Map;
+import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.Tile;
 import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.IDStorage;
@@ -18,6 +19,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +30,7 @@ import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 public class GameFieldSubController implements Controller{
 
     private final ObservableList<Tile> tiles = FXCollections.observableArrayList();
+    private final ObservableList<Player> players = FXCollections.observableArrayList();
 
     private final IDStorage idStorage;
 
@@ -35,7 +38,6 @@ public class GameFieldSubController implements Controller{
     private App app;
     private GameIDStorage gameIDStorage;
     private PioneersService pioneersService;
-    private String color;
     private final EventListener eventListener;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -64,10 +66,13 @@ public class GameFieldSubController implements Controller{
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event ->{
                     Building building = event.data();
-                    this.updateBuildings((int) building.x(),(int) building.y(),(int) building.z(),(int) building.side());
-                    System.out.println(event.event()+ " kappa");
-                    System.out.println(event.data().type());
+                    this.updateBuildings((int) building.x(),(int) building.y(),(int) building.z(),(int) building.side(), building.owner());
                 }));
+
+        pioneersService.findAllPlayers(gameIDStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this.players::addAll);
+
     }
 
 
@@ -78,6 +83,7 @@ public class GameFieldSubController implements Controller{
         hexSubControllers.clear();
         circleSubControllers.forEach(CircleSubController::destroy);
         circleSubControllers.clear();
+        disposable.dispose();
     }
 
     @Override
@@ -136,17 +142,13 @@ public class GameFieldSubController implements Controller{
             hexSubController.init();
             this.hexSubControllers.add(hexSubController);
         }
-        /*pioneersService.findOnePlayer(gameIDStorage.getId(),idStorage.getID()).observeOn(FX_SCHEDULER).subscribe(player -> {
-            this.color = player.color();
-            System.out.println(color);
-        });*/
+
 
         for (int i=0; i < hexaCoords.size(); i++) {
             for (int j=0; j < cirleCoords.size(); j++) {
                 CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage, idStorage, eventListener);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
-                //System.out.println(hexaCoords.get(i) + "_" + cirleCoords.get(j));
             }
         }
         for (String string: waterTilesCircles) {
@@ -156,12 +158,16 @@ public class GameFieldSubController implements Controller{
         }
     }
 
-    private void updateBuildings(int x, int y, int z, int side){
-        /*for(CircleSubController c : circleSubControllers){
-            c.setColor(x, y, z, side);
-            System.out.println("test");
-        }*/
-        System.out.println(circleSubControllers.size());
-        System.out.println("ha");
+    private void updateBuildings(int x, int y, int z, int side, String owner){
+        String color = Color.BLACK.toString();
+        for(Player player: players){
+            if(player.userId().equals(owner)){
+                color = player.color();
+            }
+        }
+        for(CircleSubController c : circleSubControllers){
+            c.setColor(x, y, z, side, color);
+
+        }
     }
 }

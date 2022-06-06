@@ -133,8 +133,8 @@
             <Circle fill="WHITE" layoutX="242.0" layoutY="-8.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x2yM3z1_7" />
             <Circle fill="WHITE" layoutX="327.0" layoutY="-6.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x3yM3z0_7" />
             <Circle fill="WHITE" layoutX="348.0" layoutY="5.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x3yM3z0_6" />
-            <Circle fill="WHITE" layoutX="373.0" layoutY="68.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x3yM2yM1_7" />
-            <Circle fill="WHITE" layoutX="393.0" layoutY="81.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x3yM2yM1_6" />
+            <Circle fill="WHITE" layoutX="373.0" layoutY="68.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x3yM2zM1_7" />
+            <Circle fill="WHITE" layoutX="393.0" layoutY="81.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x3yM2zM1_6" />
             <Circle fill="WHITE" layoutX="415.0" layoutY="143.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x3yM1zM2_7" />
             <Circle fill="WHITE" layoutX="435.0" layoutY="155.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x3yM1zM2_6" />
             <Circle fill="WHITE" layoutX="435.0" layoutY="206.0" radius="10.0" stroke="#1d7533" strokeType="INSIDE" fx:id="x2y1zM3_0" />

@@ -4,7 +4,6 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 
 import de.uniks.pioneers.Websocket.EventListener;
-import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.ExpectedMove;
 import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.model.State;
@@ -14,7 +13,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -25,7 +23,6 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameScreenController implements Controller {
 
@@ -53,8 +50,6 @@ public class GameScreenController implements Controller {
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
-
-
 
     private UserSubView userSubView;
 
@@ -92,16 +87,6 @@ public class GameScreenController implements Controller {
                     }
                 }));
 
-        disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".buildings.*." + "created", Building.class)
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe(event ->{
-
-                            System.out.println(event.event());
-                            System.out.println(event.data().type());
-                        }));
-
-
         //event Lister for Resources
 
         // Initialize sub controller for ingame chat, add listener and load all messages
@@ -111,7 +96,6 @@ public class GameScreenController implements Controller {
 
         this.userSubView = new UserSubView(gameIDStorage,userService,idStorage,pioneersService);
         userSubView.init();
-        System.out.println(gameIDStorage.getId());
     }
 
 
@@ -136,6 +120,7 @@ public class GameScreenController implements Controller {
         }
 
         this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,idStorage,eventListener);
+        gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
         // Show chat and load the messages
