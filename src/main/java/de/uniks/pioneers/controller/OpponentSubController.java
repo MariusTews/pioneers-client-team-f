@@ -34,6 +34,7 @@ public class OpponentSubController implements Controller {
     private final Member opponent;
     private final User opponentAsUser;
     private String userId;
+    private Parent parent;
 
     @Inject
     public OpponentSubController(Member member, User user) {
@@ -66,19 +67,24 @@ public class OpponentSubController implements Controller {
             return null;
         }
 
-        if (opponent != null) {
-            this.userId = opponent.userId();
-            this.usernameLabel.setText(opponentAsUser.name());
-            this.usernameLabel.setTextFill(Color.web(opponent.color()));
+        if (this.opponent != null) {
+            this.userId = this.opponent.userId();
+            this.usernameLabel.setText(this.opponentAsUser.name());
+            this.usernameLabel.setTextFill(Color.web(this.opponent.color()));
             if (this.opponentAsUser.avatar() != null) {
                 this.avatarImageView.setImage(new Image(this.opponentAsUser.avatar()));
             }
         }
 
+        this.parent = parent;
         return parent;
     }
 
     public String getId() {
         return userId;
+    }
+
+    public Parent getParent() {
+        return parent;
     }
 }

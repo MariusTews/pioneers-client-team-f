@@ -10,6 +10,7 @@ import de.uniks.pioneers.service.*;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -104,7 +105,13 @@ public class GameScreenController implements Controller {
         memberService
                 .getAllGameMembers(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
-                .subscribe(this.members::setAll);
+                .subscribe(result -> {
+                    for (Member member : result) {
+                        if (!member.userId().equals(idStorage.getID())) {
+                            this.members.add(member);
+                        }
+                    }
+                });
 
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".moves.*." + "created", Move.class)
@@ -129,11 +136,8 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        this.userSubView = new UserSubView(gameIDStorage,userService,idStorage,pioneersService);
+        this.userSubView = new UserSubView(gameIDStorage, userService, idStorage, pioneersService);
         userSubView.init();
-
-        // Load all opponents
-        this.initAllOpponents();
     }
 
     @Override
@@ -167,6 +171,9 @@ public class GameScreenController implements Controller {
 
         userPaneId.getChildren().setAll(userSubView.render());
 
+        this.members.addListener((ListChangeListener<? super Member>) c ->
+                this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
+
         return parent;
     }
 
@@ -199,20 +206,31 @@ public class GameScreenController implements Controller {
     private Node renderOpponent(Member member) {
         // user's view loads the opponents without the user himself/herself,
         // because user has own view with stats
-        if (!member.userId().equals(memberIDStorage.getId())) {
+        if (!member.userId().equals(idStorage.getID())) {
             // User as parameter for getting avatar and username
+            for (OpponentSubController subCon : this.opponentSubCons) {
+                if (subCon.getId().equals(member.userId())) {
+                    return subCon.getParent();
+                }
+            }
+
             OpponentSubController opponentCon = new OpponentSubController(member, this.userHash.get(member.userId()));
             opponentSubCons.add(opponentCon);
             return opponentCon.render();
         }
-        return null;
+        return new Label("Fail");
     }
 
     private void initAllOpponents() {
         // If an opponent left, the whole view has to be loaded again
-        this.opponentsView.getChildren().clear();
+        if (this.opponentsView.getChildren() != null) {
+            this.opponentsView.getChildren().clear();
+        }
+
         for (Member member : this.members) {
-          this.opponentsView.getChildren().add(this.renderOpponent(member));
+            if (!member.userId().equals(idStorage.getID())) {
+                this.opponentsView.getChildren().add(this.renderOpponent(member));
+            }
         }
     }
 
