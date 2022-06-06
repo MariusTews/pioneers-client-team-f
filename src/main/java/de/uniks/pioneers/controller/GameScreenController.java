@@ -42,23 +42,31 @@ public class GameScreenController implements Controller {
     public VBox opponentsView;
 
     private final App app;
+
     private final GameIDStorage gameIDStorage;
+    private final IDStorage idStorage;
+
     private final PioneersService pioneersService;
     private final EventListener eventListener;
     private final MemberIDStorage memberIDStorage;
     private final UserService userService;
     private final MessageService messageService;
     private final MemberService memberService;
+    public Pane userPaneId;
+
+    private GameFieldSubController gameFieldSubController;
+    private MessageViewSubController messageViewSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
 
-    private MessageViewSubController messageViewSubController;
 
+    private UserSubView userSubView;
 
     @Inject
     public GameScreenController(App app,
                                 GameIDStorage gameIDStorage,
+                                IDStorage idStorage,
                                 PioneersService pioneersService,
                                 EventListener eventListener,
                                 MemberIDStorage memberIDStorage,
@@ -67,6 +75,7 @@ public class GameScreenController implements Controller {
                                 MemberService memberService) {
         this.app = app;
         this.gameIDStorage = gameIDStorage;
+        this.idStorage = idStorage;
         this.pioneersService = pioneersService;
         this.eventListener = eventListener;
         this.userService = userService;
@@ -113,10 +122,15 @@ public class GameScreenController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleMemberEvents));
 
+        //event Lister for Resources
+
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
+
+        this.userSubView = new UserSubView(gameIDStorage,userService,idStorage,pioneersService);
+        userSubView.init();
 
         // Load all opponents
         this.initAllOpponents();
@@ -150,6 +164,8 @@ public class GameScreenController implements Controller {
 
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
+
+        userPaneId.getChildren().setAll(userSubView.render());
 
         return parent;
     }
