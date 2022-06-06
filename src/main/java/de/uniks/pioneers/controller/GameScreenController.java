@@ -61,7 +61,6 @@ public class GameScreenController implements Controller {
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
 
-
     private UserSubView userSubView;
 
     @Inject
@@ -163,7 +162,8 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService);
+        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,idStorage,eventListener);
+        gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
         // Show chat and load the messages
