@@ -81,10 +81,6 @@ public class GameScreenController implements Controller {
     @Override
     public void init() {
 
-        //listen to all theplayers
-        pioneersService.findAllPlayers(this.gameIDStorage.getId()).
-                            observeOn(FX_SCHEDULER)
-                            .subscribe(this.players::setAll);
 
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".moves.*." + "created", Move.class)
@@ -97,28 +93,14 @@ public class GameScreenController implements Controller {
                 }));
 
 
-        //event Listener for Resources
-        disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".player.*.",Player.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    Player player = event.data();
-                    if(event.event().endsWith(UPDATED)){
-                        for (Player updatedPlayer: this.players) {
-                            if(updatedPlayer.userId().equals(player.userId())){
-                                this.players.set(this.players.indexOf(updatedPlayer),player);
-                            }
-                        }
-                    } else if (event.event().endsWith(DELETED)) {
-                        players.remove(player);
-                        //needs more logic
-                    }
-                }));
 
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
+
+        this.userSubView = new UserSubView(gameIDStorage,idStorage,userService,eventListener,pioneersService);
+        this.userSubView.init();
 
     }
 
@@ -150,17 +132,9 @@ public class GameScreenController implements Controller {
         chatPane.getChildren().setAll(messageViewSubController.render());
 
 
-        players.addListener((ListChangeListener<? super Player>) c -> this.userPaneId.getChildren()
-                .setAll(c.getList().stream().map(this::updateAndShowResources).toList()));
+        userPaneId.getChildren().setAll(userSubView.render());
 
         return parent;
-    }
-
-    private Node updateAndShowResources(Player result) {
-        if(result.userId().equals(idStorage.getID()))
-            this.userSubView = new UserSubView(result,userService);
-            this.userSubView.init();
-            return this.userSubView.render();
     }
 
     public void onMouseClicked(MouseEvent mouseEvent) {

@@ -40,6 +40,7 @@ public class MessageViewSubController implements Controller {
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
+
     private final UserService userService;
     private final MemberService memberService;
     private final MessageService messageService;
