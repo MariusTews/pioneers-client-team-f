@@ -9,11 +9,9 @@ import de.uniks.pioneers.service.*;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -26,8 +24,6 @@ import java.util.List;
 import static de.uniks.pioneers.Constants.*;
 
 public class GameScreenController implements Controller {
-
-    private final ObservableList<Player> players = FXCollections.observableArrayList();
     @FXML
     public Pane mapPane;
     @FXML
@@ -52,8 +48,6 @@ public class GameScreenController implements Controller {
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
-
-
 
     private UserSubView userSubView;
 

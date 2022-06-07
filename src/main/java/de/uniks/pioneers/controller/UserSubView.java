@@ -2,7 +2,6 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
-import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameIDStorage;
@@ -82,7 +81,6 @@ public class UserSubView implements Controller {
                             this.attachTOSubview();
                         }
                     }));
-
     }
 
     private void attachTOSubview() {
@@ -93,7 +91,6 @@ public class UserSubView implements Controller {
                     this.attachName(user.name(), player.color());
                     this.attachResources(player.resources());
                     //TODO:Builidings needs to be calculated
-
                 }
             }
         }
