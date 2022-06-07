@@ -130,8 +130,6 @@ public class GameScreenController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleMemberEvents));
 
-        //event Lister for Resources
-
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
                 userService, messageService, memberIDStorage, memberService);
