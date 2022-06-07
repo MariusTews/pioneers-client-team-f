@@ -31,7 +31,7 @@ class LobbyControllerTest extends ApplicationTest {
     UserService userService;
 
     @Mock
-    MemberService memberService;
+    MessageService messageService;
 
     @Mock
     GameService gameService;
@@ -59,6 +59,7 @@ class LobbyControllerTest extends ApplicationTest {
         when(groupService.getAll()).thenReturn(Observable.empty());
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(gameService.findAllGames()).thenReturn(Observable.empty());
+        when(messageService.getAllMessages(any(), any())).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
 
 

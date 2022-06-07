@@ -75,8 +75,7 @@ public class GameLobbyController implements Controller {
                                EventListener eventListener,
                                IDStorage idStorage,
                                GameIDStorage gameIDStorage,
-                               MemberIDStorage memberIDStorage
-    ) {
+                               MemberIDStorage memberIDStorage) {
         this.app = app;
         this.memberService = memberService;
         this.userService = userService;
@@ -142,6 +141,10 @@ public class GameLobbyController implements Controller {
                     }
                 }));
 
+        // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
+        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+                userService, messageService, memberIDStorage, memberService);
+        messageViewSubController.init();
     }
 
     @Override
@@ -183,10 +186,6 @@ public class GameLobbyController implements Controller {
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
-        // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
-        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
-                userService, messageService, memberIDStorage, memberService);
-        messageViewSubController.init();
         // show chat and load the messages
         idChatContainer.getChildren().setAll(messageViewSubController.render());
 
@@ -215,8 +214,8 @@ public class GameLobbyController implements Controller {
     }
 
     public void ready(ActionEvent ignoredEvent) {
-        for (Member member: this.members) {
-            if (member.userId().equals(idStorage.getID())){
+        for (Member member : this.members) {
+            if (member.userId().equals(idStorage.getID())) {
                 if (member.ready()) {
                     memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color()).subscribe();
                     this.idReadyButton.setText("Ready");
@@ -250,33 +249,33 @@ public class GameLobbyController implements Controller {
 
     private void giveAllThePlayersColor() {
         ColorController controller = new ColorController();
-        List<Label> createdColors =  controller.getColor();
+        List<Label> createdColors = controller.getColor();
 
         List<String> allColors = createdColors(createdColors);
 
         //remove color from allcolors if it belongs to a member
-        for (Member member: members) {
-            if(member.color()!=null){
+        for (Member member : members) {
+            if (member.color() != null) {
                 allColors.remove(member.color());
             }
         }
 
         //give color to member that do not have colors
         List<Member> memberList = members;
-        for (Member member: memberList) {
-                if (member.color() == null || member.color().equals("#000000") ) {
-                    memberService.statusUpdate(member.gameId(), member.userId(),member.ready() ,allColors.get(0))
-                            .subscribe();
-                    allColors.remove(0);
-                }
+        for (Member member : memberList) {
+            if (member.color() == null || member.color().equals("#000000")) {
+                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0))
+                        .subscribe();
+                allColors.remove(0);
+            }
         }
     }
 
     //change String into hascode for colors
     private List<String> createdColors(List<Label> createdColors) {
         List<String> colorNames = new ArrayList<>();
-        for (Label label: createdColors) {
-            String colorInString = "#"+ Color.web(label.getText().toLowerCase()).toString().substring(2,8);
+        for (Label label : createdColors) {
+            String colorInString = "#" + Color.web(label.getText().toLowerCase()).toString().substring(2, 8);
             colorNames.add(colorInString);
         }
 
@@ -296,11 +295,11 @@ public class GameLobbyController implements Controller {
         comboBox.setVisibleRowCount(300);
         //This makes sure the color are presented in the strings and
         //border will be shown on Labels
-        comboBox.setCellFactory(listView -> new ListCell<Label>(){
-            public void updateItem(Label label, boolean empty){
-                super.updateItem(label,empty);
-                if (label != null){
-                    if(label.getText().equals("Select Color")){
+        comboBox.setCellFactory(listView -> new ListCell<Label>() {
+            public void updateItem(Label label, boolean empty) {
+                super.updateItem(label, empty);
+                if (label != null) {
+                    if (label.getText().equals("Select Color")) {
                         setText(null);
                     }
                     setText(label.getText());
@@ -332,7 +331,7 @@ public class GameLobbyController implements Controller {
         boolean chose = true;
         boolean ready = false;
         List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
-        for (Member member: memberList) {
+        for (Member member : memberList) {
             if (member.color() != null && member.color().equals(pickedColor)) {
                 chose = false;
             }

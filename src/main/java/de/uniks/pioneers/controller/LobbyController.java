@@ -155,51 +155,15 @@ public class LobbyController implements Controller {
 					}
 				}));
 
-
+		//get all messages from the user that are in lobby
+		messageService
+				.getAllMessages(GLOBAL, LOBBY_ID)
+				.observeOn(FX_SCHEDULER)
+				.subscribe(col -> {
+					this.lobby_messages.setAll(col);
+					this.initAllMessages();
+				});
 	}
-
-	//render messages for all lobby
-	private void renderMessage(Message message, boolean render) {
-		((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().clear();
-
-		if (render) {
-			this.lobby_messages.add(message);
-		} else {
-			this.lobby_deletedMessages.add(message._id());
-		}
-
-		if (!lobby_messages.isEmpty()) {
-			for (Message m : lobby_messages) {
-				HBox box = new HBox(3);
-				ImageView imageView = new ImageView();
-				imageView.setFitWidth(20);
-				imageView.setFitHeight(20);
-				if (this.memberHash.get(m.sender()).avatar() != null) {
-					imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
-				}
-				box.getChildren().add(imageView);
-				if (this.lobby_deletedMessages.contains(m._id())) {
-					Label label = new Label(this.memberHash.get(m.sender()).name() + ": - message deleted - ");
-					label.setFont(Font.font("Italic"));
-					box.getChildren().add(label);
-					//this.idMessageView.getChildren().add(box);
-					((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
-				} else {
-					Label label = new Label();
-					label.setMinWidth(100);
-					this.initRightClickForAllMessages(label, m._id(), m.sender());
-					label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
-					box.getChildren().add(label);
-					((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
-
-				}
-			}
-		}
-		//this helps the messages to be scrolled down
-		((ScrollPane)allTab.getContent()).vvalueProperty().bind(((VBox)((ScrollPane) allTab.getContent()).getContent()).heightProperty());
-
-	}
-
 
 	@Override
 	public void destroy() {
@@ -235,6 +199,45 @@ public class LobbyController implements Controller {
 					handleTabSwitching(oldValue, newValue));
 		tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
 		return parent;
+	}
+
+	//render messages for all lobby
+	private void renderMessage(Message message, boolean render) {
+		((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().clear();
+
+		if (render) {
+			this.lobby_messages.add(message);
+		} else {
+			this.lobby_deletedMessages.add(message._id());
+		}
+
+		if (!lobby_messages.isEmpty()) {
+			for (Message m : lobby_messages) {
+				HBox box = new HBox(3);
+				ImageView imageView = new ImageView();
+				imageView.setFitWidth(20);
+				imageView.setFitHeight(20);
+				if (this.memberHash.get(m.sender()).avatar() != null) {
+					imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
+				}
+				box.getChildren().add(imageView);
+				Label label;
+				if (this.lobby_deletedMessages.contains(m._id())) {
+					label = new Label(this.memberHash.get(m.sender()).name() + ": - message deleted - ");
+					label.setFont(Font.font("Italic"));
+				} else {
+					label = new Label();
+					label.setMinWidth(100);
+					this.initRightClickForAllMessages(label, m._id(), m.sender());
+					label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
+				}
+				box.getChildren().add(label);
+				((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
+			}
+		}
+		//this helps the messages to be scrolled down
+		((ScrollPane)allTab.getContent()).vvalueProperty().bind(((VBox)((ScrollPane) allTab.getContent()).getContent()).heightProperty());
+
 	}
 
 	private void handleTabSwitching(Tab oldValue, Tab newValue) {
@@ -307,9 +310,7 @@ public class LobbyController implements Controller {
 			if (currentDirectStorage != null) {
 				this.messageService.send(GROUPS, currentDirectStorage.getGroupId(), chatMessageField.getText())
 						.observeOn(FX_SCHEDULER)
-						.subscribe(result -> {
-							this.chatMessageField.setText("");
-						});
+						.subscribe(result -> this.chatMessageField.setText(""));
 			} else{
 				this.messageService.send(GLOBAL, LOBBY_ID, chatMessageField.getText())
 						.observeOn(FX_SCHEDULER)
@@ -479,17 +480,6 @@ public class LobbyController implements Controller {
 				this.ownUsername = user.name();
 			}
 		}
-
-		//get all messages from the user that are in lobby
-		messageService
-				.getAllMessages(GLOBAL, LOBBY_ID)
-				.observeOn(FX_SCHEDULER)
-				.subscribe(col -> {
-					this.lobby_messages.setAll(col);
-					this.initAllMessages();
-				});
-
-
 
 		List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
 		List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
