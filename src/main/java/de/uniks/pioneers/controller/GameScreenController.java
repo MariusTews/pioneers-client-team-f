@@ -58,6 +58,7 @@ public class GameScreenController implements Controller {
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
+
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
 
@@ -86,6 +87,7 @@ public class GameScreenController implements Controller {
 
     @Override
     public void init() {
+
 
         // For later : userHash is needed in MessageViewSubController too,
         // improvement would be to not initialize the hash twice.
@@ -128,15 +130,14 @@ public class GameScreenController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleMemberEvents));
 
-        //event Lister for Resources
-
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        this.userSubView = new UserSubView(gameIDStorage, userService, idStorage, pioneersService);
-        userSubView.init();
+        this.userSubView = new UserSubView(gameIDStorage,idStorage,userService,eventListener,pioneersService);
+        this.userSubView.init();
+
     }
 
     @Override
@@ -168,6 +169,7 @@ public class GameScreenController implements Controller {
 
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
+
 
         userPaneId.getChildren().setAll(userSubView.render());
 
