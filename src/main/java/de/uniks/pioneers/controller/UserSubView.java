@@ -77,6 +77,7 @@ public class UserSubView implements Controller {
                     subscribe(event -> {
                         Player p = event.data();
                         if(event.event().endsWith(UPDATED)){
+                            //this needs to be done
                             this.players.add(p);
                             this.attachTOSubview();
                         }
