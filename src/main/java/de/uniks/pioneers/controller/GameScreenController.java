@@ -10,10 +10,12 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -40,6 +42,8 @@ public class GameScreenController implements Controller {
     @FXML
     public VBox opponentsView;
     @FXML
+    public Button finishTurnButton;
+    @FXML
     public Label nextMoveLabel;
     @FXML
     public Label currentPlayerLabel;
@@ -56,6 +60,8 @@ public class GameScreenController implements Controller {
     private final MessageService messageService;
     private final MemberService memberService;
     public Pane userPaneId;
+
+    private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -287,5 +293,12 @@ public class GameScreenController implements Controller {
         pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> diceSumLabel.setText(Integer.toString(result.roll())), Throwable::printStackTrace);
+    }
+
+    public void finishTurn(ActionEvent event) {
+        pioneersService.move(gameIDStorage.getId(),"build",null,null,null,null,null)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result->{},onError->{});
+
     }
 }
