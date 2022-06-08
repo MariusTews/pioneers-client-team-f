@@ -3,6 +3,8 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.model.ExpectedMove;
+import de.uniks.pioneers.model.State;
 import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
@@ -16,6 +18,8 @@ import javafx.scene.shape.Circle;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
@@ -34,6 +38,7 @@ public class CircleSubController implements Controller{
     private int y;
     private int z;
     private int side;
+    private ExpectedMove nextMove;
 
     @Inject
     public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, EventListener eventListener){
@@ -52,6 +57,7 @@ public class CircleSubController implements Controller{
         this.view.setOnMouseExited(this::onFieldMouseHoverExit);
         this.view.setOnMouseClicked(this::onFieldClicked);
 
+        //get coordinates from fxid
         String id = this.view.getId();
         id = (id.replace("M", "-"));
         id = id.substring(1);
@@ -63,32 +69,59 @@ public class CircleSubController implements Controller{
         this.z =  Integer.parseInt(split2[0]);
         this.side = Integer.parseInt(split2[1]);
 
+        this.nextMove = new ExpectedMove("", Collections.singletonList(idStorage.getID()));
+
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    State state = event.data();
+                    this.nextMove = state.expectedMoves().get(0);
+                }));
+
     }
 
     private void onFieldClicked(MouseEvent mouseEvent) {
+        //if its not your turn
+        if(!yourTurn(nextMove)){
+            new Alert(Alert.AlertType.INFORMATION,"Not your turn!").showAndWait();
+        // if the game is in the founding-phase
+        }else if(nextMove.action().startsWith("founding-road") || nextMove.action().startsWith("founding-s")){
+            this.pioneersService.findOneState(gameIDStorage.getId())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(move -> {
+                        String action = move.expectedMoves().get(0).action();
+                        if (side == 0 || side == 6) {
+                            this.pioneersService.move(gameIDStorage.getId(), action, x, z, y, side, "settlement")
+                                    .observeOn(FX_SCHEDULER)
+                                    .doOnError(error -> {
+                                        String[] building = nextMove.action().split("-");
+                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] +  " here!").showAndWait();
+                                    })
+                                    .subscribe(onSuc -> {
+                                    }, onError -> {
+                                    });
+                        } else {
+                            this.pioneersService.move(gameIDStorage.getId(), action, x, z, y, side, "road")
+                                    .observeOn(FX_SCHEDULER)
+                                    .doOnError(error -> {
+                                        String[] building = nextMove.action().split("-");
+                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] +  " here!").showAndWait();
+                                    })
+                                    .subscribe(onSuc -> {}, onError -> {});
+                        }
+                    });
+        }
+    }
 
-        this.pioneersService.findOneState(gameIDStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(move ->{
-                    String action = move.expectedMoves().get(0).action();
-                    if(side == 0 || side == 6){
-
-                        this.pioneersService.move(gameIDStorage.getId(), action, x ,z ,y ,side , "settlement")
-                                .observeOn(FX_SCHEDULER)
-                                .doOnError(error->{
-                                    new Alert(Alert.AlertType.INFORMATION,"Not your turn or invalid move").showAndWait();
-                                })
-                                .subscribe(onSuc->{},onError->{});
-                    }else{
-
-                        this.pioneersService.move(gameIDStorage.getId(), action, x ,z ,y ,side , "road")
-                                .observeOn(FX_SCHEDULER)
-                                .doOnError(error->{
-                                    new Alert(Alert.AlertType.INFORMATION,"Not your turn or invalid move").showAndWait();
-                                })
-                                .subscribe(onSuc->{},onError->{});
-                    }
-                });
+    public Boolean yourTurn(ExpectedMove move){
+        List<String> currPlayer = move.players();
+        for(String player: currPlayer){
+            if(player.equals(idStorage.getID())){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setColor(int x, int y, int z, int side, String color){

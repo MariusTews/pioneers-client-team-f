@@ -12,10 +12,12 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -41,6 +43,8 @@ public class GameScreenController implements Controller {
     public Label diceSumLabel;
     @FXML
     public VBox opponentsView;
+    @FXML
+    public Button finishTurnButton;
 
     private final App app;
 
@@ -54,6 +58,8 @@ public class GameScreenController implements Controller {
     private final MessageService messageService;
     private final MemberService memberService;
     public Pane userPaneId;
+    public Label yourTurn;
+
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
@@ -123,6 +129,25 @@ public class GameScreenController implements Controller {
                         diceSumLabel.setText(Integer.toString(move.roll()));
                     }
                 }));
+
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    State state = event.data();
+                    List<String> currPlayer = state.expectedMoves().get(0).players();
+                    for(String player: currPlayer){
+                        if(player.equals(idStorage.getID())){
+                            yourTurn.setText("Your Turn");
+                            break;
+                        } else {
+                            yourTurn.setText("Not your Turn");
+
+                        }
+                    }
+                }));
+
+
 
         // Listen to the members to get to know if a member of the game leaves or joins the game
         disposable.add(eventListener
@@ -235,5 +260,12 @@ public class GameScreenController implements Controller {
                     .subscribe(result -> {
                     }, Throwable::printStackTrace);
         }
+    }
+
+    public void finishTurn(ActionEvent event) {
+        pioneersService.move(gameIDStorage.getId(),"build",null,null,null,null,null)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result->{},onError->{});
+
     }
 }
