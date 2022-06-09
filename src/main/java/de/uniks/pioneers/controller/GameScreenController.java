@@ -49,6 +49,8 @@ public class GameScreenController implements Controller {
     public VBox opponentsView;
     @FXML
     public Label nextMoveLabel;
+    @FXML
+    public Label currentPlayerLabel;
 
     private final App app;
 
@@ -121,16 +123,11 @@ public class GameScreenController implements Controller {
                                 }
                             });
                 });
-
+        // Listen to the Moves to handle the event
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".moves.*." + "created", Move.class)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    Move move = event.data();
-                    if (move.action().equals("roll")) {
-                        diceSumLabel.setText(Integer.toString(move.roll()));
-                    }
-                }));
+                .subscribe(this::handleMoveEvents));
 
         // Listen to the members to get to know if a member of the game leaves or joins the game
         disposable.add(eventListener
@@ -138,16 +135,13 @@ public class GameScreenController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleMemberEvents));
 
+        // Listen to the State to handle the event
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    State state = event.data();
-                    if (event.event().endsWith("updated")){
-                        nextMoveLabel.setText(state.expectedMoves().get(0).action());
-                    }
-                }));
+                .subscribe(this::handleStateEvents));
 
+        // Check if expected move is founding-roll after joining the game
         pioneersService
                 .findOneState(gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
@@ -207,6 +201,15 @@ public class GameScreenController implements Controller {
         return parent;
     }
 
+    private void handleMoveEvents(Event<Move> moveEvent) {
+        Move move = moveEvent.data();
+
+        // if the move is a roll change the diceSumLabel to the roll number
+        if (move.action().equals("roll")) {
+            diceSumLabel.setText(Integer.toString(move.roll()));
+        }
+    }
+
     private void handleMemberEvents(Event<Member> memberEvent) {
         // Handle event on player and refresh list of players
         Member member = memberEvent.data();
@@ -218,6 +221,17 @@ public class GameScreenController implements Controller {
             this.members.removeIf(p -> p.userId().equals(member.userId()));
             // Remove opponent sub-controller and render the opponent list again without the game member
             this.removeOpponent(member);
+        }
+    }
+
+    private void handleStateEvents(Event<State> stateEvent) {
+        State state = stateEvent.data();
+
+        if (stateEvent.event().endsWith(UPDATED)){
+            // change the nextMoveLabel to the current move
+            nextMoveLabel.setText(state.expectedMoves().get(0).action());
+            // change the currentPlayerLabel to the current player
+            currentPlayerLabel.setText(this.userHash.get(state.expectedMoves().get(0).players().get(0)).name());
         }
     }
 
@@ -250,8 +264,9 @@ public class GameScreenController implements Controller {
         diceRoll();
     }
 
+    // diceRoll if the current move is roll
     public void diceRoll() {
-        if (nextMoveLabel.getText().endsWith("roll")) {
+        if (nextMoveLabel.getText().equals("roll")) {
             pioneersService.move(gameIDStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement")
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
@@ -259,6 +274,7 @@ public class GameScreenController implements Controller {
         }
     }
 
+    // automatic foundingDiceRoll after joining the game
     public void foundingDiceRoll() {
         pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
                 .observeOn(FX_SCHEDULER)
