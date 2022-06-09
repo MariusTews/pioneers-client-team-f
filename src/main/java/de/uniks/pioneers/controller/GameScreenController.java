@@ -2,19 +2,14 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
-import de.uniks.pioneers.model.*;
-import de.uniks.pioneers.model.ExpectedMove;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.model.State;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
-
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -145,7 +140,7 @@ public class GameScreenController implements Controller {
         pioneersService
                 .findOneState(gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
-                .subscribe( result -> {
+                .subscribe(result -> {
                     if (result.expectedMoves().get(0).action().equals("founding-roll")) {
                         foundingDiceRoll();
                     }
@@ -156,7 +151,7 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        this.userSubView = new UserSubView(gameIDStorage,idStorage,userService,eventListener,pioneersService);
+        this.userSubView = new UserSubView(gameIDStorage, idStorage, userService, eventListener, pioneersService);
         this.userSubView.init();
 
     }
@@ -184,7 +179,7 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,idStorage,eventListener);
+        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
@@ -227,7 +222,7 @@ public class GameScreenController implements Controller {
     private void handleStateEvents(Event<State> stateEvent) {
         State state = stateEvent.data();
 
-        if (stateEvent.event().endsWith(UPDATED)){
+        if (stateEvent.event().endsWith(UPDATED)) {
             // change the nextMoveLabel to the current move
             nextMoveLabel.setText(state.expectedMoves().get(0).action());
             // change the currentPlayerLabel to the current player
