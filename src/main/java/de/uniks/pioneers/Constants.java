@@ -5,6 +5,7 @@ import de.uniks.pioneers.model.User;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.application.Platform;
+import javafx.scene.paint.Color;
 
 import java.util.Comparator;
 import java.util.List;
@@ -60,4 +61,15 @@ public class Constants {
 
     // Game
     public static final int MAX_MEMBERS = 6;
+
+    //Array of Colors as Strings for the Label text
+    public  static final String[] COLORSTRINGARRAY = {"RED", "BLUE", "ORANGE", "VIOLET", "PINK", "CORAL", "GOLD", "DARKORANGE",
+            "TOMATO", "DARKORCHID", "LIME", "GREEN", "PALEGREEN", "PURPLE", "ROYALBLUE", "CRIMSON", "ROSYBROWN", "BROWN",
+            "CHOCOLATE", "SIENNA", "BURLYWOOD", "LIMEGREEN", "DARKCYAN", "DEEPSKYBLUE", "SEAGREEN", "POWDERBLUE"};
+
+    //Array of Colors
+    public static final Color[] COLORARRAY = {Color.RED, Color.BLUE, Color.ORANGE, Color.VIOLET, Color.PINK,
+            Color.CORAL, Color.GOLD, Color.DARKORANGE, Color.TOMATO, Color.DARKORCHID, Color.LIME, Color.GREEN,
+            Color.PALEGREEN, Color.PURPLE, Color.ROYALBLUE, Color.CRIMSON, Color.ROSYBROWN, Color.BROWN, Color.CHOCOLATE,
+            Color.SIENNA, Color.BURLYWOOD, Color.LIMEGREEN, Color.DARKCYAN, Color.DEEPSKYBLUE, Color.SEAGREEN, Color.POWDERBLUE};
 }

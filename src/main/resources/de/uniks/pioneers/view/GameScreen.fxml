@@ -8,50 +8,42 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
-   <children>
-      <VBox maxHeight="900.0" prefHeight="900.0" prefWidth="500.0">
-         <children>
-            <VBox prefHeight="580.0" prefWidth="500.0" style="-fx-background-color: #FF0000;" />
-            <Pane prefHeight="320.0" prefWidth="500.0" style="-fx-background-color: #0000FF;" />
-         </children></VBox>
-      <VBox prefHeight="900.0" prefWidth="650.0">
-         <children>
-            <Pane prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: #808080;" />
-            <Pane fx:id="mapPane" minHeight="600.0" minWidth="650.0" style="-fx-background-color: #B22222;" />
-            <Pane prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: #008000;">
-               <children>
-                  <ImageView fx:id="diceImageView" fitHeight="83.0" fitWidth="92.0" layoutX="347.0" layoutY="34.0" onMouseClicked="#onMouseClicked" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../DicePicture.png" />
-                     </image>
-                  </ImageView>
-                  <Label fx:id="diceSumLabel" alignment="CENTER" layoutX="211.0" layoutY="34.0" prefHeight="83.0" prefWidth="92.0" style="-fx-background-color: RED;" text="12">
-                     <font>
-                        <Font name="Bernard MT Condensed" size="58.0" />
-                     </font>
-                  </Label>
-               </children></Pane>
-         </children>
-      </VBox>
-      <VBox prefHeight="900.0" prefWidth="450.0">
-         <children>
-            <Pane prefHeight="100.0" prefWidth="500.0" style="-fx-background-color: #800080;" />
-            <Pane prefHeight="480.0" prefWidth="500.0" style="-fx-background-color: #FF0000;">
-               <children>
-                  <Label alignment="CENTER" contentDisplay="TOP" layoutX="102.0" layoutY="70.0" prefHeight="61.0" prefWidth="246.0" text="NEXT MOVE">
-                     <font>
-                        <Font name="Bernard MT Condensed" size="36.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="nextMoveLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="9.0" layoutY="131.0" prefHeight="61.0" prefWidth="436.0">
-                     <font>
-                        <Font name="System Bold" size="27.0" />
-                     </font>
-                  </Label>
-               </children></Pane>
-            <Pane fx:id="chatPane" prefHeight="320.0" prefWidth="500.0" style="-fx-background-color: #0000FF;" />
-         </children>
-      </VBox>
-   </children>
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0"
+      prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.uniks.pioneers.controller.GameScreenController">
+   <VBox maxHeight="900.0" prefHeight="900.0" prefWidth="500.0">
+      <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0" style="-fx-background-color: #FFFFFF;"/>
+      <Pane fx:id="userPaneId" prefHeight="320.0" prefWidth="500.0" style="-fx-background-color: #00FF00;"/>
+   </VBox>
+   <VBox prefHeight="900.0" prefWidth="650.0">
+      <Pane prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: #808080;"/>
+      <Pane fx:id="mapPane" minHeight="600.0" minWidth="650.0" style="-fx-background-color: #B22222;"/>
+      <Pane prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: #008000;">
+         <ImageView fx:id="diceImageView" fitHeight="83.0" fitWidth="92.0" layoutX="347.0" layoutY="34.0"
+                    onMouseClicked="#onMouseClicked" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../DicePicture.png"/>
+         </ImageView>
+         <Label fx:id="diceSumLabel" alignment="CENTER" layoutX="211.0" layoutY="34.0" prefHeight="83.0"
+                prefWidth="92.0" style="-fx-background-color: RED;" text="12">
+            <font>
+               <Font name="Bernard MT Condensed" size="58.0"/>
+            </font>
+         </Label>
+      </Pane>
+   </VBox>
+   <VBox prefHeight="900.0" prefWidth="450.0">
+      <Pane prefHeight="100.0" prefWidth="500.0" style="-fx-background-color: #800080;"/>
+      <Pane prefHeight="480.0" prefWidth="500.0" style="-fx-background-color: #FF0000;"/>
+      <Label alignment="CENTER" contentDisplay="TOP" layoutX="102.0" layoutY="70.0" prefHeight="61.0" prefWidth="246.0" text="NEXT MOVE">
+         <font>
+            <Font name="Bernard MT Condensed" size="36.0" />
+         </font>
+      </Label>
+      <Label fx:id="nextMoveLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="9.0" layoutY="131.0" prefHeight="61.0" prefWidth="436.0">
+         <font>
+            <Font name="System Bold" size="27.0" />
+         </font>
+      </Label>
+      <Pane fx:id="chatPane" prefHeight="320.0" prefWidth="500.0" style="-fx-background-color: #0000FF;"/>
+   </VBox>
 </HBox>

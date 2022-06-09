@@ -16,14 +16,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
@@ -63,10 +62,7 @@ public class GameLobbyController implements Controller {
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     @FXML
-    public ComboBox<String> colorPicker;
-    //this will allow change the status if user is ready
-    public boolean ready_button = false;
-
+    public ComboBox<Label> colorPicker = new ComboBox<>();
 
     @Inject
     public GameLobbyController(App app,
@@ -79,8 +75,7 @@ public class GameLobbyController implements Controller {
                                EventListener eventListener,
                                IDStorage idStorage,
                                GameIDStorage gameIDStorage,
-                               MemberIDStorage memberIDStorage
-    ) {
+                               MemberIDStorage memberIDStorage) {
         this.app = app;
         this.memberService = memberService;
         this.userService = userService;
@@ -146,6 +141,10 @@ public class GameLobbyController implements Controller {
                     }
                 }));
 
+        // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
+        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+                userService, messageService, memberIDStorage, memberService);
+        messageViewSubController.init();
     }
 
     @Override
@@ -183,13 +182,10 @@ public class GameLobbyController implements Controller {
                 .setAll(c.getList().stream().map(this::renderMember).toList()));
 
         addColorOnComboBox(colorPicker);
+
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
-        // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
-        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
-                userService, messageService, memberIDStorage, memberService);
-        messageViewSubController.init();
         // show chat and load the messages
         idChatContainer.getChildren().setAll(messageViewSubController.render());
 
@@ -218,8 +214,8 @@ public class GameLobbyController implements Controller {
     }
 
     public void ready(ActionEvent ignoredEvent) {
-        for (Member member: this.members) {
-            if (member.userId().equals(idStorage.getID())){
+        for (Member member : this.members) {
+            if (member.userId().equals(idStorage.getID())) {
                 if (member.ready()) {
                     memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color()).subscribe();
                     this.idReadyButton.setText("Ready");
@@ -232,7 +228,8 @@ public class GameLobbyController implements Controller {
     }
 
     public void startGame(ActionEvent ignoredEvent) {
-
+        //give all the players color
+        giveAllThePlayersColor();
         gameService.updateGame(gameIDStorage.getId(), null, null, null, true)
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error -> {
@@ -242,11 +239,47 @@ public class GameLobbyController implements Controller {
                     }
                 })
                 .subscribe(onSuccess -> {
+
                     final GameScreenController controller = gameScreenController.get();
                     this.app.show(controller);
+
                 }, onError -> {
                 });
+    }
 
+    private void giveAllThePlayersColor() {
+        ColorController controller = new ColorController();
+        List<Label> createdColors = controller.getColor();
+
+        List<String> allColors = createdColors(createdColors);
+
+        //remove color from allcolors if it belongs to a member
+        for (Member member : members) {
+            if (member.color() != null) {
+                allColors.remove(member.color());
+            }
+        }
+
+        //give color to member that do not have colors
+        List<Member> memberList = members;
+        for (Member member : memberList) {
+            if (member.color() == null || member.color().equals("#000000")) {
+                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0))
+                        .subscribe();
+                allColors.remove(0);
+            }
+        }
+    }
+
+    //change String into hascode for colors
+    private List<String> createdColors(List<Label> createdColors) {
+        List<String> colorNames = new ArrayList<>();
+        for (Label label : createdColors) {
+            String colorInString = "#" + Color.web(label.getText().toLowerCase()).toString().substring(2, 8);
+            colorNames.add(colorInString);
+        }
+
+        return colorNames;
     }
 
     private Node renderMember(Member member) {
@@ -255,76 +288,50 @@ public class GameLobbyController implements Controller {
     }
 
     private void addColorOnComboBox(ComboBox comboBox) {
-        comboBox.setPromptText("Select Color");
-        //get key and value
-        HashMap<String, String> color_to_hex = colorToHexcode(color());
-        List<String> leftColor = remainingColor(color_to_hex);
-        //addToCombox(comboBox,leftColor);
-        comboBox.getItems().addAll(color());
-    }
 
-    //this makes sure duplicate dones not come
-    //into combox
-    private void addToCombox(ComboBox comboBox, List<String> leftColor) {
-        for (String color : leftColor) {
-            if (!comboBox.getItems().contains(color)) {
-                comboBox.getItems().add(color);
+        ObservableList<Label> items = FXCollections.observableArrayList(color());
+        comboBox.getItems().addAll(items);
+        comboBox.getSelectionModel().clearSelection(0);
+        comboBox.setVisibleRowCount(300);
+        //This makes sure the color are presented in the strings and
+        //border will be shown on Labels
+        comboBox.setCellFactory(listView -> new ListCell<Label>() {
+            public void updateItem(Label label, boolean empty) {
+                super.updateItem(label, empty);
+                if (label != null) {
+                    if (label.getText().equals("Select Color")) {
+                        setText(null);
+                    }
+                    setText(label.getText());
+                    setTextFill(label.getTextFill());
+                    setMinWidth(label.getMinWidth());
+                    setStyle(label.getStyle());
+                } else {
+                    setText(null);
+
+                }
             }
-        }
-    }
-
-    //Get all the color from members
-    private List<String> remainingColor(HashMap<String, String> colortoHex) {
-        List<String> remaining_color = new ArrayList<>();
-        List<String> setOfColors = color();
-
-        for (Member member : members) {
-            if (colortoHex.containsKey(member.color())) {
-                remaining_color.add(colortoHex.get(member.color()));
-            }
-        }
-
-        for (String color : remaining_color) {
-            if (setOfColors.contains(color)) {
-                setOfColors.remove(color);
-            }
-        }
-        return setOfColors;
-    }
-
-    //This maps every color to its hexcode BLUE:#0000FF
-    private HashMap<String, String> colorToHexcode(List<String> list) {
-        HashMap<String, String> color_to_hexcode = new HashMap<>();
-        for (String E : list) {
-            Color c = Color.web(E.toLowerCase());
-            String pickedColor = "#" + c.toString().substring(2, 8);
-            color_to_hexcode.put(pickedColor, E);
-        }
-        return color_to_hexcode;
+        });
     }
 
     //List of colors
-    private List<String> color() {
-        List<String> color = new ArrayList<>();
-        color.add("RED");
-        color.add("BLUE");
-        color.add("GREEN");
-        color.add("ORANGE");
-        color.add("YELLOW");
-        color.add("VIOLET");
-
+    private List<Label> color() {
+        final ColorController controller = new ColorController();
+        List<Label> color = controller.getColor();
         return color;
     }
 
-    //color event
+    //color event, if color is picked then send color
     public void colorPicked(ActionEvent ignoredEvent) {
-        Color c = Color.web(colorPicker.getSelectionModel().getSelectedItem().toLowerCase());
+        Label label = colorPicker.getSelectionModel().getSelectedItem();
+
+        Color c = Color.web(label.getText().toLowerCase());
         String pickedColor = "#" + c.toString().substring(2, 8);
 
         boolean chose = true;
         boolean ready = false;
         List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
-        for (Member member: memberList) {
+        for (Member member : memberList) {
             if (member.color() != null && member.color().equals(pickedColor)) {
                 chose = false;
             }
