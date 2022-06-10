@@ -1,25 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="singleOpponentView" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="de.uniks.pioneers.controller.OpponentSubController">
-   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="12.0">
-      <ImageView fx:id="avatarImageView" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true"/>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="12.0">
-         <Label fx:id="usernameLabel" prefHeight="18.0" prefWidth="69.0" text="Label"/>
-         <Label fx:id="victoryPointsLabel" prefHeight="18.0" prefWidth="69.0" text="Label"/>
+<VBox fx:id="singleOpponentView" alignment="TOP_CENTER" prefHeight="110.0" prefWidth="216.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.OpponentSubController">
+   <HBox alignment="CENTER" prefHeight="68.0" prefWidth="216.0" spacing="12.0">
+      <ImageView fx:id="avatarImageView" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="8.0">
+         <Label fx:id="usernameLabel" prefHeight="18.0" prefWidth="69.0" text="Label" />
+         <Label fx:id="victoryPointsLabel" prefHeight="18.0" prefWidth="69.0" text="Label" />
       </VBox>
    </HBox>
-   <HBox fx:id="resourcesView" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="12.0">
-      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true"/>
-      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true"/>
-      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true"/>
-      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true"/>
-      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true"/>
+   <HBox fx:id="resourcesView" alignment="CENTER" prefHeight="14.0" prefWidth="200.0" spacing="12.0">
+      <ImageView fx:id="earthCactusImage" fitHeight="23.0" fitWidth="13.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../earth_cactus.png" />
+         </image></ImageView>
+      <ImageView fx:id="marsBarImage" fitHeight="26.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../mars_bar.png" />
+         </image></ImageView>
+      <ImageView fx:id="moonRockImage" fitHeight="21.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../moon_rock.png" />
+         </image></ImageView>
+      <ImageView fx:id="neptunCrystalsImage" fitHeight="21.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../neptun_crystals.png" />
+         </image></ImageView>
+      <ImageView fx:id="venusGrainImage" fitHeight="25.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../venus_grain.png" />
+         </image></ImageView>
    </HBox>
 </VBox>

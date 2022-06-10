@@ -61,6 +61,9 @@ public class Constants {
 
     // Game
     public static final int MAX_MEMBERS = 6;
+    public static final String SETTLEMENT = "settlement";
+    public static final String CITY = "city";
+    public static final int AMOUNT_SETTLEMENTS_CITIES = 13;
 
     //Array of Colors as Strings for the Label text
     public  static final String[] COLORSTRINGARRAY = {"RED", "BLUE", "ORANGE", "VIOLET", "PINK", "CORAL", "GOLD", "DARKORANGE",
