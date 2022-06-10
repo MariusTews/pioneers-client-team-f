@@ -63,7 +63,6 @@ public class GameLobbyViewTest extends ApplicationTest {
         when(gameIDStorage.getId()).thenReturn("g1");
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(m1, m2).buffer(2));
         when(userService.findAllUsers()).thenReturn(Observable.just(u1, u2).buffer(2));
-        when(userService.findOne(any())).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameService.findOneGame(any())).thenReturn(Observable.just(g));
         when(messageService.getAllMessages(any(), any())).thenReturn(Observable.just(x1, x2).buffer(2));
