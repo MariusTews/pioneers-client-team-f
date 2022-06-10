@@ -5,6 +5,7 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -16,7 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ import static de.uniks.pioneers.Constants.*;
 public class GameLobbyController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
+    private final ObservableList<User> playerList = FXCollections.observableArrayList();
 
     @FXML
     public Label idTitleLabel;
@@ -95,7 +97,20 @@ public class GameLobbyController implements Controller {
         memberService
                 .getAllGameMembers(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
-                .subscribe(this.members::setAll);
+                .subscribe(col -> {
+                    this.members.setAll(col);
+                    this.userService.findAllUsers()
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(event -> {
+                                for (User user : event) {
+                                    for (Member member : members) {
+                                        if (user._id().equals(member.userId())) {
+                                            this.playerList.add(user);
+                                        }
+                                    }
+                                }
+                            });
+                });
 
         // listen to members
         disposable.add(eventListener
@@ -106,6 +121,9 @@ public class GameLobbyController implements Controller {
                     if (event.event().endsWith(CREATED)) {
                         if (!members.contains(member)) {
                             members.add(member);
+                            userService.findOne(member.userId())
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(this.playerList::add);
                         }
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
@@ -128,6 +146,7 @@ public class GameLobbyController implements Controller {
                         }
                         this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
                     }
+                    this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
                 }));
 
         //listen to the game
@@ -171,15 +190,14 @@ public class GameLobbyController implements Controller {
             return null;
         }
 
-        //TODO: load game title WIP SERVERREQUEST LIMIT
         gameService
                 .findOneGame(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> this.idTitleLabel.setText("Welcome to " + result.name()));
 
         // load game members
-        members.addListener((ListChangeListener<? super Member>) c -> this.idUserList.getChildren()
-                .setAll(c.getList().stream().map(this::renderMember).toList()));
+        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+        playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList()));
 
         addColorOnComboBox(colorPicker);
 
@@ -283,7 +301,13 @@ public class GameLobbyController implements Controller {
     }
 
     private Node renderMember(Member member) {
-        this.memberListSubcontroller = new MemberListSubcontroller(this.app, member, this.userService);
+        for (User user : playerList) {
+            if (user._id().equals(member.userId())) {
+                this.memberListSubcontroller = new MemberListSubcontroller(member, user);
+                break;
+            }
+        }
+
         return memberListSubcontroller.render();
     }
 
