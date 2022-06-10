@@ -184,7 +184,6 @@ public class GameLobbyController implements Controller {
             return null;
         }
 
-        //TODO: load game title WIP SERVERREQUEST LIMIT
         gameService
                 .findOneGame(this.gameIDStorage.getId())
                 .observeOn(FX_SCHEDULER)
