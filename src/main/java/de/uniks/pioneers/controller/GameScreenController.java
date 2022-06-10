@@ -161,6 +161,11 @@ public class GameScreenController implements Controller {
         if (this.messageViewSubController != null) {
             this.messageViewSubController.destroy();
         }
+
+        if (this.userSubView != null) {
+            this.userSubView.destroy();
+        }
+
         disposable.dispose();
 
         this.opponentSubCons.forEach(OpponentSubController::destroy);
