@@ -3,7 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Member;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.model.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,8 +15,6 @@ import javafx.scene.paint.Color;
 import javax.inject.Inject;
 import java.io.IOException;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
-
 public class MemberListSubcontroller implements Controller {
     @FXML
     public ImageView idAvatar;
@@ -26,14 +24,14 @@ public class MemberListSubcontroller implements Controller {
     public Label idReady;
     private App app;
     private Member member;
+    private User user;
 
-    private final UserService userService;
 
     @Inject
-    public MemberListSubcontroller(App app, Member member, UserService userService) {
+    public MemberListSubcontroller(App app, Member member, User user) {
         this.app = app;
         this.member = member;
-        this.userService = userService;
+        this.user = user;
     }
 
     @Override
@@ -58,25 +56,19 @@ public class MemberListSubcontroller implements Controller {
             return null;
         }
 
+        // set username and avatar
         if (this.member != null) {
-            // set username and avatar
-            this.userService
-                    .findOne(this.member.userId())
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                        if(member.color() != null) {
-                            this.idUsername.setText(result.name());
-                            this.idUsername.setTextFill(Color.web(member.color()));
-                        }else {
-                            this.idUsername.setText(result.name());
-                        }
-                        //this.idUsername.setTextFill(Color.GREEN);
+            if(member.color() != null) {
+                this.idUsername.setText(user.name());
+                this.idUsername.setTextFill(Color.web(member.color()));
+            }else {
+                this.idUsername.setText(user.name());
+            }
 
+            if (user.avatar() != null) {
+                this.idAvatar.setImage(new Image(user.avatar()));
+            }
 
-                        if (result.avatar() != null) {
-                            this.idAvatar.setImage(new Image(result.avatar()));
-                        }
-                    });
 
             // set ready
             if (this.member.ready()) {
