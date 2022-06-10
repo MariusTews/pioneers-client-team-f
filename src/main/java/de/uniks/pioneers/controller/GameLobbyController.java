@@ -99,11 +99,17 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.members.setAll(col);
-                    for (Member member : col) {
-                        this.userService.findOne(member.userId())
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe(this.playerList::add);
-                    }
+                    this.userService.findAllUsers()
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(event -> {
+                                for (User user : event) {
+                                    for (Member member : members) {
+                                        if (user._id().equals(member.userId())) {
+                                            this.playerList.add(user);
+                                        }
+                                    }
+                                }
+                            });
                 });
 
         // listen to members
