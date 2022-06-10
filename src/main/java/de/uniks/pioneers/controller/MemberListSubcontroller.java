@@ -1,6 +1,5 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.User;
@@ -22,14 +21,12 @@ public class MemberListSubcontroller implements Controller {
     public Label idUsername;
     @FXML
     public Label idReady;
-    private App app;
-    private Member member;
-    private User user;
+    private final Member member;
+    private final User user;
 
 
     @Inject
-    public MemberListSubcontroller(App app, Member member, User user) {
-        this.app = app;
+    public MemberListSubcontroller(Member member, User user) {
         this.member = member;
         this.user = user;
     }
@@ -58,10 +55,10 @@ public class MemberListSubcontroller implements Controller {
 
         // set username and avatar
         if (this.member != null) {
-            if(member.color() != null) {
+            if (member.color() != null) {
                 this.idUsername.setText(user.name());
                 this.idUsername.setTextFill(Color.web(member.color()));
-            }else {
+            } else {
                 this.idUsername.setText(user.name());
             }
 

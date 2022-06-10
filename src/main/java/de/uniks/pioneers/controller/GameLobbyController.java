@@ -17,7 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
@@ -99,7 +99,7 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.members.setAll(col);
-                    for(Member member: col){
+                    for (Member member : col) {
                         this.userService.findOne(member.userId())
                                 .observeOn(FX_SCHEDULER)
                                 .subscribe(this.playerList::add);
@@ -192,9 +192,7 @@ public class GameLobbyController implements Controller {
 
         // load game members
         this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-        playerList.addListener((ListChangeListener<? super User>) c -> {
-            this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-        });
+        playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList()));
 
         addColorOnComboBox(colorPicker);
 
@@ -298,9 +296,9 @@ public class GameLobbyController implements Controller {
     }
 
     private Node renderMember(Member member) {
-        for(User user :playerList){
-            if(user._id().equals(member.userId())){
-                this.memberListSubcontroller = new MemberListSubcontroller(this.app, member, user);
+        for (User user : playerList) {
+            if (user._id().equals(member.userId())) {
+                this.memberListSubcontroller = new MemberListSubcontroller(member, user);
                 break;
             }
         }
