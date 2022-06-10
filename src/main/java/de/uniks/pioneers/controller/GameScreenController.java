@@ -31,7 +31,7 @@ import static de.uniks.pioneers.Constants.*;
 
 public class GameScreenController implements Controller {
 
-    private final ObservableList<Member> members = FXCollections.observableArrayList();
+    private final ObservableList<Player> players = FXCollections.observableArrayList();
 
     @FXML
     public Pane mapPane;
@@ -88,7 +88,6 @@ public class GameScreenController implements Controller {
     @Override
     public void init() {
 
-
         // For later : userHash is needed in MessageViewSubController too,
         // improvement would be to not initialize the hash twice.
         // Get all users for the username and avatar. Save in HashMap to find the user by his/her ID
@@ -100,15 +99,13 @@ public class GameScreenController implements Controller {
                         this.userHash.put(user._id(), user);
                     }
 
-                    // Get all members of the game for loading the opponents
-                    // ATTENTION: it is not possible to pass the observable list of members via constructor!
-                    memberService
-                            .getAllGameMembers(this.gameIDStorage.getId())
+                    pioneersService
+                            .findAllPlayers(this.gameIDStorage.getId())
                             .observeOn(FX_SCHEDULER)
-                            .subscribe(memberResult -> {
-                                for (Member member : memberResult) {
-                                    if (!member.userId().equals(idStorage.getID())) {
-                                        this.members.add(member);
+                            .subscribe(c -> {
+                                for (Player player : c) {
+                                    if (!player.userId().equals(idStorage.getID())) {
+                                        players.add(player);
                                     }
                                 }
                             });
@@ -124,11 +121,11 @@ public class GameScreenController implements Controller {
                     }
                 }));
 
-        // Listen to the members to get to know if a member of the game leaves or joins the game
+        // Listen to the buildings for recognizing if achievements changed
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
+                .listen("games." + this.gameIDStorage.getId() + ".players.*.*", Player.class)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(this::handleMemberEvents));
+                .subscribe(this::handlePlayerEvent));
 
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
@@ -163,41 +160,57 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,idStorage,eventListener);
+        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,
+                                                                                                idStorage,eventListener);
         gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
 
-
         userPaneId.getChildren().setAll(userSubView.render());
 
         // Render opponent loads the opponent view everytime the members list is changed
-        this.members.addListener((ListChangeListener<? super Member>) c ->
-                this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
+        // render opponents when achievements change
+        this.players.addListener((ListChangeListener<? super Player>) c ->
+               this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
 
         return parent;
     }
 
-    private void handleMemberEvents(Event<Member> memberEvent) {
-        // Handle event on player and refresh list of players
-        Member member = memberEvent.data();
+    private int calculateVP(Player player) {
+        // Calculate the victory points, when the change listener of players recognizes changes
+        // Update opponent by removing and rendering opponent with new victory points again
+        // 13 is the total number of cities and settlements a player is able to set in the game
+        return AMOUNT_SETTLEMENTS_CITIES - (player.remainingBuildings().get(SETTLEMENT) + player.remainingBuildings().get(CITY) * 2);
+    }
 
-        if (memberEvent.event().endsWith(CREATED)) {
-            this.members.add(member);
-            this.opponentsView.getChildren().add(renderOpponent(member));
-        } else if (memberEvent.event().endsWith(DELETED)) {
-            this.members.removeIf(p -> p.userId().equals(member.userId()));
-            // Remove opponent sub-controller and render the opponent list again without the game member
-            this.removeOpponent(member);
+    private void handlePlayerEvent(Event<Player> playerEvent) {
+        // Handle event on player and refresh list of players
+        Player player = playerEvent.data();
+
+        if (playerEvent.event().endsWith(UPDATED)) {
+            for (Player p : players) {
+                if (p.userId().equals(player.userId())) {
+                    this.removeOpponent(p);
+                    players.set(players.indexOf(p), player);
+                }
+            }
+        } else if (playerEvent.event().endsWith(CREATED)) {
+            if (!player.userId().equals(idStorage.getID())) {
+                this.players.add(player);
+                this.opponentsView.getChildren().add(renderOpponent(player));
+            }
+        } else if (playerEvent.event().endsWith(DELETED)) {
+            this.players.remove(player);
+            this.removeOpponent(player);
         }
     }
 
-    private void removeOpponent(Member member) {
+    private void removeOpponent(Player player) {
         // Remove sub-controller of opponent who left
         for (OpponentSubController subCon : this.opponentSubCons) {
-            if (subCon.getId().equals(member.userId())) {
+            if (subCon.getId().equals(player.userId())) {
                 this.opponentSubCons.remove(subCon);
                 break;
             }
@@ -205,19 +218,22 @@ public class GameScreenController implements Controller {
     }
 
     // Load the opponent view with username and avatar
-    private Node renderOpponent(Member member) {
+    private Node renderOpponent(Player player) {
+        System.out.println("ENTER RENDER PLAYER");
         // user's view loads the opponents without the user himself/herself, because user has own view with stats
         // User as parameter for getting avatar and username
         for (OpponentSubController subCon : this.opponentSubCons) {
-            if (subCon.getId().equals(member.userId())) {
+            if (subCon.getId().equals(player.userId())) {
                 return subCon.getParent();
             }
         }
 
-        OpponentSubController opponentCon = new OpponentSubController(member, this.userHash.get(member.userId()));
+        OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
+                                                                                            this.calculateVP(player));
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }
+
 
     public void onMouseClicked(MouseEvent mouseEvent) {
         diceRoll();
