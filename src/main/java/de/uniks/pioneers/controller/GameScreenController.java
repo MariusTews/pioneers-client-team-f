@@ -2,12 +2,10 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -41,6 +39,10 @@ public class GameScreenController implements Controller {
     public Label diceSumLabel;
     @FXML
     public VBox opponentsView;
+    @FXML
+    public Label nextMoveLabel;
+    @FXML
+    public Label currentPlayerLabel;
 
     private final App app;
 
@@ -110,29 +112,40 @@ public class GameScreenController implements Controller {
                                 }
                             });
                 });
-
+        // Listen to the Moves to handle the event
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".moves.*." + "created", Move.class)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    Move move = event.data();
-                    if (move.action().endsWith("roll")) {
-                        diceSumLabel.setText(Integer.toString(move.roll()));
-                    }
-                }));
+                .subscribe(this::handleMoveEvents));
 
-        // Listen to the buildings for recognizing if achievements changed
+        // Listen to the players for recognizing if achievements changed
         disposable.add(eventListener
                 .listen("games." + this.gameIDStorage.getId() + ".players.*.*", Player.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handlePlayerEvent));
+
+        // Listen to the State to handle the event
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this::handleStateEvents));
+
+        // Check if expected move is founding-roll after joining the game
+        pioneersService
+                .findOneState(gameIDStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    if (result.expectedMoves().get(0).action().equals("founding-roll")) {
+                        foundingDiceRoll();
+                    }
+                });
 
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        this.userSubView = new UserSubView(gameIDStorage,idStorage,userService,eventListener,pioneersService);
+        this.userSubView = new UserSubView(gameIDStorage, idStorage, userService, eventListener, pioneersService);
         this.userSubView.init();
 
     }
@@ -142,6 +155,11 @@ public class GameScreenController implements Controller {
         if (this.messageViewSubController != null) {
             this.messageViewSubController.destroy();
         }
+
+        if (this.userSubView != null) {
+            this.userSubView.destroy();
+        }
+
         disposable.dispose();
 
         this.opponentSubCons.forEach(OpponentSubController::destroy);
@@ -160,8 +178,7 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService,
-                                                                                                idStorage,eventListener);
+        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
@@ -176,6 +193,15 @@ public class GameScreenController implements Controller {
                this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
 
         return parent;
+    }
+
+    private void handleMoveEvents(Event<Move> moveEvent) {
+        Move move = moveEvent.data();
+
+        // if the move is a roll change the diceSumLabel to the roll number
+        if (move.action().equals("roll")) {
+            diceSumLabel.setText(Integer.toString(move.roll()));
+        }
     }
 
     private int calculateVP(Player player) {
@@ -207,6 +233,17 @@ public class GameScreenController implements Controller {
         }
     }
 
+    private void handleStateEvents(Event<State> stateEvent) {
+        State state = stateEvent.data();
+
+        if (stateEvent.event().endsWith(UPDATED)) {
+            // change the nextMoveLabel to the current move
+            nextMoveLabel.setText(state.expectedMoves().get(0).action());
+            // change the currentPlayerLabel to the current player
+            currentPlayerLabel.setText(this.userHash.get(state.expectedMoves().get(0).players().get(0)).name());
+        }
+    }
+
     private void removeOpponent(Player player) {
         // Remove sub-controller of opponent who left
         for (OpponentSubController subCon : this.opponentSubCons) {
@@ -219,7 +256,6 @@ public class GameScreenController implements Controller {
 
     // Load the opponent view with username and avatar
     private Node renderOpponent(Player player) {
-        System.out.println("ENTER RENDER PLAYER");
         // user's view loads the opponents without the user himself/herself, because user has own view with stats
         // User as parameter for getting avatar and username
         for (OpponentSubController subCon : this.opponentSubCons) {
@@ -234,22 +270,26 @@ public class GameScreenController implements Controller {
         return opponentCon.render();
     }
 
-
     public void onMouseClicked(MouseEvent mouseEvent) {
         diceRoll();
     }
 
+    // diceRoll if the current move is roll
     public void diceRoll() {
-        State state = pioneersService.findOneState(gameIDStorage.getId()).blockingFirst();
-        List<ExpectedMove> expectedMove = state.expectedMoves();
-        ExpectedMove currentExpectedMove = expectedMove.get(0);
-        String action = currentExpectedMove.action();
-
-        if (action.endsWith("roll")) {
-            pioneersService.move(gameIDStorage.getId(), action, 0, 0, 0, 0, "settlement")
+        if (nextMoveLabel.getText().equals("roll")) {
+            pioneersService.move(gameIDStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement")
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                     }, Throwable::printStackTrace);
         }
+    }
+
+    // automatic foundingDiceRoll after joining the game
+    public void foundingDiceRoll() {
+        pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                    diceSumLabel.setText(Integer.toString(result.roll()));
+                }, Throwable::printStackTrace);
     }
 }
