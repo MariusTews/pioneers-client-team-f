@@ -78,6 +78,7 @@ public class OpponentSubController implements Controller {
             return null;
         }
 
+        // Add victory points, add colored username and avatar
         if (this.opponent != null) {
             this.userId = this.opponent.userId();
             if (this.opponentAsUser == null) {
@@ -92,6 +93,7 @@ public class OpponentSubController implements Controller {
             this.victoryPointsLabel.setText("VP: " + victoryPoints + "/10");
         }
 
+        // Add information when hovering over items
         Tooltip.install(earthCactusImage, new Tooltip("Earth cactus"));
         Tooltip.install(marsBarImage, new Tooltip("Mars bar"));
         Tooltip.install(moonRockImage, new Tooltip("Moon rock"));

@@ -56,8 +56,6 @@ public class GameScreenController implements Controller {
     private final MessageService messageService;
     private final MemberService memberService;
     public Pane userPaneId;
-
-    private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -190,7 +188,7 @@ public class GameScreenController implements Controller {
         // Render opponent loads the opponent view everytime the members list is changed
         // render opponents when achievements change
         this.players.addListener((ListChangeListener<? super Player>) c ->
-               this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
+                this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
 
         return parent;
     }
@@ -265,12 +263,12 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                                                                                            this.calculateVP(player));
+                this.calculateVP(player));
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }
 
-    public void onMouseClicked(MouseEvent mouseEvent) {
+    public void onMouseClicked(MouseEvent ignoredMouseEvent) {
         diceRoll();
     }
 
@@ -288,8 +286,6 @@ public class GameScreenController implements Controller {
     public void foundingDiceRoll() {
         pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    diceSumLabel.setText(Integer.toString(result.roll()));
-                }, Throwable::printStackTrace);
+                .subscribe(result -> diceSumLabel.setText(Integer.toString(result.roll())), Throwable::printStackTrace);
     }
 }
