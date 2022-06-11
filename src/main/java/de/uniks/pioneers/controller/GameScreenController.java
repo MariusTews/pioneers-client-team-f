@@ -4,7 +4,10 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
-import de.uniks.pioneers.model.*;
+import de.uniks.pioneers.model.Move;
+import de.uniks.pioneers.model.Player;
+import de.uniks.pioneers.model.State;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -296,9 +299,11 @@ public class GameScreenController implements Controller {
     }
 
     public void finishTurn(ActionEvent event) {
-        pioneersService.move(gameIDStorage.getId(),"build",null,null,null,null,null)
+        pioneersService.move(gameIDStorage.getId(), "build", null, null, null, null, null)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result->{},onError->{});
+                .subscribe(result -> {
+                }, onError -> {
+                });
 
     }
 }

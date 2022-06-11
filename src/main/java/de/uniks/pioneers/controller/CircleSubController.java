@@ -23,7 +23,7 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
-public class CircleSubController implements Controller{
+public class CircleSubController implements Controller {
 
     private Parent parent;
     private final App app;
@@ -41,7 +41,7 @@ public class CircleSubController implements Controller{
     private ExpectedMove nextMove;
 
     @Inject
-    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, EventListener eventListener){
+    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, EventListener eventListener) {
         this.app = app;
         this.view = view;
         this.pioneersService = pioneersService;
@@ -64,9 +64,9 @@ public class CircleSubController implements Controller{
         String[] split = id.split("y");
         this.x = Integer.parseInt(split[0]);
         String[] split1 = split[1].split("z");
-        this.y = Integer.parseInt( split1[0]);
+        this.y = Integer.parseInt(split1[0]);
         String[] split2 = split1[1].split("_");
-        this.z =  Integer.parseInt(split2[0]);
+        this.z = Integer.parseInt(split2[0]);
         this.side = Integer.parseInt(split2[1]);
 
         this.nextMove = new ExpectedMove("", Collections.singletonList(idStorage.getID()));
@@ -83,10 +83,10 @@ public class CircleSubController implements Controller{
 
     private void onFieldClicked(MouseEvent mouseEvent) {
         //if its not your turn
-        if(!yourTurn(nextMove)){
-            new Alert(Alert.AlertType.INFORMATION,"Not your turn!").showAndWait();
-        // if the game is in the founding-phase
-        }else if(nextMove.action().startsWith("founding-road") || nextMove.action().startsWith("founding-s")){
+        if (!yourTurn(nextMove)) {
+            new Alert(Alert.AlertType.INFORMATION, "Not your turn!").showAndWait();
+            // if the game is in the founding-phase
+        } else if (nextMove.action().startsWith("founding-r") || nextMove.action().startsWith("founding-s")) {
             this.pioneersService.findOneState(gameIDStorage.getId())
                     .observeOn(FX_SCHEDULER)
                     .subscribe(move -> {
@@ -96,7 +96,7 @@ public class CircleSubController implements Controller{
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> {
                                         String[] building = nextMove.action().split("-");
-                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] +  " here!").showAndWait();
+                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] + " here!").showAndWait();
                                     })
                                     .subscribe(onSuc -> {
                                     }, onError -> {
@@ -106,26 +106,28 @@ public class CircleSubController implements Controller{
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> {
                                         String[] building = nextMove.action().split("-");
-                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] +  " here!").showAndWait();
+                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] + " here!").showAndWait();
                                     })
-                                    .subscribe(onSuc -> {}, onError -> {});
+                                    .subscribe(onSuc -> {
+                                    }, onError -> {
+                                    });
                         }
                     });
         }
     }
 
-    public Boolean yourTurn(ExpectedMove move){
+    public Boolean yourTurn(ExpectedMove move) {
         List<String> currPlayer = move.players();
-        for(String player: currPlayer){
-            if(player.equals(idStorage.getID())){
+        for (String player : currPlayer) {
+            if (player.equals(idStorage.getID())) {
                 return true;
             }
         }
         return false;
     }
 
-    public void setColor(int x, int y, int z, int side, String color){
-        if(this.x == x && this.y == z && this.z == y && this.side == side){
+    public void setColor(int x, int y, int z, int side, String color) {
+        if (this.x == x && this.y == z && this.z == y && this.side == side) {
             this.view.setFill(Color.valueOf(color));
         }
     }
@@ -157,7 +159,7 @@ public class CircleSubController implements Controller{
     // Mouse hovers over field
     private void onFieldMouseHoverEnter(MouseEvent event) {
         // Change the view
-        if(this.view.getFill().equals(Color.WHITE)) {
+        if (this.view.getFill().equals(Color.WHITE)) {
             this.view.setFill(Color.GRAY);
             this.view.setRadius(10.0);
         }
@@ -167,9 +169,9 @@ public class CircleSubController implements Controller{
     // Mouse leaves the field
     private void onFieldMouseHoverExit(MouseEvent event) {
         // Change the view
-            if(this.view.getFill().equals(Color.GRAY)) {
-                this.view.setFill(Color.WHITE);
-                this.view.setRadius(10.0);
-            }
+        if (this.view.getFill().equals(Color.GRAY)) {
+            this.view.setFill(Color.WHITE);
+            this.view.setRadius(10.0);
+        }
     }
 }
