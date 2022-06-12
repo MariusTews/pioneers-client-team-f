@@ -2,6 +2,7 @@ package de.uniks.pioneers;
 
 import de.uniks.pioneers.controller.Controller;
 import de.uniks.pioneers.controller.GameScreenController;
+import de.uniks.pioneers.controller.LobbyController;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -78,7 +79,7 @@ public class App extends Application {
         if (controller.getClass().equals(GameScreenController.class)) {
             stage.setWidth(1600);
             stage.setHeight(900);
-        }else {
+        }else if(controller.getClass().equals(LobbyController.class)){
             stage.setWidth(800);
             stage.setHeight(600);
         }
