@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.util.Locale;
 
 public class App extends Application {
 
@@ -28,6 +29,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        Locale.setDefault(new Locale("English", "England"));
         this.stage = primaryStage;
         stage.setWidth(800);
         stage.setHeight(600);

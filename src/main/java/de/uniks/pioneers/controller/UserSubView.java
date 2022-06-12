@@ -6,7 +6,6 @@ import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -15,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class UserSubView implements Controller {
 
@@ -36,7 +37,10 @@ public class UserSubView implements Controller {
     private final IDStorage idStorage;
     private final UserService userService;
     private final EventListener eventListener;
-    private final PioneersService pioneersService;
+    //private final PioneersService pioneersService;
+    private final Player player;
+    private final int vicPoints;
+
     public Label name;
     public Label victoryPoints;
     public Label item1;
@@ -44,15 +48,22 @@ public class UserSubView implements Controller {
     public Label item3;
     public Label item4;
     public Label item5;
+    public ImageView image1;
+    public ImageView image2;
+    public ImageView image3;
+    public ImageView image4;
+    public ImageView image5;
+    private Parent parent;
 
     @Inject
-    public UserSubView(GameIDStorage gameIDStorage, IDStorage idStorage, UserService userService, EventListener eventListener, PioneersService pioneersService) {
+    public UserSubView(GameIDStorage gameIDStorage, IDStorage idStorage, UserService userService, EventListener eventListener, Player player, int victoryPoints) {
 
         this.gameIDStorage = gameIDStorage;
         this.idStorage = idStorage;
         this.userService = userService;
         this.eventListener = eventListener;
-        this.pioneersService = pioneersService;
+        this.player = player;
+        this.vicPoints = victoryPoints;
     }
 
 
@@ -63,37 +74,21 @@ public class UserSubView implements Controller {
                     for (User user: col) {
                         this.users.add(user);
                     }
-                    pioneersService.findAllPlayers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
-                            .subscribe(result -> {this.players.setAll(result);
-                                this.attachTOSubview();
-                            });
+                    attachTOSubview();
                 });
 
-
-            disposable.add(eventListener.
-                listen("games." + this.gameIDStorage.getId() + ".players.*.*", Player.class)
-                    .observeOn(FX_SCHEDULER).
-                    subscribe(event -> {
-                        Player p = event.data();
-                        if(event.event().endsWith(UPDATED)){
-                            //this needs to be done
-                            this.players.add(p);
-                            this.attachTOSubview();
-                        }
-                    }));
     }
 
     private void attachTOSubview() {
-        for (Player player: this.players) {
             for(User user:this.users) {
                 if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
                     System.out.println(user._id());
                     this.attachName(user.name(), player.color());
                     this.attachResources(player.resources());
+                    this.victoryPoints.setText(Integer.toString(vicPoints) + "/10");
                     //TODO:Builidings needs to be calculated
                 }
             }
-        }
     }
 
     //resources are taken out of Hashmap
@@ -108,31 +103,33 @@ public class UserSubView implements Controller {
         } else {
             int i = 1;
             for (Integer object:resources.values()) {
-                if (i == 1) {
-                    //TODO :unknown
-                    //this needs to be handled as it is named unknown
-                } else if(i == 2) {
-                    item1.setText(object.toString());
-                    i++;
-                } else if(i == 3){
-                    item2.setText(object.toString());
-                    i++;
-                } else if(i==4){
-                    item3.setText(object.toString());
-                    i++;
-                } else if (i==5){
-                    item4.setText(object.toString());
-                    i++;
-                } else {
-                    item5.setText(object.toString());
+                switch (i) {
+                    case 2: item1.setText(object.toString());
+                            i++;
+                            break;
+                    case 3: item2.setText(object.toString());
+                            i++;
+                            break;
+                    case 4: item3.setText(object.toString());
+                            i++;
+                            break;
+                    case 5: item4.setText(object.toString());
+                            i++;
+                            break;
+                    case 6: item5.setText(object.toString());
+                            i++;
+                            break;
+                    default: i++;
+                             break;
                 }
             }
         }
     }
 
     //name is set to namelabel and color aswell
-    private void attachName(String n, String color) {
-        name.setText(n);
+    //and attach picture
+    private void attachName(String n, String color){
+        name.setText(n +" (YOU)");
         name.setTextFill(Color.web(color));
     }
 
@@ -152,8 +149,13 @@ public class UserSubView implements Controller {
             e.printStackTrace();
             return null;
         }
+        this.parent = parent;
+        return  parent;
+    }
 
-        return parent;
+    public Parent getParent(){
+        return  parent;
+
     }
 
     public void onSett(ActionEvent actionEvent) {

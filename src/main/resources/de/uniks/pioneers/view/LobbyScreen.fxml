@@ -63,7 +63,8 @@
       <HBox alignment="CENTER" maxHeight="40.0" prefHeight="100.0" prefWidth="200.0" spacing="12.0">
          <children>
             <Button fx:id="editUserButton" mnemonicParsing="false" onAction="#editButtonPressed" text="Edit User" />
-            <Pane prefHeight="39.0" prefWidth="520.0" />
+            <Pane prefHeight="39.0" prefWidth="452.0" />
+            <Button fx:id="rejoinButton" mnemonicParsing="false" onAction="#onRejoin" prefHeight="24.0" prefWidth="105.0" text="Rejoin" />
             <Button fx:id="createGameButton" mnemonicParsing="false" onAction="#createGameButtonPressed" text="Create Game" />
          </children>
       </HBox>
