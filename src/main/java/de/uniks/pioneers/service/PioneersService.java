@@ -44,7 +44,7 @@ public class PioneersService {
 
     public Observable<Move> move(String gameId, String action, Number x, Number y, Number z, Number side, String type) {
         if(x == null && y == null && z == null && side == null && type == null) {
-            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, new CreateBuildingDto(null, null, null, null, null)));
+            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null));
         }
         else {
             return this.pioneersApiService.create(gameId, new CreateMoveDto(action, new CreateBuildingDto(x, y, z, side, type)));

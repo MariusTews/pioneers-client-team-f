@@ -20,6 +20,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -52,6 +53,8 @@ public class GameScreenController implements Controller {
     @FXML
     public VBox opponentsView;
     @FXML
+    public Button finishTurnButton;
+    @FXML
     public Label nextMoveLabel;
     @FXML
     public Label currentPlayerLabel;
@@ -70,6 +73,8 @@ public class GameScreenController implements Controller {
     private final MessageService messageService;
     private final MemberService memberService;
     public Pane userPaneId;
+
+    private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -268,7 +273,6 @@ public class GameScreenController implements Controller {
                 }
             }
         } else if (playerEvent.event().endsWith(CREATED)) {
-
             if (!player.userId().equals(idStorage.getID())) {
                 this.players.add(player);
                 this.opponentsView.getChildren().add(renderOpponent(player));
@@ -371,5 +375,14 @@ public class GameScreenController implements Controller {
         }else {
             this.app.show(lobbyController.get());
         }
+    }
+
+    public void finishTurn(ActionEvent event) {
+        pioneersService.move(gameIDStorage.getId(), "build", null, null, null, null, null)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                }, onError -> {
+                });
+
     }
 }
