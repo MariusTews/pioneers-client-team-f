@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class UserSubView implements Controller {
 
@@ -82,7 +81,6 @@ public class UserSubView implements Controller {
     private void attachTOSubview() {
             for(User user:this.users) {
                 if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
-                    System.out.println(user._id());
                     this.attachName(user.name(), player.color());
                     this.attachResources(player.resources());
                     this.victoryPoints.setText(Integer.toString(vicPoints) + "/10");
