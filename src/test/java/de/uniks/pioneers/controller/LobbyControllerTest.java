@@ -50,6 +50,9 @@ class LobbyControllerTest extends ApplicationTest {
     @Spy
     IDStorage idStorage;
 
+    @Spy
+    GameIDStorage gameIDStorage;
+
     @InjectMocks
     LobbyController lobbyController;
 

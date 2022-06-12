@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.image.Image?>
 <VBox fx:id="userStatus" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="245.0" prefWidth="310.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.UserSubView">
    <children>
       <Label fx:id="name" prefHeight="38.0" prefWidth="191.0" text="Name">
@@ -39,23 +40,38 @@
       </Label>
       <HBox alignment="CENTER" prefHeight="26.0" prefWidth="301.0" spacing="30.0">
          <children>
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="image1" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" >
+            <image>
+               <Image url="@../earth_cactus.png" />
+            </image></ImageView>
+            <ImageView fx:id="image2" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../mars_bar.png" />
+               </image>
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </ImageView>
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="image3" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../moon_rock.png" />
+               </image>
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </ImageView>
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="image4" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../neptun_crystals.png" />
+               </image>
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </ImageView>
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="image5" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../venus_grain.png" />
+               </image>
                <HBox.margin>
                   <Insets />
                </HBox.margin>

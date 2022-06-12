@@ -248,7 +248,7 @@ public class GameLobbyController implements Controller {
     public void startGame(ActionEvent ignoredEvent) {
         //give all the players color
         giveAllThePlayersColor();
-        gameService.updateGame(gameIDStorage.getId(), null, null, null, true)
+        gameService.updateGame(gameIDStorage.getId(), null, null, this.idStorage.getID(), true)
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error -> {
                     if ("HTTP 403 ".equals(error.getMessage())) {
