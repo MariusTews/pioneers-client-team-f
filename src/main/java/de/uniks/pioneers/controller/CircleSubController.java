@@ -86,13 +86,13 @@ public class CircleSubController implements Controller {
         if (!yourTurn(nextMove)) {
             new Alert(Alert.AlertType.INFORMATION, "Not your turn!").showAndWait();
             // if the game is in the founding-phase
-        } else if (nextMove.action().startsWith("founding-r") || nextMove.action().startsWith("founding-s")) {
+        } else if (nextMove.action().startsWith("founding-r") || nextMove.action().startsWith("founding-s") || nextMove.action().equals("")) {
             this.pioneersService.findOneState(gameIDStorage.getId())
                     .observeOn(FX_SCHEDULER)
                     .subscribe(move -> {
                         String action = move.expectedMoves().get(0).action();
                         if (side == 0 || side == 6) {
-                            this.pioneersService.move(gameIDStorage.getId(), action, x, z, y, side, "settlement")
+                            this.pioneersService.move(gameIDStorage.getId(), action, x, y, z, side, "settlement")
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> {
                                         String[] building = nextMove.action().split("-");
@@ -102,7 +102,7 @@ public class CircleSubController implements Controller {
                                     }, onError -> {
                                     });
                         } else {
-                            this.pioneersService.move(gameIDStorage.getId(), action, x, z, y, side, "road")
+                            this.pioneersService.move(gameIDStorage.getId(), action, x, y, z, side, "road")
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> {
                                         String[] building = nextMove.action().split("-");
@@ -127,7 +127,7 @@ public class CircleSubController implements Controller {
     }
 
     public void setColor(int x, int y, int z, int side, String color) {
-        if (this.x == x && this.y == z && this.z == y && this.side == side) {
+        if (this.x == x && this.y == y && this.z == z && this.side == side) {
             this.view.setFill(Color.valueOf(color));
         }
     }
