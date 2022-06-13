@@ -107,11 +107,11 @@ public class GameFieldSubController implements Controller{
     }
 
     private void loadMap(Map map) {
-        List<String> waterTilesCircles = Arrays.asList("xM2yM1z3_3", "xM1yM2z3_6", "xM1yM2z3_3", "x0yM3z3_6", "x1yM3z2_6",
-                "x1yM3z2_7", "x2yM3z1_6", "x2yM3z1_7", "x3yM3z0_7", "x3yM3z0_6", "x3yM2zM1_7", "x3yM2zM1_6", "x3yM1zM2_7",
-                "x3yM1zM2_6", "x2y1zM3_0", "x2y1zM3_11", "x1y2zM3_0", "x1y2zM3_11", "x0y3zM3_0", "x0y3zM3_11", "xM1y3zM2_0",
-                "xM1y3zM2_11", "xM2y3zM1_0", "xM2y3zM1_11", "xM3y3z0_0", "xM3y2z1_3", "xM3y2z1_0", "xM3y0z3_3", "xM2yM1z3_6",
-                "xM3y1z2_3", "xM3y1z2_0");
+        List<String> waterTilesCircles = Arrays.asList("x1y2zM3_7", "x1y2zM3_6", "x2y1zM3_7", "x2y1zM3_6", "x3y0zM3_7",
+                "x3y0zM3_6", "x3yM1zM2_7", "x3yM1zM2_6", "x3yM2zM1_7", "x3yM2zM1_6", "x2yM3z1_0", "x2yM3z1_11", "x1yM3z2_0",
+                "x1yM3z2_11", "x0yM3z3_0", "x0yM3z3_11", "xM1yM2z3_0", "xM1yM2z3_11", "xM2yM1z3_0", "xM2yM1z3_11", "xM3y0z3_0",
+                "xM3y1z2_3", "xM3y1z2_0", "xM3y2z1_3", "xM3y2z1_0", "xM3y3z0_3", "xM2y3zM1_6", "xM2y3zM1_3", "xM1y3zM2_6",
+                "xM1y3zM2_3", "x0y3zM3_6");
         List<String> hexaCoords = new ArrayList<>();
         List<Integer> cirleCoords = new ArrayList<>();
         cirleCoords.add(0);
