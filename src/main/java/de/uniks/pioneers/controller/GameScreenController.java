@@ -209,6 +209,8 @@ public class GameScreenController implements Controller {
 
         this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
 
+        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
+
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
         currentPlayerLabel.textProperty().addListener(new ChangeListener<String>() {
             @Override
