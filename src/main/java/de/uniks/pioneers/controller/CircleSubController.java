@@ -86,7 +86,7 @@ public class CircleSubController implements Controller {
 
 
     private void onFieldClicked(MouseEvent mouseEvent) {
-        //if its not your turn
+        //if it's not your turn
         if (!yourTurn(nextMove)) {
             new Alert(Alert.AlertType.INFORMATION, "Not your turn!").showAndWait();
             // if the game is in the founding-phase
@@ -142,21 +142,21 @@ public class CircleSubController implements Controller {
 
     public void setRoad(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
-            //TODO: replace this with a image of the road
+            //TODO: replace this with an image of the road
             this.view.setFill(Color.valueOf(color));
         }
     }
 
     public void setSettlement(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
-            //TODO: replace this with a image of the settlement
+            //TODO: replace this with an image of the settlement
             this.view.setFill(Color.valueOf(color));
         }
     }
 
     public void setCity(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
-            //TODO: replace this with a image of the city
+            //TODO: replace this with an image of the city
             this.view.setFill(Color.valueOf(color));
             this.view.setRadius(15);
         }
