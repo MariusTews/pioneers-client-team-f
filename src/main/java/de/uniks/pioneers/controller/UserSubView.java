@@ -126,23 +126,13 @@ public class UserSubView implements Controller {
         }
         for (Map.Entry<String,Integer> set: resources.entrySet()) {
             switch (set.getKey()) {
-                case "lumber":
-                    item1.setText(String.valueOf(set.getValue()));
-                    break;
-                case "brick":
-                    item2.setText(String.valueOf(set.getValue()));
-                    break;
-                case "ore":
-                    item3.setText(String.valueOf(set.getValue()));
-                    break;
-                case "wool":
-                    item4.setText(String.valueOf(set.getValue()));
-                    break;
-                case "grain":
-                    item5.setText(String.valueOf(set.getValue()));
-                    break;
-                default:
-                    break;
+                case "lumber" -> item1.setText(String.valueOf(set.getValue()));
+                case "brick" -> item2.setText(String.valueOf(set.getValue()));
+                case "ore" -> item3.setText(String.valueOf(set.getValue()));
+                case "wool" -> item4.setText(String.valueOf(set.getValue()));
+                case "grain" -> item5.setText(String.valueOf(set.getValue()));
+                default -> {
+                }
             }
         }
     }
