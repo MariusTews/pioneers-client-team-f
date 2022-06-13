@@ -207,6 +207,9 @@ public class GameScreenController implements Controller {
             return null;
         }
 
+
+
+
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
         currentPlayerLabel.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -216,7 +219,7 @@ public class GameScreenController implements Controller {
         });
 
 
-        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
@@ -238,7 +241,7 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(gameIDStorage, idStorage, userService, eventListener, player, this.calculateVP(player));
+        UserSubView userSubView = new UserSubView(gameIDStorage, idStorage, userService, eventListener, player, this.calculateVP(player), gameFieldSubController);
         userSubView.init();
 
         return userSubView.render();

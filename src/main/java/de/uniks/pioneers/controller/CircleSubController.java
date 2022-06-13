@@ -32,6 +32,7 @@ public class CircleSubController implements Controller {
     private final GameIDStorage gameIDStorage;
     private final IDStorage idStorage;
     private final EventListener eventListener;
+    private final GameFieldSubController gameFieldSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private int x;
@@ -39,15 +40,17 @@ public class CircleSubController implements Controller {
     private int z;
     private int side;
     private ExpectedMove nextMove;
+    private String build = null;
 
     @Inject
-    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, EventListener eventListener) {
+    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, EventListener eventListener, GameFieldSubController gameFieldSubController) {
         this.app = app;
         this.view = view;
         this.pioneersService = pioneersService;
         this.gameIDStorage = gameIDStorage;
         this.idStorage = idStorage;
         this.eventListener = eventListener;
+        this.gameFieldSubController = gameFieldSubController;
     }
 
     @Override
@@ -81,8 +84,9 @@ public class CircleSubController implements Controller {
 
     }
 
+
     private void onFieldClicked(MouseEvent mouseEvent) {
-        //if its not your turn
+        //if it's not your turn
         if (!yourTurn(nextMove)) {
             new Alert(Alert.AlertType.INFORMATION, "Not your turn!").showAndWait();
             // if the game is in the founding-phase
@@ -113,6 +117,15 @@ public class CircleSubController implements Controller {
                                     });
                         }
                     });
+        } else {//if you build a new building in round-loop
+            if (build != null) {
+
+                this.pioneersService.move(gameIDStorage.getId(), "build", x, y, z, side, build)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+
+                this.gameFieldSubController.build(null);
+            }
         }
     }
 
@@ -126,9 +139,26 @@ public class CircleSubController implements Controller {
         return false;
     }
 
-    public void setColor(int x, int y, int z, int side, String color) {
+
+    public void setRoad(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
+            //TODO: replace this with an image of the road
             this.view.setFill(Color.valueOf(color));
+        }
+    }
+
+    public void setSettlement(int x, int y, int z, int side, String color) {
+        if (this.x == x && this.y == y && this.z == z && this.side == side) {
+            //TODO: replace this with an image of the settlement
+            this.view.setFill(Color.valueOf(color));
+        }
+    }
+
+    public void setCity(int x, int y, int z, int side, String color) {
+        if (this.x == x && this.y == y && this.z == z && this.side == side) {
+            //TODO: replace this with an image of the city
+            this.view.setFill(Color.valueOf(color));
+            this.view.setRadius(15);
         }
     }
 
@@ -173,5 +203,9 @@ public class CircleSubController implements Controller {
             this.view.setFill(Color.WHITE);
             this.view.setRadius(10.0);
         }
+    }
+
+    public void setBuild(String build) {
+        this.build = build;
     }
 }
