@@ -142,6 +142,22 @@ public class UserSubView implements Controller {
             }
         }
         updateButtons(item1.getText(), item2.getText(), item3.getText(), item4.getText(), item5.getText());
+        updateButtons(item1.getText(), item2.getText(), item3.getText(), item4.getText(), item5.getText());
+    }
+
+    private void updateButtons(String lumber, String brick, String ore, String wool, String grain) {
+        if (Integer.parseInt(lumber) > 0 && Integer.parseInt(brick) > 0) {
+            road.disableProperty().set(false);
+        }
+
+        if (Integer.parseInt(lumber) > 0 && Integer.parseInt(brick) > 0 && Integer.parseInt(wool) > 0 && Integer.parseInt(grain) > 0) {
+            sett.disableProperty().set(false);
+        }
+
+        if (Integer.parseInt(ore) > 2 && Integer.parseInt(grain) > 1) {
+            city.disableProperty().set(false);
+        }
+
     }
 
     private void updateButtons(String lumber, String brick, String ore, String wool, String grain) {
