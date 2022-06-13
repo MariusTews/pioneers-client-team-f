@@ -207,7 +207,7 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
+
 
 
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
@@ -219,7 +219,7 @@ public class GameScreenController implements Controller {
         });
 
 
-        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
