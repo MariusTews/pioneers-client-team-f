@@ -75,4 +75,7 @@ public class Constants {
             Color.CORAL, Color.GOLD, Color.DARKORANGE, Color.TOMATO, Color.DARKORCHID, Color.LIME, Color.GREEN,
             Color.PALEGREEN, Color.PURPLE, Color.ROYALBLUE, Color.CRIMSON, Color.ROSYBROWN, Color.BROWN, Color.CHOCOLATE,
             Color.SIENNA, Color.BURLYWOOD, Color.LIMEGREEN, Color.DARKCYAN, Color.DEEPSKYBLUE, Color.SEAGREEN, Color.POWDERBLUE};
+
+    //Array of resources
+    public static final String[] RESOURCES = {"lumber","brick","ore","wool","grain"};
 }
