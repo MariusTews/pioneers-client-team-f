@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -22,7 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class UserSubView implements Controller {
 
@@ -30,11 +31,12 @@ public class UserSubView implements Controller {
 
     private final ObservableList<Player> players = FXCollections.observableArrayList();
 
-    private final ArrayList<User> users= new ArrayList<>();
+    private final ArrayList<User> users = new ArrayList<>();
 
     private final GameIDStorage gameIDStorage;
     private final IDStorage idStorage;
     private final UserService userService;
+    private final GameFieldSubController gameFieldSubController;
     private final EventListener eventListener;
     //private final PioneersService pioneersService;
     private final Player player;
@@ -52,10 +54,13 @@ public class UserSubView implements Controller {
     public ImageView image3;
     public ImageView image4;
     public ImageView image5;
+    public Button sett;
+    public Button road;
+    public Button city;
     private Parent parent;
 
     @Inject
-    public UserSubView(GameIDStorage gameIDStorage, IDStorage idStorage, UserService userService, EventListener eventListener, Player player, int victoryPoints) {
+    public UserSubView(GameIDStorage gameIDStorage, IDStorage idStorage, UserService userService, EventListener eventListener, Player player, int victoryPoints, GameFieldSubController gameFieldSubController) {
 
         this.gameIDStorage = gameIDStorage;
         this.idStorage = idStorage;
@@ -63,14 +68,15 @@ public class UserSubView implements Controller {
         this.eventListener = eventListener;
         this.player = player;
         this.vicPoints = victoryPoints;
+        this.gameFieldSubController = gameFieldSubController;
     }
 
 
     @Override
     public void init() {
         userService.findAllUsers().observeOn(FX_SCHEDULER)
-                .subscribe( col -> {
-                    for (User user: col) {
+                .subscribe(col -> {
+                    for (User user : col) {
                         this.users.add(user);
                     }
                     attachTOSubview();
@@ -79,55 +85,79 @@ public class UserSubView implements Controller {
     }
 
     private void attachTOSubview() {
-            for(User user:this.users) {
-                if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
-                    this.attachName(user.name(), player.color());
-                    this.attachResources(player.resources());
-                    this.victoryPoints.setText(Integer.toString(vicPoints) + "/10");
-                    //TODO:Builidings needs to be calculated
-                }
+        for (User user : this.users) {
+            if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
+                this.attachName(user.name(), player.color());
+                this.attachResources(player.resources());
+                this.victoryPoints.setText(Integer.toString(vicPoints) + "/10");
+                //TODO:Builidings needs to be calculated
             }
+        }
     }
 
     //resources are taken out of Hashmap
     //attach to the label
     private void attachResources(HashMap<String, Integer> resources) {
-        if (resources.isEmpty()){
+        item1.setText("0");
+        item2.setText("0");
+        item3.setText("0");
+        item4.setText("0");
+        item5.setText("0");
+
+        if (resources.isEmpty()) {
             item1.setText("0");
             item2.setText("0");
             item3.setText("0");
             item4.setText("0");
             item5.setText("0");
         } else {
-            int i = 1;
-            for (Integer object:resources.values()) {
-                switch (i) {
-                    case 2: item1.setText(object.toString());
-                            i++;
-                            break;
-                    case 3: item2.setText(object.toString());
-                            i++;
-                            break;
-                    case 4: item3.setText(object.toString());
-                            i++;
-                            break;
-                    case 5: item4.setText(object.toString());
-                            i++;
-                            break;
-                    case 6: item5.setText(object.toString());
-                            i++;
-                            break;
-                    default: i++;
-                             break;
+            for (String resource : resources.keySet()) {
+
+                switch (resource) {
+                    case "lumber":
+                        item1.setText(resources.get("lumber").toString());
+                        break;
+                    case "brick":
+                        item2.setText(resources.get("brick").toString());
+                        break;
+                    case "ore":
+                        item3.setText(resources.get("ore").toString());
+                        break;
+                    case "wool":
+                        item4.setText(resources.get("wool").toString());
+
+                        break;
+                    case "grain":
+                        item5.setText(resources.get("grain").toString());
+                        break;
+                    default:
+                        System.out.println(resource);
+                        break;
                 }
             }
         }
+        updateButtons(item1.getText(), item2.getText(), item3.getText(), item4.getText(), item5.getText());
+    }
+
+    private void updateButtons(String lumber, String brick, String ore, String wool, String grain) {
+        if (Integer.parseInt(lumber) > 0 && Integer.parseInt(brick) > 0) {
+            road.disableProperty().set(false);
+        }
+
+        if (Integer.parseInt(lumber) > 0 && Integer.parseInt(brick) > 0 && Integer.parseInt(wool) > 0 && Integer.parseInt(grain) > 0) {
+            sett.disableProperty().set(false);
+        }
+
+        if (Integer.parseInt(ore) > 2 && Integer.parseInt(grain) > 1) {
+            city.disableProperty().set(false);
+        }
+
     }
 
     //name is set to namelabel and color aswell
     //and attach picture
-    private void attachName(String n, String color){
-        name.setText(n +" (YOU)");
+    private void attachName(String n, String color) {
+        name.setText(n + " (YOU)");
         name.setTextFill(Color.web(color));
     }
 
@@ -148,20 +178,26 @@ public class UserSubView implements Controller {
             return null;
         }
         this.parent = parent;
-        return  parent;
+        this.road.disableProperty().set(true);
+        this.sett.disableProperty().set(true);
+        this.city.disableProperty().set(true);
+        return parent;
     }
 
-    public Parent getParent(){
-        return  parent;
+    public Parent getParent() {
+        return parent;
 
     }
 
     public void onSett(ActionEvent actionEvent) {
+        gameFieldSubController.build("settlement");
     }
 
     public void onRoad(ActionEvent actionEvent) {
+        gameFieldSubController.build("road");
     }
 
     public void onCity(ActionEvent actionEvent) {
+        gameFieldSubController.build("city");
     }
 }
