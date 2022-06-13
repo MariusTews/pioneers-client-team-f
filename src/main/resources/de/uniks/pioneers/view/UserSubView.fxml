@@ -31,7 +31,7 @@
             <Font size="17.0" />
          </font>
       </Label>
-      <Label fx:id="resources" prefHeight="32.0" prefWidth="170.0" text="resoruces">
+      <Label fx:id="resources" prefHeight="32.0" prefWidth="170.0" text="Resources">
          <VBox.margin>
             <Insets left="80.0" right="60.0" />
          </VBox.margin>
