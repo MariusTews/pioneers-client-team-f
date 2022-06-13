@@ -120,6 +120,22 @@ public class GameScreenController implements Controller {
                         this.userHash.put(user._id(), user);
                     }
 
+                    // Listen to the State to handle the event
+                    disposable.add(eventListener
+                            .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(this::handleStateEvents));
+
+                    // Check if expected move is founding-roll after joining the game
+                    pioneersService
+                            .findOneState(gameIDStorage.getId())
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(r -> {
+                                if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                    foundingDiceRoll();
+                                }
+                            });
+
                     pioneersService
                             .findAllPlayers(this.gameIDStorage.getId())
                             .observeOn(FX_SCHEDULER)
@@ -145,27 +161,6 @@ public class GameScreenController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handlePlayerEvent));
 
-        //listen to player for own user
-        disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".players.*.*", Player.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(this::handleOwnUser));
-
-        // Listen to the State to handle the event
-        disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(this::handleStateEvents));
-
-        // Check if expected move is founding-roll after joining the game
-        pioneersService
-                .findOneState(gameIDStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    if (result.expectedMoves().get(0).action().equals("founding-roll")) {
-                        foundingDiceRoll();
-                    }
-                });
 
         // Initialize sub controller for ingame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
@@ -174,19 +169,6 @@ public class GameScreenController implements Controller {
 
     }
 
-    private void handleOwnUser(Event<Player> playerEvent) {
-        Player player = playerEvent.data();
-
-        //handle own User
-        if (playerEvent.event().endsWith(UPDATED)) {
-            for (Player p : playerOwnView) {
-                if (p.userId().equals(player.userId())) {
-                    playerOwnView.set(playerOwnView.indexOf(p), player);
-                }
-            }
-        }
-
-    }
 
     @Override
     public void destroy() {
@@ -238,10 +220,10 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView  = new UserSubView(gameIDStorage,idStorage,userService,eventListener,player,this.calculateVP(player));
+        UserSubView userSubView = new UserSubView(gameIDStorage, idStorage, userService, eventListener, player, this.calculateVP(player));
         userSubView.init();
 
-         return  userSubView.render();
+        return userSubView.render();
 
     }
 
@@ -266,6 +248,11 @@ public class GameScreenController implements Controller {
         Player player = playerEvent.data();
 
         if (playerEvent.event().endsWith(UPDATED)) {
+            for (Player p : playerOwnView) {
+                if (p.userId().equals(player.userId())) {
+                    playerOwnView.set(playerOwnView.indexOf(p), player);
+                }
+            }
             for (Player p : players) {
                 if (p.userId().equals(player.userId())) {
                     this.removeOpponent(p);
@@ -278,17 +265,15 @@ public class GameScreenController implements Controller {
                 this.opponentsView.getChildren().add(renderOpponent(player));
             }
         } else if (playerEvent.event().endsWith(DELETED)) {
-            if(players.size() < 2) {
+            if (players.size() < 2) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setContentText("You are the Winner!!!");
                 Optional<ButtonType> result = alert.showAndWait();
-                if(!result.isPresent()) {
+                if (!result.isPresent()) {
                     this.app.show(lobbyController.get());
-                }
-                else if(result.get() == ButtonType.OK) {
+                } else if (result.get() == ButtonType.OK) {
                     this.app.show(lobbyController.get());
-                }
-                else if(result.get() == ButtonType.CANCEL){
+                } else if (result.get() == ButtonType.CANCEL) {
                     this.app.show(lobbyController.get());
                 }
             }
@@ -352,27 +337,27 @@ public class GameScreenController implements Controller {
     public void foundingDiceRoll() {
         pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result -> diceSumLabel.setText(Integer.toString(result.roll())), Throwable::printStackTrace);
+                .subscribe();
     }
 
     public void onLeave(ActionEvent event) {
-        if((players.size() + playerOwnView.size()) == 2) {
+        if ((players.size() + playerOwnView.size()) == 2) {
             gameService.findOneGame(this.gameIDStorage.getId())
-                .observeOn(FX_SCHEDULER).
-                subscribe( col -> {
-                    if(col.owner().equals(idStorage.getID())) {
-                        gameService.
-                                deleteGame(this.gameIDStorage.getId()).
-                                observeOn(FX_SCHEDULER).
-                                subscribe(onSuccess ->
-                                        this.app.show(lobbyController.get()), onError -> {
-                                });
-                    } else{
-                        this.app.show(lobbyController.get());
-                    }
-                });
+                    .observeOn(FX_SCHEDULER).
+                    subscribe(col -> {
+                        if (col.owner().equals(idStorage.getID())) {
+                            gameService.
+                                    deleteGame(this.gameIDStorage.getId()).
+                                    observeOn(FX_SCHEDULER).
+                                    subscribe(onSuccess ->
+                                            this.app.show(lobbyController.get()), onError -> {
+                                    });
+                        } else {
+                            this.app.show(lobbyController.get());
+                        }
+                    });
 
-        }else {
+        } else {
             this.app.show(lobbyController.get());
         }
     }
