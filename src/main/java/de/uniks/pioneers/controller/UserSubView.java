@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -92,34 +93,56 @@ public class UserSubView implements Controller {
     //resources are taken out of Hashmap
     //attach to the label
     private void attachResources(HashMap<String, Integer> resources) {
-        if (resources.isEmpty()){
-            item1.setText("0");
-            item2.setText("0");
-            item3.setText("0");
-            item4.setText("0");
-            item5.setText("0");
-        } else {
-            int i = 1;
-            for (Integer object:resources.values()) {
-                switch (i) {
-                    case 2: item1.setText(object.toString());
-                            i++;
-                            break;
-                    case 3: item2.setText(object.toString());
-                            i++;
-                            break;
-                    case 4: item3.setText(object.toString());
-                            i++;
-                            break;
-                    case 5: item4.setText(object.toString());
-                            i++;
-                            break;
-                    case 6: item5.setText(object.toString());
-                            i++;
-                            break;
-                    default: i++;
-                             break;
-                }
+        for (String value: RESOURCES) {
+            switch (value){
+                case "lumber":
+                    if(!resources.containsKey(value)) {
+                        item1.setText("0");
+                    }
+                    break;
+                case "brick":
+                    if(!resources.containsKey(value)) {
+                        item2.setText("0");
+                    }
+                    break;
+                case "ore":
+                    if(!resources.containsKey(value)) {
+                        item3.setText("0");
+                    }
+                    break;
+                case "wool":
+                    if(!resources.containsKey(value)) {
+                        item4.setText("0");
+                    }
+                    break;
+                case "grain":
+                    if(!resources.containsKey(value)) {
+                        item5.setText("0");
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (Map.Entry<String,Integer> set: resources.entrySet()) {
+            switch (set.getKey()) {
+                case "lumber":
+                    item1.setText(String.valueOf(set.getValue()));
+                    break;
+                case "brick":
+                    item2.setText(String.valueOf(set.getValue()));
+                    break;
+                case "ore":
+                    item3.setText(String.valueOf(set.getValue()));
+                    break;
+                case "wool":
+                    item4.setText(String.valueOf(set.getValue()));
+                    break;
+                case "grain":
+                    item5.setText(String.valueOf(set.getValue()));
+                    break;
+                default:
+                    break;
             }
         }
     }
