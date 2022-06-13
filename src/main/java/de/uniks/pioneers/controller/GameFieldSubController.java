@@ -35,9 +35,9 @@ public class GameFieldSubController implements Controller {
     private final IDStorage idStorage;
 
     private Parent parent;
-    private App app;
-    private GameIDStorage gameIDStorage;
-    private PioneersService pioneersService;
+    private final App app;
+    private final GameIDStorage gameIDStorage;
+    private final PioneersService pioneersService;
     private final EventListener eventListener;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -172,15 +172,9 @@ public class GameFieldSubController implements Controller {
         }
         for (CircleSubController c : circleSubControllers) {
             switch (type) {
-                case "road":
-                    c.setRoad(x, y, z, side, color);
-                    break;
-                case "settlement":
-                    c.setSettlement(x, y, z, side, color);
-                    break;
-                case "city":
-                    c.setCity(x, y, z, side, color);
-                    break;
+                case "road" -> c.setRoad(x, y, z, side, color);
+                case "settlement" -> c.setSettlement(x, y, z, side, color);
+                case "city" -> c.setCity(x, y, z, side, color);
             }
 
         }

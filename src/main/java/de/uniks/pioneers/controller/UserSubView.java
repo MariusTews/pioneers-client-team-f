@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.RESOURCES;
 
 public class UserSubView implements Controller {
 
@@ -39,7 +40,6 @@ public class UserSubView implements Controller {
     private final UserService userService;
     private final GameFieldSubController gameFieldSubController;
     private final EventListener eventListener;
-    //private final PioneersService pioneersService;
     private final Player player;
     private final int vicPoints;
 
@@ -99,30 +99,30 @@ public class UserSubView implements Controller {
     //resources are taken out of Hashmap
     //attach to the label
     private void attachResources(HashMap<String, Integer> resources) {
-        for (String value: RESOURCES) {
-            switch (value){
+        for (String value : RESOURCES) {
+            switch (value) {
                 case "lumber":
-                    if(!resources.containsKey(value)) {
+                    if (!resources.containsKey(value)) {
                         item1.setText("0");
                     }
                     break;
                 case "brick":
-                    if(!resources.containsKey(value)) {
+                    if (!resources.containsKey(value)) {
                         item2.setText("0");
                     }
                     break;
                 case "ore":
-                    if(!resources.containsKey(value)) {
+                    if (!resources.containsKey(value)) {
                         item3.setText("0");
                     }
                     break;
                 case "wool":
-                    if(!resources.containsKey(value)) {
+                    if (!resources.containsKey(value)) {
                         item4.setText("0");
                     }
                     break;
                 case "grain":
-                    if(!resources.containsKey(value)) {
+                    if (!resources.containsKey(value)) {
                         item5.setText("0");
                     }
                     break;
@@ -130,7 +130,7 @@ public class UserSubView implements Controller {
                     break;
             }
         }
-        for (Map.Entry<String,Integer> set: resources.entrySet()) {
+        for (Map.Entry<String, Integer> set : resources.entrySet()) {
             switch (set.getKey()) {
                 case "lumber" -> item1.setText(String.valueOf(set.getValue()));
                 case "brick" -> item2.setText(String.valueOf(set.getValue()));
@@ -142,7 +142,6 @@ public class UserSubView implements Controller {
             }
         }
         updateButtons(item1.getText(), item2.getText(), item3.getText(), item4.getText(), item5.getText());
-        updateButtons(item1.getText(), item2.getText(), item3.getText(), item4.getText(), item5.getText());
     }
 
     private void updateButtons(String lumber, String brick, String ore, String wool, String grain) {
@@ -160,20 +159,6 @@ public class UserSubView implements Controller {
 
     }
 
-    private void updateButtons(String lumber, String brick, String ore, String wool, String grain) {
-        if (Integer.parseInt(lumber) > 0 && Integer.parseInt(brick) > 0) {
-            road.disableProperty().set(false);
-        }
-
-        if (Integer.parseInt(lumber) > 0 && Integer.parseInt(brick) > 0 && Integer.parseInt(wool) > 0 && Integer.parseInt(grain) > 0) {
-            sett.disableProperty().set(false);
-        }
-
-        if (Integer.parseInt(ore) > 2 && Integer.parseInt(grain) > 1) {
-            city.disableProperty().set(false);
-        }
-
-    }
 
     //name is set to namelabel and color aswell
     //and attach picture
