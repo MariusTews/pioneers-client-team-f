@@ -55,11 +55,21 @@
                   <Font name="System Bold" size="27.0" />
                </font>
             </Label>
-            <Button fx:id="finishTurnButton" layoutX="131.0" layoutY="350.0" mnemonicParsing="false" onAction="#finishTurn" prefHeight="58.0" prefWidth="189.0" style="-fx-background-color: #4cd73d; -fx-background-radius: 10;" text="Move" textFill="WHITE">
+            <Button fx:id="finishTurnButton" layoutX="131.0" layoutY="381.0" mnemonicParsing="false" onAction="#finishTurn" prefHeight="58.0" prefWidth="189.0" style="-fx-background-color: #4cd73d; -fx-background-radius: 10;" text="Move" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="28.0" />
                </font>
             </Button>
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="7.0" layoutY="234.0" prefHeight="61.0" prefWidth="436.0" text="TIMER">
+               <font>
+                  <Font name="System Bold" size="27.0" />
+               </font>
+            </Label>
+            <Label fx:id="TimerLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="7.0" layoutY="295.0" prefHeight="61.0" prefWidth="436.0">
+               <font>
+                  <Font name="System Bold" size="27.0" />
+               </font>
+            </Label>
          </children></Pane>
       <Pane fx:id="chatPane" prefHeight="320.0" prefWidth="500.0" style="-fx-background-color: #0000FF;" />
    </VBox>
