@@ -15,7 +15,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
@@ -58,6 +60,9 @@ public class UserSubView implements Controller {
     public Button sett;
     public Button road;
     public Button city;
+    public Pane settlemetPane;
+    public Pane roadPane;
+    public Pane cityPane;
     private Parent parent;
 
     @Inject
@@ -186,6 +191,10 @@ public class UserSubView implements Controller {
         this.road.disableProperty().set(true);
         this.sett.disableProperty().set(true);
         this.city.disableProperty().set(true);
+
+        Tooltip.install(this.roadPane,new Tooltip("1 Earth cactus, 1 Mars bar "));
+        Tooltip.install(this.settlemetPane,new Tooltip("1 Earth cactus, 1 Mars bar, 1 Neptun crystals, 1 Venus grain "));
+        Tooltip.install(this.cityPane,new Tooltip("3 Moon rock, 2 Venus grain "));
         return parent;
     }
 
