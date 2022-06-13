@@ -19,8 +19,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -198,7 +198,8 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        GameFieldSubController gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
+
         gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
 
@@ -220,7 +221,7 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(gameIDStorage, idStorage, userService, eventListener, player, this.calculateVP(player));
+        UserSubView userSubView = new UserSubView(gameIDStorage, idStorage, userService, eventListener, player, this.calculateVP(player), gameFieldSubController);
         userSubView.init();
 
         return userSubView.render();

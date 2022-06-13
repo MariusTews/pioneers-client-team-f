@@ -27,7 +27,7 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
-public class GameFieldSubController implements Controller{
+public class GameFieldSubController implements Controller {
 
     private final ObservableList<Tile> tiles = FXCollections.observableArrayList();
     private final ObservableList<Player> players = FXCollections.observableArrayList();
@@ -51,7 +51,7 @@ public class GameFieldSubController implements Controller{
                                   GameIDStorage gameIDStorage,
                                   PioneersService pioneersService,
                                   IDStorage idStorage,
-                                  EventListener eventListener){
+                                  EventListener eventListener) {
         this.app = app;
         this.gameIDStorage = gameIDStorage;
         this.pioneersService = pioneersService;
@@ -62,11 +62,11 @@ public class GameFieldSubController implements Controller{
     @Override
     public void init() {
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".buildings.*." + "created", Building.class)
+                .listen("games." + this.gameIDStorage.getId() + ".buildings.*.*", Building.class)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(event ->{
+                .subscribe(event -> {
                     Building building = event.data();
-                    this.updateBuildings((int) building.x(),(int) building.y(),(int) building.z(),(int) building.side(), building.owner());
+                    this.updateBuildings((int) building.x(), (int) building.y(), (int) building.z(), (int) building.side(), building.owner(), building.type());
                 }));
 
         pioneersService.findAllPlayers(gameIDStorage.getId())
@@ -74,7 +74,6 @@ public class GameFieldSubController implements Controller{
                 .subscribe(this.players::addAll);
 
     }
-
 
 
     @Override
@@ -144,29 +143,45 @@ public class GameFieldSubController implements Controller{
         }
 
 
-        for (int i=0; i < hexaCoords.size(); i++) {
-            for (int j=0; j < cirleCoords.size(); j++) {
-                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)),pioneersService,gameIDStorage, idStorage, eventListener);
+        for (int i = 0; i < hexaCoords.size(); i++) {
+            for (int j = 0; j < cirleCoords.size(); j++) {
+                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)), pioneersService, gameIDStorage, idStorage, eventListener, this);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
             }
         }
-        for (String string: waterTilesCircles) {
-            CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup("#" + string),pioneersService,gameIDStorage,idStorage, eventListener);
+        for (String string : waterTilesCircles) {
+            CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup("#" + string), pioneersService, gameIDStorage, idStorage, eventListener, this);
             circleSubController.init();
             this.circleSubControllers.add(circleSubController);
         }
     }
 
-    private void updateBuildings(int x, int y, int z, int side, String owner){
+    public void build(String building) {
+        for (CircleSubController c : circleSubControllers) {
+            c.setBuild(building);
+        }
+    }
+
+    private void updateBuildings(int x, int y, int z, int side, String owner, String type) {
         String color = Color.BLACK.toString();
-        for(Player player: players){
-            if(player.userId().equals(owner)){
+        for (Player player : players) {
+            if (player.userId().equals(owner)) {
                 color = player.color();
             }
         }
-        for(CircleSubController c : circleSubControllers){
-            c.setColor(x, y, z, side, color);
+        for (CircleSubController c : circleSubControllers) {
+            switch (type) {
+                case "road":
+                    c.setRoad(x, y, z, side, color);
+                    break;
+                case "settlement":
+                    c.setSettlement(x, y, z, side, color);
+                    break;
+                case "city":
+                    c.setCity(x, y, z, side, color);
+                    break;
+            }
 
         }
     }
