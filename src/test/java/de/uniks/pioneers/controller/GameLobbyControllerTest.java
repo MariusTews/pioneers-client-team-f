@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GameLobbyControllerTest extends ApplicationTest {
-    // TODO: fix test
 
     @Mock
     UserService userService;
