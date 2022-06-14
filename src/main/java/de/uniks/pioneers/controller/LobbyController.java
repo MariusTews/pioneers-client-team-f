@@ -4,10 +4,7 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
-import de.uniks.pioneers.model.Game;
-import de.uniks.pioneers.model.Group;
-import de.uniks.pioneers.model.Message;
-import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -81,6 +78,8 @@ public class LobbyController implements Controller {
 	private final App app;
 	private final IDStorage idStorage;
 
+	private final GameIDStorage gameIDStorage;
+
 	private final UserService userService;
 	private final GameService gameService;
 	private final GroupService groupService;
@@ -91,10 +90,13 @@ public class LobbyController implements Controller {
 	private final Provider<LoginController> loginController;
 	private final Provider<RulesScreenController> rulesScreenController;
 	private final Provider<CreateGameController> createGameController;
-	private final Provider<EditUserController> editUserController;
+
 	private final Provider<GameLobbyController> gameLobbyController;
+	private final Provider<EditUserController> editUserController;
+	private final Provider<GameScreenController> gameScreenController;
 
 	private final CompositeDisposable disposable = new CompositeDisposable();
+	public Button rejoinButton;
 	private Disposable tabDisposable;
 	private DirectChatStorage currentDirectStorage;
 
@@ -104,7 +106,7 @@ public class LobbyController implements Controller {
 	@Inject
 	public LobbyController(App app,
 						   IDStorage idStorage,
-						   UserService userService,
+						   GameIDStorage gameIDStorage, UserService userService,
 						   GameService gameService,
 						   GroupService groupService,
 						   MessageService messageService,
@@ -114,11 +116,13 @@ public class LobbyController implements Controller {
 						   Provider<LoginController> loginController,
 						   Provider<RulesScreenController> rulesScreenController,
 						   Provider<CreateGameController> createGameController,
+						   Provider<GameLobbyController> gameLobbyController,
 						   Provider<EditUserController> editUserController,
-						   Provider<GameLobbyController> gameLobbyController) {
+						   Provider<GameScreenController> gameScreenController) {
 
 		this.app = app;
 		this.idStorage = idStorage;
+		this.gameIDStorage = gameIDStorage;
 		this.userService = userService;
 		this.gameService = gameService;
 		this.groupService = groupService;
@@ -129,12 +133,14 @@ public class LobbyController implements Controller {
 		this.loginController = loginController;
 		this.rulesScreenController = rulesScreenController;
 		this.createGameController = createGameController;
-		this.editUserController = editUserController;
 		this.gameLobbyController = gameLobbyController;
+		this.editUserController = editUserController;
+		this.gameScreenController = gameScreenController;
 	}
 
 	@Override
 	public void init() {
+
 		gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
 		userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
 		groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this::loadGroups);
@@ -186,6 +192,27 @@ public class LobbyController implements Controller {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		}
+
+		//make the rejoin button visible
+		//based upon if a user is in game or not
+		if(this.gameIDStorage.getId() != null){
+			memberService.getAllGameMembers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
+					.subscribe( result ->{
+						boolean trace = true;
+						for (Member member: result) {
+							if(member.userId().equals(this.idStorage.getID())) {
+								rejoinButton.disableProperty().set(false);
+								trace = false;
+								break;
+							}
+						}
+						if (trace) {
+							rejoinButton.disableProperty().set(true);
+						}
+					});
+		}else {
+			rejoinButton.disableProperty().set(true);
 		}
 
 		this.users.addListener((ListChangeListener<? super User>) c -> ((VBox) this.userScrollPane.getContent())
@@ -295,8 +322,29 @@ public class LobbyController implements Controller {
 	}
 
 	public void createGameButtonPressed(ActionEvent ignoredEvent) {
-		final CreateGameController controller = createGameController.get();
-		app.show(controller);
+		//makes sure if user in game or not , and depending on that
+		//allows user to create the game
+		if(this.gameIDStorage.getId() != null){
+			memberService.getAllGameMembers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
+					.subscribe( result ->{
+						boolean trace = true;
+						for (Member member: result) {
+							if(member.userId().equals(this.idStorage.getID())) {
+								new Alert(Alert.AlertType.ERROR, "You cannot create Game while being part of another Game")
+										.showAndWait();
+								trace = false;
+								break;
+							}
+						}
+						if (trace) {
+							final CreateGameController controller = createGameController.get();
+							app.show(controller);
+						}
+					});
+		}else {
+			final CreateGameController controller = createGameController.get();
+			app.show(controller);
+		}
 	}
 
 	public void enterKeyPressed(KeyEvent event) {
@@ -546,7 +594,6 @@ public class LobbyController implements Controller {
 	}
 
 	private void loadGroups(List<Group> groups) {
-		//627xx3c93496bc00158f3859
 		this.groups.addAll(groups);
 	}
 
@@ -602,6 +649,30 @@ public class LobbyController implements Controller {
 	}
 
 	public void joinGame(Game game) {
+		//allows to join a game, if the user does not belong to another game
+		//otherwise user cannot join the game
+		if(this.gameIDStorage.getId() != null){
+			memberService.getAllGameMembers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
+					.subscribe( result ->{
+						boolean trace = true;
+						for (Member member: result) {
+							if(member.userId().equals(this.idStorage.getID())) {
+								new Alert(Alert.AlertType.ERROR, "You cannot join another Game while being part of another Game")
+										.showAndWait();
+								trace = false;
+								break;
+							}
+						}
+						if (trace) {
+							joinMessage(game);
+						}
+					});
+		}else {
+			joinMessage(game);
+		}
+	}
+
+	private void joinMessage(Game game) {
 		TextInputDialog dialog = new TextInputDialog();
 		dialog.setTitle("Enter the password");
 		dialog.setHeaderText("password");
@@ -639,5 +710,10 @@ public class LobbyController implements Controller {
 						.showAndWait();
 			}
 		});
+	}
+
+	//reactivate for the possiblity of joining the game
+	public void onRejoin(ActionEvent actionEvent) {
+		this.app.show(gameScreenController.get());
 	}
 }

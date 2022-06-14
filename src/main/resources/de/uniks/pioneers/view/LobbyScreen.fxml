@@ -58,6 +58,7 @@
    <HBox alignment="CENTER" maxHeight="40.0" prefHeight="100.0" prefWidth="200.0" spacing="12.0">
       <Button fx:id="editUserButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#editButtonPressed" styleClass="blueButton" text="Edit User" />
       <Pane prefHeight="39.0" prefWidth="520.0" />
+      <Button fx:id="rejoinButton" mnemonicParsing="false" onAction="#onRejoin" prefHeight="24.0" prefWidth="105.0" text="Rejoin" />
       <Button fx:id="createGameButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#createGameButtonPressed" styleClass="greenButton" text="Create Game" />
    </HBox>
 </VBox>

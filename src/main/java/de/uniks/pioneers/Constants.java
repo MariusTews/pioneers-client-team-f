@@ -71,4 +71,7 @@ public class Constants {
     //Array of Colors
     public static final Color[] COLORARRAY = {Color.RED, Color.BLUE, Color.ORANGE, Color.DARKORCHID, Color.LIMEGREEN,
             Color.SIENNA, Color.DEEPSKYBLUE, Color.SALMON};
+
+    //Array of resources
+    public static final String[] RESOURCES = {"lumber","brick","ore","wool","grain"};
 }

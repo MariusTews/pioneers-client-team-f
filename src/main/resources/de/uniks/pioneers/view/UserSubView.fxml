@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox id="userView" fx:id="userStatus" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
@@ -26,7 +27,7 @@
          <Insets bottom="10.0" top="10.0"/>
       </padding>
    </Label>
-   <Label fx:id="resources" prefHeight="32.0" prefWidth="170.0" text="resoruces">
+   <Label fx:id="resources" prefHeight="32.0" prefWidth="170.0" text="Resources">
       <VBox.margin>
          <Insets left="80.0" right="60.0"/>
       </VBox.margin>
@@ -63,19 +64,26 @@
       </VBox.margin>
    </Label>
    <HBox prefHeight="52.0" prefWidth="310.0">
-      <Button fx:id="sett" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0"
-              prefWidth="82.0" styleClass="move" text="SETT.">
+      <Pane fx:id="settlemetPane">
          <HBox.margin>
-            <Insets left="30.0" right="10.0"/>
+            <Insets left="30.0" right="10.0" />
          </HBox.margin>
-      </Button>
-      <Button fx:id="road" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0"
-              prefWidth="77.0" styleClass="move" text="Road"/>
-      <Button fx:id="city" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0"
-              prefWidth="84.0" styleClass="move" text="City">
+         <children>
+            <Button fx:id="sett" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="82.0" text="SETT." />
+         </children>
+      </Pane>
+      <Pane fx:id="roadPane">
+         <children>
+            <Button fx:id="road" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="77.0" text="Road" />
+         </children>
+      </Pane>
+      <Pane fx:id="cityPane">
          <HBox.margin>
-            <Insets left="20.0" right="10.0"/>
+            <Insets left="20.0" right="10.0" />
          </HBox.margin>
-      </Button>
+         <children>
+            <Button fx:id="city" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="84.0" text="City" />
+         </children>
+      </Pane>
    </HBox>
 </VBox>

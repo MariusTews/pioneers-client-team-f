@@ -6,7 +6,6 @@ import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -14,13 +13,18 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -30,13 +34,16 @@ public class UserSubView implements Controller {
 
     private final ObservableList<Player> players = FXCollections.observableArrayList();
 
-    private final ArrayList<User> users= new ArrayList<>();
+    private final ArrayList<User> users = new ArrayList<>();
 
     private final GameIDStorage gameIDStorage;
     private final IDStorage idStorage;
     private final UserService userService;
+    private final GameFieldSubController gameFieldSubController;
     private final EventListener eventListener;
-    private final PioneersService pioneersService;
+    private final Player player;
+    private final int vicPoints;
+
     public Label name;
     public Label victoryPoints;
     public Label item1;
@@ -44,54 +51,51 @@ public class UserSubView implements Controller {
     public Label item3;
     public Label item4;
     public Label item5;
+    public ImageView image1;
+    public ImageView image2;
+    public ImageView image3;
+    public ImageView image4;
+    public ImageView image5;
+    public Button sett;
+    public Button road;
+    public Button city;
+    public Pane settlemetPane;
+    public Pane roadPane;
+    public Pane cityPane;
+    private Parent parent;
 
     @Inject
-    public UserSubView(GameIDStorage gameIDStorage, IDStorage idStorage, UserService userService, EventListener eventListener, PioneersService pioneersService) {
+    public UserSubView(GameIDStorage gameIDStorage, IDStorage idStorage, UserService userService, EventListener eventListener, Player player, int victoryPoints, GameFieldSubController gameFieldSubController) {
 
         this.gameIDStorage = gameIDStorage;
         this.idStorage = idStorage;
         this.userService = userService;
         this.eventListener = eventListener;
-        this.pioneersService = pioneersService;
+        this.player = player;
+        this.vicPoints = victoryPoints;
+        this.gameFieldSubController = gameFieldSubController;
     }
 
 
     @Override
     public void init() {
         userService.findAllUsers().observeOn(FX_SCHEDULER)
-                .subscribe( col -> {
-                    for (User user: col) {
+                .subscribe(col -> {
+                    for (User user : col) {
                         this.users.add(user);
                     }
-                    pioneersService.findAllPlayers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
-                            .subscribe(result -> {this.players.setAll(result);
-                                this.attachTOSubview();
-                            });
+                    attachTOSubview();
                 });
 
-
-            disposable.add(eventListener.
-                listen("games." + this.gameIDStorage.getId() + ".players.*.*", Player.class)
-                    .observeOn(FX_SCHEDULER).
-                    subscribe(event -> {
-                        Player p = event.data();
-                        if(event.event().endsWith(UPDATED)){
-                            //this needs to be done
-                            this.players.add(p);
-                            this.attachTOSubview();
-                        }
-                    }));
     }
 
     private void attachTOSubview() {
-        for (Player player: this.players) {
-            for(User user:this.users) {
-                if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
-                    System.out.println(user._id());
-                    this.attachName(user.name(), player.color());
-                    this.attachResources(player.resources());
-                    //TODO:Builidings needs to be calculated
-                }
+        for (User user : this.users) {
+            if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
+                this.attachName(user.name(), player.color());
+                this.attachResources(player.resources());
+                this.victoryPoints.setText(Integer.toString(vicPoints) + "/10");
+                //TODO:Builidings needs to be calculated
             }
         }
     }
@@ -99,40 +103,71 @@ public class UserSubView implements Controller {
     //resources are taken out of Hashmap
     //attach to the label
     private void attachResources(HashMap<String, Integer> resources) {
-        if (resources.isEmpty()){
-            item1.setText("0");
-            item2.setText("0");
-            item3.setText("0");
-            item4.setText("0");
-            item5.setText("0");
-        } else {
-            int i = 1;
-            for (Integer object:resources.values()) {
-                if (i == 1) {
-                    //TODO :unknown
-                    //this needs to be handled as it is named unknown
-                } else if(i == 2) {
-                    item1.setText(object.toString());
-                    i++;
-                } else if(i == 3){
-                    item2.setText(object.toString());
-                    i++;
-                } else if(i==4){
-                    item3.setText(object.toString());
-                    i++;
-                } else if (i==5){
-                    item4.setText(object.toString());
-                    i++;
-                } else {
-                    item5.setText(object.toString());
+        for (String value : RESOURCES) {
+            switch (value) {
+                case "lumber":
+                    if (!resources.containsKey(value)) {
+                        item1.setText("0");
+                    }
+                    break;
+                case "brick":
+                    if (!resources.containsKey(value)) {
+                        item2.setText("0");
+                    }
+                    break;
+                case "ore":
+                    if (!resources.containsKey(value)) {
+                        item3.setText("0");
+                    }
+                    break;
+                case "wool":
+                    if (!resources.containsKey(value)) {
+                        item4.setText("0");
+                    }
+                    break;
+                case "grain":
+                    if (!resources.containsKey(value)) {
+                        item5.setText("0");
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (Map.Entry<String, Integer> set : resources.entrySet()) {
+            switch (set.getKey()) {
+                case "lumber" -> item1.setText(String.valueOf(set.getValue()));
+                case "brick" -> item2.setText(String.valueOf(set.getValue()));
+                case "ore" -> item3.setText(String.valueOf(set.getValue()));
+                case "wool" -> item4.setText(String.valueOf(set.getValue()));
+                case "grain" -> item5.setText(String.valueOf(set.getValue()));
+                default -> {
                 }
             }
         }
+        updateButtons(item1.getText(), item2.getText(), item3.getText(), item4.getText(), item5.getText());
     }
 
+    private void updateButtons(String lumber, String brick, String ore, String wool, String grain) {
+        if (Integer.parseInt(lumber) > 0 && Integer.parseInt(brick) > 0) {
+            road.disableProperty().set(false);
+        }
+
+        if (Integer.parseInt(lumber) > 0 && Integer.parseInt(brick) > 0 && Integer.parseInt(wool) > 0 && Integer.parseInt(grain) > 0) {
+            sett.disableProperty().set(false);
+        }
+
+        if (Integer.parseInt(ore) > 2 && Integer.parseInt(grain) > 1) {
+            city.disableProperty().set(false);
+        }
+
+    }
+
+
     //name is set to namelabel and color aswell
+    //and attach picture
     private void attachName(String n, String color) {
-        name.setText(n);
+        name.setText(n + " (YOU)");
         name.setTextFill(Color.web(color));
     }
 
@@ -152,16 +187,31 @@ public class UserSubView implements Controller {
             e.printStackTrace();
             return null;
         }
+        this.parent = parent;
+        this.road.disableProperty().set(true);
+        this.sett.disableProperty().set(true);
+        this.city.disableProperty().set(true);
 
+        Tooltip.install(this.roadPane,new Tooltip("1 Earth cactus, 1 Mars bar "));
+        Tooltip.install(this.settlemetPane,new Tooltip("1 Earth cactus, 1 Mars bar, 1 Neptun crystals, 1 Venus grain "));
+        Tooltip.install(this.cityPane,new Tooltip("3 Moon rock, 2 Venus grain "));
         return parent;
     }
 
+    public Parent getParent() {
+        return parent;
+
+    }
+
     public void onSett(ActionEvent actionEvent) {
+        gameFieldSubController.build("settlement");
     }
 
     public void onRoad(ActionEvent actionEvent) {
+        gameFieldSubController.build("road");
     }
 
     public void onCity(ActionEvent actionEvent) {
+        gameFieldSubController.build("city");
     }
 }
