@@ -264,7 +264,7 @@
     -fx-background-image: url("assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: bottom;
-    -fx-background-size: 350 260;
+    -fx-background-size: 360 260;
 }
 
 .button.move {
@@ -273,7 +273,7 @@
     -fx-background-repeat: stretch;
     -fx-scale-y: 0.8;
     -fx-scale-x: 0.8;
-    -fx-font-size: 14;
+    -fx-font-size: 12;
     -fx-text-fill: #666666;
 }
 
@@ -281,7 +281,7 @@
     -fx-background-image: url("assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: bottom;
-    -fx-background-size: 230 135;
+    -fx-background-size: 230 130;
 }
 
 #cactus {
@@ -326,8 +326,13 @@
     -fx-background-size: 320 220;
 }
 
-.button.finishTurn {
-    -fx-scale-x: 1.5;
-    -fx-scale-y: 1.5;
-    -fx-font-size: 38;
+#timer {
+    -fx-background-image: url("assets/grey_panel.png");
+    -fx-background-size: stretch;
+    -fx-background-position: buttom;
+}
+
+#remainingTime {
+    -fx-font-size: 34;
+    -fx-text-fill: orangered;
 }

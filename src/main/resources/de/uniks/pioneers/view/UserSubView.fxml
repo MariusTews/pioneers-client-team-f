@@ -64,25 +64,25 @@
       </VBox.margin>
    </Label>
    <HBox prefHeight="52.0" prefWidth="310.0">
-      <Pane fx:id="settlemetPane">
+      <Pane fx:id="settlemetPane" >
          <HBox.margin>
             <Insets left="30.0" right="10.0" />
          </HBox.margin>
          <children>
-            <Button fx:id="sett" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="82.0" text="SETT." />
+            <Button fx:id="sett" id="move" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="110.0" text="SETT." />
          </children>
       </Pane>
       <Pane fx:id="roadPane">
          <children>
-            <Button fx:id="road" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="77.0" text="Road" />
+            <Button fx:id="road" id="move" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="100.0" text="Road" />
          </children>
       </Pane>
       <Pane fx:id="cityPane">
          <HBox.margin>
-            <Insets left="20.0" right="10.0" />
+            <Insets left="10.0"/>
          </HBox.margin>
          <children>
-            <Button fx:id="city" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="84.0" text="City" />
+            <Button fx:id="city" id="move" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="100.0" text="City" />
          </children>
       </Pane>
    </HBox>
