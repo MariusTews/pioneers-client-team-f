@@ -8,32 +8,32 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0"
-      prefWidth="500.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MessageViewSubController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="320.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MessageViewSubController">
    <VBox prefHeight="263.0" prefWidth="500.0">
       <VBox.margin>
          <Insets />
       </VBox.margin>
-      <ScrollPane fx:id="idChatScrollPane" prefHeight="226.0" prefWidth="400.0" styleClass="gameChat">
+      <ScrollPane fx:id="idChatScrollPane" prefHeight="239.0" prefWidth="400.0" styleClass="gameChat">
          <VBox.margin>
-            <Insets left="25.0" right="75.0" top="30.0" />
+            <Insets left="25.0" right="75.0" top="50.0" />
          </VBox.margin>
-         <FlowPane fx:id="idMessageView" prefHeight="175.0" prefWidth="300.0" styleClass="gameChat">
-            <opaqueInsets>
-               <Insets />
-            </opaqueInsets>
+         <FlowPane fx:id="idMessageView" prefHeight="150.0" prefWidth="300.0" styleClass="gameChat">
             <padding>
                <Insets left="10.0" top="10.0" />
             </padding>
          </FlowPane>
       </ScrollPane>
    </VBox>
-   <HBox alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="516.0" spacing="10.0" styleClass="gameChat">
-      <TextField fx:id="idMessageField" alignment="TOP_LEFT" onKeyPressed="#enterKeyPressed" prefHeight="27.0" prefWidth="300.0" promptText="Type message" styleClass="gameChat">
+   <HBox alignment="CENTER_RIGHT" prefHeight="15.0" prefWidth="516.0">
+      <TextField id="gameChat" fx:id="idMessageField" alignment="TOP_LEFT" onKeyPressed="#enterKeyPressed" prefHeight="27.0" prefWidth="300.0" promptText="Type message" />
+      <Button id="send" fx:id="idSendButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#send" text="Send">
          <HBox.margin>
-            <Insets left="30.0" />
-         </HBox.margin></TextField>
-      <Button fx:id="idSendButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#send" styleClass="sendGameChat" text="Send">
+            <Insets right="70.0" />
+         </HBox.margin>
       </Button>
+      <VBox.margin>
+         <Insets top="5.0" />
+      </VBox.margin>
    </HBox>
 </VBox>

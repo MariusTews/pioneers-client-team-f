@@ -215,7 +215,7 @@ public class MessageViewSubController implements Controller {
 
         contextMenu.getItems().add(menuItem);
 
-        label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: LIGHTGREY"));
+        label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: rgba(255, 255, 255, .7)"));
         label.setOnMouseExited(event -> label.setStyle("-fx-background-color: TRANSPARENT"));
         label.setContextMenu(contextMenu);
 
