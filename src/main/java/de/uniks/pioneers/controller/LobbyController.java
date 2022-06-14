@@ -625,7 +625,7 @@ public class LobbyController implements Controller {
 
 		contextMenu.getItems().add(menuItem);
 		label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: LIGHTGREY"));
-		label.setOnMouseExited(event -> label.setStyle("-fx-background-color: DEFAULT"));
+		label.setOnMouseExited(event -> label.setStyle("-fx-background-color: TRANSPARENT"));
 		label.setContextMenu(contextMenu);
 
 		menuItem.setOnAction(event -> {

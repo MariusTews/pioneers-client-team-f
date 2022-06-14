@@ -101,3 +101,8 @@
     -fx-graphic: url("assets/grey_button.png");
     -fx-text-fill: dimgrey;
 }
+
+/* text field image size for login and signup */
+.text-field.loginRegister {
+    -fx-background-size: 200 38;
+}
