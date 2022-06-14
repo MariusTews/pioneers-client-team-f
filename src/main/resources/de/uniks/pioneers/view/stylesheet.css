@@ -183,3 +183,9 @@
     -fx-text-fill: midnightblue;
     -fx-font-size: 14;
 }
+
+/**************** create game screen specific styles ****************/
+.text-field.createGame {
+    -fx-background-size: 223 34;
+    -fx-font-size: 16;
+}
