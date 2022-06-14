@@ -1,11 +1,11 @@
 /* import font */
 @font-face {
-    src: url("kenvector_future.ttf");
+    src: url("fonts/kenvector_future.ttf");
 }
 
 /************** general settings for all elements of the specific types **************/
 
-/* all backgrounds default to grey gradient */
+/* all backgrounds default to grey gradient and all inputs have the same font */
 .root {
     -fx-font-family: "KenVector Future Regular";
     -fx-background-color: linear-gradient(to bottom, #666666, #F5F5F5);
@@ -18,7 +18,7 @@
 
 /* default focus for all buttons and textfields */
 .button:focused {
-    -fx-effect: dropshadow(gaussian, gray, 30, 0, 0, 0);
+    -fx-effect: dropshadow(gaussian, grey, 30, 0, 0, 0);
 }
 
 .text-field:focused {
@@ -48,7 +48,7 @@
 }
 
 .button:pressed {
-    -fx-text-fill: gray;
+    -fx-text-fill: grey;
 }
 
 .text-field {
@@ -60,26 +60,26 @@
     -fx-background-color: transparent;
 }
 
-.scroll-bar:horizontal, .scroll-bar:vertical{
-    -fx-background-color:transparent;
-}
-
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track{
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-background-radius: 0em;
+    -fx-background-radius: 4em;
 }
 
 .scroll-bar:horizontal .thumb,
 .scroll-bar:vertical .thumb {
-    -fx-background-color: darkgrey;
-    -fx-background-radius: 2em;
+    -fx-background-color: dimgrey;
+    -fx-background-radius: 4em;
+    -fx-border-radius: 15;
 }
 
 .scroll-bar .increment-arrow,
 .scroll-bar .decrement-arrow {
-    -fx-padding: 1;
+    -fx-padding: -2;
+}
+.scroll-bar:horizontal, .scroll-bar:vertical{
+    -fx-background-color:transparent;
 }
 
 /************** Definitions for specific style classes **************/
@@ -105,6 +105,7 @@
 /* text field image size for login and signup */
 .text-field.loginRegister {
     -fx-background-size: 200 38;
+    -fx-font-size: 16;
 }
 
 /***************** lobby specific styles *****************/
@@ -112,14 +113,15 @@
 /* send button of the chat */
 .button.send {
     -fx-graphic: url("assets/blue_chat_button.png");
-    -fx-scale-x: 0.65;
-    -fx-scale-y: 0.65;
     -fx-font-size: 14;
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.6;
 }
 
 /* text field of the chat (same style like in loginRegister, but another scaling */
 .text-field.send {
-    -fx-background-size: 220 30;
+    -fx-background-size: 205 30;
+    -fx-scale-x: 1.1;
     -fx-background-image-position: center;
     -fx-background-repeat: no-repeat;
 }
@@ -167,24 +169,39 @@
     -fx-font-size: 18;
     -fx-text-fill: dimgrey;
 }
+/**************** edit user screen specific styles ****************/
+.label.whiteTitle {
+    -fx-font-size: 30;
+    -fx-text-fill: #F5F5F5;
+}
 
+.label.avatarTitle {
+    -fx-font-size: 16;
+    -fx-text-fill: #F5F5F5;
+}
+
+.text-field.edit {
+    -fx-background-size: 305 32;
+    -fx-font-size: 16;
+}
 
 /**************** rules screen specific styles ****************/
 
 .text-field.rules {
-    -fx-background-image: url("ingame_background.png");
+    -fx-background-image: url("assets/ingame_background.png");
     -fx-text-fill: #F5F5F5;
     -fx-font-size: 18;
 }
 
 .text-area.rules {
-    -fx-background-image: url("ingame_background.png");
+    -fx-background-image: url("assets/ingame_background.png");
     -fx-wrap-text: true;
     -fx-text-fill: midnightblue;
     -fx-font-size: 14;
 }
 
 /**************** create game screen specific styles ****************/
+
 .text-field.createGame {
     -fx-background-size: 223 34;
     -fx-font-size: 16;
@@ -192,49 +209,125 @@
 
 /**************** game lobby screen specific styles ****************/
 
-.label.gameTitle {
-    -fx-font-size: 30;
-    -fx-text-fill: #F5F5F5;
-}
-
 .scroll-pane.memberList > .viewport {
-    -fx-border-radius: 15;
     -fx-background-image: url("assets/blue_panel.png");
+    -fx-background-position: center;
     -fx-background-repeat: stretch;
-    -fx-background-size: 248 335;
-    -fx-background-radius: 25;
+    -fx-background-size: 250 325;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
 }
 
-/* gamelobby and ingame chat */
+/******************* gamelobby and ingame chat ********************/
 
 .scroll-pane.gameChat, .scroll-pane.memberList {
     -fx-background-color: transparent;
-    -fx-border-radius: 15;
 }
 
-.scroll-pane.gameChat > .viewport  {
-    -fx-border-radius: 15;
-    -fx-background-radius: 25;
+.scroll-bar.gameChat:horizontal, .scroll-bar.gameChat:vertical {
+    -fx-background-color:dodgerblue;
+}
+
+.scroll-pane.gameChat {
     -fx-background-image: url("assets/blue_panel.png");
     -fx-background-repeat: stretch;
-    -fx-background-size: 400 222;
+    -fx-background-position: center;
+    -fx-background-size: 405 220;
 }
 
-.text-field.gameChat{
-    -fx-background-size: 270 30;
+.scroll-pane.gameChat > .viewport {
+    -fx-background-color: transparent;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
 }
 
-/* TODO: SPACING BETWEEN BUTTON AND OTHER ELEMTENTS ARE NOT CORRECT */
-.button.sendGameChat {
-    -fx-graphic: url("assets/blue_button.png");
-    -fx-scale-x: 0.35;
-    -fx-scale-y: 0.55;
-    -fx-font-size: 28;
+#gameChat {
+    -fx-background-size: 310px 30px;
+    -fx-background-position: center;
+    -fx-scale-y: 1.1;
 }
 
-/* BAUSTELLE */
-.dialog-pane {
-    -fx-background-color: #CEF2F2;
-    -fx-border-color: #2BD9D9;
-    -fx-border-width:2px;
+#send {
+    -fx-background-image: url("assets/blue_button.png");
+    -fx-background-position: center;
+}
+/************************* ingame screen *************************/
+
+#gameView {
+    -fx-background-image: url("assets/ingame_background.png");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 1600 900;
+}
+
+/* player's views with resource icons */
+#userView {
+    -fx-background-image: url("assets/green_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: bottom;
+    -fx-background-size: 350 260;
+}
+
+.button.move {
+    -fx-background-image: url("assets/grey_button.png");
+    -fx-background-size: 100 50;
+    -fx-background-repeat: stretch;
+    -fx-scale-y: 0.8;
+    -fx-scale-x: 0.8;
+    -fx-font-size: 14;
+    -fx-text-fill: #666666;
+}
+
+#opponentView {
+    -fx-background-image: url("assets/green_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: bottom;
+    -fx-background-size: 230 135;
+}
+
+#cactus {
+    -fx-image: url("assets/earth_cactus.png");
+}
+
+#mars {
+    -fx-image: url("assets/mars_bar.png");
+}
+
+#moon {
+    -fx-image: url("assets/moon_rock.png");
+}
+
+#neptun {
+    -fx-image: url("assets/neptun_crystals.png");
+}
+
+#venus {
+    -fx-image: url("assets/venus_grain.png");
+}
+
+/* bottom of the screen: dice roll */
+
+#roll {
+    -fx-background-image: url("assets/grey_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: bottom;
+    -fx-background-size: 230 90;
+}
+
+#diceSum {
+    -fx-font-size: 48;
+}
+
+/* right side of the screen: current move and player, finish move via button */
+
+#currentGameState {
+    -fx-background-image: url("assets/grey_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: top;
+    -fx-background-size: 320 220;
+}
+
+.button.finishTurn {
+    -fx-scale-x: 1.5;
+    -fx-scale-y: 1.5;
+    -fx-font-size: 38;
 }
