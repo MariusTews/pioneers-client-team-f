@@ -29,12 +29,15 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.stage = primaryStage;
-        stage.setWidth(800);
+        stage.setWidth(900);
         stage.setHeight(600);
         stage.setTitle("Pioneers");
 
         final Scene scene = new Scene(new Label("Loading ... "));
         stage.setScene(scene);
+
+        // Load css into the scene for the design
+        scene.getStylesheets().add(Main.class.getResource("view/stylesheet.css").toString());
 
         setAppIcon(stage);
 
