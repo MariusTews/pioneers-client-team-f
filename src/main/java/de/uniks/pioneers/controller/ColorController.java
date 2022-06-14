@@ -18,7 +18,7 @@ public class ColorController {
 
     //Sets labels withs its respective colors
     public  void createColor(){
-        for(int i = 0; i<26;i++) {
+        for(int i = 0; i<8;i++) {
             Label label = new Label();
             label.setText(COLORSTRINGARRAY[i]);
             label.setTextFill(COLORARRAY[i]);

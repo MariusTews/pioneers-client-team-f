@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 import java.util.Comparator;
-import java.util.List;
 
 public class Constants {
     public static final String VERSION_PREFIX = "/v2";
@@ -66,13 +65,10 @@ public class Constants {
     public static final int AMOUNT_SETTLEMENTS_CITIES = 13;
 
     //Array of Colors as Strings for the Label text
-    public  static final String[] COLORSTRINGARRAY = {"RED", "BLUE", "ORANGE", "VIOLET", "PINK", "CORAL", "GOLD", "DARKORANGE",
-            "TOMATO", "DARKORCHID", "LIME", "GREEN", "PALEGREEN", "PURPLE", "ROYALBLUE", "CRIMSON", "ROSYBROWN", "BROWN",
-            "CHOCOLATE", "SIENNA", "BURLYWOOD", "LIMEGREEN", "DARKCYAN", "DEEPSKYBLUE", "SEAGREEN", "POWDERBLUE"};
+    public static final String[] COLORSTRINGARRAY = {"RED", "BLUE", "ORANGE", "DARKORCHID", "LIMEGREEN", "SIENNA",
+            "DEEPSKYBLUE", "SALMON"};
 
     //Array of Colors
-    public static final Color[] COLORARRAY = {Color.RED, Color.BLUE, Color.ORANGE, Color.VIOLET, Color.PINK,
-            Color.CORAL, Color.GOLD, Color.DARKORANGE, Color.TOMATO, Color.DARKORCHID, Color.LIME, Color.GREEN,
-            Color.PALEGREEN, Color.PURPLE, Color.ROYALBLUE, Color.CRIMSON, Color.ROSYBROWN, Color.BROWN, Color.CHOCOLATE,
-            Color.SIENNA, Color.BURLYWOOD, Color.LIMEGREEN, Color.DARKCYAN, Color.DEEPSKYBLUE, Color.SEAGREEN, Color.POWDERBLUE};
+    public static final Color[] COLORARRAY = {Color.RED, Color.BLUE, Color.ORANGE, Color.DARKORCHID, Color.LIMEGREEN,
+            Color.SIENNA, Color.DEEPSKYBLUE, Color.SALMON};
 }
