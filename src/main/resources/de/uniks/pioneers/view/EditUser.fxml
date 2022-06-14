@@ -21,7 +21,7 @@
       </Label>
       <Button fx:id="cancelButton" contentDisplay="CENTER" minWidth="100.0" mnemonicParsing="false" onAction="#cancelButtonPressed" styleClass="blueButton" text="Cancel">
          <HBox.margin>
-            <Insets left="280.0" />
+            <Insets left="100.0" />
          </HBox.margin>
       </Button>
    </HBox>
@@ -63,16 +63,15 @@
          <VBox alignment="CENTER" minHeight="263.0" minWidth="263.0" prefHeight="355.0" prefWidth="350.0">
             <Label prefHeight="12.0" prefWidth="100.0" styleClass="avatarTitle" text="avatar">
                <VBox.margin>
-                  <Insets left="10.0"/>
+                  <Insets left="10.0" />
                </VBox.margin></Label>
             <Pane prefHeight="200.0" prefWidth="225.0">
                <ImageView fitHeight="177.0" fitWidth="180.0" layoutX="108.0" layoutY="12.0">
-                  <Image url="@assets/blue_panel.png"/>
+                  <Image url="@assets/blue_panel.png" />
                </ImageView>
-               <ImageView fx:id="userPicture" fitHeight="155.0" fitWidth="180.0" layoutX="120.0" layoutY="23.0"
-                          pickOnBounds="true" preserveRatio="true">
+               <ImageView fx:id="userPicture" fitHeight="155.0" fitWidth="180.0" layoutX="120.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
                   <viewport>
-                     <Rectangle2D/>
+                     <Rectangle2D />
                   </viewport>
                </ImageView>
             </Pane>

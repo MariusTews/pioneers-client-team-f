@@ -83,7 +83,7 @@ public class App extends Application {
             stage.setWidth(1600);
             stage.setHeight(900);
         }else if(controller.getClass().equals(LobbyController.class)){
-            stage.setWidth(800);
+            stage.setWidth(900);
             stage.setHeight(600);
         }
     }
