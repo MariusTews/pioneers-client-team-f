@@ -16,24 +16,19 @@
    </HBox>
    <HBox fx:id="resourcesView" alignment="CENTER" prefHeight="14.0" prefWidth="200.0" spacing="12.0">
       <ImageView fx:id="earthCactusImage" fitHeight="23.0" fitWidth="13.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../earth_cactus.png" />
-         </image></ImageView>
+         <Image url="@assets/earth_cactus.png"/>
+      </ImageView>
       <ImageView fx:id="marsBarImage" fitHeight="26.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../mars_bar.png" />
-         </image></ImageView>
+         <Image url="@assets/mars_bar.png"/>
+      </ImageView>
       <ImageView fx:id="moonRockImage" fitHeight="21.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../moon_rock.png" />
-         </image></ImageView>
+         <Image url="@assets/moon_rock.png"/>
+      </ImageView>
       <ImageView fx:id="neptunCrystalsImage" fitHeight="21.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../neptun_crystals.png" />
-         </image></ImageView>
+         <Image url="@assets/neptun_crystals.png"/>
+      </ImageView>
       <ImageView fx:id="venusGrainImage" fitHeight="25.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../venus_grain.png" />
-         </image></ImageView>
+         <Image url="@assets/venus_grain.png"/>
+      </ImageView>
    </HBox>
 </VBox>

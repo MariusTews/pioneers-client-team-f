@@ -21,7 +21,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -193,13 +192,12 @@ public class MessageViewSubController implements Controller {
         box.getChildren().add(imageView);
         // Label with message
         Label label = new Label();
-        // Font shall be changed when design is implemented
-        label.setFont(new Font("Arial", 14));
         // Format the message label and display the whole message with line breaks
         label.setMinWidth(100);
         label.setMaxWidth(250);
         label.setWrapText(true);
         label.setText(m.body());
+        label.setTextFill(Color.WHITE);
         this.initRightClick(label, m._id(), m.sender());
 
         // Label with colored username
@@ -209,7 +207,7 @@ public class MessageViewSubController implements Controller {
         this.idMessageView.getChildren().add(box);
     }
 
-    // Option to delete the own message by right clicking.
+    // Option to delete the own message by right-clicking.
     // Fails when not sender of the message.
     private void initRightClick(Label label, String messageId, String sender) {
         final ContextMenu contextMenu = new ContextMenu();
@@ -259,7 +257,6 @@ public class MessageViewSubController implements Controller {
         username.setMinWidth(50);
         // Set username as text, default is black which shall be white later
         username.setText(userHash.get(m.sender()).name() + ":");
-        username.setFont(new Font("Arial", 14));
 
         // get the color of the game member from memberHash
         String color = memberHash.get(m.sender()).color();

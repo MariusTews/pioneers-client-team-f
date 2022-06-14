@@ -189,3 +189,52 @@
     -fx-background-size: 223 34;
     -fx-font-size: 16;
 }
+
+/**************** game lobby screen specific styles ****************/
+
+.label.gameTitle {
+    -fx-font-size: 30;
+    -fx-text-fill: #F5F5F5;
+}
+
+.scroll-pane.memberList > .viewport {
+    -fx-border-radius: 15;
+    -fx-background-image: url("assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 248 335;
+    -fx-background-radius: 25;
+}
+
+/* gamelobby and ingame chat */
+
+.scroll-pane.gameChat, .scroll-pane.memberList {
+    -fx-background-color: transparent;
+    -fx-border-radius: 15;
+}
+
+.scroll-pane.gameChat > .viewport  {
+    -fx-border-radius: 15;
+    -fx-background-radius: 25;
+    -fx-background-image: url("assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 400 222;
+}
+
+.text-field.gameChat{
+    -fx-background-size: 270 30;
+}
+
+/* TODO: SPACING BETWEEN BUTTON AND OTHER ELEMTENTS ARE NOT CORRECT */
+.button.sendGameChat {
+    -fx-graphic: url("assets/blue_button.png");
+    -fx-scale-x: 0.35;
+    -fx-scale-y: 0.55;
+    -fx-font-size: 28;
+}
+
+/* BAUSTELLE */
+.dialog-pane {
+    -fx-background-color: #CEF2F2;
+    -fx-border-color: #2BD9D9;
+    -fx-border-width:2px;
+}
