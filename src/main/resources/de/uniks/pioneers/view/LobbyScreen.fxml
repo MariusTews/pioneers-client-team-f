@@ -11,12 +11,16 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" spacing="12.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.LobbyController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="800.0" prefHeight="600.0"
+      prefWidth="800.0" spacing="12.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.LobbyController">
    <HBox alignment="CENTER" maxHeight="40.0" prefWidth="200.0" spacing="7.0">
-      <Button fx:id="rulesButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#rulesButtonPressed" styleClass="blueButton" text="Rules" />
-      <Label fx:id="userWelcomeLabel" prefHeight="20.0" prefWidth="600.0" text="Nice to see you again, " style="-fx-text-fill: orange; -fx-font-size: 18">
+      <Button fx:id="rulesButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#rulesButtonPressed"
+              styleClass="blueButton" text="Rules" />
+      <Label fx:id="userWelcomeLabel" prefHeight="20.0" prefWidth="600.0" text="Nice to see you again, "
+             style="-fx-text-fill: orange; -fx-font-size: 18">
       </Label>
-      <Button fx:id="logoutButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#logoutButtonPressed" styleClass="redButton" text="Logout" />
+      <Button fx:id="logoutButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#logoutButtonPressed"
+              styleClass="redButton" text="Logout" />
    </HBox>
    <HBox alignment="CENTER" prefHeight="500.0" prefWidth="800.0" spacing="15.0">
       <ScrollPane fx:id="userScrollPane" prefHeight="200.0" prefWidth="300.0" styleClass="lobby">
@@ -33,12 +37,12 @@
                </ScrollPane>
             </Tab>
          </TabPane>
-         <HBox prefHeight="40.0" prefWidth="400.0" >
+         <HBox prefHeight="40.0" prefWidth="400.0">
             <TextField fx:id="chatMessageField" onKeyPressed="#enterKeyPressed" prefHeight="30.0" prefWidth="350.0" styleClass="send">
                <HBox.margin>
-                  <Insets top="15.0" />
+                  <Insets top="15.0" left="15.0"/>
                </HBox.margin></TextField>
-            <Button fx:id="sendButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#sendButtonPressed" prefHeight="14.0" prefWidth="5.0" styleClass="send" text="send" />
+            <Button fx:id="sendButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#sendButtonPressed" styleClass="send" text="send" />
          </HBox>
       </VBox>
       <ScrollPane fx:id="gamesScrollPane" prefHeight="200.0" prefWidth="280.0" styleClass="gamelist">
