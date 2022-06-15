@@ -4,10 +4,7 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
-import de.uniks.pioneers.model.Move;
-import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.State;
-import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.animation.KeyFrame;
@@ -208,8 +205,6 @@ public class GameScreenController implements Controller {
         }
 
 
-
-
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
         currentPlayerLabel.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -395,7 +390,7 @@ public class GameScreenController implements Controller {
     private void startTime() {
 
         // starting time
-        final Integer[] startTime = {180};
+        final Integer[] startTime = {20};
         final Integer[] seconds = {startTime[0]};
 
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -408,7 +403,64 @@ public class GameScreenController implements Controller {
                 timerLabel.setText(seconds[0].toString());
                 if (seconds[0] <= 0) {
                     timeline.stop();
-                    if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name())) {
+                    if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-settlement")) {
+                        Map map = pioneersService.findAllTiles(gameIDStorage.getId()).blockingFirst();
+                        List<String> allTileCoordinates = new ArrayList<>();
+                        for (Tile tile : map.tiles()) {
+                            allTileCoordinates.add("x" + tile.x().toString() + "y" + tile.y() + "z" + tile.z());
+                        }
+                        List<String> validPositions = new ArrayList<>();
+                        for (String string : allTileCoordinates) {
+                            validPositions.add(string + "_0");
+                            validPositions.add(string + "_6");
+                        }
+                        List<Building> allBuildings = pioneersService.findAllBuildings(gameIDStorage.getId()).blockingFirst();
+                        List<String> allInvalidSettlementCoordinates = new ArrayList<>();
+                        for (Building building : allBuildings) {
+                            if (building.side().intValue() == 0) {
+                                //building itself
+                                allInvalidSettlementCoordinates.add("x" + building.x().toString() + "y" + building.y() + "z" + building.z() + "_" + building.side());
+                                //building place down left from current building
+                                allInvalidSettlementCoordinates.add("x" + building.x() + "y" + (building.y().intValue() + 1) + "z" + (building.z().intValue() - 1) + "_" + "6");
+                                //building place down right from current building
+                                allInvalidSettlementCoordinates.add("x" + (building.x().intValue() + 1) + "y" + building.y() + "z" + (building.z().intValue() - 1) + "_" + "6");
+                                //building place on top of current building
+                                allInvalidSettlementCoordinates.add("x" + (building.x().intValue() + 1) + "y" + (building.y().intValue() + 1) + "z" + (building.z().intValue() - 2) + "_" + "6");
+                            } else if (building.side().intValue() == 6){
+                                //building itself
+                                allInvalidSettlementCoordinates.add("x" + building.x().toString() + "y" + building.y() + "z" + building.z() + "_" + building.side());
+                                //building place top left from current building
+                                allInvalidSettlementCoordinates.add("x" + (building.x().intValue() - 1) + "y" + building.y() + "z" + (building.z().intValue() + 1) + "_" + "0");
+                                //building place top left from current building
+                                allInvalidSettlementCoordinates.add("x" + building.x() + "y" + (building.y().intValue() - 1) + "z" + (building.z().intValue() + 1) + "_" + "0");
+                                //building place bottom of current building
+                                allInvalidSettlementCoordinates.add("x" + (building.x().intValue() - 1) + "y" + (building.y().intValue() - 1) + "z" + (building.z().intValue() + 2) + "_" + "0");
+                            }
+                        }
+                        for (String string : allInvalidSettlementCoordinates) {
+                            if (validPositions.contains(string)) {
+                                validPositions.remove(string);
+                            }
+                        }
+                        int randomNum = (int) (Math.random() * (validPositions.size() + 1));
+                        String selectedPosition = validPositions.get(randomNum);
+                        int x = Integer.parseInt(selectedPosition.substring(selectedPosition.indexOf("x") + 1, selectedPosition.indexOf("y")));
+                        int y = Integer.parseInt(selectedPosition.substring(selectedPosition.indexOf("y") + 1, selectedPosition.indexOf("z")));
+                        int z = Integer.parseInt(selectedPosition.substring(selectedPosition.indexOf("z") + 1, selectedPosition.indexOf("_")));
+                        int side = Integer.parseInt(selectedPosition.substring(selectedPosition.indexOf("_") + 1));
+
+                        pioneersService.move(gameIDStorage.getId(), nextMoveLabel.getText(), x, y, z, side, "settlement")
+                                .observeOn(FX_SCHEDULER)
+                                .subscribe();
+
+
+
+
+
+                        if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-road")) {
+                            System.out.println("hello");
+                        }
+                    } else {
                         // player needs to roll and skips his turn if the timer reached 0 seconds
                         if (nextMoveLabel.getText().equals("roll")) {
                             diceRoll();
