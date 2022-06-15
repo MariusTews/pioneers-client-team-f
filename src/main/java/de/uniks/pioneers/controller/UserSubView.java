@@ -42,9 +42,9 @@ public class UserSubView implements Controller {
     private final GameFieldSubController gameFieldSubController;
     private final EventListener eventListener;
     private final Player player;
-    private final int vicPoints;
+    private final int vicPoints ;
 
-    public Label name;
+    public Label name ;
     public Label victoryPoints;
     public Label item1;
     public Label item2;
@@ -79,6 +79,7 @@ public class UserSubView implements Controller {
 
     @Override
     public void init() {
+        //setAll();
         userService.findAllUsers().observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     for (User user : col) {
@@ -92,6 +93,7 @@ public class UserSubView implements Controller {
     private void attachTOSubview() {
         for (User user : this.users) {
             if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
+                //this.attachResources(player.resources());
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
                 this.victoryPoints.setText(Integer.toString(vicPoints) + "/10");
@@ -167,8 +169,8 @@ public class UserSubView implements Controller {
     //name is set to namelabel and color aswell
     //and attach picture
     private void attachName(String n, String color) {
-        name.setText(n + " (YOU)");
-        name.setTextFill(Color.web(color));
+        this.name.setText(n + " (YOU)");
+        this.name.setTextFill(Color.web(color));
     }
 
     @Override
@@ -214,4 +216,5 @@ public class UserSubView implements Controller {
     public void onCity(ActionEvent actionEvent) {
         gameFieldSubController.build("city");
     }
+
 }

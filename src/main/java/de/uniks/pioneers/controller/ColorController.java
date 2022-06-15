@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 
 import javafx.scene.control.Label;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class ColorController {
 
     private final List<Label> color = new ArrayList<>();
 
+    @Inject
     public ColorController(){
         createColor();
     }
