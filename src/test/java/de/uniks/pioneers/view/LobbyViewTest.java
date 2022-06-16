@@ -141,7 +141,8 @@ public class LobbyViewTest extends ApplicationTest {
         Assertions.assertThat(imageView.getImage()).isNull();
         Assertions.assertThat(circle.getFill()).isEqualTo(Color.GREEN);
         Assertions.assertThat(label.getText()).isEqualTo("test");
-        Assertions.assertThat(chat.getText()).isEqualTo("chat");
+        // There is an icon for the chat button, therefore no text
+        Assertions.assertThat(chat.getText()).isEqualTo("");
 
         HBox hBox2 = (HBox) vBox.getChildren().get(2);
 

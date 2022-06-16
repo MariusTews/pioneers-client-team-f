@@ -74,7 +74,6 @@ public class EditUserController implements Controller {
 
     }
 
-
     @Override
     public void init() {
 
@@ -142,10 +141,10 @@ public class EditUserController implements Controller {
         dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         alert.setTitle("Deleting Account");
         alert.setContentText("Are you sure you want to delete " + username + "?" );
-        alert.getButtonTypes().set(0,new ButtonType("Yes"));
-        alert.getButtonTypes().set(1,new ButtonType("No"));
+        alert.getButtonTypes().set(0, ButtonType.YES);
+        alert.getButtonTypes().set(1, ButtonType.NO);
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
+        if (result.get() == ButtonType.YES){
             userService.delete(idStorage.getID())
                     .observeOn(FX_SCHEDULER)
                     .subscribe(suc -> app.show(loginController.get()), error->{});
