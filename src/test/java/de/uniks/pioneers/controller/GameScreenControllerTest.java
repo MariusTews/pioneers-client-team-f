@@ -1,0 +1,161 @@
+package de.uniks.pioneers.controller;
+
+import de.uniks.pioneers.App;
+import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.model.*;
+import de.uniks.pioneers.service.*;
+import io.reactivex.rxjava3.core.Observable;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.matcher.base.NodeMatchers;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.testfx.api.FxAssert.verifyThat;
+
+@ExtendWith(MockitoExtension.class)
+class GameScreenControllerTest extends ApplicationTest {
+
+    @Mock
+    UserService userService;
+    @Mock
+    PioneersService pioneersService;
+    @Mock
+    MemberService memberService;
+    @Mock()
+    EventListener eventListener;
+
+    @Spy
+    GameIDStorage gameIDStorage;
+    @Spy
+    IDStorage idStorage;
+
+
+    @InjectMocks
+    GameScreenController gameScreenController;
+
+    @ExtendWith(MockitoExtension.class)
+    public void start(Stage stage) {
+
+        when(userService.findAllUsers()).thenReturn(Observable.empty());
+        when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
+        when(gameIDStorage.getId()).thenReturn("02");
+        when(idStorage.getID()).thenReturn("01");
+
+        when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
+        when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
+        Map map = new Map("02", createMap());
+        when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
+
+
+        App app = new App(gameScreenController);
+
+        app.start(stage);
+        gameScreenController.nextMoveLabel.setText("roll");
+        gameScreenController.getGameFieldSubController().loadMap(map);
+        HashMap<String, Integer> remain = new HashMap<String, Integer>();
+        remain.put("settlement", 3);
+        remain.put("city", 3);
+        remain.put("road", 3);
+        Player player = new Player("01", "02", "#9932cc", 4, null, remain);
+        gameScreenController.getGameFieldSubController().getPlayers().add(player);
+        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 7, "02", "road");
+        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "city");
+        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "settlement");
+
+    }
+
+    List<Tile> createMap() {
+        List<Tile> titles = new ArrayList<>();
+        titles.add(new Tile(-2, 2, 0, "fields", 5));
+        titles.add(new Tile(-2, 1, 1, "desert", 5));
+        titles.add(new Tile(-2, 0, 2, "hills", 5));
+        titles.add(new Tile(-1, 2, -1, "mountains", 5));
+        titles.add(new Tile(-1, 1, 0, "forest", 5));
+        titles.add(new Tile(-1, 0, 1, "pasture", 5));
+        titles.add(new Tile(-1, -1, 2, "fields", 5));
+        titles.add(new Tile(0, 2, -2, "fields", 5));
+        titles.add(new Tile(0, 1, -1, "fields", 5));
+        titles.add(new Tile(0, 0, 0, "fields", 5));
+        titles.add(new Tile(0, -1, 1, "fields", 5));
+        titles.add(new Tile(0, -2, 2, "fields", 5));
+        titles.add(new Tile(1, 1, -2, "fields", 5));
+        titles.add(new Tile(1, 0, -1, "fields", 5));
+        titles.add(new Tile(1, -1, 0, "fields", 5));
+        titles.add(new Tile(1, -2, 1, "fields", 5));
+        titles.add(new Tile(2, 0, -2, "fields", 5));
+        titles.add(new Tile(2, -1, -1, "fields", 5));
+        titles.add(new Tile(2, -2, 0, "fields", 5));
+
+
+        return titles;
+    }
+
+
+    @Test
+    void error() {
+        List<ExpectedMove> moves = new ArrayList<>();
+        moves.add(new ExpectedMove("founding-settlement-1", null));
+        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves)));
+        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.error(new Throwable()));
+        clickOn("#x0y0z0_6");
+        verify(pioneersService).move("02", "founding-settlement-1", 0, 0, 0, 6, "settlement");
+
+        moves.clear();
+        moves.add(new ExpectedMove("founding-road-1", null));
+        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves)));
+
+        clickOn("#x0y0z0_7");
+        verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road");
+    }
+
+    @Test
+    void foundingPhase() {
+        List<ExpectedMove> moves = new ArrayList<>();
+        moves.add(new ExpectedMove("founding-settlement-1", null));
+        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves)));
+        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
+
+        clickOn("#x0y0z0_6");
+        verify(pioneersService).move("02", "founding-settlement-1", 0, 0, 0, 6, "settlement");
+
+
+        moves.clear();
+        moves.add(new ExpectedMove("founding-road-1", null));
+        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves)));
+
+        clickOn("#x0y0z0_7");
+        verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road");
+
+    }
+
+
+    @Test
+    void notYourTurn() {
+        when(idStorage.getID()).thenReturn("02");
+        clickOn("#x0y0z0_6");
+        verifyThat("OK", NodeMatchers.isVisible());
+        type(KeyCode.SPACE);
+    }
+
+    @Test
+    void finishTurn() {
+        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
+        write("\t");
+        type(KeyCode.SPACE);
+        verify(pioneersService).move("02", "build", null, null, null, null, null);
+    }
+
+}
