@@ -34,12 +34,13 @@
       </VBox>
    </HBox>
    <HBox alignment="CENTER_RIGHT" prefHeight="92.0" prefWidth="640.0">
-      <ComboBox fx:id="colorPicker" onAction="#colorPicked" prefWidth="170.0" promptText="Choose color">
+      <ComboBox fx:id="colorPicker" onAction="#colorPicked" prefWidth="190.0" promptText="Choose color">
          <HBox.margin>
             <Insets right="190.0" />
          </HBox.margin>
       </ComboBox>
-      <Button fx:id="idReadyButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#ready" prefHeight="35.0" prefWidth="66.0" styleClass="blueButton" text="Ready">
+      <Button fx:id="idReadyButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#ready"
+              prefHeight="35.0" prefWidth="66.0" styleClass="blueButton" text="Ready">
          <HBox.margin>
             <Insets/>
          </HBox.margin>

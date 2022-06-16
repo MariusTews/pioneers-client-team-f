@@ -12,16 +12,16 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="600.0" maxWidth="800.0" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.EditUserController">
+<VBox maxHeight="600.0" maxWidth="800.0" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.EditUserController">
    <HBox alignment="CENTER_LEFT" maxWidth="800.0" prefHeight="151.0" prefWidth="800.0">
       <Label fx:id="usernameLabel" prefWidth="350.0" styleClass="whiteTitle" text="edit %username">
          <HBox.margin>
-            <Insets left="130.0" />
+            <Insets left="80.0" />
          </HBox.margin>
       </Label>
       <Button fx:id="cancelButton" contentDisplay="CENTER" minWidth="100.0" mnemonicParsing="false" onAction="#cancelButtonPressed" styleClass="blueButton" text="Cancel">
          <HBox.margin>
-            <Insets left="100.0" />
+            <Insets left="50.0" />
          </HBox.margin>
       </Button>
    </HBox>
@@ -61,19 +61,16 @@
             <Insets />
          </HBox.margin>
          <VBox alignment="CENTER" minHeight="263.0" minWidth="263.0" prefHeight="355.0" prefWidth="350.0">
-            <Label prefHeight="12.0" prefWidth="100.0" styleClass="avatarTitle" text="avatar">
-               <VBox.margin>
-                  <Insets left="10.0" />
-               </VBox.margin></Label>
-            <Pane prefHeight="200.0" prefWidth="225.0">
-               <ImageView fitHeight="177.0" fitWidth="180.0" layoutX="108.0" layoutY="12.0">
+            <Pane prefHeight="234.0" prefWidth="395.0">
+               <ImageView fitHeight="170.0" fitWidth="170.0" layoutX="113.0" layoutY="42.0">
                   <Image url="@assets/blue_panel.png" />
                </ImageView>
-               <ImageView fx:id="userPicture" fitHeight="155.0" fitWidth="180.0" layoutX="120.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
+               <ImageView fx:id="userPicture" fitHeight="130.0" fitWidth="130.0" layoutX="133.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
                   <viewport>
                      <Rectangle2D />
                   </viewport>
                </ImageView>
+               <Label alignment="CENTER" layoutX="152.0" layoutY="6.0" prefHeight="17.0" prefWidth="91.0" styleClass="avatarTitle" text="avatar" />
             </Pane>
             <Button fx:id="editButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#editPicture" styleClass="blueButton" text="Edit">
                <VBox.margin>

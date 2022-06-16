@@ -9,31 +9,30 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox id="userView" fx:id="userStatus" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="285.0" prefWidth="390.0" xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.UserSubView">
+      minWidth="-Infinity" prefHeight="285.0" prefWidth="416.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.UserSubView">
    <padding>
-      <Insets left="20.0" top="10.0"/>
+      <Insets left="20.0" top="10.0" />
    </padding>
    <Label fx:id="name" prefHeight="38.0" prefWidth="191.0" text="Name">
       <VBox.margin>
-         <Insets left="80.0" right="60.0" top="20.0"/>
+         <Insets left="80.0" right="60.0" top="20.0" />
       </VBox.margin>
    </Label>
    <Label fx:id="victoryPoints" prefHeight="24.0" prefWidth="180.0" text="victoryPoints">
       <VBox.margin>
-         <Insets left="80.0" right="50.0"/>
+         <Insets left="80.0" right="50.0" />
       </VBox.margin>
       <padding>
-         <Insets bottom="10.0" top="10.0"/>
+         <Insets bottom="10.0" top="10.0" />
       </padding>
    </Label>
    <Label fx:id="resources" prefHeight="32.0" prefWidth="170.0" text="Resources">
       <VBox.margin>
-         <Insets left="80.0" right="60.0"/>
+         <Insets left="80.0" right="60.0" />
       </VBox.margin>
    </Label>
    <HBox alignment="CENTER" prefHeight="26.0" prefWidth="301.0" spacing="30.0">
-      <ImageView id="cactus" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true"/>
+      <ImageView id="cactus" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
       <ImageView id="mars" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
       <ImageView id="moon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -46,7 +45,7 @@
    <HBox alignment="CENTER" prefHeight="32.0" prefWidth="310.0" spacing="30.0">
       <Label fx:id="item1" prefHeight="20.0" prefWidth="20.0" text="it1">
          <HBox.margin>
-            <Insets left="5.0"/>
+            <Insets left="5.0" />
          </HBox.margin>
       </Label>
       <Label fx:id="item2" prefHeight="20.0" prefWidth="20.0" text="it2">
@@ -60,29 +59,29 @@
    </HBox>
    <Label fx:id="build" prefHeight="24.0" prefWidth="139.0" text="Build:">
       <VBox.margin>
-         <Insets left="100.0" right="80.0"/>
+         <Insets left="100.0" right="80.0" />
       </VBox.margin>
    </Label>
    <HBox prefHeight="52.0" prefWidth="310.0">
-      <Pane fx:id="settlemetPane" >
+      <Pane fx:id="settlementPane">
          <HBox.margin>
             <Insets left="30.0" right="10.0" />
          </HBox.margin>
          <children>
-            <Button fx:id="sett" id="move" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="110.0" text="SETT." />
+            <Button fx:id="sett" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="110.0" styleClass="move" text="SETT." />
          </children>
       </Pane>
       <Pane fx:id="roadPane">
          <children>
-            <Button fx:id="road" id="move" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="100.0" text="Road" />
+            <Button fx:id="road" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="100.0" styleClass="move" text="Road" />
          </children>
       </Pane>
       <Pane fx:id="cityPane">
          <HBox.margin>
-            <Insets left="10.0"/>
+            <Insets left="10.0" />
          </HBox.margin>
          <children>
-            <Button fx:id="city" id="move" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="100.0" text="City" />
+            <Button fx:id="city" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="100.0" styleClass="move" text="City" />
          </children>
       </Pane>
    </HBox>

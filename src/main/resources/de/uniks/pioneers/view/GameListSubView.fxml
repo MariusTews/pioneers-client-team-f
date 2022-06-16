@@ -7,7 +7,7 @@
 
 <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
       prefHeight="50.0" prefWidth="250.0" spacing="2.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameListSubController">
-   <Label fx:id="gameNameLabel" prefHeight="17.0" prefWidth="300.0" styleClass="lobby" text="gamename">
+   <Label fx:id="gameNameLabel" prefHeight="17.0" prefWidth="200.0" styleClass="lobby" text="gamename">
       <HBox.margin>
          <Insets left="10.0" />
       </HBox.margin></Label>
