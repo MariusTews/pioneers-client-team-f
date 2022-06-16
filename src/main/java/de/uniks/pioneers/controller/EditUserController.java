@@ -135,8 +135,6 @@ public class EditUserController implements Controller {
 
     public void deleteButtonPressed(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         alert.setTitle("Deleting Account");
         alert.setContentText("Are you sure you want to delete " + username + "?" );
         Optional<ButtonType> result = alert.showAndWait();
