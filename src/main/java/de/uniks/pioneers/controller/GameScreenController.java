@@ -20,10 +20,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -31,10 +28,7 @@ import javafx.util.Duration;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -269,6 +263,10 @@ public class GameScreenController implements Controller {
         } else if (playerEvent.event().endsWith(DELETED)) {
             if (players.size() < 2) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                // Set style
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
                 alert.setContentText("You are the Winner!!!");
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isEmpty()) {

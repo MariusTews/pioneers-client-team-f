@@ -18,7 +18,9 @@ import javafx.stage.Window;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Objects;
@@ -135,8 +137,13 @@ public class EditUserController implements Controller {
 
     public void deleteButtonPressed(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        // Change style of alert
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         alert.setTitle("Deleting Account");
         alert.setContentText("Are you sure you want to delete " + username + "?" );
+        alert.getButtonTypes().set(0,new ButtonType("Yes"));
+        alert.getButtonTypes().set(1,new ButtonType("No"));
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
             userService.delete(idStorage.getID())
@@ -173,20 +180,29 @@ public class EditUserController implements Controller {
     public void updateUser(String id, String name, String password, String repeatPassword, String avatar) {
         if (avatar != null) {
             if (avatar.length() > 16384) {
-                new Alert(Alert.AlertType.INFORMATION, "the chosen image is to big! \nplease choose a picture which is smaller than 10kb")
-                        .showAndWait();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "the chosen image is to big! \nplease choose a picture which is smaller than 10kb");
+                // Change style of alert
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                alert.showAndWait();
                 return;
             }
         }
         if (password != null) {
             if (!password.equals(repeatPassword)) {
-                new Alert(Alert.AlertType.INFORMATION, "passwords do not match!")
-                        .showAndWait();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "passwords do not match!");
+                // Change style of alert
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                alert.showAndWait();
                 return;
 
             } else if (password.length() < 8) {
-                new Alert(Alert.AlertType.INFORMATION, "the password length must be at least 8!")
-                        .showAndWait();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "the password length must be at least 8!");
+                // Change style of alert
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                alert.showAndWait();
                 return;
             }
         }
@@ -194,12 +210,18 @@ public class EditUserController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error ->{
                     if ("HTTP 409 ".equals(error.getMessage())) {
-                        new Alert(Alert.AlertType.INFORMATION, "username is already taken!")
-                                .showAndWait();
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "username is already taken!");
+                        // Change style of alert
+                        DialogPane dialogPane = alert.getDialogPane();
+                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                        alert.showAndWait();
                     }
                     if ("HTTP 400 ".equals(error.getMessage())) {
-                        new Alert(Alert.AlertType.INFORMATION, "name must be shorter than or equal to 32 characters!")
-                                .showAndWait();
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "name must be shorter than or equal to 32 characters!");
+                        // Change style of alert
+                        DialogPane dialogPane = alert.getDialogPane();
+                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                        alert.showAndWait();
                     }
                 })
 
@@ -208,16 +230,19 @@ public class EditUserController implements Controller {
 
     public void editPicture(ActionEvent event) {
 
-        Alert alert =new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setHeaderText("what you want to do?");
-        alert.getButtonTypes().set(0,new ButtonType("change Picture"));
-        alert.getButtonTypes().set(1,new ButtonType("delete Picture"));
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeaderText("what you want to do \nwith your picture?");
+        alert.getButtonTypes().set(0,new ButtonType("change"));
+        alert.getButtonTypes().set(1,new ButtonType("delete"));
+        // Change style of alert
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         Window window = alert.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(e -> alert.close());
 
         Optional<ButtonType> result = alert.showAndWait();
         result.ifPresent(res-> {
-            if (res.getText().equals("change Picture")) {
+            if (res.getText().equals("change")) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.getExtensionFilters().addAll();
                 File selectedFile = fileChooser.showOpenDialog(null);
@@ -225,7 +250,7 @@ public class EditUserController implements Controller {
                     this.pictureFile = selectedFile;
                     userPicture.setImage(new Image(selectedFile.toURI().toString()));
                 }
-            } else if (res.getText().equals("delete Picture")) {
+            } else if (res.getText().equals("delete")) {
                 this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
                 avatar = "data:image/png;base64,";
             }

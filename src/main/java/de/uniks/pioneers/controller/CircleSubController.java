@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -94,7 +95,12 @@ public class CircleSubController implements Controller {
     private void onFieldClicked(MouseEvent mouseEvent) {
         //if it's not your turn
         if (!yourTurn(nextMove)) {
-            new Alert(Alert.AlertType.INFORMATION, "Not your turn!").showAndWait();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not your turn!");
+            // set style
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+            alert.showAndWait();
             // if the game is in the founding-phase
         } else if (nextMove.action().startsWith("founding-r") || nextMove.action().startsWith("founding-s") || nextMove.action().equals("")) {
             this.pioneersService.findOneState(gameIDStorage.getId())
@@ -106,7 +112,12 @@ public class CircleSubController implements Controller {
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> {
                                         String[] building = nextMove.action().split("-");
-                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] + " here!").showAndWait();
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "you can't place that " + building[1] + " here!");
+                                        // Set style
+                                        DialogPane dialogPane = alert.getDialogPane();
+                                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                        alert.showAndWait();
                                     })
                                     .subscribe(onSuc -> {
                                     }, onError -> {
@@ -116,7 +127,12 @@ public class CircleSubController implements Controller {
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> {
                                         String[] building = nextMove.action().split("-");
-                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] + " here!").showAndWait();
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "you can't place that " + building[1] + " here!");
+                                        // Set style
+                                        DialogPane dialogPane = alert.getDialogPane();
+                                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                        alert.showAndWait();
                                     })
                                     .subscribe(onSuc -> {
                                     }, onError -> {
@@ -148,6 +164,7 @@ public class CircleSubController implements Controller {
 
     public void setRoad(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
+            // Set polygon as road on the coordinates
             Polygon road = new Polygon(-12.0, 5.0, 12.0, 5.0, 12.0, -5.0, -12.0, -5.0);
             road.setLayoutX(view.getLayoutX() + 106.0);
             road.setLayoutY(view.getLayoutY() + 119.0);
@@ -173,6 +190,7 @@ public class CircleSubController implements Controller {
 
     public void setSettlement(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
+            // Set style and image on the coordinates
             this.view.setRadius(20);
             this.view.toFront();
             this.view.setStroke(Color.TRANSPARENT);
@@ -184,6 +202,7 @@ public class CircleSubController implements Controller {
 
     public void setCity(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
+            // Set style and image on the coordinates
             this.view.setRadius(20);
             this.view.setStroke(Color.TRANSPARENT);
             Image city = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/city_" + color + ".png")).toExternalForm());

@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -329,8 +330,12 @@ public class LobbyController implements Controller {
                         boolean trace = true;
                         for (Member member : result) {
                             if (member.userId().equals(this.idStorage.getID())) {
-                                new Alert(Alert.AlertType.ERROR, "You cannot create Game while being part of another Game")
-                                        .showAndWait();
+                                Alert alert = new Alert(Alert.AlertType.ERROR, "You cannot create Game while being part of another Game");
+                                // Change style of error alert
+                                DialogPane dialogPane = alert.getDialogPane();
+                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                alert.showAndWait();
                                 trace = false;
                                 break;
                             }
@@ -583,8 +588,12 @@ public class LobbyController implements Controller {
                         .subscribe();
                 ((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().remove(label);
             } else {
-                new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
-                        .showAndWait();
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.");
+                // Change style of error
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                alert.showAndWait();
             }
         });
     }
@@ -653,8 +662,12 @@ public class LobbyController implements Controller {
                         boolean trace = true;
                         for (Member member : result) {
                             if (member.userId().equals(this.idStorage.getID())) {
-                                new Alert(Alert.AlertType.ERROR, "You cannot join another Game while being part of another Game")
-                                        .showAndWait();
+                                Alert alert = new Alert(Alert.AlertType.ERROR, "You can't join a game while \nbeing part of another game");
+                                // Change style of error alert
+                                DialogPane dialogPane = alert.getDialogPane();
+                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                alert.showAndWait();
                                 trace = false;
                                 break;
                             }
@@ -672,13 +685,21 @@ public class LobbyController implements Controller {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Enter the password");
         dialog.setHeaderText("password");
+        // Change style of password input dialog
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         dialog.showAndWait()
                 .ifPresent(password -> this.memberService.join(idStorage.getID(), game._id(), password)
                         .observeOn(FX_SCHEDULER)
                         .doOnError(error -> {
-                            if ("HTTP 401 ".equals(error.getMessage())) {
-                                new Alert(Alert.AlertType.ERROR, "wrong password")
-                                        .showAndWait();
+                            if ("HTTP 403 ".equals(error.getMessage())) {
+                                Alert alert = new Alert(Alert.AlertType.ERROR, "wrong password");
+                                // Change style of error alert
+                                DialogPane errorPane = alert.getDialogPane();
+                                errorPane.getStylesheets().add(Objects.requireNonNull(Main.class.
+                                        getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                alert.showAndWait();
                             }
 
                         })
@@ -702,13 +723,17 @@ public class LobbyController implements Controller {
                         .observeOn(FX_SCHEDULER)
                         .subscribe();
             } else {
-                new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.")
-                        .showAndWait();
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.");
+                // set style of warning
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                alert.showAndWait();
             }
         });
     }
 
-    //reactivate for the possiblity of joining the game
+    //reactivate for the possibility of joining the game
     public void onRejoin() {
         this.app.show(gameScreenController.get());
     }
