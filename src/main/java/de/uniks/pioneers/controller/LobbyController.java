@@ -147,6 +147,7 @@ public class LobbyController implements Controller {
 
 		disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
 		disposable.add(eventListener.listen("games.*.*", Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
+		disposable.add(eventListener.listen("group.*.*", Group.class).observeOn(FX_SCHEDULER).subscribe(this::handleGroupEvents));
 
 		//listen to messages on lobby on Global channel
 		disposable.add(eventListener
@@ -198,7 +199,7 @@ public class LobbyController implements Controller {
 		//based upon if a user is in game or not
 		if(this.gameIDStorage.getId() != null){
 			memberService.getAllGameMembers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
-					.subscribe( result ->{
+					.subscribe(result -> {
 						boolean trace = true;
 						for (Member member: result) {
 							if(member.userId().equals(this.idStorage.getID())) {
@@ -211,7 +212,7 @@ public class LobbyController implements Controller {
 							rejoinButton.disableProperty().set(true);
 						}
 					});
-		}else {
+		} else {
 			rejoinButton.disableProperty().set(true);
 		}
 
@@ -359,7 +360,7 @@ public class LobbyController implements Controller {
 				this.messageService.send(GROUPS, currentDirectStorage.getGroupId(), chatMessageField.getText())
 						.observeOn(FX_SCHEDULER)
 						.subscribe(result -> this.chatMessageField.setText(""));
-			} else{
+			} else {
 				this.messageService.send(GLOBAL, LOBBY_ID, chatMessageField.getText())
 						.observeOn(FX_SCHEDULER)
 						.subscribe();
@@ -456,6 +457,24 @@ public class LobbyController implements Controller {
 			if (subCon.getId().equals(updatedGame._id())) {
 				this.gameSubCons.remove(subCon);
 				break;
+			}
+		}
+	}
+
+	// Handle group events, so the users do not end up in different groups when opening the direct chat
+	private void handleGroupEvents(Event<Group> groupEvent) {
+		final Group group = groupEvent.data();
+
+		if (groupEvent.event().endsWith(CREATED)) {
+			this.groups.add(group);
+		} else if (groupEvent.event().endsWith(DELETED)) {
+			this.groups.removeIf(u -> u._id().equals(group._id()));
+		} else if (groupEvent.event().endsWith(UPDATED)) {
+			for (Group updatedGroup : this.groups) {
+				if (updatedGroup._id().equals(group._id())) {
+					this.groups.set(this.groups.indexOf(updatedGroup), group);
+					break;
+				}
 			}
 		}
 	}
