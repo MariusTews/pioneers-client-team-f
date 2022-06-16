@@ -479,7 +479,7 @@ public class GameScreenController implements Controller {
                                             .subscribe();
                                 });
 
-                        //current Move is found-road
+                        //current Move is founding-road
                     } else if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-road")) {
                         // String to int from lastBuildingPlaced to calculate possible roadPlacements
                         int x = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("x") + 1, lastBuildingPosition.indexOf("y")));
