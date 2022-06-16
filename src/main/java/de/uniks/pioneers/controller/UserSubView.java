@@ -60,7 +60,6 @@ public class UserSubView implements Controller {
 
     @Override
     public void init() {
-        //setAll();
         userService.findAllUsers().observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.users.addAll(col);

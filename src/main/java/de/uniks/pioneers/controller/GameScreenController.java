@@ -620,4 +620,8 @@ public class GameScreenController implements Controller {
         }
         return possibleRoadPlacements;
     }
+
+    public void accessUsersubView(Player player){
+        renderSingleUser(player);
+    }
 }
