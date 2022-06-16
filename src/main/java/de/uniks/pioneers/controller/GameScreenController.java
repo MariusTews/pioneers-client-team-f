@@ -519,9 +519,7 @@ public class GameScreenController implements Controller {
             }
         });
 
-        timeline.getKeyFrames().
-
-                setAll(frame);
+        timeline.getKeyFrames().setAll(frame);
         // start timer
         timeline.playFromStart();
     }
