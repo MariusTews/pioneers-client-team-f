@@ -68,6 +68,7 @@ public class GameScreenController implements Controller {
 
     private final GameIDStorage gameIDStorage;
     private final IDStorage idStorage;
+    private String lastBuildingPosition;
 
     private final PioneersService pioneersService;
     private final EventListener eventListener;
@@ -166,6 +167,12 @@ public class GameScreenController implements Controller {
                 .listen("games." + this.gameIDStorage.getId() + ".players.*.*", Player.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handlePlayerEvent));
+
+        //Listen to the Building to handle the event
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".buildings.*.*", Building.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this::handleBuildingEvents));
 
 
         // Initialize sub controller for ingame chat, add listener and load all messages
@@ -306,6 +313,21 @@ public class GameScreenController implements Controller {
             nextMoveLabel.setText(state.expectedMoves().get(0).action());
             // change the currentPlayerLabel to the current player
             currentPlayerLabel.setText(this.userHash.get(state.expectedMoves().get(0).players().get(0)).name());
+        }
+    }
+
+    private void handleBuildingEvents(Event<Building> buildingEvent) {
+        Building building = buildingEvent.data();
+        int x = building.x().intValue();
+        int y = building.y().intValue();
+        int z = building.z().intValue();
+        int side = building.side().intValue();
+        String position = "x" + x + "y" + y + "z" + z + "_" + side;
+        if (buildingEvent.event().endsWith(CREATED)) {
+            lastBuildingPosition = position;
+        }
+        if (buildingEvent.event().endsWith(UPDATED)) {
+            lastBuildingPosition = position;
         }
     }
 
