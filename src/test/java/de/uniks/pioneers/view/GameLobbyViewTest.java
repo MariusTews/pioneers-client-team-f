@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
@@ -74,22 +75,26 @@ public class GameLobbyViewTest extends ApplicationTest {
     @Test
     public void testGameLobbyUIElement() {
         // buttons
+        // The message sub view is a VBox with all the chat elements in it which is loaded into the chat container
+        VBox vBox = lookup("#idChatContainer").query();
+        HBox hBox = (HBox) ((VBox) vBox.getChildren().get(0)).getChildren().get(1);
+
         Button leaveButton = lookup("#idLeaveButton").query();
-        Button sendButton = lookup("#idSendButton").query();
+        Button sendButton = (Button) hBox.getChildren().get(1);
         Button readyButton = lookup("#idReadyButton").query();
         Button startGameButton = lookup("#idStartGameButton").query();
 
         // label
         Label titleLabel = lookup("#idTitleLabel").query();
 
-        // textfield
-        TextField messageField = lookup("#idMessageField").query();
+        // text field is part of the message sub view (see above)
+        TextField messageField = (TextField) hBox.getChildren().get(0);
 
         // assertions buttons
         Assertions.assertEquals(leaveButton.getText(), "Leave");
         Assertions.assertEquals(sendButton.getText(), "Send");
         Assertions.assertEquals(readyButton.getText(), "Ready");
-        Assertions.assertEquals(startGameButton.getText(), "Start Game");
+        Assertions.assertEquals(startGameButton.getText(), "Start");
 
         // assertion title
         Assertions.assertEquals(titleLabel.getText(), "Welcome to g");
@@ -98,7 +103,6 @@ public class GameLobbyViewTest extends ApplicationTest {
         clickOn(messageField);
         write("something");
         Assertions.assertEquals(messageField.getText(), "something");
-
     }
 
     @Test

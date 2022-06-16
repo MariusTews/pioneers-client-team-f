@@ -70,10 +70,10 @@ public class MemberListSubcontroller implements Controller {
             // set ready
             if (this.member.ready()) {
                 this.idReady.setText("- ready -");
-                this.idReady.setTextFill(Color.GREEN);
+                this.idReady.setTextFill(Color.DARKGREEN);
             } else {
                 this.idReady.setText("- not ready -");
-                this.idReady.setTextFill(Color.RED);
+                this.idReady.setTextFill(Color.FIREBRICK);
             }
         }
 

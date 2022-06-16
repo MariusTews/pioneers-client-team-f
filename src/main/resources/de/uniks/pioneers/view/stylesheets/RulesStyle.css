@@ -1,0 +1,14 @@
+/**************** rules screen specific styles ****************/
+
+.text-field.rules {
+    -fx-background-image: url("../assets/ingame_background.png");
+    -fx-text-fill: #F5F5F5;
+    -fx-font-size: 18;
+}
+
+.text-area.rules {
+    -fx-background-image: url("../assets/ingame_background.png");
+    -fx-wrap-text: true;
+    -fx-text-fill: midnightblue;
+    -fx-font-size: 14;
+}

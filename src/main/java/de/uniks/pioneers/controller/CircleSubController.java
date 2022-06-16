@@ -10,23 +10,29 @@ import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.DialogPane;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class CircleSubController implements Controller {
 
     private Parent parent;
-    private final App app;
     private final Circle view;
     private final PioneersService pioneersService;
     private final GameIDStorage gameIDStorage;
@@ -43,8 +49,10 @@ public class CircleSubController implements Controller {
     private String build = null;
 
     @Inject
-    public CircleSubController(App app, Circle view, PioneersService pioneersService, GameIDStorage gameIDStorage, IDStorage idStorage, EventListener eventListener, GameFieldSubController gameFieldSubController) {
-        this.app = app;
+    public CircleSubController(Parent parent, App app, Circle view, PioneersService pioneersService,
+                               GameIDStorage gameIDStorage, IDStorage idStorage, EventListener eventListener,
+                               GameFieldSubController gameFieldSubController) {
+        this.parent = parent;
         this.view = view;
         this.pioneersService = pioneersService;
         this.gameIDStorage = gameIDStorage;
@@ -81,14 +89,18 @@ public class CircleSubController implements Controller {
                     State state = event.data();
                     this.nextMove = state.expectedMoves().get(0);
                 }));
-
     }
 
 
     private void onFieldClicked(MouseEvent mouseEvent) {
         //if it's not your turn
         if (!yourTurn(nextMove)) {
-            new Alert(Alert.AlertType.INFORMATION, "Not your turn!").showAndWait();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not your turn!");
+            // set style
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+            alert.showAndWait();
             // if the game is in the founding-phase
         } else if (nextMove.action().startsWith("founding-r") || nextMove.action().startsWith("founding-s") || nextMove.action().equals("")) {
             this.pioneersService.findOneState(gameIDStorage.getId())
@@ -100,7 +112,12 @@ public class CircleSubController implements Controller {
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> {
                                         String[] building = nextMove.action().split("-");
-                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] + " here!").showAndWait();
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "you can't place that " + building[1] + " here!");
+                                        // Set style
+                                        DialogPane dialogPane = alert.getDialogPane();
+                                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                        alert.showAndWait();
                                     })
                                     .subscribe(onSuc -> {
                                     }, onError -> {
@@ -110,7 +127,12 @@ public class CircleSubController implements Controller {
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> {
                                         String[] building = nextMove.action().split("-");
-                                        new Alert(Alert.AlertType.INFORMATION, "you cant place that " + building[1] + " here!").showAndWait();
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "you can't place that " + building[1] + " here!");
+                                        // Set style
+                                        DialogPane dialogPane = alert.getDialogPane();
+                                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                        alert.showAndWait();
                                     })
                                     .subscribe(onSuc -> {
                                     }, onError -> {
@@ -142,23 +164,50 @@ public class CircleSubController implements Controller {
 
     public void setRoad(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
-            //TODO: replace this with an image of the road
-            this.view.setFill(Color.valueOf(color));
+            // Set polygon as road on the coordinates
+            Polygon road = new Polygon(-12.0, 5.0, 12.0, 5.0, 12.0, -5.0, -12.0, -5.0);
+            road.setLayoutX(view.getLayoutX() + 106.0);
+            road.setLayoutY(view.getLayoutY() + 119.0);
+
+            switch (side) {
+                case 3 -> road.setRotate(90.0);
+                case 11 -> road.setRotate(150.0);
+                case 7 -> road.setRotate(30.0);
+            }
+
+            road.setFill(Color.valueOf(color));
+            Pane pane = (Pane) this.parent;
+            Group group = (Group) pane.getChildren().get(0);
+            group.getChildren().add(road);
+            road.setLayoutX(view.getLayoutX());
+            road.setLayoutY(view.getLayoutY());
+
+            this.view.setFill(Color.TRANSPARENT);
+            this.view.setStroke(Color.TRANSPARENT);
+            this.view.setOnMouseClicked(null);
         }
     }
 
     public void setSettlement(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
-            //TODO: replace this with an image of the settlement
-            this.view.setFill(Color.valueOf(color));
+            // Set style and image on the coordinates
+            this.view.setRadius(20);
+            this.view.toFront();
+            this.view.setStroke(Color.TRANSPARENT);
+            Image settlement = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/settlement_" + color + ".png")).toExternalForm());
+            ImagePattern settlementPattern = new ImagePattern(settlement);
+            this.view.setFill(settlementPattern);
         }
     }
 
     public void setCity(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
-            //TODO: replace this with an image of the city
-            this.view.setFill(Color.valueOf(color));
-            this.view.setRadius(15);
+            // Set style and image on the coordinates
+            this.view.setRadius(20);
+            this.view.setStroke(Color.TRANSPARENT);
+            Image city = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/city_" + color + ".png")).toExternalForm());
+            ImagePattern cityPattern = new ImagePattern(city);
+            this.view.setFill(cityPattern);
         }
     }
 
@@ -189,19 +238,16 @@ public class CircleSubController implements Controller {
     // Mouse hovers over field
     private void onFieldMouseHoverEnter(MouseEvent event) {
         // Change the view
-        if (this.view.getFill().equals(Color.WHITE)) {
+        if (this.view.getFill().equals(Color.TRANSPARENT)) {
             this.view.setFill(Color.GRAY);
-            this.view.setRadius(10.0);
         }
-
     }
 
     // Mouse leaves the field
     private void onFieldMouseHoverExit(MouseEvent event) {
         // Change the view
         if (this.view.getFill().equals(Color.GRAY)) {
-            this.view.setFill(Color.WHITE);
-            this.view.setRadius(10.0);
+            this.view.setFill(Color.TRANSPARENT);
         }
     }
 

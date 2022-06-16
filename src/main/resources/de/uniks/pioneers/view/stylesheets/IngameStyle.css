@@ -1,0 +1,101 @@
+/************************* ingame screen *************************/
+
+#gameView {
+    -fx-background-image: url("../assets/ingame_background.png");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 1600 900;
+}
+
+/* player's views with resource icons */
+#userView {
+    -fx-background-image: url("../assets/green_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: bottom;
+    -fx-background-size: 370 260;
+}
+
+#userView .text {
+    -fx-font-size: 18;
+}
+
+.button.move {
+    -fx-background-image: url("../assets/grey_button.png");
+    -fx-background-size: 100 50;
+    -fx-background-repeat: stretch;
+    -fx-scale-y: 0.8;
+    -fx-scale-x: 0.8;
+    -fx-font-size: 12;
+    -fx-text-fill: #666666;
+}
+
+#bigButton {
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+#opponentView {
+    -fx-background-image: url("../assets/green_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: bottom;
+    -fx-background-size: 230 130;
+}
+
+#cactus {
+    -fx-image: url("../assets/earth_cactus.png");
+}
+
+#mars {
+    -fx-image: url("../assets/mars_bar.png");
+}
+
+#moon {
+    -fx-image: url("../assets/moon_rock.png");
+}
+
+#neptun {
+    -fx-image: url("../assets/neptun_crystals.png");
+}
+
+#venus {
+    -fx-image: url("../assets/venus_grain.png");
+}
+
+.label.tileNumber {
+    -fx-background-color: WHITE;
+    -fx-background-radius: 5;
+    -fx-border-color: BLACK;
+    -fx-border-radius: 5;
+}
+
+/* bottom of the screen: dice roll */
+
+#roll {
+    -fx-background-image: url("../assets/grey_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: bottom;
+    -fx-background-size: 230 90;
+}
+
+#diceSum {
+    -fx-font-size: 48;
+    -fx-text-fill: dimgrey;
+}
+
+/* right side of the screen: current move and player, finish move via button */
+
+#currentGameState {
+    -fx-background-image: url("../assets/grey_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: top, right;
+    -fx-background-size: 320 220;
+}
+
+#timer {
+    -fx-background-image: url("../assets/grey_panel.png");
+    -fx-background-size: stretch;
+}
+
+#remainingTime {
+    -fx-font-size: 34;
+    -fx-text-fill: orangered;
+}

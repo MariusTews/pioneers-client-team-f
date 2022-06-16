@@ -2,22 +2,17 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.service.GameService;
-import de.uniks.pioneers.service.IDStorage;
-import io.reactivex.rxjava3.core.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
@@ -80,16 +75,22 @@ public class CreateGameController implements Controller {
     public void createGameButtonPressed(ActionEvent event) {
 
         if (gameNameTextField.getText().length() > 32 || gameNameTextField.getText().length() < 1) {
-            new Alert(Alert.AlertType.INFORMATION, "the name of the game must be between 1 and 32 characters long!")
-                    .showAndWait();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "the name of the game must be \nbetween 1 and 32 characters!");
+            // set style of information
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+            alert.showAndWait();
         } else if (passwordTextField.getText().length() < 1) {
-            new Alert(Alert.AlertType.INFORMATION, "password cant be empty!")
-                    .showAndWait();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "password can't be empty!");
+            // set style of information
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+            alert.showAndWait();
         } else {
             gameService.create(gameNameTextField.getText(), passwordTextField.getText())
                     .observeOn(FX_SCHEDULER)
-                    .subscribe(onSuccess -> app.show(gameLobbyController.get()), onError -> {});
+                    .subscribe(onSuccess -> app.show(gameLobbyController.get()), onError -> {
+                    });
         }
-
     }
 }
