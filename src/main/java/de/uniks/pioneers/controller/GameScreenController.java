@@ -4,6 +4,7 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
+import de.uniks.pioneers.model.Map;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -198,23 +199,14 @@ public class GameScreenController implements Controller {
         }
 
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
-        currentPlayerLabel.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        currentPlayerLabel.textProperty().addListener((observable, oldValue, newValue) -> startTime());
+
+        //add listener on nextMoveLabel to reset the timer if founding-settlement-2
+        nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.equals("founding-settlement-2")) {
                 startTime();
             }
         });
-
-        //add listener on nextMoveLabel to reset the timer if founding-settlement-2
-        nextMoveLabel.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (newValue.equals("founding-settlement-2")) {
-                    startTime();
-                }
-            }
-        });
-
 
         this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
@@ -415,93 +407,88 @@ public class GameScreenController implements Controller {
         timeline.setCycleCount(Timeline.INDEFINITE);
 
         //gets called every second to reduce the timer by one second
-        KeyFrame frame = new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                seconds[0]--;
-                timerLabel.setText(seconds[0].toString());
-                if (seconds[0] <= 0) {
-                    timeline.stop();
-                    //current Move is founding-settlement
-                    if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-settlement")) {
-                        //get all valid settlementPosition in dependence of map
-                        List<String> validPositions = getAllValidPositions();
-                        //get all incalid settlementPositions
-                        List<String> allInvalidSettlementCoordinates = getAllInvalidSettlementCoordinates();
+        KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
+            seconds[0]--;
+            timerLabel.setText(seconds[0].toString());
+            if (seconds[0] <= 0) {
+                timeline.stop();
+                //current Move is founding-settlement
+                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-settlement")) {
+                    //get all valid settlementPosition in dependence of map
+                    List<String> validPositions = getAllValidPositions();
+                    //get all incalid settlementPositions
+                    List<String> allInvalidSettlementCoordinates = getAllInvalidSettlementCoordinates();
 
-                        //remove invalidsettlementPositions from validPositions
-                        for (String string : allInvalidSettlementCoordinates) {
-                            validPositions.remove(string);
-                        }
-
-                        int randomNumSettlement = (int) (Math.random() * (validPositions.size()));
-                        //select one settlementPosition from all valid settlementPositions
-                        String selectedSettlementPosition = validPositions.get(randomNumSettlement);
-                        // String to int for next method call
-                        int x = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("x") + 1, selectedSettlementPosition.indexOf("y")));
-                        int y = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("y") + 1, selectedSettlementPosition.indexOf("z")));
-                        int z = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("z") + 1, selectedSettlementPosition.indexOf("_")));
-                        int side = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("_") + 1));
-
-                        //get every possible roadPosition in dependence of chosen settlementPosition
-                        List<String> possibleRoadPlacements = getPossibleRoadPlacements(x, y, z, side);
-
-                        int randomNumRoad = (int) (Math.random() * possibleRoadPlacements.size());
-                        //select one roadPosition from all valid roadPositions
-                        String selectedRoadPosition = possibleRoadPlacements.get(randomNumRoad);
-                        // String to int for move call
-                        int xRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("x") + 1, selectedRoadPosition.indexOf("y")));
-                        int yRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("y") + 1, selectedRoadPosition.indexOf("z")));
-                        int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
-                        int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
-                        //get foundingPhase (1 or 2)
-                        String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
-
-                        //place chosen settlement and road
-                        pioneersService.move(gameIDStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement")
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe(result -> {
-                                    pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
-                                            .observeOn(FX_SCHEDULER)
-                                            .subscribe();
-                                });
-
-                        //current Move is founding-road
-                    } else if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-road")) {
-                        // String to int from lastBuildingPlaced to calculate possible roadPlacements
-                        int x = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("x") + 1, lastBuildingPosition.indexOf("y")));
-                        int y = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("y") + 1, lastBuildingPosition.indexOf("z")));
-                        int z = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("z") + 1, lastBuildingPosition.indexOf("_")));
-                        int side = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("_") + 1));
-
-                        //get every possible roadPosition
-                        List<String> possibleRoadPlacements = getPossibleRoadPlacements(x, y, z, side);
-
-                        int randomNumRoad = (int) (Math.random() * possibleRoadPlacements.size());
-                        //select one possibleRoad
-                        String selectedRoadPosition = possibleRoadPlacements.get(randomNumRoad);
-                        // String to int for move call
-                        int xRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("x") + 1, selectedRoadPosition.indexOf("y")));
-                        int yRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("y") + 1, selectedRoadPosition.indexOf("z")));
-                        int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
-                        int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
-
-                        //get foundingPhase (1 or 2)
-                        String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
-
-                        //place chosen and road
-                        pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe();
-
-
-                    } else if (nextMoveLabel.getText().equals("roll")) {
-                        // player needs to roll and skips his turn if the timer reached 0 seconds
-                        diceRoll();
-                        finishTurn();
-                    } else {
-                        finishTurn();
+                    //remove invalidsettlementPositions from validPositions
+                    for (String string : allInvalidSettlementCoordinates) {
+                        validPositions.remove(string);
                     }
+
+                    int randomNumSettlement = (int) (Math.random() * (validPositions.size()));
+                    //select one settlementPosition from all valid settlementPositions
+                    String selectedSettlementPosition = validPositions.get(randomNumSettlement);
+                    // String to int for next method call
+                    int x = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("x") + 1, selectedSettlementPosition.indexOf("y")));
+                    int y = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("y") + 1, selectedSettlementPosition.indexOf("z")));
+                    int z = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("z") + 1, selectedSettlementPosition.indexOf("_")));
+                    int side = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("_") + 1));
+
+                    //get every possible roadPosition in dependence of chosen settlementPosition
+                    List<String> possibleRoadPlacements = getPossibleRoadPlacements(x, y, z, side);
+
+                    int randomNumRoad = (int) (Math.random() * possibleRoadPlacements.size());
+                    //select one roadPosition from all valid roadPositions
+                    String selectedRoadPosition = possibleRoadPlacements.get(randomNumRoad);
+                    // String to int for move call
+                    int xRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("x") + 1, selectedRoadPosition.indexOf("y")));
+                    int yRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("y") + 1, selectedRoadPosition.indexOf("z")));
+                    int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
+                    int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
+                    //get foundingPhase (1 or 2)
+                    String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
+
+                    //place chosen settlement and road
+                    pioneersService.move(gameIDStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement")
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(result -> pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe());
+
+                    //current Move is founding-road
+                } else if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-road")) {
+                    // String to int from lastBuildingPlaced to calculate possible roadPlacements
+                    int x = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("x") + 1, lastBuildingPosition.indexOf("y")));
+                    int y = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("y") + 1, lastBuildingPosition.indexOf("z")));
+                    int z = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("z") + 1, lastBuildingPosition.indexOf("_")));
+                    int side = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("_") + 1));
+
+                    //get every possible roadPosition
+                    List<String> possibleRoadPlacements = getPossibleRoadPlacements(x, y, z, side);
+
+                    int randomNumRoad = (int) (Math.random() * possibleRoadPlacements.size());
+                    //select one possibleRoad
+                    String selectedRoadPosition = possibleRoadPlacements.get(randomNumRoad);
+                    // String to int for move call
+                    int xRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("x") + 1, selectedRoadPosition.indexOf("y")));
+                    int yRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("y") + 1, selectedRoadPosition.indexOf("z")));
+                    int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
+                    int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
+
+                    //get foundingPhase (1 or 2)
+                    String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
+
+                    //place chosen and road
+                    pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe();
+
+
+                } else if (nextMoveLabel.getText().equals("roll")) {
+                    // player needs to roll and skips his turn if the timer reached 0 seconds
+                    diceRoll();
+                    finishTurn();
+                } else {
+                    finishTurn();
                 }
             }
         });
@@ -601,7 +588,8 @@ public class GameScreenController implements Controller {
 
     public List<String> getPossibleRoadPlacements(int x, int y, int z, int side) {
         List<String> possibleRoadPlacements = new ArrayList<>();
-        //TODO: get size from server in V3
+
+        //TODOs: get size from server in V3
         int gameFieldSize = 2;
         if (side == 0) {
             //road bottom left
