@@ -147,6 +147,7 @@ public class LobbyController implements Controller {
 
         disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
         disposable.add(eventListener.listen("games.*.*", Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
+		disposable.add(eventListener.listen("group.*.*", Group.class).observeOn(FX_SCHEDULER).subscribe(this::handleGroupEvents));
 
         //listen to messages on lobby on Global channel
         disposable.add(eventListener
@@ -409,6 +410,24 @@ public class LobbyController implements Controller {
             }
         }
     }
+
+	// Handle group events, so the users do not end up in different groups when opening the direct chat
+	private void handleGroupEvents(Event<Group> groupEvent) {
+		final Group group = groupEvent.data();
+
+		if (groupEvent.event().endsWith(CREATED)) {
+			this.groups.add(group);
+		} else if (groupEvent.event().endsWith(DELETED)) {
+			this.groups.removeIf(u -> u._id().equals(group._id()));
+		} else if (groupEvent.event().endsWith(UPDATED)) {
+			for (Group updatedGroup : this.groups) {
+				if (updatedGroup._id().equals(group._id())) {
+					this.groups.set(this.groups.indexOf(updatedGroup), group);
+					break;
+				}
+			}
+		}
+	}
 
     public void openDirectChat(User user) {
 
