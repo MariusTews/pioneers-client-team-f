@@ -6,7 +6,6 @@ import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -32,7 +31,7 @@ public class SignUpController implements Controller {
     @FXML
     public Button backButton;
     private final App app;
-    private Provider<LoginController> loginController;
+    private final Provider<LoginController> loginController;
     private final AuthService authService;
     private final UserService userService;
 
@@ -105,11 +104,11 @@ public class SignUpController implements Controller {
     }
 
 
-    public void signUpButtonPressed(ActionEvent event) {
+    public void signUpButtonPressed() {
         register(usernameTextField.getText(), null, passwordField.getText());
     }
 
-    public void backButtonPressed(ActionEvent event) {
+    public void backButtonPressed() {
         app.show(loginController.get());
     }
 }

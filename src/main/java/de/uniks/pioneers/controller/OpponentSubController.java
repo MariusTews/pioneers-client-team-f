@@ -61,6 +61,7 @@ public class OpponentSubController implements Controller {
 
     @Override
     public void init() {
+
     }
 
     @Override

@@ -88,7 +88,6 @@ public class CircleSubController implements Controller {
                     State state = event.data();
                     this.nextMove = state.expectedMoves().get(0);
                 }));
-
     }
 
 
@@ -223,7 +222,6 @@ public class CircleSubController implements Controller {
         if (this.view.getFill().equals(Color.TRANSPARENT)) {
             this.view.setFill(Color.GRAY);
         }
-
     }
 
     // Mouse leaves the field

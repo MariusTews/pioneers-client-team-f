@@ -21,6 +21,7 @@ import javax.inject.Provider;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.Optional;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
@@ -54,7 +55,7 @@ public class EditUserController implements Controller {
     private Observable<User> user;
     private String avatar;
     private String username;
-    private ArrayList<String> friends = new ArrayList<>();
+    private final ArrayList<String> friends = new ArrayList<>();
 
 
     @Inject
@@ -134,6 +135,8 @@ public class EditUserController implements Controller {
 
     public void deleteButtonPressed(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         alert.setTitle("Deleting Account");
         alert.setContentText("Are you sure you want to delete " + username + "?" );
         Optional<ButtonType> result = alert.showAndWait();
@@ -151,7 +154,7 @@ public class EditUserController implements Controller {
             FileInputStream fileInputStreamReader = new FileInputStream(file);
             byte[] bytes = new byte[(int) file.length()];
             fileInputStreamReader.read(bytes);
-            encodedFile = new String(Base64.getEncoder().encodeToString(bytes));
+            encodedFile = Base64.getEncoder().encodeToString(bytes);
         } catch (IOException e) {
             e.printStackTrace();
         }

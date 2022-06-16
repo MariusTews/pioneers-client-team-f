@@ -280,8 +280,7 @@ public class GameLobbyController implements Controller {
         }
 
         //give color to member that do not have colors
-        List<Member> memberList = members;
-        for (Member member : memberList) {
+        for (Member member : members) {
             if (member.color() == null || member.color().equals("#000000")) {
                 memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0))
                         .subscribe();
@@ -330,7 +329,6 @@ public class GameLobbyController implements Controller {
                     setText(label.getText());
                     setTextFill(label.getTextFill());
                     setMinWidth(label.getMinWidth());
-                    setStyle(label.getStyle());
                 } else {
                     setText(null);
 
@@ -342,8 +340,7 @@ public class GameLobbyController implements Controller {
     //List of colors
     private List<Label> color() {
         final ColorController controller = new ColorController();
-        List<Label> color = controller.getColor();
-        return color;
+        return controller.getColor();
     }
 
     //color event, if color is picked then send color

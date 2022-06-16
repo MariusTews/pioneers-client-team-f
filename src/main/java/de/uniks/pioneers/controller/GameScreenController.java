@@ -12,13 +12,10 @@ import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -27,7 +24,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -185,10 +181,6 @@ public class GameScreenController implements Controller {
             this.messageViewSubController.destroy();
         }
 
-        /*if (this.userSubView != null) {
-            this.userSubView.destroy();
-        }*/
-
         disposable.dispose();
 
         this.opponentSubCons.forEach(OpponentSubController::destroy);
@@ -207,17 +199,8 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-
-
-
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
-        currentPlayerLabel.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                startTime();
-            }
-        });
-
+        currentPlayerLabel.textProperty().addListener((observable, oldValue, newValue) -> startTime());
 
         this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
@@ -225,8 +208,6 @@ public class GameScreenController implements Controller {
 
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
-
-        //userPaneId.getChildren().setAll(userSubView.render());
 
         // Render opponent loads the opponent view everytime the members list is changed
         // render opponents when achievements change
@@ -241,11 +222,10 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(gameIDStorage, idStorage, userService, eventListener, player, this.calculateVP(player), gameFieldSubController);
+        UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
         userSubView.init();
 
         return userSubView.render();
-
     }
 
     private void handleMoveEvents(Event<Move> moveEvent) {
@@ -274,6 +254,7 @@ public class GameScreenController implements Controller {
                     playerOwnView.set(playerOwnView.indexOf(p), player);
                 }
             }
+
             for (Player p : players) {
                 if (p.userId().equals(player.userId())) {
                     this.removeOpponent(p);
@@ -290,7 +271,7 @@ public class GameScreenController implements Controller {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setContentText("You are the Winner!!!");
                 Optional<ButtonType> result = alert.showAndWait();
-                if (!result.isPresent()) {
+                if (result.isEmpty()) {
                     this.app.show(lobbyController.get());
                 } else if (result.get() == ButtonType.OK) {
                     this.app.show(lobbyController.get());
@@ -340,7 +321,7 @@ public class GameScreenController implements Controller {
         return opponentCon.render();
     }
 
-    public void onMouseClicked(MouseEvent ignoredMouseEvent) {
+    public void onMouseClicked() {
         diceRoll();
     }
 
@@ -361,7 +342,7 @@ public class GameScreenController implements Controller {
                 .subscribe();
     }
 
-    public void onLeave(ActionEvent event) {
+    public void onLeave(ActionEvent ignoredEvent) {
         if ((players.size() + playerOwnView.size()) == 2) {
             gameService.findOneGame(this.gameIDStorage.getId())
                     .observeOn(FX_SCHEDULER).
@@ -401,20 +382,17 @@ public class GameScreenController implements Controller {
         timeline.setCycleCount(Timeline.INDEFINITE);
 
         //gets called every second to reduce the timer by one second
-        KeyFrame frame = new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                seconds[0]--;
-                timerLabel.setText(seconds[0].toString());
-                if (seconds[0] <= 0) {
-                    timeline.stop();
-                    if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name())) {
-                        // player needs to roll and skips his turn if the timer reached 0 seconds
-                        if (nextMoveLabel.getText().equals("roll")) {
-                            diceRoll();
-                        }
-                        finishTurn();
+        KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
+            seconds[0]--;
+            timerLabel.setText(seconds[0].toString());
+            if (seconds[0] <= 0) {
+                timeline.stop();
+                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name())) {
+                    // player needs to roll and skips his turn if the timer reached 0 seconds
+                    if (nextMoveLabel.getText().equals("roll")) {
+                        diceRoll();
                     }
+                    finishTurn();
                 }
             }
         });

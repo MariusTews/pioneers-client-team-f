@@ -13,14 +13,15 @@ import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Objects;
 
-public class HexSubController implements Controller{
+public class HexSubController implements Controller {
 
     private final Polygon view;
     private final Tile tile;
 
     @Inject
-    public HexSubController(App app, Polygon view, Tile tile){
+    public HexSubController(Polygon view, Tile tile) {
         this.view = view;
         this.tile = tile;
     }
@@ -31,7 +32,6 @@ public class HexSubController implements Controller{
         this.view.setOnMouseEntered(this::onFieldMouseHoverEnter);
         this.view.setOnMouseExited(this::onFieldMouseHoverExit);
         setPolygonColor();
-
     }
 
 
@@ -51,8 +51,6 @@ public class HexSubController implements Controller{
             e.printStackTrace();
             return null;
         }
-
-
         return parent;
     }
 
@@ -72,32 +70,32 @@ public class HexSubController implements Controller{
         String type = tile.type();
         switch (type) {
             case "desert" -> {
-                Image desert = new Image(Main.class.getResource("view/assets/2_desert.png").toExternalForm());
+                Image desert = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/2_desert.png")).toExternalForm());
                 ImagePattern desertPattern = new ImagePattern(desert);
                 view.setFill(desertPattern);
             }
             case "fields" -> {
-                Image fields = new Image(Main.class.getResource("view/assets/4_venus.png").toExternalForm());
+                Image fields = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/4_venus.png")).toExternalForm());
                 ImagePattern fieldPattern = new ImagePattern(fields);
                 view.setFill(fieldPattern);
             }
             case "hills" -> {
-                Image hills = new Image(Main.class.getResource("view/assets/3_moon.png").toExternalForm());
+                Image hills = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/3_moon.png")).toExternalForm());
                 ImagePattern hillPattern = new ImagePattern(hills);
                 view.setFill(hillPattern);
             }
             case "mountains" -> {
-                Image mountains = new Image(Main.class.getResource("view/assets/1_mars.png").toExternalForm());
+                Image mountains = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/1_mars.png")).toExternalForm());
                 ImagePattern mountainPattern = new ImagePattern(mountains);
                 view.setFill(mountainPattern);
             }
             case "forest" -> {
-                Image forest = new Image(Main.class.getResource("view/assets/6_earth.png").toExternalForm());
+                Image forest = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/6_earth.png")).toExternalForm());
                 ImagePattern forestPattern = new ImagePattern(forest);
                 view.setFill(forestPattern);
             }
             case "pasture" -> {
-                Image pasture = new Image(Main.class.getResource("view/assets/5_neptun.png").toExternalForm());
+                Image pasture = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/5_neptun.png")).toExternalForm());
                 ImagePattern pasturePattern = new ImagePattern(pasture);
                 view.setFill(pasturePattern);
             }
