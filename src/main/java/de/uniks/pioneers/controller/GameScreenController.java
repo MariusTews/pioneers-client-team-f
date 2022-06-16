@@ -220,6 +220,16 @@ public class GameScreenController implements Controller {
             }
         });
 
+        //add listener on nextMoveLabel to reset the timer if founding-settlement-2
+        nextMoveLabel.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.equals("founding-settlement-2")) {
+                    startTime();
+                }
+            }
+        });
+
 
         this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
