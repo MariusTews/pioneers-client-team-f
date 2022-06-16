@@ -105,7 +105,7 @@ public class GameFieldSubController implements Controller {
         return parent;
     }
 
-    private void loadMap(Map map) {
+    public void loadMap(Map map) {
         List<String> waterTilesCircles = Arrays.asList("x1y2zM3_7", "x1y2zM3_6", "x2y1zM3_7", "x2y1zM3_6", "x3y0zM3_7",
                 "x3y0zM3_6", "x3yM1zM2_7", "x3yM1zM2_6", "x3yM2zM1_7", "x3yM2zM1_6", "x2yM3z1_0", "x2yM3z1_11", "x1yM3z2_0",
                 "x1yM3z2_11", "x0yM3z3_0", "x0yM3z3_11", "xM1yM2z3_0", "xM1yM2z3_11", "xM2yM1z3_0", "xM2yM1z3_11", "xM3y0z3_0",
@@ -176,7 +176,7 @@ public class GameFieldSubController implements Controller {
         }
     }
 
-    private void updateBuildings(int x, int y, int z, int side, String owner, String type) {
+    public void updateBuildings(int x, int y, int z, int side, String owner, String type) {
         String color = Color.BLACK.toString();
         for (Player player : players) {
             if (player.userId().equals(owner)) {
@@ -191,5 +191,9 @@ public class GameFieldSubController implements Controller {
             }
 
         }
+    }
+
+    public ObservableList<Player> getPlayers() {
+        return players;
     }
 }
