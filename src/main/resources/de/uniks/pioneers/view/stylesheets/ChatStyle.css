@@ -1,0 +1,33 @@
+/******************* gamelobby and ingame chat ********************/
+
+.scroll-bar.gameChat:horizontal, .scroll-bar.gameChat:vertical {
+    -fx-background-color:dodgerblue;
+}
+
+.scroll-pane.gameChat {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 410 220;
+}
+
+.scroll-pane.gameChat > .text-area {
+    -fx-border-radius: 20;
+}
+
+.scroll-pane.gameChat > .viewport {
+    -fx-background-color: transparent;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+}
+
+#gameChat {
+    -fx-background-size: 310px 28px;
+    -fx-background-position: center;
+    -fx-scale-y: 1.1;
+}
+
+#send {
+    -fx-background-image: url("../assets/blue_button.png");
+    -fx-background-position: center;
+}

@@ -1,0 +1,16 @@
+/**************** edit user screen specific styles ****************/
+
+.label.whiteTitle {
+    -fx-font-size: 30;
+    -fx-text-fill: #F5F5F5;
+}
+
+.label.avatarTitle {
+    -fx-font-size: 16;
+    -fx-text-fill: #F5F5F5;
+}
+
+.text-field.edit {
+    -fx-background-size: 305 32;
+    -fx-font-size: 16;
+}

@@ -1,0 +1,103 @@
+/* import font */
+@font-face {
+    src: url("../fonts/kenvector_future.ttf");
+}
+
+/************** general settings for all elements of the specific types **************/
+
+/* all backgrounds default to grey gradient and all inputs have the same font */
+.root {
+    -fx-font-family: "KenVector Future Regular";
+    -fx-background-color: linear-gradient(to bottom, #666666, #F5F5F5);
+}
+
+/* all texts shall have one font */
+.text {
+    -fx-font-family: "KenVector Future Regular";
+}
+
+/* default focus for all buttons and textfields */
+.button:focused {
+    -fx-effect: dropshadow(gaussian, grey, 30, 0, 0, 0);
+}
+
+.text-field:focused {
+    -fx-effect: dropshadow(gaussian, white, 5, 0, 0, 0);
+}
+
+/* set style for title labels in the different screens */
+.label.title {
+    -fx-font-size: 30;
+    -fx-text-fill: orange;
+}
+
+.label {
+    -fx-font-size: 14;
+}
+
+.hyperlink {
+    -fx-font-size: 16;
+}
+
+.button {
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+    -fx-font-size: 20;
+    -fx-text-fill: #F5F5F5;
+    -fx-background-color: transparent;
+}
+
+.button:pressed {
+    -fx-text-fill: grey;
+}
+
+.text-field {
+    -fx-background-image: url("../assets/grey_blue_textfield.png");
+    -fx-background-repeat: no-repeat;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 4em;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: dimgrey;
+    -fx-background-radius: 4em;
+    -fx-border-radius: 15;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-padding: -2;
+}
+.scroll-bar:horizontal, .scroll-bar:vertical{
+    -fx-background-color:transparent;
+}
+
+/************** Definitions for specific style classes **************/
+
+/* colored buttons with a bigger scaling */
+.button.redButton {
+    -fx-graphic: url("../assets/red_button.png");
+}
+
+.button.blueButton {
+    -fx-graphic: url("../assets/blue_button.png");
+}
+
+.button.greenButton {
+    -fx-graphic: url("../assets/green_button.png");
+}
+
+.button.greyButton {
+    -fx-graphic: url("../assets/grey_button.png");
+    -fx-text-fill: dimgrey;
+}
