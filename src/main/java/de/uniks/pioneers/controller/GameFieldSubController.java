@@ -15,11 +15,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +30,6 @@ import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameFieldSubController implements Controller {
 
-    private final ObservableList<Tile> tiles = FXCollections.observableArrayList();
     private final ObservableList<Player> players = FXCollections.observableArrayList();
 
     private final IDStorage idStorage;
@@ -43,7 +43,7 @@ public class GameFieldSubController implements Controller {
 
 
     // This variable is needed for the starting/stopping of the field controllers
-    private List<HexSubController> hexSubControllers = new ArrayList<>();
+    private final List<HexSubController> hexSubControllers = new ArrayList<>();
     private final List<CircleSubController> circleSubControllers = new ArrayList<>();
 
     @Inject
@@ -134,24 +134,37 @@ public class GameFieldSubController implements Controller {
             if (z < 0) {
                 stringZ = "zM" + Math.abs(z);
             }
-            HexSubController hexSubController = new HexSubController(app, (Polygon) parent.lookup("#" + stringX + stringY + stringZ), tile);
-            //System.out.println("#" + stringX + stringY + stringZ);
+            HexSubController hexSubController = new HexSubController((Polygon) parent.lookup("#" + stringX + stringY + stringZ), tile);
             hexaCoords.add("#" + stringX + stringY + stringZ);
 
             hexSubController.init();
             this.hexSubControllers.add(hexSubController);
+
+            // Set number token on tiles
+            Label label = (Label) parent.lookup("#" + stringX + stringY + stringZ + "_label");
+            if (label != null) {
+                label.setText("" + tile.numberToken());
+
+                if (tile.numberToken() == 7) {
+                    label.toBack();
+                }
+            }
         }
 
 
-        for (int i = 0; i < hexaCoords.size(); i++) {
-            for (int j = 0; j < cirleCoords.size(); j++) {
-                CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup(hexaCoords.get(i) + "_" + cirleCoords.get(j)), pioneersService, gameIDStorage, idStorage, eventListener, this);
+        for (String hexaCoord : hexaCoords) {
+            for (Integer cirleCoord : cirleCoords) {
+                CircleSubController circleSubController = new CircleSubController(parent, app,
+                        (Circle) parent.lookup(hexaCoord + "_" + cirleCoord), pioneersService, gameIDStorage,
+                        idStorage, eventListener, this);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
             }
         }
         for (String string : waterTilesCircles) {
-            CircleSubController circleSubController = new CircleSubController(app, (Circle) parent.lookup("#" + string), pioneersService, gameIDStorage, idStorage, eventListener, this);
+            CircleSubController circleSubController = new CircleSubController(parent, app,
+                    (Circle) parent.lookup("#" + string), pioneersService, gameIDStorage, idStorage,
+                    eventListener, this);
             circleSubController.init();
             this.circleSubControllers.add(circleSubController);
         }
