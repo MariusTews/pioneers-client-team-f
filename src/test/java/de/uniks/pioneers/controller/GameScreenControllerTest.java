@@ -34,7 +34,7 @@ class GameScreenControllerTest extends ApplicationTest {
     PioneersService pioneersService;
     @Mock
     MemberService memberService;
-    @Mock()
+    @Mock
     EventListener eventListener;
 
     @Spy
@@ -61,9 +61,8 @@ class GameScreenControllerTest extends ApplicationTest {
 
 
         App app = new App(gameScreenController);
-
         app.start(stage);
-        gameScreenController.nextMoveLabel.setText("roll");
+        gameScreenController.nextMoveLabel.setText("founding-settlement-2");
         gameScreenController.getGameFieldSubController().loadMap(map);
         HashMap<String, Integer> remain = new HashMap<String, Integer>();
         remain.put("settlement", 3);
