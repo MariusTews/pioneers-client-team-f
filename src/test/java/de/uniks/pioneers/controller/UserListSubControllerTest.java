@@ -35,13 +35,10 @@ public class UserListSubControllerTest extends ApplicationTest {
 
 	@Test
 	public void testUserOnline() {
-
 		Label usernameLabel = lookup("#userNameLabel").query();
 		Circle statusCircle = lookup("#userStatusCircle").query();
-		Button chatButton = lookup("#chatButton").query();
 
 		Assertions.assertThat(usernameLabel.getText()).isEqualTo("username");
 		Assertions.assertThat(statusCircle.getFill()).isEqualTo(Color.WHITE);
-		Assertions.assertThat(chatButton.getText()).isEqualTo("chat");
 	}
 }

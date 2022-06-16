@@ -25,8 +25,8 @@ public class LoginController implements Controller {
     private final App app;
     private final AuthService authService;
     private final UserService userService;
-    private Provider<SignUpController> signUpController;
-    private Provider<LobbyController> lobbyController;
+    private final Provider<SignUpController> signUpController;
+    private final Provider<LobbyController> lobbyController;
     @FXML
     public TextField usernameTextField;
     @FXML
@@ -101,13 +101,13 @@ public class LoginController implements Controller {
                 })
                 .subscribe(result -> {
                     userService.statusUpdate(result, "online")
-                                    .observeOn(FX_SCHEDULER)
-                                            .subscribe();
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe();
                     app.show(lobbyController.get());
                 });
     }
 
-    public void loginButtonPressed(ActionEvent event) {
+    public void loginButtonPressed() {
         if (rememberMeCheckBox.isSelected()) {
             ResourceManager.saveConfig(JsonUtil.createRememberMeConfig(usernameTextField.getText()));
         } else {

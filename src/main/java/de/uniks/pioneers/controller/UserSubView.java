@@ -1,22 +1,15 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.GameIDStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -26,21 +19,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.RESOURCES;
 
 public class UserSubView implements Controller {
 
-    private final CompositeDisposable disposable = new CompositeDisposable();
-
-    private final ObservableList<Player> players = FXCollections.observableArrayList();
-
     private final ArrayList<User> users = new ArrayList<>();
-
-    private final GameIDStorage gameIDStorage;
     private final IDStorage idStorage;
     private final UserService userService;
     private final GameFieldSubController gameFieldSubController;
-    private final EventListener eventListener;
     private final Player player;
     private final int vicPoints ;
 
@@ -51,26 +38,18 @@ public class UserSubView implements Controller {
     public Label item3;
     public Label item4;
     public Label item5;
-    public ImageView image1;
-    public ImageView image2;
-    public ImageView image3;
-    public ImageView image4;
-    public ImageView image5;
     public Button sett;
     public Button road;
     public Button city;
-    public Pane settlemetPane;
+    public Pane settlementPane;
     public Pane roadPane;
     public Pane cityPane;
     private Parent parent;
 
     @Inject
-    public UserSubView(GameIDStorage gameIDStorage, IDStorage idStorage, UserService userService, EventListener eventListener, Player player, int victoryPoints, GameFieldSubController gameFieldSubController) {
-
-        this.gameIDStorage = gameIDStorage;
+    public UserSubView(IDStorage idStorage, UserService userService, Player player, int victoryPoints, GameFieldSubController gameFieldSubController) {
         this.idStorage = idStorage;
         this.userService = userService;
-        this.eventListener = eventListener;
         this.player = player;
         this.vicPoints = victoryPoints;
         this.gameFieldSubController = gameFieldSubController;
@@ -82,12 +61,9 @@ public class UserSubView implements Controller {
         //setAll();
         userService.findAllUsers().observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
-                    for (User user : col) {
-                        this.users.add(user);
-                    }
+                    this.users.addAll(col);
                     attachTOSubview();
                 });
-
     }
 
     private void attachTOSubview() {
@@ -96,8 +72,7 @@ public class UserSubView implements Controller {
                 //this.attachResources(player.resources());
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
-                this.victoryPoints.setText(Integer.toString(vicPoints) + "/10");
-                //TODO:Builidings needs to be calculated
+                this.victoryPoints.setText(vicPoints + "/10");
             }
         }
     }
@@ -162,9 +137,7 @@ public class UserSubView implements Controller {
         if (Integer.parseInt(ore) > 2 && Integer.parseInt(grain) > 1) {
             city.disableProperty().set(false);
         }
-
     }
-
 
     //name is set to namelabel and color aswell
     //and attach picture
@@ -194,26 +167,25 @@ public class UserSubView implements Controller {
         this.sett.disableProperty().set(true);
         this.city.disableProperty().set(true);
 
-        Tooltip.install(this.roadPane,new Tooltip("1 Earth cactus, 1 Mars bar "));
-        Tooltip.install(this.settlemetPane,new Tooltip("1 Earth cactus, 1 Mars bar, 1 Neptun crystals, 1 Venus grain "));
-        Tooltip.install(this.cityPane,new Tooltip("3 Moon rock, 2 Venus grain "));
+        Tooltip.install(this.roadPane, new Tooltip("1 Earth cactus, \n1 Mars bar "));
+        Tooltip.install(this.settlementPane, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptun crystals, \n1 Venus grain "));
+        Tooltip.install(this.cityPane, new Tooltip("3 Moon rock, \n2 Venus grain "));
         return parent;
     }
 
     public Parent getParent() {
         return parent;
-
     }
 
-    public void onSett(ActionEvent actionEvent) {
+    public void onSett() {
         gameFieldSubController.build("settlement");
     }
 
-    public void onRoad(ActionEvent actionEvent) {
+    public void onRoad() {
         gameFieldSubController.build("road");
     }
 
-    public void onCity(ActionEvent actionEvent) {
+    public void onCity() {
         gameFieldSubController.build("city");
     }
 

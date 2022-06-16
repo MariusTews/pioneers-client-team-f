@@ -6,7 +6,6 @@ import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,6 +14,7 @@ import javafx.scene.control.*;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
@@ -32,7 +32,7 @@ public class SignUpController implements Controller {
     @FXML
     public Button backButton;
     private final App app;
-    private Provider<LoginController> loginController;
+    private final Provider<LoginController> loginController;
     private final AuthService authService;
     private final UserService userService;
 
@@ -122,25 +122,33 @@ public class SignUpController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error -> {
                     if (error.getMessage().equals("HTTP 409 ")) {
-                        new Alert(Alert.AlertType.ERROR, "Username already taken")
-                                .showAndWait();
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "Username already taken");
+                        // set style of error
+                        DialogPane dialogPane = alert.getDialogPane();
+                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                        alert.showAndWait();
                     }
                 })
                 .subscribe(result -> {
                     if (result._id() != null) {
-                        new Alert(Alert.AlertType.INFORMATION, "sign up successful")
-                                .showAndWait()
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "sign up successful");
+                        // set style of information
+                        DialogPane dialogPane = alert.getDialogPane();
+                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                        alert.showAndWait()
                                 .ifPresent((btn) -> app.show(loginController.get()));
                     }
                 });
     }
 
 
-    public void signUpButtonPressed(ActionEvent event) {
+    public void signUpButtonPressed() {
         register(usernameTextField.getText(), null, passwordField.getText());
     }
 
-    public void backButtonPressed(ActionEvent event) {
+    public void backButtonPressed() {
         app.show(loginController.get());
     }
 }

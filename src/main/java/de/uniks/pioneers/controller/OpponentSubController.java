@@ -39,6 +39,8 @@ public class OpponentSubController implements Controller {
     ImageView neptunCrystalsImage;
     @FXML
     ImageView venusGrainImage;
+    @FXML
+    Label totalResourcesLabel;
 
     private final Player opponent;
     private final User opponentAsUser;
@@ -59,6 +61,7 @@ public class OpponentSubController implements Controller {
 
     @Override
     public void init() {
+
     }
 
     @Override
@@ -90,7 +93,9 @@ public class OpponentSubController implements Controller {
             if (this.opponentAsUser != null && this.opponentAsUser.avatar() != null) {
                 this.avatarImageView.setImage(new Image(this.opponentAsUser.avatar()));
             }
+            // Set the current victory points and total amount of resources
             this.victoryPointsLabel.setText("VP: " + victoryPoints + "/10");
+            this.totalResourcesLabel.setText("Total resources: " + opponent.resources().get("unknown"));
         }
 
         // Add information when hovering over items

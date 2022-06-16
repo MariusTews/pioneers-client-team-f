@@ -19,13 +19,12 @@ public class ColorController {
     }
 
     //Sets labels withs its respective colors
-    public  void createColor(){
-        for(int i = 0; i<26;i++) {
+    public  void createColor() {
+        for(int i = 0; i<8;i++) {
             Label label = new Label();
             label.setText(COLORSTRINGARRAY[i]);
             label.setTextFill(COLORARRAY[i]);
-            label.setMinWidth(120);
-            label.setStyle("-fx-border-color: blue;");
+            label.setMinWidth(150);
             color.add(label);
         }
     }

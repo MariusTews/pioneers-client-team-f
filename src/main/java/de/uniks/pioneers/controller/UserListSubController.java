@@ -4,7 +4,6 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,89 +19,85 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 public class UserListSubController implements Controller {
-	@FXML
-	public ImageView userImageView;
-	@FXML
-	public Circle userStatusCircle;
-	@FXML
-	public Label userNameLabel;
-	@FXML
-	public Button chatButton;
-	private App app;
-	private LobbyController lobbyController;
-	private final User user;
-	private IDStorage idStorage;
+    @FXML
+    public ImageView userImageView;
+    @FXML
+    public Circle userStatusCircle;
+    @FXML
+    public Label userNameLabel;
+    @FXML
+    public Button chatButton;
+    private final LobbyController lobbyController;
+    private final User user;
+    private final IDStorage idStorage;
 
-	private Parent parent;
+    private Parent parent;
 
-	private String id;
+    private String id;
 
-	@Inject
-	public UserListSubController(App app, LobbyController lobbyController, User user, IDStorage idStorage){
+    @Inject
+    public UserListSubController(App app, LobbyController lobbyController, User user, IDStorage idStorage) {
 
-		this.app = app;
-		this.lobbyController = lobbyController;
-		this.user = user;
-		this.idStorage = idStorage;
-	}
+        this.lobbyController = lobbyController;
+        this.user = user;
+        this.idStorage = idStorage;
+    }
 
-	@Override
-	public void init() {
+    @Override
+    public void init() {
 
-	}
+    }
 
-	@Override
-	public void destroy() {
+    @Override
+    public void destroy() {
 
-	}
+    }
 
-	@Override
-	public Parent render() {
-		final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/UserListSubView.fxml"));
-		loader.setControllerFactory(c -> this);
-		final Parent parent;
-		try {
-			parent = loader.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+    @Override
+    public Parent render() {
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/UserListSubView.fxml"));
+        loader.setControllerFactory(c -> this);
+        final Parent parent;
+        try {
+            parent = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-		if (this.user != null){
-			this.userNameLabel.setText(this.user.name());
-			this.id = user._id();
+        if (this.user != null) {
+            this.userNameLabel.setText(this.user.name());
+            this.id = user._id();
 
-			if (this.user.status().equals("online")){
-				this.userStatusCircle.setFill(Color.GREEN);
-			}
+            if (this.user.status().equals("online")) {
+                this.userStatusCircle.setFill(Color.GREEN);
+            } else if (this.user.status().equals("offline")) {
+                this.userStatusCircle.setFill(Color.RED);
+            }
 
-			else if (this.user.status().equals("offline")){
-				this.userStatusCircle.setFill(Color.RED);
-			}
+            if (this.user.avatar() != null) {
+                this.userImageView.setImage(new Image(this.user.avatar()));
+            }
 
-			if (this.user.avatar()!=null){
-				this.userImageView.setImage(new Image(this.user.avatar().toString()));
-			}
+            if (this.user.status().equals("offline") || user._id().equals(idStorage.getID())) {
+                HBox box = (HBox) this.chatButton.getParent();
+                box.getChildren().removeIf(node -> node.equals(chatButton));
+            }
+        }
 
-			if(this.user.status().equals("offline") || user._id().equals(idStorage.getID())){
-				HBox box = (HBox) this.chatButton.getParent();
-				box.getChildren().removeIf(node -> node.equals(chatButton));
-			}
-		}
+        this.parent = parent;
+        return parent;
+    }
 
-		this.parent = parent;
-		return parent;
-	}
+    public void chatButtonPressed() {
+        this.lobbyController.openDirectChat(this.user);
+    }
 
-	public void chatButtonPressed(ActionEvent event) {
-		this.lobbyController.openDirectChat(this.user);
-	}
+    public Parent getParent() {
+        return parent;
+    }
 
-	public Parent getParent() {
-		return parent;
-	}
-
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 }
