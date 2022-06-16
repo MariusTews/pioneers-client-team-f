@@ -9,29 +9,26 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="12.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.LoginController">
-   <children>
-      <Label text="Hello pioneer!">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Pane prefHeight="12.0" prefWidth="600.0" />
-      <Label text="Username" />
-      <TextField fx:id="usernameTextField" maxWidth="160.0" />
-      <Label text="Password" />
-      <PasswordField fx:id="userPasswordField" maxWidth="160.0" />
-      <CheckBox fx:id="rememberMeCheckBox" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Remember me" />
-      <Label fx:id="errorLabel" prefHeight="17.0" prefWidth="163.0" textFill="RED" />
-      <Button fx:id="loginButton" mnemonicParsing="false" onAction="#loginButtonPressed" text="Login" />
-      <HBox alignment="TOP_CENTER" prefHeight="66.0" prefWidth="600.0" spacing="3.0">
-         <children>
-            <Label layoutX="272.0" layoutY="10.0" prefHeight="30.0" prefWidth="89.0" text="Didn't settle yet?" />
-            <Label />
-            <Hyperlink fx:id="signUpHyperlink" prefHeight="30.0" prefWidth="49.0" text="Sign up" underline="true" />
-         </children>
-      </HBox>
-   </children>
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="400.0" prefWidth="600.0" spacing="12.0" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.LoginController">
+   <Label styleClass="title" text="Hello pioneer!">
+   </Label>
+   <Pane prefHeight="12.0" prefWidth="600.0"/>
+   <Label text="Username"/>
+   <TextField fx:id="usernameTextField" maxWidth="200.0" prefHeight="36.0" prefWidth="150.0"
+              styleClass="loginRegister"/>
+   <Label text="Password"/>
+   <PasswordField fx:id="userPasswordField" maxWidth="200.0" prefHeight="36.0" prefWidth="150.0"
+                  styleClass="loginRegister"/>
+   <CheckBox fx:id="rememberMeCheckBox" mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" text="Remember me"/>
+   <Label fx:id="errorLabel" alignment="CENTER" prefHeight="17.0" prefWidth="450.0" textFill="RED"/>
+   <Button fx:id="loginButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#loginButtonPressed"
+           styleClass="greenButton" text="Login"/>
+   <HBox alignment="TOP_CENTER" prefHeight="66.0" prefWidth="600.0" spacing="3.0">
+      <Label layoutX="272.0" layoutY="10.0" prefHeight="30.0" prefWidth="200.0" text="Didn't settle yet?"/>
+      <Label/>
+      <Hyperlink fx:id="signUpHyperlink" prefHeight="30.0" prefWidth="100.0" text="Sign up" underline="true"/>
+   </HBox>
 </VBox>

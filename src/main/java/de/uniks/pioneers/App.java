@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.util.Locale;
+import java.util.Objects;
 
 public class App extends Application {
 
@@ -32,12 +33,23 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         Locale.setDefault(new Locale("English", "England"));
         this.stage = primaryStage;
-        stage.setWidth(800);
+        stage.setWidth(900);
         stage.setHeight(600);
         stage.setTitle("Pioneers");
 
         final Scene scene = new Scene(new Label("Loading ... "));
         stage.setScene(scene);
+
+        // Load css into the scene for the design
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MainStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/LoginSignupStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/LobbyStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/EditUserStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/RulesStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/CreateGameStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/GameLobbyStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/ChatStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/IngameStyle.css")).toString());
 
         setAppIcon(stage);
 
@@ -48,7 +60,7 @@ public class App extends Application {
     }
 
     private void setAppIcon(Stage stage) {
-        final Image image = new Image(App.class.getResource("FATARI_logo.png").toString());
+        final Image image = new Image(Objects.requireNonNull(App.class.getResource("FATARI_logo.png")).toString());
         stage.getIcons().add(image);
     }
 
@@ -59,7 +71,7 @@ public class App extends Application {
 
         try {
             final Taskbar taskbar = Taskbar.getTaskbar();
-            final java.awt.Image image = ImageIO.read(Main.class.getResource("FATARI_logo.png"));
+            final java.awt.Image image = ImageIO.read(Objects.requireNonNull(Main.class.getResource("FATARI_logo.png")));
             taskbar.setIconImage(image);
         } catch (Exception ignored) {
 
@@ -80,7 +92,7 @@ public class App extends Application {
             stage.setWidth(1600);
             stage.setHeight(900);
         }else if(controller.getClass().equals(LobbyController.class)){
-            stage.setWidth(800);
+            stage.setWidth(900);
             stage.setHeight(600);
         }
     }

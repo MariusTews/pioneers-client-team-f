@@ -5,23 +5,23 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Tile;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Objects;
 
-public class HexSubController implements Controller{
+public class HexSubController implements Controller {
 
-    private Parent parent;
-    private App app;
-    private Polygon view;
-    private Tile tile;
+    private final Polygon view;
+    private final Tile tile;
 
     @Inject
-    public HexSubController(App app, Polygon view, Tile tile){
-        this.app = app;
+    public HexSubController(Polygon view, Tile tile) {
         this.view = view;
         this.tile = tile;
     }
@@ -32,7 +32,6 @@ public class HexSubController implements Controller{
         this.view.setOnMouseEntered(this::onFieldMouseHoverEnter);
         this.view.setOnMouseExited(this::onFieldMouseHoverExit);
         setPolygonColor();
-
     }
 
 
@@ -52,9 +51,6 @@ public class HexSubController implements Controller{
             e.printStackTrace();
             return null;
         }
-
-
-        this.parent = parent;
         return parent;
     }
 
@@ -73,24 +69,36 @@ public class HexSubController implements Controller{
     private void setPolygonColor() {
         String type = tile.type();
         switch (type) {
-            case "desert":
-                view.setFill(Color.YELLOW);
-                break;
-            case "fields":
-                view.setFill(Color.GREEN);
-                break;
-            case "hills":
-                view.setFill(Color.GREENYELLOW);
-                break;
-            case "mountains":
-                view.setFill(Color.GREY);
-                break;
-            case "forest":
-                view.setFill(Color.ORANGE);
-                break;
-            case "pasture":
-                view.setFill(Color.MAROON);
-                break;
+            case "desert" -> {
+                Image desert = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/2_desert.png")).toExternalForm());
+                ImagePattern desertPattern = new ImagePattern(desert);
+                view.setFill(desertPattern);
+            }
+            case "fields" -> {
+                Image fields = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/4_venus.png")).toExternalForm());
+                ImagePattern fieldPattern = new ImagePattern(fields);
+                view.setFill(fieldPattern);
+            }
+            case "hills" -> {
+                Image hills = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/3_moon.png")).toExternalForm());
+                ImagePattern hillPattern = new ImagePattern(hills);
+                view.setFill(hillPattern);
+            }
+            case "mountains" -> {
+                Image mountains = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/1_mars.png")).toExternalForm());
+                ImagePattern mountainPattern = new ImagePattern(mountains);
+                view.setFill(mountainPattern);
+            }
+            case "forest" -> {
+                Image forest = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/6_earth.png")).toExternalForm());
+                ImagePattern forestPattern = new ImagePattern(forest);
+                view.setFill(forestPattern);
+            }
+            case "pasture" -> {
+                Image pasture = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/5_neptun.png")).toExternalForm());
+                ImagePattern pasturePattern = new ImagePattern(pasture);
+                view.setFill(pasturePattern);
+            }
         }
     }
 }
