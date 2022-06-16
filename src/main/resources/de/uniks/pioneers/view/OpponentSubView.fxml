@@ -15,19 +15,22 @@
          <Label fx:id="victoryPointsLabel" prefHeight="18.0" prefWidth="110.0" text="Label" />
       </VBox>
    </HBox>
-   <HBox fx:id="resourcesView" alignment="CENTER" prefHeight="14.0" prefWidth="200.0" spacing="12.0">
-      <ImageView id="cactus" fx:id="earthCactusImage" fitHeight="23.0" fitWidth="13.0" pickOnBounds="true" preserveRatio="true">
+   <HBox fx:id="resourcesView" alignment="CENTER" prefHeight="14.0" prefWidth="200.0" spacing="15.0">
+      <ImageView id="cactus" fx:id="earthCactusImage" fitHeight="28.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
-      <ImageView id="mars" fx:id="marsBarImage" fitHeight="26.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView id="mars" fx:id="marsBarImage" fitHeight="31.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
-      <ImageView id="moon" fx:id="moonRockImage" fitHeight="21.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView id="moon" fx:id="moonRockImage" fitHeight="26.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
-      <ImageView id="neptun" fx:id="neptunCrystalsImage" fitHeight="21.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView id="neptun" fx:id="neptunCrystalsImage" fitHeight="26.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
-      <ImageView id="venus" fx:id="venusGrainImage" fitHeight="25.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView id="venus" fx:id="venusGrainImage" fitHeight="30.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
    </HBox>
-   <Label fx:id="totalResourcesLabel" text="total: " />
+   <Label fx:id="totalResourcesLabel" text="total resources: ">
+      <VBox.margin>
+         <Insets bottom="5.0" />
+      </VBox.margin></Label>
    <padding>
       <Insets top="10.0" />
    </padding>
