@@ -19,8 +19,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.uniks.pioneers.Constants.AMOUNT_SETTLEMENTS_CITIES;
+import static de.uniks.pioneers.Constants.CITY;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
+import static de.uniks.pioneers.Constants.SETTLEMENT;
 
 public class UserSubView implements Controller {
 
@@ -29,7 +32,7 @@ public class UserSubView implements Controller {
     private final UserService userService;
     private final GameFieldSubController gameFieldSubController;
     private final Player player;
-    private final int vicPoints ;
+    //private final int vicPoints ;
 
     public Label name ;
     public Label victoryPoints;
@@ -47,11 +50,10 @@ public class UserSubView implements Controller {
     private Parent parent;
 
     @Inject
-    public UserSubView(IDStorage idStorage, UserService userService, Player player, int victoryPoints, GameFieldSubController gameFieldSubController) {
+    public UserSubView(IDStorage idStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController) {
         this.idStorage = idStorage;
         this.userService = userService;
         this.player = player;
-        this.vicPoints = victoryPoints;
         this.gameFieldSubController = gameFieldSubController;
     }
 
@@ -72,7 +74,8 @@ public class UserSubView implements Controller {
                 //this.attachResources(player.resources());
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
-                this.victoryPoints.setText(vicPoints + "/10");
+                this.victoryPoints.setText(AMOUNT_SETTLEMENTS_CITIES - (player.remainingBuildings().get(SETTLEMENT) +
+                        player.remainingBuildings().get(CITY) * 2) + "/10");
             }
         }
     }

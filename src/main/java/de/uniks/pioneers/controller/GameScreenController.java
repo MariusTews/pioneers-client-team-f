@@ -228,7 +228,7 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
+        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController);
         userSubView.init();
 
         return userSubView.render();
