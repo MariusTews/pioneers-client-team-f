@@ -81,7 +81,7 @@ class GameLobbyControllerTest extends ApplicationTest {
         verify(memberService).leave("id", "4");
     }
 
-
+    @Test
     void leaveLastMember() {
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
                                                     "id", "name", "owner", 1, false)));

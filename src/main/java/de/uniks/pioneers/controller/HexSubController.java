@@ -79,12 +79,12 @@ public class HexSubController implements Controller {
                 ImagePattern fieldPattern = new ImagePattern(fields);
                 view.setFill(fieldPattern);
             }
-            case "hills" -> {
+            case "mountains" -> {
                 Image hills = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/3_moon.png")).toExternalForm());
                 ImagePattern hillPattern = new ImagePattern(hills);
                 view.setFill(hillPattern);
             }
-            case "mountains" -> {
+            case "hills" -> {
                 Image mountains = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/1_mars.png")).toExternalForm());
                 ImagePattern mountainPattern = new ImagePattern(mountains);
                 view.setFill(mountainPattern);
