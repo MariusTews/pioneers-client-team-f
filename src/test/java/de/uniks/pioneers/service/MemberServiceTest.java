@@ -60,6 +60,8 @@ public class MemberServiceTest {
         when(gameMembersApiService.findOne(any(),any())).thenReturn(Observable.just(new Member("0:30",
                                                 "15:50", "01", "02", false, "#000000")));
         Member member = memberService.findOne("testGame","testUser").blockingFirst();
+        assertEquals(member.createdAt(), "0:30");
+        assertEquals(member.updatedAt(), "15:50");
         assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000]", member.toString());
         verify(gameMembersApiService).findOne("testGame", "testUser");
     }

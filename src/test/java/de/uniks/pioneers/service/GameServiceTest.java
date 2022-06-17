@@ -59,6 +59,8 @@ class GameServiceTest {
     void findOneGame() {
         when(gamesApiService.findOne(any())).thenReturn(Observable.just(new Game("5","6","7","8","9",4,false)));
         Game game = gameService.findOneGame("7").blockingFirst();
+        assertEquals(game.createdAt(), "5");
+        assertEquals(game.updatedAt(), "6");
         assertEquals("Game[createdAt=5, updatedAt=6, _id=7, name=8, owner=9, members=4, started=false]", game.toString());
 
         verify(gamesApiService).findOne("7");
