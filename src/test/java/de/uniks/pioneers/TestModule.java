@@ -9,6 +9,7 @@ import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
 import io.reactivex.rxjava3.core.Observable;
 
+import java.util.ArrayList;
 import java.util.List;
 @Module
 public class TestModule {
@@ -28,12 +29,14 @@ public class TestModule {
 		return new UserApiService() {
 			@Override
 			public Observable<User> createUser(CreateUserDto dto) {
-				return Observable.empty();
+				return Observable.just(new User("01","Alice","online",null,null));
 			}
 
 			@Override
 			public Observable<List<User>> findAllUsers() {
-				return Observable.just(List.of());
+				ArrayList<User> users = new ArrayList<>();
+				users.add(new User("01","Alice","online",null,null));
+				return Observable.just(users);
 			}
 
 			@Override
@@ -43,12 +46,12 @@ public class TestModule {
 
 			@Override
 			public Observable<User> updateUser(String id, UpdateUserDto dto) {
-				return null;
+				return Observable.just(new User("01","Alice","online",null,null));
 			}
 
 			@Override
 			public Observable<User> statusUpdate(String id, StatusUpdateDto dto) {
-				return null;
+				return Observable.just(new User("01","Alice","online",null,null));
 			}
 
 			@Override
@@ -63,7 +66,7 @@ public class TestModule {
 		return new AuthApiService() {
 			@Override
 			public Observable<LoginResult> login(LoginDto dto) {
-				return null;
+				return Observable.just(new LoginResult("0","0","01","Alice","online",null,null,"123","321"));
 			}
 
 			@Override
@@ -83,7 +86,7 @@ public class TestModule {
 		return new GroupApiService() {
 			@Override
 			public Observable<List<Group>> getAll() {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
@@ -113,7 +116,7 @@ public class TestModule {
 		return new MessageApiService() {
 			@Override
 			public Observable<List<Message>> findAll(String namespace, String parent) {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
@@ -143,7 +146,10 @@ public class TestModule {
 		return new GameMembersApiService() {
 			@Override
 			public Observable<List<Member>> findAll(String gameId) {
-				return null;
+				ArrayList<Member> members = new ArrayList<>();
+				members.add(new Member("0","0","01","10",true,null));
+				members.add(new Member("0","0","01","15",true,null));
+				return Observable.just(members);
 			}
 
 			@Override
@@ -158,7 +164,7 @@ public class TestModule {
 
 			@Override
 			public Observable<Member> patch(String gameId, String userId, UpdateMemberDto dto) {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
@@ -173,22 +179,22 @@ public class TestModule {
 		return new GamesApiService() {
 			@Override
 			public Observable<List<Game>> findAll() {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
 			public Observable<Game> create(CreateGameDto dto) {
-				return null;
+				return Observable.just(new Game("0","0","01","testGame","01",1,false));
 			}
 
 			@Override
 			public Observable<Game> findOne(String id) {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
 			public Observable<Game> patch(String id, UpdateGameDto dto) {
-				return null;
+				return Observable.just(new Game("0","0","01","testGame","10",2,true));
 			}
 
 			@Override
@@ -202,38 +208,66 @@ public class TestModule {
 		return new PioneersApiService() {
 			@Override
 			public Observable<Map> findAllTiles(String gameId) {
-				return null;
+				List<Tile> titles = new ArrayList<>();
+				titles.add(new Tile(-2, 2, 0, "fields", 5));
+				titles.add(new Tile(-2, 1, 1, "desert", 5));
+				titles.add(new Tile(-2, 0, 2, "hills", 5));
+				titles.add(new Tile(-1, 2, -1, "mountains", 5));
+				titles.add(new Tile(-1, 1, 0, "forest", 5));
+				titles.add(new Tile(-1, 0, 1, "pasture", 5));
+				titles.add(new Tile(-1, -1, 2, "fields", 5));
+				titles.add(new Tile(0, 2, -2, "fields", 5));
+				titles.add(new Tile(0, 1, -1, "fields", 5));
+				titles.add(new Tile(0, 0, 0, "fields", 5));
+				titles.add(new Tile(0, -1, 1, "fields", 5));
+				titles.add(new Tile(0, -2, 2, "fields", 5));
+				titles.add(new Tile(1, 1, -2, "fields", 5));
+				titles.add(new Tile(1, 0, -1, "fields", 5));
+				titles.add(new Tile(1, -1, 0, "fields", 5));
+				titles.add(new Tile(1, -2, 1, "fields", 5));
+				titles.add(new Tile(2, 0, -2, "fields", 5));
+				titles.add(new Tile(2, -1, -1, "fields", 5));
+				titles.add(new Tile(2, -2, 0, "fields", 5));
+				Map map = new Map("02", titles);
+
+				return Observable.just(map);
 			}
 
 			@Override
 			public Observable<List<Player>> findAllPlayers(String gameId) {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
 			public Observable<Player> findOnePlayer(String gameId, String userId) {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
 			public Observable<State> findOneState(String gameId) {
-				return null;
+				List<ExpectedMove> moves = new ArrayList<>();
+				List<String> players = new ArrayList<>();
+				players.add("01");
+				moves.add(new ExpectedMove("founding-settlement-1",players));
+				return Observable.just(new State("0","02",moves));
 			}
 
 			@Override
 			public Observable<List<Building>> findAllBuildings(String gameId) {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
 			public Observable<Building> findOneBuilding(String gameId, String buildingId) {
-				return null;
+				return Observable.empty();
 			}
 
 			@Override
 			public Observable<Move> create(String gameId, CreateMoveDto dto) {
-				return null;
+				return Observable.empty();
 			}
 		};
+
 	}
+
 }

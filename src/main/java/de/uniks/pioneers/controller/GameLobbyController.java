@@ -98,6 +98,15 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.members.setAll(col);
+                    int ready = 0;
+                    for(Member member : members){
+                        if(member.ready()){
+                            ready++;
+                        }
+                    }
+                    if(ready>=2){
+                        idStartGameButton.disableProperty().set(false);
+                    }
                     this.userService.findAllUsers()
                             .observeOn(FX_SCHEDULER)
                             .subscribe(event -> {
