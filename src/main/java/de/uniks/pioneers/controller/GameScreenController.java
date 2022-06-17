@@ -19,6 +19,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -54,11 +55,14 @@ public class GameScreenController implements Controller {
     public Label currentPlayerLabel;
     @FXML
     public Label timerLabel;
+    @FXML
+    public ImageView diceImage;
 
     private final App app;
 
     private final GameIDStorage gameIDStorage;
     private final IDStorage idStorage;
+
     private String lastBuildingPosition;
 
     private final PioneersService pioneersService;
@@ -228,7 +232,7 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController);
+        UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
         userSubView.init();
 
         return userSubView.render();
@@ -409,7 +413,7 @@ public class GameScreenController implements Controller {
         //gets called every second to reduce the timer by one second
         KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
             seconds[0]--;
-            timerLabel.setText(seconds[0].toString());
+            timerLabel.setText("" + (seconds[0]/60) + ":" + seconds[0]%60 );
             if (seconds[0] <= 0) {
                 timeline.stop();
                 //current Move is founding-settlement
@@ -621,7 +625,8 @@ public class GameScreenController implements Controller {
         return possibleRoadPlacements;
     }
 
-    public void accessUsersubView(Player player){
-        renderSingleUser(player);
+    public GameFieldSubController getGameFieldSubController() {
+        return gameFieldSubController;
     }
+
 }

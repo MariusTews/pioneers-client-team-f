@@ -23,7 +23,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -45,8 +44,8 @@ public class LobbyController implements Controller {
     //message for Lobby
     private final ObservableList<Message> lobby_messages = FXCollections.observableArrayList();
 
-    private final List<String> lobby_deletedMessages = new ArrayList<>();
     private final List<String> deletedMessages = new ArrayList<>();
+    private final List<String> deletedAllMessages = new ArrayList<>();
     private final List<UserListSubController> userSubCons = new ArrayList<>();
     private final List<GameListSubController> gameSubCons = new ArrayList<>();
     private final List<DirectChatStorage> directChatStorages = new ArrayList<>();
@@ -148,28 +147,15 @@ public class LobbyController implements Controller {
 
         disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
         disposable.add(eventListener.listen("games.*.*", Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
+		disposable.add(eventListener.listen("group.*.*", Group.class).observeOn(FX_SCHEDULER).subscribe(this::handleGroupEvents));
 
         //listen to messages on lobby on Global channel
         disposable.add(eventListener
                 .listen("global." + LOBBY_ID + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    final Message message = event.data();
-                    if (event.event().endsWith(CREATED)) {
-                        renderMessage(message, true);
-                    } else if (event.event().endsWith(DELETED)) {
-                        renderMessage(message, false);
-                    }
-                }));
+                .subscribe(this::handleAllTabMessages));
 
-        //get all messages from the user that are in lobby
-        messageService
-                .getAllMessages(GLOBAL, LOBBY_ID)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(col -> {
-                    this.lobby_messages.setAll(col);
-                    this.initAllMessages();
-                });
+
     }
 
     @Override
@@ -229,44 +215,6 @@ public class LobbyController implements Controller {
         return parent;
     }
 
-    //render messages for all lobby
-    private void renderMessage(Message message, boolean render) {
-        ((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().clear();
-
-        if (render) {
-            this.lobby_messages.add(message);
-        } else {
-            this.lobby_deletedMessages.add(message._id());
-        }
-
-        if (!lobby_messages.isEmpty()) {
-            for (Message m : lobby_messages) {
-                HBox box = new HBox(3);
-                ImageView imageView = new ImageView();
-                imageView.setFitWidth(20);
-                imageView.setFitHeight(20);
-                if (this.memberHash.get(m.sender()).avatar() != null) {
-                    imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
-                }
-                box.getChildren().add(imageView);
-                Label label;
-                if (this.lobby_deletedMessages.contains(m._id())) {
-                    label = new Label(this.memberHash.get(m.sender()).name() + ": - message deleted - ");
-                    label.setFont(Font.font("Italic"));
-                } else {
-                    label = new Label();
-                    label.setMinWidth(100);
-                    this.initRightClickForAllMessages(label, m._id(), m.sender());
-                    label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
-                }
-                box.getChildren().add(label);
-                ((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
-            }
-        }
-        //this helps the messages to be scrolled down
-        ((ScrollPane) allTab.getContent()).vvalueProperty().bind(((VBox) ((ScrollPane) allTab.getContent()).getContent()).heightProperty());
-    }
-
     private void handleTabSwitching(Tab oldValue, Tab newValue) {
 
         for (DirectChatStorage directChatStorage : directChatStorages) {
@@ -278,15 +226,14 @@ public class LobbyController implements Controller {
         for (DirectChatStorage directChatStorage : directChatStorages) {
             if (directChatStorage.getTab() != null && directChatStorage.getTab().equals(newValue)) {
                 this.currentDirectStorage = directChatStorage;
-                User user = currentDirectStorage.getUser();
-                this.loadDirectMessages(currentDirectStorage.getGroupId(), user, currentDirectStorage.getTab());
+                this.loadMessages(currentDirectStorage.getGroupId(), currentDirectStorage.getTab());
                 tabDisposable = eventListener.listen("groups." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
                     if (messageEvent.event().endsWith(CREATED)) {
                         this.messages.add(messageEvent.data());
-                        renderSingleMessage(directChatStorage.getUser(), directChatStorage.getGroupId(), directChatStorage.getTab(), messageEvent.data());
+                        renderSingleMessage(directChatStorage.getGroupId(), directChatStorage.getTab(), messageEvent.data());
                     } else if (messageEvent.event().endsWith(DELETED)) {
                         this.deletedMessages.add(messageEvent.data()._id());
-                        loadDirectMessages(directChatStorage.getGroupId(), user, newValue);
+                        loadMessages(directChatStorage.getGroupId(), newValue);
                     }
                 });
             }
@@ -464,6 +411,24 @@ public class LobbyController implements Controller {
         }
     }
 
+	// Handle group events, so the users do not end up in different groups when opening the direct chat
+	private void handleGroupEvents(Event<Group> groupEvent) {
+		final Group group = groupEvent.data();
+
+		if (groupEvent.event().endsWith(CREATED)) {
+			this.groups.add(group);
+		} else if (groupEvent.event().endsWith(DELETED)) {
+			this.groups.removeIf(u -> u._id().equals(group._id()));
+		} else if (groupEvent.event().endsWith(UPDATED)) {
+			for (Group updatedGroup : this.groups) {
+				if (updatedGroup._id().equals(group._id())) {
+					this.groups.set(this.groups.indexOf(updatedGroup), group);
+					break;
+				}
+			}
+		}
+	}
+
     public void openDirectChat(User user) {
 
         List<Tab> tabs = this.tabPane.getTabs();
@@ -502,12 +467,12 @@ public class LobbyController implements Controller {
                     User storageUser = storage.getUser();
                     if (storage.getGroupId().equals(group._id()) && storageUser._id().equals(user._id())) {
                         storage.setTab(tab);
-                        loadDirectMessages(storage.getGroupId(), storageUser, storage.getTab());
+                        loadMessages(storage.getGroupId(), storage.getTab());
                         return;
                     }
                 }
                 addToDirectChatStorage(group._id(), user, tab);
-                loadDirectMessages(group._id(), user, tab);
+                loadMessages(group._id(), tab);
                 return;
             }
         }
@@ -519,7 +484,7 @@ public class LobbyController implements Controller {
 
         this.groupService.createGroup(toAdd).observeOn(FX_SCHEDULER).subscribe(group -> {
             addToDirectChatStorage(group._id(), user, tab);
-            loadDirectMessages(group._id(), user, tab);
+            loadMessages(group._id(), tab);
             this.groups.add(group);
         });
     }
@@ -537,6 +502,19 @@ public class LobbyController implements Controller {
         List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
         this.users.addAll(online);
         this.users.addAll(offline);
+
+        //get all messages from the user that are in lobby
+        messageService
+                .getAllMessages(GLOBAL, LOBBY_ID)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(col -> {
+                    this.lobby_messages.setAll(col);
+                    for (Message message: lobby_messages) {
+                        if (!this.deletedAllMessages.contains(message._id())) {
+                            renderSingleMessage(null, allTab, message);
+                        }
+                    }
+                });
     }
 
     private void loadGames(List<Game> games) {
@@ -547,74 +525,38 @@ public class LobbyController implements Controller {
         this.games.addAll(notAccessible);
     }
 
-    //load all messages
-    private void initAllMessages() {
-        for (Message m : this.lobby_messages) {
-            HBox box = new HBox(3);
-            Label label = new Label();
-            ImageView imageView = new ImageView();
-            imageView.setFitWidth(20);
-            imageView.setFitHeight(20);
-            if (this.memberHash.get(m.sender()).avatar() != null) {
-                imageView.setImage(new Image(this.memberHash.get(m.sender()).avatar()));
-            }
-            box.getChildren().add(imageView);
-            label.setMinWidth(100);
-            this.initRightClickForAllMessages(label, m._id(), m.sender());
-            label.setText(memberHash.get(m.sender()).name() + ": " + m.body());
-            box.getChildren().add(label);
-            //this attaches messages to alltab
-            ((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().add(box);
-        }
-    }
-
-    //this deletes messages on right click or gives warning
-    // if the code does not belong to the user
-    private void initRightClickForAllMessages(Label label, String messageId, String sender) {
-        final ContextMenu contextMenu = new ContextMenu();
-        final MenuItem menuItem = new MenuItem("delete");
-
-        contextMenu.getItems().add(menuItem);
-
-        label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: LIGHTGREY"));
-        label.setOnMouseExited(event -> label.setStyle("-fx-background-color: TRANSPARENT"));
-        label.setContextMenu(contextMenu);
-
-        menuItem.setOnAction(event -> {
-            if (sender.equals(this.idStorage.getID())) {
-                messageService
-                        .delete(GLOBAL, LOBBY_ID, messageId)
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe();
-                ((VBox) ((ScrollPane) allTab.getContent()).getContent()).getChildren().remove(label);
-            } else {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.");
-                // Change style of error
-                DialogPane dialogPane = alert.getDialogPane();
-                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                alert.showAndWait();
-            }
-        });
-    }
-
     private void loadGroups(List<Group> groups) {
         this.groups.addAll(groups);
     }
 
 
-    private void loadDirectMessages(String groupId, User user, Tab tab) {
-        this.messageService.getAllMessages(GROUPS, groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
-            this.messages.clear();
-            this.messages.addAll(messages);
-            ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
+    private void loadMessages(String groupId, Tab tab) {
+        if (tab.equals(allTab)) {
+            this.messageService.getAllMessages(GLOBAL, LOBBY_ID).observeOn(FX_SCHEDULER).subscribe(messages -> {
+                this.lobby_messages.clear();
+                this.lobby_messages.addAll(messages);
+                ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
 
-            for (Message message : this.messages) {
-                if (!this.deletedMessages.contains(message._id())) {
-                    renderSingleMessage(user, groupId, tab, message);
+                for (Message message : this.lobby_messages) {
+                    if (!this.deletedAllMessages.contains(message._id())) {
+                        renderSingleMessage(null, allTab, message);
+                    }
                 }
-            }
-        });
+            });
+        }
+        else {
+            this.messageService.getAllMessages(GROUPS, groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
+                this.messages.clear();
+                this.messages.addAll(messages);
+                ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
+
+                for (Message message : this.messages) {
+                    if (!this.deletedMessages.contains(message._id())) {
+                        renderSingleMessage(groupId, tab, message);
+                    }
+                }
+            });
+        }
     }
 
     private void addToDirectChatStorage(String groupId, User user, Tab tab) {
@@ -625,32 +567,37 @@ public class LobbyController implements Controller {
         this.directChatStorages.add(directChatStorage);
     }
 
-    private void renderSingleMessage(User user, String groupID, Tab tab, Message message) {
+    private  void handleAllTabMessages(Event<Message> event) {
+        final Message message = event.data();
+        if (event.event().endsWith(CREATED)) {
+            this.lobby_messages.add(message);
+            renderSingleMessage(null, allTab, message);
+        } else if (event.event().endsWith(DELETED)) {
+            this.deletedAllMessages.add(message._id());
+            this.lobby_messages.removeIf(m -> m._id().equals(message._id()));
+            this.loadMessages(null, allTab);
+        }
+    }
+
+    private void renderSingleMessage(String groupID, Tab tab, Message message) {
+
         HBox box = new HBox(3);
+        Label label = new Label();
         ImageView imageView = new ImageView();
         imageView.setFitWidth(20);
         imageView.setFitHeight(20);
-        Label label = new Label();
-        initRightClick(label, message._id(), message.sender(), groupID);
-        if (message.sender().equals(idStorage.getID())) {
-            if (this.ownAvatar != null) {
-                imageView.setImage(new Image(this.ownAvatar));
-            }
-            box.getChildren().add(imageView);
-
-            label.setText(ownUsername + ": " + message.body());
-            box.getChildren().add(label);
-            ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
-        } else if (message.sender().equals(user._id())) {
-            if (user.avatar() != null) {
-                imageView.setImage(new Image(user.avatar()));
-            }
-            box.getChildren().add(imageView);
-
-            label.setText(user.name() + ": " + message.body());
-            box.getChildren().add(label);
-            ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
+        if (this.memberHash.get(message.sender()).avatar() != null) {
+            imageView.setImage(new Image(this.memberHash.get(message.sender()).avatar()));
         }
+        box.getChildren().add(imageView);
+        label.setMinWidth(100);
+        initRightClick(label, message._id(), message.sender(), groupID);
+        label.setText(memberHash.get(message.sender()).name() + ": " + message.body());
+        box.getChildren().add(label);
+
+        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
+
+        ((ScrollPane) tab.getContent()).vvalueProperty().bind(((VBox) ((ScrollPane) tab.getContent()).getContent()).heightProperty());
     }
 
     public void joinGame(Game game) {
@@ -718,10 +665,17 @@ public class LobbyController implements Controller {
 
         menuItem.setOnAction(event -> {
             if (sender.equals(this.idStorage.getID())) {
-                messageService
-                        .delete(GROUPS, groupId, messageId)
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe();
+                if(groupId != null) {
+                    messageService
+                            .delete(GROUPS, groupId, messageId)
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe();
+                } else {
+                    messageService
+                            .delete(GLOBAL, LOBBY_ID, messageId)
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe();
+                }
             } else {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.");
                 // set style of warning
