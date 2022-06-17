@@ -19,8 +19,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.uniks.pioneers.Constants.AMOUNT_SETTLEMENTS_CITIES;
+import static de.uniks.pioneers.Constants.CITY;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
+import static de.uniks.pioneers.Constants.SETTLEMENT;
 
 public class UserSubView implements Controller {
 
@@ -29,9 +32,9 @@ public class UserSubView implements Controller {
     private final UserService userService;
     private final GameFieldSubController gameFieldSubController;
     private final Player player;
-    private final int vicPoints;
+    private final int vicPoints ;
 
-    public Label name;
+    public Label name ;
     public Label victoryPoints;
     public Label item1;
     public Label item2;
@@ -47,12 +50,12 @@ public class UserSubView implements Controller {
     private Parent parent;
 
     @Inject
-    public UserSubView(IDStorage idStorage, UserService userService, Player player, int victoryPoints, GameFieldSubController gameFieldSubController) {
+    public UserSubView(IDStorage idStorage, UserService userService, Player player,int victoryPoints, GameFieldSubController gameFieldSubController) {
         this.idStorage = idStorage;
         this.userService = userService;
         this.player = player;
-        this.vicPoints = victoryPoints;
         this.gameFieldSubController = gameFieldSubController;
+        this.vicPoints = victoryPoints;
     }
 
 
@@ -68,6 +71,7 @@ public class UserSubView implements Controller {
     private void attachTOSubview() {
         for (User user : this.users) {
             if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
+                //this.attachResources(player.resources());
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
                 this.victoryPoints.setText(vicPoints + "/10");
@@ -140,8 +144,8 @@ public class UserSubView implements Controller {
     //name is set to namelabel and color aswell
     //and attach picture
     private void attachName(String n, String color) {
-        name.setText(n + " (YOU)");
-        name.setTextFill(Color.web(color));
+        this.name.setText(n + " (YOU)");
+        this.name.setTextFill(Color.web(color));
     }
 
     @Override
@@ -186,4 +190,5 @@ public class UserSubView implements Controller {
     public void onCity() {
         gameFieldSubController.build("city");
     }
+
 }

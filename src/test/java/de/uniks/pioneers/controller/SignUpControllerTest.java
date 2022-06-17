@@ -51,7 +51,7 @@ class SignUpControllerTest extends ApplicationTest {
 
         write("bob111\t");
 
-        FxAssert.verifyThat("#errorLabel", LabeledMatchers.hasText(""));
+        FxAssert.verifyThat("#errorLabel", LabeledMatchers.hasText("Passwords is too short"));
         FxAssert.verifyThat("#signUpButton", NodeMatchers.isDisabled());
 
         type(KeyCode.TAB);
