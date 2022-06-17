@@ -7,6 +7,7 @@ import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -64,7 +65,7 @@ class GameScreenControllerTest extends ApplicationTest {
         app.start(stage);
         gameScreenController.nextMoveLabel.setText("founding-settlement-2");
         gameScreenController.getGameFieldSubController().loadMap(map);
-        HashMap<String, Integer> remain = new HashMap<String, Integer>();
+        HashMap<String, Integer> remain = new HashMap<>();
         remain.put("settlement", 3);
         remain.put("city", 3);
         remain.put("road", 3);
@@ -73,7 +74,6 @@ class GameScreenControllerTest extends ApplicationTest {
         gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 7, "02", "road");
         gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "city");
         gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "settlement");
-
     }
 
     List<Tile> createMap() {
@@ -98,10 +98,8 @@ class GameScreenControllerTest extends ApplicationTest {
         titles.add(new Tile(2, -1, -1, "fields", 5));
         titles.add(new Tile(2, -2, 0, "fields", 5));
 
-
         return titles;
     }
-
 
     @Test
     void error() {
@@ -137,9 +135,7 @@ class GameScreenControllerTest extends ApplicationTest {
 
         clickOn("#x0y0z0_7");
         verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road");
-
     }
-
 
     @Test
     void notYourTurn() {
@@ -157,4 +153,27 @@ class GameScreenControllerTest extends ApplicationTest {
         verify(pioneersService).move("02", "build", null, null, null, null, null);
     }
 
+    @Test
+    void loadValidPositions() {
+        List<String> pos = gameScreenController.getAllValidPositions();
+        Assertions.assertEquals(pos.size(), 54);
+    }
+
+    @Test
+    void possibleRoadPlacements() {
+        List<String> possiblePlacesTop = gameScreenController.getPossibleRoadPlacements(0, 0, 0, 0);
+        Assertions.assertEquals(possiblePlacesTop.size(), 3);
+        List<String> possiblePlacesBottom = gameScreenController.getPossibleRoadPlacements(0, 0, 0, 6);
+        Assertions.assertEquals(possiblePlacesBottom.size(), 3);
+    }
+
+    @Test
+    void loadInvalidPositions() {
+        when(pioneersService.findAllBuildings(any())).thenReturn(Observable.just(List.of(
+                new Building(0, 0, 0, "id", 0, "settlement", "123", "321"),
+                new Building(0, 0, 0, "id", 6, "settlement", "123", "321"))));
+
+        List<String> invalidPos = gameScreenController.getAllInvalidSettlementCoordinates();
+        Assertions.assertEquals(invalidPos.size(), 8);
+    }
 }
