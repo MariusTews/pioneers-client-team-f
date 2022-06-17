@@ -74,16 +74,47 @@ public class SignUpController implements Controller {
         final BooleanBinding length = Bindings.greaterThan(8, passwordField.lengthProperty());
         final BooleanBinding usernameLengthMax = Bindings.greaterThan(33, usernameTextField.lengthProperty());
         final BooleanBinding usernameLengthMin = Bindings.greaterThan(1, usernameTextField.lengthProperty());
-        errorLabel.textProperty().bind(
-                Bindings.when(match)
-                        .then("")
-                        .otherwise("Passwords do not match")
-        );
+
+        passwordField.textProperty().addListener(((observable, oldValue, newValue) -> {
+            if( newValue.length() <8 ) {
+                errorLabel.textProperty().bind(
+                        Bindings.when(match)
+                                .then("Passwords is too short")
+                                .otherwise("Passwords do not match")
+                );
+            } else {
+                errorLabel.textProperty().bind(
+                        Bindings.when(match)
+                                .then("")
+                                .otherwise("Passwords do not match")
+                );
+            }
+            repeatPasswordField.textProperty().addListener((observable1, oldValue1, newValue1) -> {
+                if( newValue.length() <8 || newValue1 .length() <8 ) {
+                       errorLabel.textProperty().bind(
+                               Bindings.when(match)
+                                       .then("Passwords is too short")
+                                       .otherwise("Passwords do not match")
+                       );
+
+                } else {
+                    errorLabel.textProperty().bind(
+                            Bindings.when(match)
+                                    .then("")
+                                    .otherwise("Passwords do not match")
+                    );
+                }
+            });
+        }));
+
+
         signUpButton.disableProperty().bind(length.or(match.not()).or(usernameLengthMax.not().or(usernameLengthMin)));
 
 
         return parent;
     }
+
+
 
     public void register(String username, String avatar, String password) {
 
