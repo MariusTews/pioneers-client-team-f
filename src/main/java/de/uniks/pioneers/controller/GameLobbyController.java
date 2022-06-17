@@ -143,7 +143,7 @@ public class GameLobbyController implements Controller {
                                 readyMembers += 1;
                             }
                         }
-                        this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size());
+                        this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
                     }
                     this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
                 }));
