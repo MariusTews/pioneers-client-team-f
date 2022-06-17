@@ -32,7 +32,7 @@ public class UserSubView implements Controller {
     private final UserService userService;
     private final GameFieldSubController gameFieldSubController;
     private final Player player;
-    //private final int vicPoints ;
+    private final int vicPoints ;
 
     public Label name ;
     public Label victoryPoints;
@@ -50,11 +50,12 @@ public class UserSubView implements Controller {
     private Parent parent;
 
     @Inject
-    public UserSubView(IDStorage idStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController) {
+    public UserSubView(IDStorage idStorage, UserService userService, Player player,int victoryPoints, GameFieldSubController gameFieldSubController) {
         this.idStorage = idStorage;
         this.userService = userService;
         this.player = player;
         this.gameFieldSubController = gameFieldSubController;
+        this.vicPoints = victoryPoints;
     }
 
 
@@ -73,8 +74,7 @@ public class UserSubView implements Controller {
                 //this.attachResources(player.resources());
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
-                this.victoryPoints.setText(AMOUNT_SETTLEMENTS_CITIES - (player.remainingBuildings().get(SETTLEMENT) +
-                        player.remainingBuildings().get(CITY) * 2) + "/10");
+                this.victoryPoints.setText(vicPoints + "/10");
             }
         }
     }
