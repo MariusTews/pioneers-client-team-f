@@ -47,6 +47,8 @@ public class GameLobbyController implements Controller {
     public VBox idUserList;
     @FXML
     public VBox idChatContainer;
+    @FXML
+    public ComboBox<Label> colorPicker = new ComboBox<>();
 
     private final App app;
     private final MemberService memberService;
@@ -62,9 +64,6 @@ public class GameLobbyController implements Controller {
     private final MemberIDStorage memberIDStorage;
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
-
-    @FXML
-    public ComboBox<Label> colorPicker = new ComboBox<>();
 
     @Inject
     public GameLobbyController(App app,
