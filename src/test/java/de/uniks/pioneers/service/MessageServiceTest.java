@@ -36,6 +36,8 @@ public class MessageServiceTest {
         final List<Message> result = messageService.getAllMessages("g", "001").blockingFirst();
 
         assertEquals("Message[createdAt=0, updatedAt=0, _id=1, sender=11, body=Hi]", result.get(0).toString());
+        assertEquals(result.get(0).createdAt(), "0");
+        assertEquals(result.get(0).updatedAt(), "0");
         assertEquals("Message[createdAt=1, updatedAt=1, _id=2, sender=11, body=Jo]", result.get(1).toString());
 
         verify(messageApiService).findAll("g", "001");
