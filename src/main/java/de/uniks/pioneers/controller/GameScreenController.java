@@ -413,7 +413,7 @@ public class GameScreenController implements Controller {
         //gets called every second to reduce the timer by one second
         KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
             seconds[0]--;
-            timerLabel.setText(seconds[0].toString());
+            timerLabel.setText("" + (seconds[0]/60) + ":" + seconds[0]%60 );
             if (seconds[0] <= 0) {
                 timeline.stop();
                 //current Move is founding-settlement
