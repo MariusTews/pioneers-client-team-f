@@ -249,6 +249,12 @@ public class TestModule {
 			}
 
 			@Override
+			public Observable<Player> updatePlayer(String gameId, String userId, UpdatePlayerDto dto) {
+				return null;
+			}
+
+
+			@Override
 			public Observable<State> findOneState(String gameId) {
 				List<ExpectedMove> moves = new ArrayList<>();
 				List<String> players = new ArrayList<>();
@@ -270,6 +276,16 @@ public class TestModule {
 			@Override
 			public Observable<Move> create(String gameId, CreateMoveDto dto) {
 				return Observable.empty();
+			}
+
+			@Override
+			public Observable<List<Move>> findAllMoves(String gameId) {
+				return null;
+			}
+
+			@Override
+			public Observable<Move> findOneMove(String gameId, String moveId) {
+				return null;
 			}
 		};
 	}
