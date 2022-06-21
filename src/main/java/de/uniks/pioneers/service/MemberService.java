@@ -11,45 +11,44 @@ import java.util.List;
 
 public class MemberService {
 
-    private final GameMembersApiService gameMembersApiService;
+	private final GameMembersApiService gameMembersApiService;
 
-    // id of game and member needed when joining
-    private final GameIDStorage gameIDStorage;
-    private final MemberIDStorage memberIDStorage;
+	// id of game and member needed when joining
+	private final GameIDStorage gameIDStorage;
+	private final MemberIDStorage memberIDStorage;
 
-    @Inject
-    public MemberService(GameMembersApiService gameMembersApiService, GameIDStorage gameIDStorage, MemberIDStorage memberIDStorage) {
-        this.gameMembersApiService = gameMembersApiService;
-        this.gameIDStorage = gameIDStorage;
-        this.memberIDStorage = memberIDStorage;
-    }
+	@Inject
+	public MemberService(GameMembersApiService gameMembersApiService, GameIDStorage gameIDStorage, MemberIDStorage memberIDStorage) {
+		this.gameMembersApiService = gameMembersApiService;
+		this.gameIDStorage = gameIDStorage;
+		this.memberIDStorage = memberIDStorage;
+	}
 
-    public Observable<List<Member>> getAllGameMembers(String gameId) {
-        return gameMembersApiService.findAll(gameId);
-    }
+	public Observable<List<Member>> getAllGameMembers(String gameId) {
+		return gameMembersApiService.findAll(gameId);
+	}
 
-    public Observable<Member> join(String userId, String gameID, String password) {
-        return gameMembersApiService
-                .create(gameID, new CreateMemberDto(false, "#000000", password))
-                .doOnNext(result -> {
-                    this.gameIDStorage.setId(result.gameId());
-                    this.memberIDStorage.setId(result.userId());
-                });
-    }
-
-
-    public Observable<Member> statusUpdate(String gameId, String userId, boolean status, String color){
-        return gameMembersApiService.patch(gameId,userId,new UpdateMemberDto(status, color));
-    }
-
-    public Observable<Member> findOne(String gameId, String userId){
-        return gameMembersApiService.findOne(gameId, userId);
-    }
+	public Observable<Member> join(String userId, String gameID, String password) {
+		return gameMembersApiService
+				.create(gameID, new CreateMemberDto(false, "#000000", false, password))
+				.doOnNext(result -> {
+					this.gameIDStorage.setId(result.gameId());
+					this.memberIDStorage.setId(result.userId());
+				});
+	}
 
 
-    public Observable<Member> leave(String gameId, String userID) {
-        return gameMembersApiService
-                .delete(gameId, userID);
-    }
+	public Observable<Member> statusUpdate(String gameId, String userId, boolean status, String color, boolean spectator) {
+		return gameMembersApiService.patch(gameId, userId, new UpdateMemberDto(status, color, spectator));
+	}
 
+	public Observable<Member> findOne(String gameId, String userId) {
+		return gameMembersApiService.findOne(gameId, userId);
+	}
+
+
+	public Observable<Member> leave(String gameId, String userID) {
+		return gameMembersApiService
+				.delete(gameId, userID);
+	}
 }
