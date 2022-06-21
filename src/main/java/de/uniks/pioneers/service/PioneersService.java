@@ -2,6 +2,7 @@ package de.uniks.pioneers.service;
 
 import de.uniks.pioneers.dto.CreateBuildingDto;
 import de.uniks.pioneers.dto.CreateMoveDto;
+import de.uniks.pioneers.dto.UpdatePlayerDto;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.PioneersApiService;
 import io.reactivex.rxjava3.core.Observable;
@@ -48,5 +49,17 @@ public class PioneersService {
 		} else {
 			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, new CreateBuildingDto(x, y, z, side, type)));
 		}
+	}
+
+	public Observable<Player> updatePlayer(String gameId, String userId, boolean active) {
+		return this.pioneersApiService.updatePlayer(gameId, userId, new UpdatePlayerDto(active));
+	}
+
+	public Observable<List<Move>> findAllMoves(String gameId) {
+		return this.pioneersApiService.findAllMoves(gameId);
+	}
+
+	public Observable<Move> findOneMove(String gameId, String moveId) {
+		return this.pioneersApiService.findOneMove(gameId, moveId);
 	}
 }
