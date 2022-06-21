@@ -1,6 +1,7 @@
 package de.uniks.pioneers.rest;
 
 import de.uniks.pioneers.dto.CreateMoveDto;
+import de.uniks.pioneers.dto.UpdatePlayerDto;
 import de.uniks.pioneers.model.*;
 import io.reactivex.rxjava3.core.Observable;
 import retrofit2.http.*;
@@ -20,7 +21,7 @@ public interface PioneersApiService {
 									 @Path("userId") String userId);
 
 	@PATCH("games/{gameId}/players/{userId}")
-	Observable<Player> updatePlayer(@Path("gameId") String gameId, @Path("userId") String userId);
+	Observable<Player> updatePlayer(@Path("gameId") String gameId, @Path("userId") String userId, @Body UpdatePlayerDto dto);
 
 	@GET("games/{gameId}/state")
 	Observable<State> findOneState(@Path("gameId") String gameId);
