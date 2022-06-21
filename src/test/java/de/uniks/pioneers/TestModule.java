@@ -11,31 +11,35 @@ import io.reactivex.rxjava3.core.Observable;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Module
 public class TestModule {
 	@Provides
-	static EventListener eventListener(){
-		return new EventListener(null,null){
+	static EventListener eventListener() {
+		return new EventListener(null, null) {
 			@Override
-			public <T> Observable<Event<T>> listen(String pattern, Class<T> type){return Observable.empty();}
+			public <T> Observable<Event<T>> listen(String pattern, Class<T> type) {
+				return Observable.empty();
+			}
 
 			@Override
-			public void send(Object message){}
+			public void send(Object message) {
+			}
 		};
 	}
 
 	@Provides
-	static UserApiService userApiService(){
+	static UserApiService userApiService() {
 		return new UserApiService() {
 			@Override
 			public Observable<User> createUser(CreateUserDto dto) {
-				return Observable.just(new User("01","Alice","online",null,null));
+				return Observable.just(new User("1234", "12345", "01", "Alice", "online", null, null));
 			}
 
 			@Override
 			public Observable<List<User>> findAllUsers() {
 				ArrayList<User> users = new ArrayList<>();
-				users.add(new User("01","Alice","online",null,null));
+				users.add(new User("1234", "12345", "01", "Alice", "online", null, null));
 				return Observable.just(users);
 			}
 
@@ -46,12 +50,12 @@ public class TestModule {
 
 			@Override
 			public Observable<User> updateUser(String id, UpdateUserDto dto) {
-				return Observable.just(new User("01","Alice","online",null,null));
+				return Observable.just(new User("1234", "12345", "01", "Alice", "online", null, null));
 			}
 
 			@Override
 			public Observable<User> statusUpdate(String id, StatusUpdateDto dto) {
-				return Observable.just(new User("01","Alice","online",null,null));
+				return Observable.just(new User("1234", "12345", "01", "Alice", "online", null, null));
 			}
 
 			@Override
@@ -66,7 +70,7 @@ public class TestModule {
 		return new AuthApiService() {
 			@Override
 			public Observable<LoginResult> login(LoginDto dto) {
-				return Observable.just(new LoginResult("0","0","01","Alice","online",null,null,"123","321"));
+				return Observable.just(new LoginResult("0", "0", "01", "Alice", "online", null, null, "123", "321"));
 			}
 
 			@Override
@@ -112,7 +116,7 @@ public class TestModule {
 	}
 
 	@Provides
-	static MessageApiService messageApiService(){
+	static MessageApiService messageApiService() {
 		return new MessageApiService() {
 			@Override
 			public Observable<List<Message>> findAll(String namespace, String parent) {
@@ -142,13 +146,13 @@ public class TestModule {
 	}
 
 	@Provides
-	GameMembersApiService gameMembersApiService(){
+	GameMembersApiService gameMembersApiService() {
 		return new GameMembersApiService() {
 			@Override
 			public Observable<List<Member>> findAll(String gameId) {
 				ArrayList<Member> members = new ArrayList<>();
-				members.add(new Member("0","0","01","10",true,null));
-				members.add(new Member("0","0","01","15",true,null));
+				members.add(new Member("0", "0", "01", "10", true, null, false));
+				members.add(new Member("0", "0", "01", "15", true, null, false));
 				return Observable.just(members);
 			}
 
@@ -175,7 +179,7 @@ public class TestModule {
 	}
 
 	@Provides
-	static GamesApiService gamesApiService (){
+	static GamesApiService gamesApiService() {
 		return new GamesApiService() {
 			@Override
 			public Observable<List<Game>> findAll() {
@@ -184,7 +188,7 @@ public class TestModule {
 
 			@Override
 			public Observable<Game> create(CreateGameDto dto) {
-				return Observable.just(new Game("0","0","01","testGame","01",1,false));
+				return Observable.just(new Game("0", "0", "01", "testGame", "01", 1, false, new GameSettings(2, 10)));
 			}
 
 			@Override
@@ -194,7 +198,7 @@ public class TestModule {
 
 			@Override
 			public Observable<Game> patch(String id, UpdateGameDto dto) {
-				return Observable.just(new Game("0","0","01","testGame","10",2,true));
+				return Observable.just(new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10)));
 			}
 
 			@Override
@@ -203,8 +207,9 @@ public class TestModule {
 			}
 		};
 	}
+
 	@Provides
-	static  PioneersApiService pioneersApiService() {
+	static PioneersApiService pioneersApiService() {
 		return new PioneersApiService() {
 			@Override
 			public Observable<Map> findAllTiles(String gameId) {
@@ -228,7 +233,7 @@ public class TestModule {
 				titles.add(new Tile(2, 0, -2, "fields", 5));
 				titles.add(new Tile(2, -1, -1, "fields", 5));
 				titles.add(new Tile(2, -2, 0, "fields", 5));
-				Map map = new Map("02", titles);
+				Map map = new Map("02", titles, null);
 
 				return Observable.just(map);
 			}
@@ -248,8 +253,8 @@ public class TestModule {
 				List<ExpectedMove> moves = new ArrayList<>();
 				List<String> players = new ArrayList<>();
 				players.add("01");
-				moves.add(new ExpectedMove("founding-settlement-1",players));
-				return Observable.just(new State("0","02",moves));
+				moves.add(new ExpectedMove("founding-settlement-1", players));
+				return Observable.just(new State("0", "02", moves, null));
 			}
 
 			@Override
@@ -267,7 +272,5 @@ public class TestModule {
 				return Observable.empty();
 			}
 		};
-
 	}
-
 }

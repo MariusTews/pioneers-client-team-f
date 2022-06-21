@@ -35,7 +35,7 @@ class DirectChatStorageTest {
 	void testUser() {
 		Assertions.assertNull(storage.getUser());
 
-		User user = new User("id","name","status","avatar", new ArrayList<>());
+		User user = new User("1234","12345","id","name","status","avatar", new ArrayList<>());
 		storage.setUser(user);
 
 		Assertions.assertEquals(storage.getUser(),user);

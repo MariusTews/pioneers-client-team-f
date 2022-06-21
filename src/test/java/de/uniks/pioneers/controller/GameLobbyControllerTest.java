@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.model.GameSettings;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
@@ -57,7 +58,7 @@ class GameLobbyControllerTest extends ApplicationTest {
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
-                "id", "name", "owner", 2, false)));
+                "id", "name", "owner", 2, false,new GameSettings(2,10))));
         when(gameIDStorage.getId()).thenReturn("id");
 
 
@@ -73,7 +74,7 @@ class GameLobbyControllerTest extends ApplicationTest {
 
         when(idStorage.getID()).thenReturn("4");
         when(memberService.leave("id", "4")).thenReturn(Observable.just(new Member("0:00",
-                "0:30", "id", "4", false, "#000000")));
+                "0:30", "id", "4", false, "#000000",false)));
 
         write("\t\t\t\t\t");
         type(KeyCode.SPACE);
@@ -84,9 +85,9 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Test
     void leaveLastMember() {
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
-                                                    "id", "name", "owner", 1, false)));
+                                                    "id", "name", "owner", 1, false,new GameSettings(2,10))));
         when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30",
-                                                        "id", "name", "owner", 1, false)));
+                                                        "id", "name", "owner", 1, false,new GameSettings(2,10))));
 
         write("\t\t\t\t\t");
         type(KeyCode.SPACE);

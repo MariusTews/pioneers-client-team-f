@@ -41,7 +41,7 @@ class SignUpControllerTest extends ApplicationTest {
     @Test
     void register() {
         when(userService.register("Bob", null, "bobbob111")).thenReturn(Observable
-                                .just(new User("123", "Bob", "status", null, new ArrayList<>())));
+                                .just(new User("1234","12345","123", "Bob", "status", null, new ArrayList<>())));
 
         write("Bob\t");
         write("bob111\t");

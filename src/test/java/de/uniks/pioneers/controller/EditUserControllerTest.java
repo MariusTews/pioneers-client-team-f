@@ -44,7 +44,7 @@ class EditUserControllerTest extends ApplicationTest {
         File file = new File(Main.class.getResource("defaultPicture.png").getFile());
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
-        when(userService.findOne(any())).thenReturn(Observable.just(new User("01", "Alice","offline",
+        when(userService.findOne(any())).thenReturn(Observable.just(new User("1234","12345","01", "Alice","offline",
                                                                                             avatar, new ArrayList<>())));
         when(idStorage.getID()).thenReturn(("01"));
 
@@ -67,7 +67,7 @@ class EditUserControllerTest extends ApplicationTest {
 
     @Test
     void deleteUser(){
-        when(userService.delete(any())).thenReturn(Observable.just(new User("01","Alice","offline",null,new ArrayList<>())));
+        when(userService.delete(any())).thenReturn(Observable.just(new User("1234","12345","01","Alice","offline",null,new ArrayList<>())));
 
         write("\t\t\t\t");
         type(KeyCode.SPACE);
@@ -80,7 +80,7 @@ class EditUserControllerTest extends ApplicationTest {
         File file = new File(Main.class.getResource("defaultPicture.png").getFile());
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
-        when(userService.userUpdate(any(),any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("01","Alice","offline",avatar,new ArrayList<>())));
+        when(userService.userUpdate(any(),any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("1234","12345","01","Alice","offline",avatar,new ArrayList<>())));
         write("\t\t\t\t\t\t");
         //check if all textfields are empty
         type(KeyCode.SPACE);

@@ -75,7 +75,7 @@ class LobbyControllerTest extends ApplicationTest {
     @Test
     void logout() {
         when(idStorage.getID()).thenReturn("4");
-        when(userService.statusUpdate("4", "offline")).thenReturn(Observable.just(new User("id",
+        when(userService.statusUpdate("4", "offline")).thenReturn(Observable.just(new User("1234","12345","id",
                                                     "name", "status", "avatar", new ArrayList<>())));
         when(authService.logout()).thenReturn(Observable.just(new ErrorResponse(123, "error", "message")));
 

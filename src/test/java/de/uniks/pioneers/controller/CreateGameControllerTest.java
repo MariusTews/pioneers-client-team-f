@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.model.GameSettings;
 import de.uniks.pioneers.service.GameService;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.Node;
@@ -38,7 +39,7 @@ class CreateGameControllerTest extends ApplicationTest {
 
     @Test
     void createGameButtonPressed() {
-        when(gameService.create(anyString(),anyString())).thenReturn(Observable.just(new Game("0:00","now", "01", "Test game","Alice",1, false)));
+        when(gameService.create(anyString(),anyString())).thenReturn(Observable.just(new Game("0:00","now", "01", "Test game","Alice",1, false,new GameSettings(2,10))));
 
         write("\t\t \t");
         type(KeyCode.SPACE);
