@@ -59,13 +59,13 @@
             </Label>
             <HBox alignment="CENTER" prefHeight="30.0" prefWidth="450.0">
                <children>
-                  <Button fx:id="mapSizeMinusButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="-" />
+                  <Button fx:id="mapSizeMinusButton" mnemonicParsing="false" onAction="#mapSizeMinusButtonPressed" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="-" />
                   <Label fx:id="mapSizeLabel" alignment="CENTER" prefHeight="30.0" prefWidth="30.0" style="-fx-border-color: AQUA; -fx-background-color: WHITe;" text="2" textAlignment="CENTER">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Label>
-                  <Button fx:id="mapSizePlusButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+" />
+                  <Button fx:id="mapSizePlusButton" mnemonicParsing="false" onAction="#mapSizePlusButtonPressed" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+" />
                </children>
             </HBox>
             <Label alignment="CENTER" prefHeight="21.0" prefWidth="180.0" text="Victory Points">
@@ -75,13 +75,13 @@
             </Label>
             <HBox alignment="CENTER" prefHeight="30.0" prefWidth="450.0">
                <children>
-                  <Button fx:id="victoryPointsMinusButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="-" />
+                  <Button fx:id="victoryPointsMinusButton" mnemonicParsing="false" onAction="#victoryPointsMinusButtonPressed" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="-" />
                   <Label fx:id="victoryPointsLabel" alignment="CENTER" prefHeight="30.0" prefWidth="30.0" style="-fx-border-color: AQUA; -fx-background-color: WHITE;" text="10">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Label>
-                  <Button fx:id="victoryPointsPlusButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+" />
+                  <Button fx:id="victoryPointsPlusButton" mnemonicParsing="false" onAction="#victoryPointsPlusButtonPressed" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+" />
                </children>
             </HBox>
          </VBox>
