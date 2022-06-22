@@ -324,7 +324,7 @@ public class GameLobbyController implements Controller {
 		return memberListSubcontroller.render();
 	}
 
-	private void addColorOnComboBox(ComboBox comboBox) {
+	private void addColorOnComboBox(ComboBox<Label> comboBox) {
 
 		ObservableList<Label> items = FXCollections.observableArrayList(color());
 		comboBox.getItems().addAll(items);
