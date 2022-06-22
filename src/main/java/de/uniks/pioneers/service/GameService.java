@@ -3,6 +3,7 @@ package de.uniks.pioneers.service;
 import de.uniks.pioneers.dto.CreateGameDto;
 import de.uniks.pioneers.dto.UpdateGameDto;
 import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.model.GameSettings;
 import de.uniks.pioneers.rest.GamesApiService;
 import io.reactivex.rxjava3.core.Observable;
 
@@ -22,9 +23,9 @@ public class GameService {
         this.memberIDStorage = memberIDStorage;
     }
 
-    public Observable<Game> create(String gameName, String password) {
+    public Observable<Game> create(String gameName, String password, int mapSize, int victoryPoints) {
         return gamesApiService
-                .create(new CreateGameDto(gameName, false, password))
+                .create(new CreateGameDto(gameName, false, new GameSettings(mapSize, victoryPoints), password))
                 .doOnNext(result -> {
                     this.gameIDStorage.setId(result._id());
                     this.memberIDStorage.setId(result.owner());
@@ -39,8 +40,8 @@ public class GameService {
         return this.gamesApiService.findOne(id);
     }
 
-    public Observable<Game> updateGame(String id, String name, String password, String owner, boolean started) {
-        return this.gamesApiService.patch(id, new UpdateGameDto(name, owner, password, started));
+    public Observable<Game> updateGame(String id, String name, String password, String owner, boolean started, int mapSize, int victoryPoints) {
+        return this.gamesApiService.patch(id, new UpdateGameDto(name, owner, started, new GameSettings(mapSize, victoryPoints), password));
     }
 
     public Observable<Game> deleteGame(String id) {
