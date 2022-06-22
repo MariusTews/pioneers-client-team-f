@@ -243,10 +243,10 @@ public class GameLobbyController implements Controller {
         for (Member member : this.members) {
             if (member.userId().equals(idStorage.getID())) {
                 if (member.ready()) {
-                    memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color()).subscribe();
+                    memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color(),member.spectator()).subscribe();
                     this.idReadyButton.setText("Ready");
                 } else {
-                    memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, member.color()).subscribe();
+                    memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, member.color(),member.spectator()).subscribe();
                     this.idReadyButton.setText("Not Ready");
                 }
             }
@@ -289,7 +289,7 @@ public class GameLobbyController implements Controller {
         //give color to member that do not have colors
         for (Member member : members) {
             if (member.color() == null || member.color().equals("#000000")) {
-                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0))
+                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0),member.spectator())
                         .subscribe();
                 allColors.remove(0);
             }
@@ -359,6 +359,7 @@ public class GameLobbyController implements Controller {
 
         boolean chose = true;
         boolean ready = false;
+        boolean spectator = false;
         List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
         for (Member member : memberList) {
             if (member.color() != null && member.color().equals(pickedColor)) {
@@ -366,10 +367,11 @@ public class GameLobbyController implements Controller {
             }
             if (member.userId().equals(idStorage.getID())) {
                 ready = member.ready();
+                spectator = member.spectator();
             }
         }
         if (chose) {
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), ready, pickedColor).
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), ready, pickedColor, spectator).
                     observeOn(FX_SCHEDULER).subscribe();
         }
     }

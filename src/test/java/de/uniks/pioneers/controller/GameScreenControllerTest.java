@@ -57,7 +57,7 @@ class GameScreenControllerTest extends ApplicationTest {
 
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
-        Map map = new Map("02", createMap());
+        Map map = new Map("02", createMap(), createHarbors());
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
 
 
@@ -69,7 +69,7 @@ class GameScreenControllerTest extends ApplicationTest {
         remain.put("settlement", 3);
         remain.put("city", 3);
         remain.put("road", 3);
-        Player player = new Player("01", "02", "#9932cc", 4, null, remain);
+        Player player = new Player("01", "02", "#9932cc", true,4, null, remain,2,2,null);
         gameScreenController.getGameFieldSubController().getPlayers().add(player);
         gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 7, "02", "road");
         gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "city");
@@ -100,19 +100,25 @@ class GameScreenControllerTest extends ApplicationTest {
 
         return titles;
     }
+    List<Harbor> createHarbors() {
+        List<Harbor> harbors = new ArrayList<>();
+        harbors.add(new Harbor(2,0,-2, null,1));
+
+        return harbors;
+    }
 
     @Test
     void error() {
         List<ExpectedMove> moves = new ArrayList<>();
         moves.add(new ExpectedMove("founding-settlement-1", null));
-        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves)));
+        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves,null)));
         when(pioneersService.move(any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.error(new Throwable()));
         clickOn("#x0y0z0_6");
         verify(pioneersService).move("02", "founding-settlement-1", 0, 0, 0, 6, "settlement");
 
         moves.clear();
         moves.add(new ExpectedMove("founding-road-1", null));
-        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves)));
+        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves,null)));
 
         clickOn("#x0y0z0_7");
         verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road");
@@ -122,7 +128,7 @@ class GameScreenControllerTest extends ApplicationTest {
     void foundingPhase() {
         List<ExpectedMove> moves = new ArrayList<>();
         moves.add(new ExpectedMove("founding-settlement-1", null));
-        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves)));
+        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves,null)));
         when(pioneersService.move(any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
 
         clickOn("#x0y0z0_6");
@@ -131,7 +137,7 @@ class GameScreenControllerTest extends ApplicationTest {
 
         moves.clear();
         moves.add(new ExpectedMove("founding-road-1", null));
-        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves)));
+        when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves,null)));
 
         clickOn("#x0y0z0_7");
         verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road");
