@@ -20,6 +20,10 @@ public class CreateGameController implements Controller {
     private final Provider<GameLobbyController> gameLobbyController;
     private final Provider<LobbyController> lobbyController;
     private final GameService gameService;
+
+    private int mapSize;
+
+    private int victoryPoints;
     @FXML
     public TextField gameNameTextField;
 
@@ -29,8 +33,19 @@ public class CreateGameController implements Controller {
     public Button createGameButton;
     @FXML
     public PasswordField passwordTextField;
+    @FXML
+    public Button mapSizeMinusButton;
+    @FXML
+    public Label mapSizeLabel;
+    @FXML
+    public Button mapSizePlusButton;
+    @FXML
+    public Button victoryPointsMinusButton;
+    @FXML
+    public Label victoryPointsLabel;
+    @FXML
+    public Button victoryPointsPlusButton;
     private final App app;
-
     @Inject
     public CreateGameController(App app,
                                 GameService gameService,
@@ -44,7 +59,8 @@ public class CreateGameController implements Controller {
 
     @Override
     public void init() {
-
+        this.mapSize = 2;
+        this.victoryPoints = 10;
     }
 
     @Override
@@ -63,6 +79,8 @@ public class CreateGameController implements Controller {
             e.printStackTrace();
             return null;
         }
+        mapSizeLabel.setText("" + mapSize);
+        victoryPointsLabel.setText("" + victoryPoints);
 
         return parent;
     }
@@ -87,10 +105,78 @@ public class CreateGameController implements Controller {
             dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
             alert.showAndWait();
         } else {
-            gameService.create(gameNameTextField.getText(), passwordTextField.getText())
+            gameService.create(gameNameTextField.getText(), passwordTextField.getText(), mapSize, victoryPoints)
                     .observeOn(FX_SCHEDULER)
                     .subscribe(onSuccess -> app.show(gameLobbyController.get()), onError -> {
                     });
+        }
+    }
+
+    public void mapSizeMinusButtonPressed(ActionEvent event) {
+        //reduces mapSize by One if - Button is Pressed
+        if(mapSize>0) {
+            this.mapSizeLabel.setText("" + (--mapSize));
+        }
+        //disables and hides - Button at Minimum
+        if (mapSize == 0) {
+            this.mapSizeMinusButton.disableProperty().set(true);
+            this.mapSizeMinusButton.setVisible(false);
+        }
+        //makes + Button visible and clickable if - Button is Pressed
+        if (this.mapSizePlusButton.disableProperty().get()) {
+            this.mapSizePlusButton.disableProperty().set(false);
+            this.mapSizePlusButton.setVisible(true);
+        }
+    }
+
+    public void mapSizePlusButtonPressed(ActionEvent event) {
+        //increases mapSize by One if + Button is Pressed
+        if(mapSize<10) {
+            this.mapSizeLabel.setText("" + (++mapSize));
+        }
+        //disables and hides + Button at Maximum
+        if (mapSize == 10) {
+            this.mapSizePlusButton.disableProperty().set(true);
+            this.mapSizePlusButton.setVisible(false);
+        }
+        //makes - Button visible and clickable if + Button is Pressed
+        if (this.mapSizeMinusButton.disableProperty().get()) {
+            this.mapSizeMinusButton.disableProperty().set(false);
+            this.mapSizeMinusButton.setVisible(true);
+        }
+    }
+
+    public void victoryPointsMinusButtonPressed(ActionEvent event) {
+        //reduces victoryPoints by One if - Button is Pressed
+        if(victoryPoints>3) {
+            this.victoryPointsLabel.setText("" + (--victoryPoints));
+        }
+        //disables and hides - Button at Minimum
+        if (victoryPoints == 3) {
+            this.victoryPointsMinusButton.disableProperty().set(true);
+            this.victoryPointsMinusButton.setVisible(false);
+        }
+        //makes + Button visible and clickable if - Button is Pressed
+        if (this.victoryPointsPlusButton.disableProperty().get()) {
+            this.victoryPointsPlusButton.disableProperty().set(false);
+            this.victoryPointsPlusButton.setVisible(true);
+        }
+    }
+
+    public void victoryPointsPlusButtonPressed(ActionEvent event) {
+        //increases victoryPoints by One if + Button is Pressed
+        if(victoryPoints<15) {
+            this.victoryPointsLabel.setText("" + (++victoryPoints));
+        }
+        //disables and hides + Button at Maximum
+        if (victoryPoints == 15) {
+            this.victoryPointsPlusButton.disableProperty().set(true);
+            this.victoryPointsPlusButton.setVisible(false);
+        }
+        //makes - Button visible and clickable if + Button is Pressed
+        if (this.victoryPointsMinusButton.disableProperty().get()) {
+            this.victoryPointsMinusButton.disableProperty().set(false);
+            this.victoryPointsMinusButton.setVisible(true);
         }
     }
 }
