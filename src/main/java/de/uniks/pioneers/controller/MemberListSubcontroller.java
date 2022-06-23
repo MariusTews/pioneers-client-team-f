@@ -53,27 +53,46 @@ public class MemberListSubcontroller implements Controller {
             return null;
         }
 
+
+
         // set username and avatar
         if (this.member != null) {
-            if (member.color() != null) {
-                this.idUsername.setText(user.name());
-                this.idUsername.setTextFill(Color.web(member.color()));
-            } else {
-                this.idUsername.setText(user.name());
-            }
+            if(!member.spectator()) {
+                if (member.color() != null) {
+                    this.idUsername.setText(user.name());
+                    this.idUsername.setTextFill(Color.web(member.color()));
+                } else {
+                    this.idUsername.setText(user.name());
+                }
 
-            if (user.avatar() != null) {
-                this.idAvatar.setImage(new Image(user.avatar()));
-            }
+                if (user.avatar() != null) {
+                    this.idAvatar.setImage(new Image(user.avatar()));
+                }
+                // set ready
+                if (this.member.ready()) {
+                    this.idReady.setText("- ready -");
+                    this.idReady.setTextFill(Color.DARKGREEN);
+                } else {
+                    this.idReady.setText("- not ready -");
+                    this.idReady.setTextFill(Color.FIREBRICK);
+                }
+            } else  {
+                if (member.color() != null) {
+                    this.idUsername.setText("(Spectator)");
+                    this.idUsername.setTextFill(Color.web(member.color()));
+                    this.idReady.setText(user.name());
+                    this.idReady.setTextFill(Color.web(member.color()));
+                } else {
+                    this.idUsername.setText("(Spectator)");
+                    this.idReady.setText(user.name());
+                }
 
+                if (user.avatar() != null) {
+                    this.idAvatar.setImage(new Image(user.avatar()));
+                }
 
-            // set ready
-            if (this.member.ready()) {
-                this.idReady.setText("- ready -");
-                this.idReady.setTextFill(Color.DARKGREEN);
-            } else {
-                this.idReady.setText("- not ready -");
-                this.idReady.setTextFill(Color.FIREBRICK);
+                //this.idReady.setText(user.name());
+                //this.idReady.setTextFill(Color.web(member.color()));
             }
         }
 

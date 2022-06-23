@@ -5,12 +5,13 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
    <HBox alignment="CENTER_RIGHT" prefHeight="90.0" prefWidth="640.0">
       <Label fx:id="idTitleLabel" styleClass="whiteTitle">
       </Label>
@@ -32,22 +33,44 @@
             <Insets left="10.0" top="20.0" />
          </HBox.margin>
       </VBox>
+      <ScrollPane fx:id="idUserInLobby1" prefHeight="346.0" prefWidth="248.0" styleClass="memberList">
+         <content>
+            <VBox fx:id="spectatorIds" alignment="TOP_CENTER" prefHeight="306.0" prefWidth="218.0">
+               <children>
+                  <Label fx:id="spectatorTitleId" alignment="CENTER" prefHeight="35.0" prefWidth="212.0" text="Spectator">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </Label>
+                  <fx:include source="MemberListSubView.fxml" />
+               </children>
+            </VBox>
+         </content>
+         <HBox.margin>
+            <Insets left="40.0" right="5.0" top="20.0" />
+         </HBox.margin>
+      </ScrollPane>
    </HBox>
    <HBox alignment="CENTER_RIGHT" prefHeight="92.0" prefWidth="640.0">
-      <ComboBox fx:id="colorPicker" onAction="#colorPicked" prefWidth="190.0" promptText="Choose color">
+      <ComboBox fx:id="colorPicker" onAction="#colorPicked" prefHeight="24.0" prefWidth="210.0" promptText="Choose color">
          <HBox.margin>
-            <Insets right="190.0" />
+            <Insets right="100.0" />
          </HBox.margin>
       </ComboBox>
-      <Button fx:id="idReadyButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#ready"
-              prefHeight="35.0" prefWidth="66.0" styleClass="blueButton" text="Ready">
+      <Button fx:id="spectatorId" contentDisplay="CENTER" minHeight="24.0" minWidth="119.0" mnemonicParsing="false" onAction="#onClickSpectator" prefHeight="51.0" prefWidth="198.0" styleClass="blueButton" text="Spectator">
          <HBox.margin>
-            <Insets/>
+            <Insets />
+         </HBox.margin>
+      </Button>
+      <ImageView fx:id="imageForSpectator" fitHeight="47.0" fitWidth="56.0" pickOnBounds="true" preserveRatio="true" />
+      <Button fx:id="idReadyButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#ready" prefHeight="35.0" prefWidth="66.0" styleClass="blueButton" text="Ready">
+         <HBox.margin>
+            <Insets />
          </HBox.margin>
       </Button>
       <Button fx:id="idStartGameButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#startGame" prefHeight="35.0" prefWidth="70.0" styleClass="greyButton" text="Start">
          <HBox.margin>
-            <Insets/>
+            <Insets />
          </HBox.margin>
       </Button>
    </HBox>

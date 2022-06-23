@@ -17,21 +17,31 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameLobbyController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
+
+    private final List<MemberListSubcontroller> memberarrayList = new ArrayList<>();
+
+    private final ObservableList<User> allUsers = FXCollections.observableArrayList();
     private final ObservableList<User> playerList = FXCollections.observableArrayList();
+
+    private final ObservableList<User> spectatorList = FXCollections.observableArrayList();
 
     @FXML
     public Label idTitleLabel;
@@ -57,13 +67,24 @@ public class GameLobbyController implements Controller {
     private final GameService gameService;
     private final Provider<LobbyController> lobbyController;
     private final Provider<GameScreenController> gameScreenController;
+    //Button for spectator
+    public Button spectatorId;
+    public VBox spectatorIds;
+    //image for Cross with blue borderline
+    public ImageView imageForSpectator;
+    //label for spectator Title
+    public Label spectatorTitleId;
     private MessageViewSubController messageViewSubController;
     private MemberListSubcontroller memberListSubcontroller;
+
+    private MemberListSubcontroller memberListSpectatorSubcontroller;
     private final EventListener eventListener;
     private final GameIDStorage gameIDStorage;
     private final MemberIDStorage memberIDStorage;
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
+
+    private String lastColorPicked = "";
 
     @Inject
     public GameLobbyController(App app,
@@ -111,11 +132,16 @@ public class GameLobbyController implements Controller {
                             .observeOn(FX_SCHEDULER)
                             .subscribe(event -> {
                                 for (User user : event) {
+                                    //allUsers.add(user);
                                     for (Member member : members) {
                                         if (user._id().equals(member.userId())) {
+                                            System.out.println("hallo");
                                             this.playerList.add(user);
+                                            System.out.println(playerList.size());
+                                            this.spectatorList.add(user);
                                         }
                                     }
+                                    //this.playerList.add(user);
                                 }
                             });
                 });
@@ -132,6 +158,10 @@ public class GameLobbyController implements Controller {
                             userService.findOne(member.userId())
                                     .observeOn(FX_SCHEDULER)
                                     .subscribe(this.playerList::add);
+
+                            /*userService.findOne(member.userId())
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(this.spectatorList::add);*/
                         }
                     } else if (event.event().endsWith(DELETED)) {
                         members.remove(member);
@@ -152,7 +182,37 @@ public class GameLobbyController implements Controller {
                                 readyMembers += 1;
                             }
                         }
-                        this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
+                        this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size());
+                        /*for (User u : allUsers) {
+                            for (Member updateMember:this.members){
+                                if(updateMember.userId().equals(u._id()) && updateMember.spectator()){
+                                    this.spectatorList.add(u);
+                                    this.playerList.remove(u);
+                                    if(playerList.size() == 0) {
+                                        this.idUserList.getChildren().clear();
+                                        this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
+                                    } else {
+                                        this.spectatorIds.getChildren().clear();
+                                        this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
+                                        this.idUserList.getChildren().clear();
+                                        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+                                    }
+                                } else if(updateMember.userId().equals(u._id()) && !updateMember.spectator()){
+                                    this.playerList.add(u);
+                                    this.spectatorList.remove(u);
+                                    if(spectatorList.size() == 0){
+                                        this.spectatorIds.getChildren().clear();
+                                        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+                                    }else {
+                                        this.idUserList.getChildren().clear();
+                                        this.spectatorIds.getChildren().clear();
+                                        this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
+                                        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+                                    }
+
+                                }
+                            }
+                        }*/
                     }
                     this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
                 }));
@@ -207,6 +267,9 @@ public class GameLobbyController implements Controller {
         this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList()));
 
+        //this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
+        //spectatorList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList()));
+
         addColorOnComboBox(colorPicker);
 
         // disable start button when entering game lobby
@@ -214,6 +277,11 @@ public class GameLobbyController implements Controller {
 
         // show chat and load the messages
         idChatContainer.getChildren().setAll(messageViewSubController.render());
+
+        //default Bild
+        File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
+        final Image image = new Image(file.toString());
+        imageForSpectator.setImage(image);
 
         return parent;
     }
@@ -281,14 +349,14 @@ public class GameLobbyController implements Controller {
 
         //remove color from allcolors if it belongs to a member
         for (Member member : members) {
-            if (member.color() != null) {
+            if (member.color() != null && !member.spectator()) {
                 allColors.remove(member.color());
             }
         }
 
         //give color to member that do not have colors
         for (Member member : members) {
-            if (member.color() == null || member.color().equals("#000000")) {
+            if ((member.color() == null || member.color().equals("#000000")) && !member.spectator()) {
                 memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0),member.spectator())
                         .subscribe();
                 allColors.remove(0);
@@ -309,13 +377,28 @@ public class GameLobbyController implements Controller {
 
     private Node renderMember(Member member) {
         for (User user : playerList) {
-            if (user._id().equals(member.userId())) {
+            if (user._id().equals(member.userId()) && !member.spectator()) {
                 this.memberListSubcontroller = new MemberListSubcontroller(member, user);
-                break;
+                 break;
             }
         }
 
         return memberListSubcontroller.render();
+
+    }
+
+    //render spectators
+    private Node renderSpectatorMember(Member member) {
+        for (User user : spectatorList) {
+            if (user._id().equals(member.userId()) && member.spectator()) {
+                this.memberListSpectatorSubcontroller = new MemberListSubcontroller(member, user);
+                break;
+            }
+        }
+
+
+        return memberListSpectatorSubcontroller.render();
+
     }
 
     private void addColorOnComboBox(ComboBox comboBox) {
@@ -373,6 +456,53 @@ public class GameLobbyController implements Controller {
         if (chose) {
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), ready, pickedColor, spectator).
                     observeOn(FX_SCHEDULER).subscribe();
+        }
+    }
+
+
+    //changes between Spectator and Player
+    public void onClickSpectator(ActionEvent event) {
+        //get all the members that are currently in the game
+        List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        boolean ready = false;
+        boolean spectator = false;
+        for (Member member : memberList) {
+            if (member.userId().equals(idStorage.getID())) {
+                ready = member.ready();
+                spectator = member.spectator();
+            }
+        }
+
+        if(!spectator) {
+            //makes ready button invisible
+            this.idReadyButton.setText("Not Ready");
+            this.idReadyButton.setDisable(true);
+
+            //sets the Box to cross
+            File file = new File(String.valueOf(Main.class.getResource("CrossWithBlueBorder.png")));
+            final Image image = new Image(file.toString());
+            imageForSpectator.setImage(image);
+            this.colorPicker.setDisable(true);
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, "#000000", true)
+                    .observeOn(FX_SCHEDULER).subscribe();
+        } else {
+            //Checks if the other user already picked the color
+            /*for (Member member : memberList) {
+                if (member.color() != null && member.color().equals(lastColorPicked) &&
+                        member.userId().equals(this.idStorage.getID())) {
+                    lastColorPicked = null;
+                }
+            }*/
+            //makes ready button visible
+            this.idReadyButton.setText("Ready");
+            this.idReadyButton.setDisable(false);
+            //Set the Box back without cross
+            File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
+            final Image image = new Image(file.toString());
+            imageForSpectator.setImage(image);
+            this.colorPicker.setDisable(false);
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), !ready, null, false)
+                    .observeOn(FX_SCHEDULER).subscribe();
         }
     }
 }

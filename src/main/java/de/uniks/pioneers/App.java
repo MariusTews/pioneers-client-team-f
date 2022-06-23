@@ -1,6 +1,7 @@
 package de.uniks.pioneers;
 
 import de.uniks.pioneers.controller.Controller;
+import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.controller.GameScreenController;
 import de.uniks.pioneers.controller.LobbyController;
 import javafx.application.Application;
@@ -94,6 +95,9 @@ public class App extends Application {
         }else if(controller.getClass().equals(LobbyController.class)){
             stage.setWidth(900);
             stage.setHeight(600);
+        }else if(controller.getClass().equals(GameLobbyController.class)){
+            stage.setWidth(1050);
+            stage.setHeight(500);
         }
     }
 
