@@ -16,7 +16,7 @@
       <ImageView id="moon" fitHeight="32.0" fitWidth="30.0" layoutX="20.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true" />
       <ImageView id="neptun" fitHeight="32.0" fitWidth="30.0" layoutX="20.0" layoutY="190.0" pickOnBounds="true" preserveRatio="true" />
       <ImageView id="venus" fitHeight="32.0" fitWidth="30.0" layoutX="20.0" layoutY="240.0" pickOnBounds="true" preserveRatio="true" />
-      <Button fx:id="discardButton" onAction="#onDiscardPressed" layoutX="18.0" layoutY="298.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="174.0" styleClass="discard" text="discard" />
+      <Button fx:id="discardButton" onAction="#onDiscardButtonPressed" layoutX="18.0" layoutY="298.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="174.0" styleClass="discard" text="discard" />
       <Button fx:id="incResource4Btn" layoutX="150.0" layoutY="190.0" mnemonicParsing="false" onAction="#onIncreaseRes4ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="+" />
       <Button fx:id="incResource5Btn" layoutX="150.0" layoutY="240.0" mnemonicParsing="false" onAction="#onIncreaseRes5ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="+" />
       <Button fx:id="decResource1Btn" onAction="#onDecreaseRes1ButtonPressed" layoutX="70.0" layoutY="40.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="-" />
