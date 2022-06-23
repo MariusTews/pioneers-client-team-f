@@ -67,7 +67,7 @@ public class Constants {
     public static final String MARS_BAR = "brick";
     public static final String MOON_ROCK = "ore";
     public static final String EARTH_CACTUS = "lumber";
-    public static final String NEPTUNE_CRYSTALS = "wool";
+    public static final String NEPTUNE_CRYSTAL = "wool";
     public static final String DROP_STATE = "drop";
 
     //Array of Colors as Strings for the Label text

@@ -112,16 +112,16 @@ class GameScreenControllerTest extends ApplicationTest {
         List<ExpectedMove> moves = new ArrayList<>();
         moves.add(new ExpectedMove("founding-settlement-1", null));
         when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves,null)));
-        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.error(new Throwable()));
+        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.error(new Throwable()));
         clickOn("#x0y0z0_6");
-        verify(pioneersService).move("02", "founding-settlement-1", 0, 0, 0, 6, "settlement");
+        verify(pioneersService).move("02", "founding-settlement-1", 0, 0, 0, 6, "settlement", null, null);
 
         moves.clear();
         moves.add(new ExpectedMove("founding-road-1", null));
         when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves,null)));
 
         clickOn("#x0y0z0_7");
-        verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road");
+        verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road", null, null);
     }
 
     @Test
@@ -129,10 +129,10 @@ class GameScreenControllerTest extends ApplicationTest {
         List<ExpectedMove> moves = new ArrayList<>();
         moves.add(new ExpectedMove("founding-settlement-1", null));
         when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves,null)));
-        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
+        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
 
         clickOn("#x0y0z0_6");
-        verify(pioneersService).move("02", "founding-settlement-1", 0, 0, 0, 6, "settlement");
+        verify(pioneersService).move("02", "founding-settlement-1", 0, 0, 0, 6, "settlement", null, null);
 
 
         moves.clear();
@@ -140,7 +140,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(pioneersService.findOneState(any())).thenReturn(Observable.just(new State("0", "02", moves,null)));
 
         clickOn("#x0y0z0_7");
-        verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road");
+        verify(pioneersService).move("02", "founding-road-1", 0, 0, 0, 7, "road", null, null);
     }
 
     @Test
@@ -153,10 +153,10 @@ class GameScreenControllerTest extends ApplicationTest {
 
     @Test
     void finishTurn() {
-        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
+        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
         write("\t");
         type(KeyCode.SPACE);
-        verify(pioneersService).move("02", "build", null, null, null, null, null);
+        verify(pioneersService).move("02", "build", null, null, null, null, null, null, null);
     }
 
     @Test

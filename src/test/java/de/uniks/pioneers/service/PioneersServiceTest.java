@@ -155,7 +155,7 @@ public class PioneersServiceTest {
 		when(pioneersApiService.create(any(), any()))
 				.thenReturn(Observable.just(new Move("4", "10", "100", "99", "build",
 						3, "city", null, null, null)));
-		final Move result = pioneersService.move("100", "build", 1, 2, 3, 20, "city").blockingFirst();
+		final Move result = pioneersService.move("100", "build", 1, 2, 3, 20, "city", null, null).blockingFirst();
 
 		assertEquals(result._id(), "10");
 		assertEquals(result.createdAt(), "4");
@@ -174,7 +174,7 @@ public class PioneersServiceTest {
 		when(pioneersApiService.create(any(), any()))
 				.thenReturn(Observable.just(new Move("4", "10", "100", "99", "roll",
 						3, null, null, null, null)));
-		final Move result = pioneersService.move("100", "roll", null, null, null, null, null).blockingFirst();
+		final Move result = pioneersService.move("100", "roll", null, null, null, null, null, null, null).blockingFirst();
 
 		assertEquals(result._id(), "10");
 		assertEquals(result.createdAt(), "4");

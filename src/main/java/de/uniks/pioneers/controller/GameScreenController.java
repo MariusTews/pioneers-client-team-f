@@ -303,9 +303,16 @@ public class GameScreenController implements Controller {
 
         if (stateEvent.event().endsWith(UPDATED)) {
             // change the nextMoveLabel to the current move
-            nextMoveLabel.setText(state.expectedMoves().get(0).action());
+            String currentMove = state.expectedMoves().get(0).action();
+            nextMoveLabel.setText(currentMove);
             // change the currentPlayerLabel to the current player
-            currentPlayerLabel.setText(this.userHash.get(state.expectedMoves().get(0).players().get(0)).name());
+            User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
+            currentPlayerLabel.setText(currentPlayer.name());
+
+            // TODO: open screen for discarding resources if its current player's screen + total resources >7
+            if (currentMove.equals(DROP_STATE) && currentPlayer._id().equals(memberIDStorage.getId())) {
+                // TODO: initialize and render the discard resources view -> open new window (new stage)
+            }
         }
     }
 
@@ -357,7 +364,7 @@ public class GameScreenController implements Controller {
     // diceRoll if the current move is roll
     public void diceRoll() {
         if (nextMoveLabel.getText().equals("roll")) {
-            pioneersService.move(gameIDStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement")
+            pioneersService.move(gameIDStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement", null, null)
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                     }, Throwable::printStackTrace);
@@ -366,7 +373,7 @@ public class GameScreenController implements Controller {
 
     // automatic foundingDiceRoll after joining the game
     public void foundingDiceRoll() {
-        pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
+        pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement", null, null)
                 .observeOn(FX_SCHEDULER)
                 .subscribe();
     }
@@ -394,7 +401,7 @@ public class GameScreenController implements Controller {
     }
 
     public void finishTurn() {
-        pioneersService.move(gameIDStorage.getId(), "build", null, null, null, null, null)
+        pioneersService.move(gameIDStorage.getId(), "build", null, null, null, null, null, null, null)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                 }, onError -> {
@@ -452,9 +459,9 @@ public class GameScreenController implements Controller {
                     String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
                     //place chosen settlement and road
-                    pioneersService.move(gameIDStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement")
+                    pioneersService.move(gameIDStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement", null, null)
                             .observeOn(FX_SCHEDULER)
-                            .subscribe(result -> pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
+                            .subscribe(result -> pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road", null, null)
                                     .observeOn(FX_SCHEDULER)
                                     .subscribe());
 
@@ -482,7 +489,7 @@ public class GameScreenController implements Controller {
                     String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
                     //place chosen and road
-                    pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
+                    pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road", null, null)
                             .observeOn(FX_SCHEDULER)
                             .subscribe();
 
