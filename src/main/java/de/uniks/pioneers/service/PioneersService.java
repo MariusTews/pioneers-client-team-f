@@ -2,12 +2,14 @@ package de.uniks.pioneers.service;
 
 import de.uniks.pioneers.dto.CreateBuildingDto;
 import de.uniks.pioneers.dto.CreateMoveDto;
+import de.uniks.pioneers.dto.RobDto;
 import de.uniks.pioneers.dto.UpdatePlayerDto;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.PioneersApiService;
 import io.reactivex.rxjava3.core.Observable;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 
 public class PioneersService {
@@ -43,9 +45,14 @@ public class PioneersService {
 		return this.pioneersApiService.findOneBuilding(gameId, buildingId);
 	}
 
-	public Observable<Move> move(String gameId, String action, Number x, Number y, Number z, Number side, String type) {
+	public Observable<Move> move(String gameId, String action, Number x, Number y, Number z, Number side,
+								 String type, String target, HashMap<String, Integer> resources) {
 		if (x == null && y == null && z == null && side == null && type == null) {
 			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, null));
+		} else if (resources != null) {
+			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, resources, null, null));
+		} else if (action.equals("rob") && !target.isEmpty()) {
+			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, new RobDto(x, y, z, target), null, null, null));
 		} else {
 			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, new CreateBuildingDto(x, y, z, side, type)));
 		}
