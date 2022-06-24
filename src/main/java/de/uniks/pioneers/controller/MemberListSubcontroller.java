@@ -24,6 +24,8 @@ public class MemberListSubcontroller implements Controller {
     private final Member member;
     private final User user;
 
+    private String userId;
+
 
     @Inject
     public MemberListSubcontroller(Member member, User user) {
@@ -52,7 +54,6 @@ public class MemberListSubcontroller implements Controller {
             e.printStackTrace();
             return null;
         }
-
 
 
         // set username and avatar
@@ -97,5 +98,9 @@ public class MemberListSubcontroller implements Controller {
         }
 
         return parent;
+    }
+
+    public String getId(){
+        return userId;
     }
 }

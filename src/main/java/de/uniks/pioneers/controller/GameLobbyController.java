@@ -36,12 +36,10 @@ public class GameLobbyController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
 
-    private final List<MemberListSubcontroller> memberarrayList = new ArrayList<>();
+    private final ObservableList<Member> spectatorMember = FXCollections.observableArrayList();
 
     private final ObservableList<User> allUsers = FXCollections.observableArrayList();
     private final ObservableList<User> playerList = FXCollections.observableArrayList();
-
-    private final ObservableList<User> spectatorList = FXCollections.observableArrayList();
 
     @FXML
     public Label idTitleLabel;
@@ -125,6 +123,7 @@ public class GameLobbyController implements Controller {
                             ready++;
                         }
                     }
+                    System.out.println(this.members);
                     if(ready>=2){
                         idStartGameButton.disableProperty().set(false);
                     }
@@ -132,17 +131,16 @@ public class GameLobbyController implements Controller {
                             .observeOn(FX_SCHEDULER)
                             .subscribe(event -> {
                                 for (User user : event) {
-                                    //allUsers.add(user);
+                                    allUsers.add(user);
                                     for (Member member : members) {
                                         if (user._id().equals(member.userId())) {
-                                            System.out.println("hallo");
                                             this.playerList.add(user);
-                                            System.out.println(playerList.size());
-                                            this.spectatorList.add(user);
+                                            //this.spectatorList.add(user);
                                         }
+
                                     }
-                                    //this.playerList.add(user);
                                 }
+
                             });
                 });
 
@@ -153,6 +151,7 @@ public class GameLobbyController implements Controller {
                 .subscribe(event -> {
                     final Member member = event.data();
                     if (event.event().endsWith(CREATED)) {
+
                         if (!members.contains(member)) {
                             members.add(member);
                             userService.findOne(member.userId())
@@ -164,15 +163,33 @@ public class GameLobbyController implements Controller {
                                     .subscribe(this.spectatorList::add);*/
                         }
                     } else if (event.event().endsWith(DELETED)) {
-                        members.remove(member);
+                        if(members.contains(member)) {
+                            members.remove(member);
+                        }else {
+                            spectatorMember.remove(member);
+                        }
                         if (member.userId().equals(idStorage.getID())) {
                             app.show(lobbyController.get());
                         }
 
                     } else if (event.event().endsWith(UPDATED)) {
                         for (Member updatedMember : this.members) {
-                            if (updatedMember.userId().equals(member.userId())) {
+                            if (updatedMember.userId().equals(member.userId()) && member.spectator()) {
+
+                                //this.members.set(this.members.indexOf(updatedMember), member);
+                                spectatorMember.add(member);
+                                members.remove(updatedMember);
+                                break;
+                            } else if(updatedMember.userId().equals(member.userId()) && !member.spectator()){
                                 this.members.set(this.members.indexOf(updatedMember), member);
+                                break;
+                            }
+                        }
+                        for (Member upSpectatorMember:this.spectatorMember){
+                            if (upSpectatorMember.userId().equals(member.userId()) && !member.spectator()) {
+                                //this.members.set(this.members.indexOf(updatedMember), member);
+                                spectatorMember.remove(upSpectatorMember);
+                                members.add(member);
                                 break;
                             }
                         }
@@ -182,39 +199,22 @@ public class GameLobbyController implements Controller {
                                 readyMembers += 1;
                             }
                         }
-                        this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size());
-                        /*for (User u : allUsers) {
-                            for (Member updateMember:this.members){
-                                if(updateMember.userId().equals(u._id()) && updateMember.spectator()){
-                                    this.spectatorList.add(u);
-                                    this.playerList.remove(u);
-                                    if(playerList.size() == 0) {
-                                        this.idUserList.getChildren().clear();
-                                        this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
-                                    } else {
-                                        this.spectatorIds.getChildren().clear();
-                                        this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
-                                        this.idUserList.getChildren().clear();
-                                        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-                                    }
-                                } else if(updateMember.userId().equals(u._id()) && !updateMember.spectator()){
-                                    this.playerList.add(u);
-                                    this.spectatorList.remove(u);
-                                    if(spectatorList.size() == 0){
-                                        this.spectatorIds.getChildren().clear();
-                                        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-                                    }else {
-                                        this.idUserList.getChildren().clear();
-                                        this.spectatorIds.getChildren().clear();
-                                        this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
-                                        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-                                    }
-
-                                }
+                        for(Member member1:this.spectatorMember){
+                            if(member1.ready()){
+                                readyMembers +=1;
                             }
-                        }*/
+                        }
+                        this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
+                                +spectatorMember.size());
+
+                        this.idUserList.getChildren().clear();
+                        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+                        this.spectatorIds.getChildren().clear();
+                        this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
                     }
-                    this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+
+                    //this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
+
                 }));
 
         //listen to the game
@@ -267,8 +267,8 @@ public class GameLobbyController implements Controller {
         this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList()));
 
-        //this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
-        //spectatorList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList()));
+        this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
+        playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList()));
 
         addColorOnComboBox(colorPicker);
 
@@ -278,7 +278,7 @@ public class GameLobbyController implements Controller {
         // show chat and load the messages
         idChatContainer.getChildren().setAll(messageViewSubController.render());
 
-        //default Bild
+        //default picture
         File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
         final Image image = new Image(file.toString());
         imageForSpectator.setImage(image);
@@ -356,7 +356,7 @@ public class GameLobbyController implements Controller {
 
         //give color to member that do not have colors
         for (Member member : members) {
-            if ((member.color() == null || member.color().equals("#000000")) && !member.spectator()) {
+            if ((member.color() == null || member.color().equals("#000000"))) {
                 memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0),member.spectator())
                         .subscribe();
                 allColors.remove(0);
@@ -389,16 +389,14 @@ public class GameLobbyController implements Controller {
 
     //render spectators
     private Node renderSpectatorMember(Member member) {
-        for (User user : spectatorList) {
+        for (User user : playerList) {
             if (user._id().equals(member.userId()) && member.spectator()) {
                 this.memberListSpectatorSubcontroller = new MemberListSubcontroller(member, user);
                 break;
             }
         }
 
-
         return memberListSpectatorSubcontroller.render();
-
     }
 
     private void addColorOnComboBox(ComboBox comboBox) {

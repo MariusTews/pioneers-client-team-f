@@ -344,6 +344,7 @@ public class GameScreenController implements Controller {
             }
         }
 
+
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
                 this.calculateVP(player));
         opponentSubCons.add(opponentCon);
