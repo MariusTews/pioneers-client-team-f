@@ -27,3 +27,12 @@
     -fx-background-color: lightgrey;
 }
 
+.check-box.checkboxStyle:selected > .box > .mark {
+    -fx-shape: "M2,0L5,4L8,0L10,0L10,2L6,5L10,8L10,10L8,10L5,6L2,10L0,10L0,8L4,5L0,2L0,0Z";
+    -fx-background-color: black;
+}
+
+.label.spectatorStyle{
+    -fx-text-fill:#00FF00 ;
+    -fx-border-color: #33D1FF;
+}

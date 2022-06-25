@@ -2,16 +2,15 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
    <HBox alignment="CENTER_RIGHT" prefHeight="90.0" prefWidth="640.0">
       <Label fx:id="idTitleLabel" styleClass="whiteTitle">
       </Label>
@@ -37,11 +36,6 @@
          <content>
             <VBox fx:id="spectatorIds" alignment="TOP_CENTER" prefHeight="306.0" prefWidth="218.0">
                <children>
-                  <Label fx:id="spectatorTitleId" alignment="CENTER" prefHeight="35.0" prefWidth="212.0" text="Spectator">
-                     <font>
-                        <Font size="17.0" />
-                     </font>
-                  </Label>
                   <fx:include source="MemberListSubView.fxml" />
                </children>
             </VBox>
@@ -57,12 +51,16 @@
             <Insets right="100.0" />
          </HBox.margin>
       </ComboBox>
-      <Button fx:id="spectatorId" contentDisplay="CENTER" minHeight="24.0" minWidth="119.0" mnemonicParsing="false" onAction="#onClickSpectator" prefHeight="51.0" prefWidth="198.0" styleClass="blueButton" text="Spectator">
-         <HBox.margin>
-            <Insets />
-         </HBox.margin>
-      </Button>
-      <ImageView fx:id="imageForSpectator" fitHeight="47.0" fitWidth="56.0" pickOnBounds="true" preserveRatio="true" />
+      <VBox prefHeight="87.0" prefWidth="134.0">
+         <children>
+            <Label fx:id="spectatorId" alignment="CENTER" prefHeight="41.0" prefWidth="134.0" styleClass="spectatorStyle" text="Spectator" />
+            <CheckBox fx:id="checkBoxId" mnemonicParsing="false" onAction="#onCheckBox" prefHeight="18.0" prefWidth="31.0" styleClass="checkboxStyle">
+               <VBox.margin>
+                  <Insets left="50.0" top="10.0" />
+               </VBox.margin>
+            </CheckBox>
+         </children>
+      </VBox>
       <Button fx:id="idReadyButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#ready" prefHeight="35.0" prefWidth="66.0" styleClass="blueButton" text="Ready">
          <HBox.margin>
             <Insets />

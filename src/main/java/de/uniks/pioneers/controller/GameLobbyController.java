@@ -66,12 +66,12 @@ public class GameLobbyController implements Controller {
     private final Provider<LobbyController> lobbyController;
     private final Provider<GameScreenController> gameScreenController;
     //Button for spectator
-    public Button spectatorId;
+    public Label spectatorId;
     public VBox spectatorIds;
     //image for Cross with blue borderline
     public ImageView imageForSpectator;
     //label for spectator Title
-    public Label spectatorTitleId;
+    //public Label spectatorTitleId;
     private MessageViewSubController messageViewSubController;
     private MemberListSubcontroller memberListSubcontroller;
 
@@ -277,9 +277,9 @@ public class GameLobbyController implements Controller {
         idChatContainer.getChildren().setAll(messageViewSubController.render());
 
         //default picture
-        File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
+        /*File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
         final Image image = new Image(file.toString());
-        imageForSpectator.setImage(image);
+        imageForSpectator.setImage(image);*/
 
         return parent;
     }
@@ -458,6 +458,10 @@ public class GameLobbyController implements Controller {
 
     //changes between Spectator and Player
     public void onClickSpectator(ActionEvent event) {
+
+    }
+
+    public void onCheckBox(ActionEvent event) {
         //get all the members that are currently in the game
         List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
         boolean ready = false;
@@ -475,9 +479,9 @@ public class GameLobbyController implements Controller {
             this.idReadyButton.setDisable(true);
 
             //sets the Box to cross
-            File file = new File(String.valueOf(Main.class.getResource("CrossWithBlueBorder.png")));
+            /*File file = new File(String.valueOf(Main.class.getResource("CrossWithBlueBorder.png")));
             final Image image = new Image(file.toString());
-            imageForSpectator.setImage(image);
+            imageForSpectator.setImage(image);*/
             this.colorPicker.setDisable(true);
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, "#000000", true)
                     .observeOn(FX_SCHEDULER).subscribe();
@@ -493,9 +497,9 @@ public class GameLobbyController implements Controller {
             this.idReadyButton.setText("Ready");
             this.idReadyButton.setDisable(false);
             //Set the Box back without cross
-            File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
+            /*File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
             final Image image = new Image(file.toString());
-            imageForSpectator.setImage(image);
+            imageForSpectator.setImage(image);*/
             this.colorPicker.setDisable(false);
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), !ready, null, false)
                     .observeOn(FX_SCHEDULER).subscribe();
