@@ -37,12 +37,12 @@ class GameServiceTest {
 	@Test
 	void create() {
 		when(gamesApiService.create(any())).thenReturn(Observable.just(new Game("0:30", "15:50", "1337", "testGame", "01", 3, false, new GameSettings(2, 10))));
-		Game game = gameService.create("testGame", "123").blockingFirst();
+		Game game = gameService.create("testGame", "123", 2, 10).blockingFirst();
 		assertEquals("Game[createdAt=0:30, updatedAt=15:50, _id=1337, name=testGame, owner=01, members=3, started=false, settings=GameSettings[mapRadius=2, victoryPoints=10]]", game.toString());
 		assertEquals("1337", gameIDStorage.getId());
 		assertEquals("01", memberIDStorage.getId());
 
-		verify(gamesApiService).create(new CreateGameDto("testGame", false, "123"));
+		verify(gamesApiService).create(new CreateGameDto("testGame", false, new GameSettings(2, 10), "123"));
 	}
 
 	@Test
@@ -68,10 +68,10 @@ class GameServiceTest {
 	@Test
 	void updateGame() {
 		when(gamesApiService.patch(any(), any())).thenReturn(Observable.just(new Game("0:00", "0:01", "420", "chill", "69", 1, false, new GameSettings(2, 10))));
-		Game game = gameService.updateGame("420", "chill", "password", "69", true).blockingFirst();
+		Game game = gameService.updateGame("420", "chill", "password", "69", true, 2, 10).blockingFirst();
 		assertEquals("Game[createdAt=0:00, updatedAt=0:01, _id=420, name=chill, owner=69, members=1, started=false, settings=GameSettings[mapRadius=2, victoryPoints=10]]", game.toString());
 
-		verify(gamesApiService).patch("420", new UpdateGameDto("chill", "69", "password", true));
+		verify(gamesApiService).patch("420", new UpdateGameDto("chill", "69", true, new GameSettings(2, 10), "password"));
 	}
 
 	@Test

@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
@@ -211,130 +212,134 @@ public class GameLobbyController implements Controller {
 
                 }));
 
-        //listen to the game
-        disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".*.*", Message.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    if (event.event().endsWith("state" + CREATED)) {
-                        final GameScreenController controller = gameScreenController.get();
-                        this.app.show(controller);
-                    }
-                }));
+		//listen to the game
+		disposable.add(eventListener
+				.listen("games." + this.gameIDStorage.getId() + ".*.*", Message.class)
+				.observeOn(FX_SCHEDULER)
+				.subscribe(event -> {
+					if (event.event().endsWith("state" + CREATED)) {
+						final GameScreenController controller = gameScreenController.get();
+						this.app.show(controller);
+					}
+				}));
 
-        // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
-        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
-                userService, messageService, memberIDStorage, memberService);
-        messageViewSubController.init();
-    }
+		// initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
+		this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+				userService, messageService, memberIDStorage, memberService);
+		messageViewSubController.init();
+	}
 
-    @Override
-    public void destroy() {
-        // destroy sub controller, otherwise the messages are displayed twice in-game, because the game controller
-        // creates a new messageViewSubController
-        if (this.messageViewSubController != null) {
-            this.messageViewSubController.destroy();
-        }
-        disposable.dispose();
-    }
+	@Override
+	public void destroy() {
+		// destroy sub controller, otherwise the messages are displayed twice in-game, because the game controller
+		// creates a new messageViewSubController
+		if (this.messageViewSubController != null) {
+			this.messageViewSubController.destroy();
+		}
+		disposable.dispose();
+	}
 
-    @Override
-    public Parent render() {
-        // load UI elements
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameLobbyScreen.fxml"));
-        loader.setControllerFactory(c -> this);
-        final Parent parent;
+	@Override
+	public Parent render() {
+		// load UI elements
+		final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameLobbyScreen.fxml"));
+		loader.setControllerFactory(c -> this);
+		final Parent parent;
 
-        try {
-            parent = loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+		try {
+			parent = loader.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 
-        gameService
-                .findOneGame(this.gameIDStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> this.idTitleLabel.setText("Welcome to " + result.name()));
+		gameService
+				.findOneGame(this.gameIDStorage.getId())
+				.observeOn(FX_SCHEDULER)
+				.subscribe(result -> {
+					this.game = result;
+					this.idTitleLabel.setText("Welcome to " + this.game.name());
+				});
 
-        // load game members
-        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-        playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList()));
+		// load game members
+		this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+		playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList()));
 
+		addColorOnComboBox(colorPicker);
         this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList()));
 
         addColorOnComboBox(colorPicker);
 
-        // disable start button when entering game lobby
-        idStartGameButton.disableProperty().set(true);
+		// disable start button when entering game lobby
+		idStartGameButton.disableProperty().set(true);
 
-        // show chat and load the messages
-        idChatContainer.getChildren().setAll(messageViewSubController.render());
+		// show chat and load the messages
+		idChatContainer.getChildren().setAll(messageViewSubController.render());
 
-        return parent;
-    }
+		return parent;
+	}
 
-    public void leave(ActionEvent ignoredEvent) {
-        gameService
-                .findOneGame(gameIDStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    if ((int) result.members() == 1 || result.owner().equals(idStorage.getID())) {
-                        gameService
-                                .deleteGame(gameIDStorage.getId())
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
-                                });
-                    } else {
-                        memberService
-                                .leave(gameIDStorage.getId(), idStorage.getID())
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
-                                });
-                    }
-                });
-    }
+	public void leave(ActionEvent ignoredEvent) {
+		gameService
+				.findOneGame(gameIDStorage.getId())
+				.observeOn(FX_SCHEDULER)
+				.subscribe(result -> {
+					if ((int) result.members() == 1 || result.owner().equals(idStorage.getID())) {
+						gameService
+								.deleteGame(gameIDStorage.getId())
+								.observeOn(FX_SCHEDULER)
+								.subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
+								});
+					} else {
+						memberService
+								.leave(gameIDStorage.getId(), idStorage.getID())
+								.observeOn(FX_SCHEDULER)
+								.subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
+								});
+					}
+				});
+	}
 
-    public void ready(ActionEvent ignoredEvent) {
-        for (Member member : this.members) {
-            if (member.userId().equals(idStorage.getID())) {
-                if (member.ready()) {
-                    memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color(),member.spectator()).subscribe();
-                    this.idReadyButton.setText("Ready");
-                } else {
-                    memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, member.color(),member.spectator()).subscribe();
-                    this.idReadyButton.setText("Not Ready");
-                }
-            }
-        }
-    }
+	public void ready(ActionEvent ignoredEvent) {
+		for (Member member : this.members) {
+			if (member.userId().equals(idStorage.getID())) {
+				if (member.ready()) {
+					memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color(), member.spectator()).subscribe();
+					this.idReadyButton.setText("Ready");
+				} else {
+					memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, member.color(), member.spectator()).subscribe();
+					this.idReadyButton.setText("Not Ready");
+				}
+			}
+		}
+	}
 
-    public void startGame(ActionEvent ignoredEvent) {
-        //give all the players color
-        giveAllThePlayersColor();
-        gameService.updateGame(gameIDStorage.getId(), null, null, this.idStorage.getID(), true)
-                .observeOn(FX_SCHEDULER)
-                .doOnError(error -> {
-                    if ("HTTP 403 ".equals(error.getMessage())) {
-                        new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!")
-                                .showAndWait();
-                    }
-                })
-                .subscribe(onSuccess -> {
+	public void startGame(ActionEvent ignoredEvent) {
+		//give all the players color
+		giveAllThePlayersColor();
+		gameService.updateGame(gameIDStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints())
+				.observeOn(FX_SCHEDULER)
+				.doOnError(error -> {
+					if ("HTTP 403 ".equals(error.getMessage())) {
+						new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!")
+								.showAndWait();
+					}
+				})
+				.subscribe(onSuccess -> {
 
-                    final GameScreenController controller = gameScreenController.get();
-                    this.app.show(controller);
+					final GameScreenController controller = gameScreenController.get();
+					this.app.show(controller);
 
-                }, onError -> {
-                });
-    }
+				}, onError -> {
+				});
+	}
 
-    private void giveAllThePlayersColor() {
-        ColorController controller = new ColorController();
-        List<Label> createdColors = controller.getColor();
+	private void giveAllThePlayersColor() {
+		ColorController controller = new ColorController();
+		List<Label> createdColors = controller.getColor();
 
-        List<String> allColors = createdColors(createdColors);
+		List<String> allColors = createdColors(createdColors);
 
         //remove color from allcolors if it belongs to a member
         for (Member member : members) {
@@ -353,16 +358,16 @@ public class GameLobbyController implements Controller {
         }
     }
 
-    //change String into hascode for colors
-    private List<String> createdColors(List<Label> createdColors) {
-        List<String> colorNames = new ArrayList<>();
-        for (Label label : createdColors) {
-            String colorInString = "#" + Color.web(label.getText().toLowerCase()).toString().substring(2, 8);
-            colorNames.add(colorInString);
-        }
+	//change String into hascode for colors
+	private List<String> createdColors(List<Label> createdColors) {
+		List<String> colorNames = new ArrayList<>();
+		for (Label label : createdColors) {
+			String colorInString = "#" + Color.web(label.getText().toLowerCase()).toString().substring(2, 8);
+			colorNames.add(colorInString);
+		}
 
-        return colorNames;
-    }
+		return colorNames;
+	}
 
     private Node renderMember(Member member) {
         //sets the size of player
@@ -390,44 +395,44 @@ public class GameLobbyController implements Controller {
         return memberListSpectatorSubcontroller.render();
     }
 
-    private void addColorOnComboBox(ComboBox comboBox) {
+	private void addColorOnComboBox(ComboBox<Label> comboBox) {
 
-        ObservableList<Label> items = FXCollections.observableArrayList(color());
-        comboBox.getItems().addAll(items);
-        comboBox.getSelectionModel().clearSelection(0);
-        comboBox.setVisibleRowCount(300);
-        //This makes sure the color are presented in the strings and
-        //border will be shown on Labels
-        comboBox.setCellFactory(listView -> new ListCell<Label>() {
-            public void updateItem(Label label, boolean empty) {
-                super.updateItem(label, empty);
-                if (label != null) {
-                    if (label.getText().equals("Select Color")) {
-                        setText(null);
-                    }
-                    setText(label.getText());
-                    setTextFill(label.getTextFill());
-                    setMinWidth(label.getMinWidth());
-                } else {
-                    setText(null);
+		ObservableList<Label> items = FXCollections.observableArrayList(color());
+		comboBox.getItems().addAll(items);
+		comboBox.getSelectionModel().clearSelection(0);
+		comboBox.setVisibleRowCount(300);
+		//This makes sure the color are presented in the strings and
+		//border will be shown on Labels
+		comboBox.setCellFactory(listView -> new ListCell<Label>() {
+			public void updateItem(Label label, boolean empty) {
+				super.updateItem(label, empty);
+				if (label != null) {
+					if (label.getText().equals("Select Color")) {
+						setText(null);
+					}
+					setText(label.getText());
+					setTextFill(label.getTextFill());
+					setMinWidth(label.getMinWidth());
+				} else {
+					setText(null);
 
-                }
-            }
-        });
-    }
+				}
+			}
+		});
+	}
 
-    //List of colors
-    private List<Label> color() {
-        final ColorController controller = new ColorController();
-        return controller.getColor();
-    }
+	//List of colors
+	private List<Label> color() {
+		final ColorController controller = new ColorController();
+		return controller.getColor();
+	}
 
-    //color event, if color is picked then send color
-    public void colorPicked(ActionEvent ignoredEvent) {
-        Label label = colorPicker.getSelectionModel().getSelectedItem();
+	//color event, if color is picked then send color
+	public void colorPicked(ActionEvent ignoredEvent) {
+		Label label = colorPicker.getSelectionModel().getSelectedItem();
 
-        Color c = Color.web(label.getText().toLowerCase());
-        String pickedColor = "#" + c.toString().substring(2, 8);
+		Color c = Color.web(label.getText().toLowerCase());
+		String pickedColor = "#" + c.toString().substring(2, 8);
 
         boolean chose = true;
         boolean ready = false;
