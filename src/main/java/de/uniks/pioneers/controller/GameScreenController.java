@@ -37,6 +37,10 @@ public class GameScreenController implements Controller {
 
     private final ObservableList<Player> playerOwnView = FXCollections.observableArrayList();
 
+    private final ObservableList<Player> playerSpectator = FXCollections.observableArrayList();
+
+    private final ObservableList<Member> members = FXCollections.observableArrayList();
+
     private final Provider<LobbyController> lobbyController;
 
     @FXML
@@ -122,11 +126,20 @@ public class GameScreenController implements Controller {
                         this.userHash.put(user._id(), user);
                     }
 
+                    //get all the members
+                    memberService
+                            .getAllGameMembers(gameIDStorage.getId())
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe( c ->{
+                                this.members.setAll(c);
+                            });
+
                     // Listen to the State to handle the event
                     disposable.add(eventListener
                             .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
                             .observeOn(FX_SCHEDULER)
                             .subscribe(this::handleStateEvents));
+
 
                     // Check if expected move is founding-roll after joining the game
                     pioneersService
@@ -142,11 +155,18 @@ public class GameScreenController implements Controller {
                             .findAllPlayers(this.gameIDStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe(c -> {
-                                for (Player player : c) {
-                                    if (!player.userId().equals(idStorage.getID())) {
-                                        players.add(player);
-                                    } else {
-                                        playerOwnView.add(player);
+                                for (Member member:this.members) {
+                                    for (Player player : c) {
+                                        //this checks if the player is oppenent or spectator or yourself
+                                        if (!player.userId().equals(idStorage.getID()) && member.userId()
+                                                .equals(player.userId()) && !member.spectator()) {
+                                            players.add(player);
+                                        } else if (player.userId().equals(idStorage.getID()) && member.userId()
+                                                .equals(player.userId()) && !member.spectator()){
+                                            playerOwnView.add(player);
+                                        } else{
+                                            this.playerSpectator.add(player);
+                                        }
                                     }
                                 }
                             });

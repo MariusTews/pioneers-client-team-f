@@ -9,8 +9,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox id="gameView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
+<HBox id="gameView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
    <VBox maxHeight="900.0" prefHeight="900.0" prefWidth="500.0">
       <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0">
          <VBox.margin>
@@ -22,7 +21,7 @@
          </VBox.margin></Pane>
    </VBox>
    <VBox prefHeight="900.0" prefWidth="650.0">
-      <Pane prefHeight="150.0" prefWidth="650.0" />
+      <Pane fx:id="spectatorPaneId" prefHeight="150.0" prefWidth="650.0" />
       <Pane fx:id="mapPane" minHeight="600.0" minWidth="650.0" />
       <Pane id="roll" prefHeight="150.0" prefWidth="650.0">
          <ImageView fitHeight="83.0" fitWidth="92.0" layoutX="347.0" layoutY="30.0" onMouseClicked="#onMouseClicked" pickOnBounds="true" preserveRatio="true">

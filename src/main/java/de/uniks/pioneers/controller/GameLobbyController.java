@@ -131,11 +131,9 @@ public class GameLobbyController implements Controller {
                             .observeOn(FX_SCHEDULER)
                             .subscribe(event -> {
                                 for (User user : event) {
-                                    allUsers.add(user);
                                     for (Member member : members) {
                                         if (user._id().equals(member.userId())) {
                                             this.playerList.add(user);
-                                            //this.spectatorList.add(user);
                                         }
 
                                     }
