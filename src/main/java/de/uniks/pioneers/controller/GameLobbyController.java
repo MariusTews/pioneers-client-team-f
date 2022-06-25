@@ -155,7 +155,7 @@ public class GameLobbyController implements Controller {
 								readyMembers += 1;
 							}
 						}
-						this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
+						this.idStartGameButton.disableProperty().set(readyMembers != members.size());
 					}
 					this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
 				}));
@@ -332,7 +332,7 @@ public class GameLobbyController implements Controller {
 		comboBox.setVisibleRowCount(300);
 		//This makes sure the color are presented in the strings and
 		//border will be shown on Labels
-		comboBox.setCellFactory(listView -> new ListCell<Label>() {
+		comboBox.setCellFactory(listView -> new ListCell<>() {
 			public void updateItem(Label label, boolean empty) {
 				super.updateItem(label, empty);
 				if (label != null) {
