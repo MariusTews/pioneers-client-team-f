@@ -276,11 +276,6 @@ public class GameLobbyController implements Controller {
         // show chat and load the messages
         idChatContainer.getChildren().setAll(messageViewSubController.render());
 
-        //default picture
-        /*File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
-        final Image image = new Image(file.toString());
-        imageForSpectator.setImage(image);*/
-
         return parent;
     }
 
@@ -457,10 +452,6 @@ public class GameLobbyController implements Controller {
 
 
     //changes between Spectator and Player
-    public void onClickSpectator(ActionEvent event) {
-
-    }
-
     public void onCheckBox(ActionEvent event) {
         //get all the members that are currently in the game
         List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
@@ -478,10 +469,6 @@ public class GameLobbyController implements Controller {
             this.idReadyButton.setText("Not Ready");
             this.idReadyButton.setDisable(true);
 
-            //sets the Box to cross
-            /*File file = new File(String.valueOf(Main.class.getResource("CrossWithBlueBorder.png")));
-            final Image image = new Image(file.toString());
-            imageForSpectator.setImage(image);*/
             this.colorPicker.setDisable(true);
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, "#000000", true)
                     .observeOn(FX_SCHEDULER).subscribe();
@@ -496,10 +483,6 @@ public class GameLobbyController implements Controller {
             //makes ready button visible
             this.idReadyButton.setText("Ready");
             this.idReadyButton.setDisable(false);
-            //Set the Box back without cross
-            /*File file = new File(String.valueOf(Main.class.getResource("blue_border.png")));
-            final Image image = new Image(file.toString());
-            imageForSpectator.setImage(image);*/
             this.colorPicker.setDisable(false);
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), !ready, null, false)
                     .observeOn(FX_SCHEDULER).subscribe();
