@@ -17,14 +17,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +122,6 @@ public class GameLobbyController implements Controller {
                             ready++;
                         }
                     }
-                    System.out.println(this.members);
                     if(ready>=2){
                         idStartGameButton.disableProperty().set(false);
                     }
@@ -137,7 +133,6 @@ public class GameLobbyController implements Controller {
                                         if (user._id().equals(member.userId())) {
                                             this.playerList.add(user);
                                         }
-
                                     }
                                 }
 
@@ -157,11 +152,13 @@ public class GameLobbyController implements Controller {
                             userService.findOne(member.userId())
                                     .observeOn(FX_SCHEDULER)
                                     .subscribe(this.playerList::add);
-
+                            System.out.println("hallo");
                             /*userService.findOne(member.userId())
                                     .observeOn(FX_SCHEDULER)
                                     .subscribe(this.spectatorList::add);*/
+
                         }
+
                     } else if (event.event().endsWith(DELETED)) {
                         if(members.contains(member)) {
                             members.remove(member);
@@ -179,6 +176,7 @@ public class GameLobbyController implements Controller {
                                 //this.members.set(this.members.indexOf(updatedMember), member);
                                 spectatorMember.add(member);
                                 members.remove(updatedMember);
+                                this.playersNumberId.setText("Players "+members.size()+"/6");
                                 break;
                             } else if(updatedMember.userId().equals(member.userId()) && !member.spectator()){
                                 this.members.set(this.members.indexOf(updatedMember), member);
@@ -190,6 +188,7 @@ public class GameLobbyController implements Controller {
                                 //this.members.set(this.members.indexOf(updatedMember), member);
                                 spectatorMember.remove(upSpectatorMember);
                                 members.add(member);
+                                this.playersNumberId.setText("Players "+members.size()+"/6");
                                 break;
                             }
                         }
@@ -271,6 +270,8 @@ public class GameLobbyController implements Controller {
         playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList()));
 
         addColorOnComboBox(colorPicker);
+
+
 
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
@@ -371,6 +372,8 @@ public class GameLobbyController implements Controller {
     }
 
     private Node renderMember(Member member) {
+        //sets the size of player
+        this.playersNumberId.setText("Players "+members.size()+"/6");
         for (User user : playerList) {
             if (user._id().equals(member.userId()) && !member.spectator()) {
                 this.memberListSubcontroller = new MemberListSubcontroller(member, user);
