@@ -36,3 +36,13 @@
     -fx-text-fill:#00FF00 ;
     -fx-border-color: #33D1FF;
 }
+
+.label.playersNumberStyle {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 240 320;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+}

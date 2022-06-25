@@ -66,10 +66,12 @@ public class GameLobbyController implements Controller {
     private final Provider<LobbyController> lobbyController;
     private final Provider<GameScreenController> gameScreenController;
     //Button for spectator
-    public Label spectatorId;
     public VBox spectatorIds;
-    //image for Cross with blue borderline
-    public ImageView imageForSpectator;
+    //player Numbers Label
+    public Label playersNumberId;
+    //player LabelID
+    public Label spectatorLabelId;
+
     //label for spectator Title
     //public Label spectatorTitleId;
     private MessageViewSubController messageViewSubController;
