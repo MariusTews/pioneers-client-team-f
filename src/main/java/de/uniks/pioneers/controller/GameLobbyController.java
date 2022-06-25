@@ -152,11 +152,6 @@ public class GameLobbyController implements Controller {
                             userService.findOne(member.userId())
                                     .observeOn(FX_SCHEDULER)
                                     .subscribe(this.playerList::add);
-                            System.out.println("hallo");
-                            /*userService.findOne(member.userId())
-                                    .observeOn(FX_SCHEDULER)
-                                    .subscribe(this.spectatorList::add);*/
-
                         }
 
                     } else if (event.event().endsWith(DELETED)) {
@@ -204,7 +199,7 @@ public class GameLobbyController implements Controller {
                             }
                         }
                         this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
-                                +spectatorMember.size());
+                                +spectatorMember.size() || members.size() == 0);
 
                         this.idUserList.getChildren().clear();
                         this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
@@ -316,8 +311,6 @@ public class GameLobbyController implements Controller {
     }
 
     public void startGame(ActionEvent ignoredEvent) {
-        //TODO:check if atleast one player is there
-        //need to be discussed with PO
         //give all the players color
         giveAllThePlayersColor();
         gameService.updateGame(gameIDStorage.getId(), null, null, this.idStorage.getID(), true)
@@ -478,13 +471,6 @@ public class GameLobbyController implements Controller {
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, "#000000", true)
                     .observeOn(FX_SCHEDULER).subscribe();
         } else {
-            //Checks if the other user already picked the color
-            /*for (Member member : memberList) {
-                if (member.color() != null && member.color().equals(lastColorPicked) &&
-                        member.userId().equals(this.idStorage.getID())) {
-                    lastColorPicked = null;
-                }
-            }*/
             //makes ready button visible
             this.idReadyButton.setText("Ready");
             this.idReadyButton.setDisable(false);
