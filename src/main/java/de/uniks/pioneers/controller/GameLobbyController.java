@@ -82,6 +82,8 @@ public class GameLobbyController implements Controller {
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
+    private Game game;
+
     private String lastColorPicked = "";
 
     @Inject
