@@ -271,8 +271,6 @@ public class GameLobbyController implements Controller {
 
         addColorOnComboBox(colorPicker);
 
-
-
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
 
@@ -318,6 +316,8 @@ public class GameLobbyController implements Controller {
     }
 
     public void startGame(ActionEvent ignoredEvent) {
+        //TODO:check if atleast one player is there
+        //need to be discussed with PO
         //give all the players color
         giveAllThePlayersColor();
         gameService.updateGame(gameIDStorage.getId(), null, null, this.idStorage.getID(), true)
