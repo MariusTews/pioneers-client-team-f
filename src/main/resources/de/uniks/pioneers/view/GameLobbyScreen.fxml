@@ -19,7 +19,7 @@
       </Button>
    </HBox>
    <HBox prefHeight="335.0" prefWidth="640.0">
-      <VBox prefHeight="329.0" prefWidth="234.0" styleClass="backgroundPlayerStyle">
+      <VBox prefHeight="329.0" prefWidth="234.0" styleClass="backgroundPlayerStyle" >
          <children>
             <Label fx:id="playersNumberId" alignment="CENTER" prefHeight="16.0" prefWidth="232.0" styleClass="playersNumberStyle" text="Players" />
             <ScrollPane fx:id="idUserInLobby" prefHeight="313.0" prefWidth="241.0" styleClass="memberList">

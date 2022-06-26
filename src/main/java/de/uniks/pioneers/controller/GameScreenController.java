@@ -66,6 +66,8 @@ public class GameScreenController implements Controller {
 
     private final GameIDStorage gameIDStorage;
     private final IDStorage idStorage;
+    //specatator pane
+    public Pane spectatorPaneId;
 
     private String lastBuildingPosition;
 
@@ -159,13 +161,11 @@ public class GameScreenController implements Controller {
                                     for (Player player : c) {
                                         //this checks if the player is oppenent or spectator or yourself
                                         if (!player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId()) && !member.spectator()) {
+                                                .equals(player.userId()) ) {
                                             players.add(player);
                                         } else if (player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId()) && !member.spectator()){
+                                                .equals(player.userId())){
                                             playerOwnView.add(player);
-                                        } else{
-                                            this.playerSpectator.add(player);
                                         }
                                     }
                                 }

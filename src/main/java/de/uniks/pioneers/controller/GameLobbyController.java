@@ -70,8 +70,6 @@ public class GameLobbyController implements Controller {
     //player LabelID
     public Label spectatorLabelId;
 
-    //label for spectator Title
-    //public Label spectatorTitleId;
     private MessageViewSubController messageViewSubController;
     private MemberListSubcontroller memberListSubcontroller;
 
@@ -202,7 +200,7 @@ public class GameLobbyController implements Controller {
                             }
                         }
                         this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
-                                +spectatorMember.size() || members.size() == 0);
+                                +spectatorMember.size());// || members.size() == 0);
 
                         this.idUserList.getChildren().clear();
                         this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
@@ -460,6 +458,7 @@ public class GameLobbyController implements Controller {
     public void onCheckBox(ActionEvent event) {
         //get all the members that are currently in the game
         List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        //System.out.println(memberList);
         boolean ready = false;
         boolean spectator = false;
         for (Member member : memberList) {
@@ -476,14 +475,14 @@ public class GameLobbyController implements Controller {
 
             this.colorPicker.setDisable(true);
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, "#000000", true)
-                    .observeOn(FX_SCHEDULER).subscribe();
+                    .subscribe();
         } else {
             //makes ready button visible
             this.idReadyButton.setText("Ready");
             this.idReadyButton.setDisable(false);
             this.colorPicker.setDisable(false);
             memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), !ready, null, false)
-                    .observeOn(FX_SCHEDULER).subscribe();
+                    .subscribe();
         }
     }
 }

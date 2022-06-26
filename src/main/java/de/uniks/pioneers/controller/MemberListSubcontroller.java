@@ -97,9 +97,6 @@ public class MemberListSubcontroller implements Controller {
                 if (user.avatar() != null) {
                     this.idAvatar.setImage(new Image(user.avatar()));
                 }
-
-                //this.idReady.setText(user.name());
-                //this.idReady.setTextFill(Color.web(member.color()));
             }
         }
 
