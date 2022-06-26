@@ -142,7 +142,7 @@ public class GameFieldSubController implements Controller {
 				stringZ = "zM" + Math.abs(z);
 			}
 			HexSubController hexSubController = new HexSubController((Polygon) parent.lookup("#" + stringX + stringY + stringZ), tile);
-			//hexaCoords.add("#" + stringX + stringY + stringZ);
+
 
 			hexSubController.init();
 			this.hexSubControllers.add(hexSubController);

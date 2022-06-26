@@ -42,16 +42,8 @@ public class HexSubController implements Controller {
 
     @Override
     public Parent render() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameFieldSubView.fxml"));
-        loader.setControllerFactory(c -> this);
-        final Parent parent;
-        try {
-            parent = loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return parent;
+        //this method needs to be pressed because this subController implements controller therefore the method is empty
+        return null;
     }
 
     // Mouse hovers over field
