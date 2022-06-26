@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
 	@Spy
-	GameIDStorage gameIDStorage;
+	GameStorage gameStorage;
 
 	@Spy
 	MemberIDStorage memberIDStorage;
@@ -40,7 +40,7 @@ public class MemberServiceTest {
 				"15:50", "01", "02", false, "#000000", false)));
 		Member member = memberService.join("testUser", "testGame", "testPassword").blockingFirst();
 		assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000, spectator=false]", member.toString());
-		assertEquals("01", gameIDStorage.getId());
+		assertEquals("01", gameStorage.getId());
 		assertEquals("02", memberIDStorage.getId());
 		verify(gameMembersApiService).create("testGame", new CreateMemberDto(false, "#000000", false, "testPassword"));
 	}

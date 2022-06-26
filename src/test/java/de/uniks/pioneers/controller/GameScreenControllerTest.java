@@ -39,7 +39,7 @@ class GameScreenControllerTest extends ApplicationTest {
     EventListener eventListener;
 
     @Spy
-    GameIDStorage gameIDStorage;
+	GameStorage gameStorage;
     @Spy
     IDStorage idStorage;
 
@@ -52,7 +52,7 @@ class GameScreenControllerTest extends ApplicationTest {
 
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
-        when(gameIDStorage.getId()).thenReturn("02");
+        when(gameStorage.getId()).thenReturn("02");
         when(idStorage.getID()).thenReturn("01");
 
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());

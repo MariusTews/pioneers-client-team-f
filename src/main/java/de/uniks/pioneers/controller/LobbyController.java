@@ -78,7 +78,7 @@ public class LobbyController implements Controller {
     private final App app;
     private final IDStorage idStorage;
 
-    private final GameIDStorage gameIDStorage;
+    private final GameStorage gameStorage;
 
     private final UserService userService;
     private final GameService gameService;
@@ -106,7 +106,7 @@ public class LobbyController implements Controller {
     @Inject
     public LobbyController(App app,
                            IDStorage idStorage,
-                           GameIDStorage gameIDStorage, UserService userService,
+                           GameStorage gameStorage, UserService userService,
                            GameService gameService,
                            GroupService groupService,
                            MessageService messageService,
@@ -122,7 +122,7 @@ public class LobbyController implements Controller {
 
         this.app = app;
         this.idStorage = idStorage;
-        this.gameIDStorage = gameIDStorage;
+        this.gameStorage = gameStorage;
         this.userService = userService;
         this.gameService = gameService;
         this.groupService = groupService;
@@ -183,8 +183,8 @@ public class LobbyController implements Controller {
 
         //make the rejoin button visible
         //based upon if a user is in game or not
-        if (this.gameIDStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
+        if (this.gameStorage.getId() != null) {
+            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                         boolean trace = true;
                         for (Member member : result) {
@@ -271,8 +271,8 @@ public class LobbyController implements Controller {
     public void createGameButtonPressed(ActionEvent ignoredEvent) {
         //makes sure if user in game or not , and depending on that
         //allows user to create the game
-        if (this.gameIDStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
+        if (this.gameStorage.getId() != null) {
+            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                         boolean trace = true;
                         for (Member member : result) {
@@ -603,8 +603,8 @@ public class LobbyController implements Controller {
     public void joinGame(Game game) {
         //allows to join a game, if the user does not belong to another game
         //otherwise user cannot join the game
-        if (this.gameIDStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameIDStorage.getId()).observeOn(FX_SCHEDULER)
+        if (this.gameStorage.getId() != null) {
+            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                         boolean trace = true;
                         for (Member member : result) {
