@@ -269,8 +269,6 @@ public class GameLobbyController implements Controller {
         this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList()));
 
-        addColorOnComboBox(colorPicker);
-
 		// disable start button when entering game lobby
 		idStartGameButton.disableProperty().set(true);
 
@@ -458,7 +456,6 @@ public class GameLobbyController implements Controller {
     public void onCheckBox(ActionEvent event) {
         //get all the members that are currently in the game
         List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
-        //System.out.println(memberList);
         boolean ready = false;
         boolean spectator = false;
         for (Member member : memberList) {
