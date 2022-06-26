@@ -1,0 +1,56 @@
+/* When the user has to drop resources, a new window opens with the following style(-classes) */
+.root {
+    -fx-font-family: "KenVector Future Regular";
+    -fx-font-size: 14;
+    -fx-background-image: url("../assets/yellow_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 200 350;
+}
+
+.button:focused {
+    -fx-effect: dropshadow(gaussian, grey, 30, 0, 0, 0);
+}
+
+.button.discard {
+    -fx-background-image: url("../assets/yellow_button.png");
+    -fx-background-size: auto;
+    -fx-background-position: center;
+    -fx-text-fill: darkblue;
+}
+
+#discardResources {
+
+}
+
+.label.amount {
+    -fx-background-image: url("../assets/yellow_border.png");
+    -fx-background-position: center;
+    -fx-text-fill: darkblue;
+}
+
+.button.amount {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 20;
+}
+
+#cactus {
+    -fx-image: url("../assets/earth_cactus.png");
+}
+
+#mars {
+    -fx-image: url("../assets/mars_bar.png");
+}
+
+#moon {
+    -fx-image: url("../assets/moon_rock.png");
+}
+
+#neptun {
+    -fx-image: url("../assets/neptun_crystals.png");
+}
+
+#venus {
+    -fx-image: url("../assets/venus_grain.png");
+}
