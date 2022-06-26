@@ -33,7 +33,7 @@ import static de.uniks.pioneers.Constants.*;
 
 public class GameScreenController implements Controller {
 
-    private final ObservableList<Player> players = FXCollections.observableArrayList();
+    private final ObservableList<Player> opponents = FXCollections.observableArrayList();
 
     private final ObservableList<Player> playerOwnView = FXCollections.observableArrayList();
 
@@ -82,6 +82,7 @@ public class GameScreenController implements Controller {
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
     private final Timeline timeline = new Timeline();
+    private boolean runDiscardOnce = true;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -144,7 +145,7 @@ public class GameScreenController implements Controller {
                             .subscribe(c -> {
                                 for (Player player : c) {
                                     if (!player.userId().equals(idStorage.getID())) {
-                                        players.add(player);
+                                        opponents.add(player);
                                     } else {
                                         playerOwnView.add(player);
                                     }
@@ -221,7 +222,7 @@ public class GameScreenController implements Controller {
 
         // Render opponent loads the opponent view everytime the members list is changed
         // render opponents when achievements change
-        this.players.addListener((ListChangeListener<? super Player>) c ->
+        this.opponents.addListener((ListChangeListener<? super Player>) c ->
                 this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
 
         //userSubView
@@ -265,19 +266,19 @@ public class GameScreenController implements Controller {
                 }
             }
 
-            for (Player p : players) {
+            for (Player p : opponents) {
                 if (p.userId().equals(player.userId())) {
                     this.removeOpponent(p);
-                    players.set(players.indexOf(p), player);
+                    opponents.set(opponents.indexOf(p), player);
                 }
             }
         } else if (playerEvent.event().endsWith(CREATED)) {
             if (!player.userId().equals(idStorage.getID())) {
-                this.players.add(player);
+                this.opponents.add(player);
                 this.opponentsView.getChildren().add(renderOpponent(player));
             }
         } else if (playerEvent.event().endsWith(DELETED)) {
-            if (players.size() < 2) {
+            if (opponents.size() < 2) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 // Set style
                 DialogPane dialogPane = alert.getDialogPane();
@@ -293,7 +294,7 @@ public class GameScreenController implements Controller {
                     this.app.show(lobbyController.get());
                 }
             }
-            this.players.remove(player);
+            this.opponents.remove(player);
             this.removeOpponent(player);
         }
     }
@@ -309,10 +310,24 @@ public class GameScreenController implements Controller {
             User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
             currentPlayerLabel.setText(currentPlayer.name());
 
-            // TODO: open screen for discarding resources if its current player's screen + total resources >7
-            if (currentMove.equals(DROP_STATE) && currentPlayer._id().equals(memberIDStorage.getId())) {
+            // TODO: open screen for discarding resources if its current player's screen + state is drop
+            // TODO: enters more than one time this method: delete runDiscardOnce variable or find another solution
+            if ((currentMove.equals(DROP_ACTION)) && currentPlayer._id().equals(idStorage.getID()) && runDiscardOnce) {
                 // TODO: initialize and render the discard resources view -> open new window (new stage)
+                // get the current player and open the window for dropping resources
+                runDiscardOnce = false;
+                for (Player p : this.playerOwnView) {
+                    if (p.userId().equals(currentPlayer._id())) {
+                        System.out.println("found player");
+                        DiscardResourcesController discard = new DiscardResourcesController(p, this.gameIDStorage.getId(),
+                                                this.pioneersService, currentPlayerLabel.getScene().getWindow());
+                        discard.render();
+                        // Deleting the controller is not needed, because the garbage collector should delete the controller
+                        // after closing the window (??)
+                    }
+                }
             }
+            // TODO: set runDiscardOnce on true again, when another action appears
         }
     }
 
@@ -379,7 +394,7 @@ public class GameScreenController implements Controller {
     }
 
     public void onLeave(ActionEvent ignoredEvent) {
-        if ((players.size() + playerOwnView.size()) == 2) {
+        if ((opponents.size() + playerOwnView.size()) == 2) {
             gameService.findOneGame(this.gameIDStorage.getId())
                     .observeOn(FX_SCHEDULER).
                     subscribe(col -> {
