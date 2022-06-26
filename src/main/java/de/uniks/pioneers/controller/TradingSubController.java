@@ -1,12 +1,15 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import javax.inject.Inject;
+import java.io.IOException;
 
 public class TradingSubController implements Controller{
     @FXML
@@ -93,7 +96,17 @@ public class TradingSubController implements Controller{
 
     @Override
     public Parent render() {
-        return null;
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/TradingSubView.fxml"));
+        loader.setControllerFactory(c -> this);
+        final Parent parent;
+        try {
+            parent = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        this.parent = parent;
+        return parent;
     }
 
     public void giveCactusMinusButtonPressed(ActionEvent event) {
