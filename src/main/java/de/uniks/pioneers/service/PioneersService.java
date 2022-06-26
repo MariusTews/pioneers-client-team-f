@@ -1,9 +1,6 @@
 package de.uniks.pioneers.service;
 
-import de.uniks.pioneers.dto.CreateBuildingDto;
-import de.uniks.pioneers.dto.CreateMoveDto;
-import de.uniks.pioneers.dto.RobDto;
-import de.uniks.pioneers.dto.UpdatePlayerDto;
+import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.PioneersApiService;
 import io.reactivex.rxjava3.core.Observable;
@@ -11,6 +8,8 @@ import io.reactivex.rxjava3.core.Observable;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
+
+import static de.uniks.pioneers.Constants.*;
 
 public class PioneersService {
 
@@ -49,8 +48,10 @@ public class PioneersService {
 								 String type, String target, HashMap<String, Integer> resources) {
 		if (x == null && y == null && z == null && side == null && type == null) {
 			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, null));
-		} else if (resources != null) {
-			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, resources, null, null));
+		} else if (action.equals(DROP_ACTION) && resources != null) {
+			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null,
+					new ResourcesDto(resources.get(VENUS_GRAIN), resources.get(MARS_BAR), resources.get(MOON_ROCK),
+							resources.get(EARTH_CACTUS), resources.get(NEPTUNE_CRYSTAL)), null, null));
 		} else if (action.equals("rob") && !target.isEmpty()) {
 			return this.pioneersApiService.create(gameId, new CreateMoveDto(action, new RobDto(x, y, z, target), null, null, null));
 		} else {
