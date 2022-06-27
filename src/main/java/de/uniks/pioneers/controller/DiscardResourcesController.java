@@ -58,12 +58,12 @@ public class DiscardResourcesController implements Controller {
     public Label amountNeptuneCrystal;
     @FXML
     public Label amountVenusGrain;
-    private List<Label> allLabels = new ArrayList<>();
+    private final List<Label> allLabels = new ArrayList<>();
+    private final HashMap<String, Integer> resources = new HashMap<>();
     private final PioneersService pioneersService;
     private final int amountToDiscard;
     private final String gameID;
     private final Player player;
-    private Parent root;
     private final Window owner;
     private Stage primaryStage;
 
@@ -94,13 +94,11 @@ public class DiscardResourcesController implements Controller {
 
     @Override
     public Parent render() {
-        // TODO: remove debug print
-        System.out.println("new window");
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/DiscardResourcesView.fxml"));
         loader.setControllerFactory(c -> this);
+        Parent root;
         try {
-            this.root = loader.load();
-            //this.root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("view/DiscardResourcesView.fxml")));
+            root = loader.load();
             this.primaryStage = new Stage();
             // TODO: Set to UNDECORATED or TRANSPARENT (without white background) to remove minimize, maximize AND close button of stage
             primaryStage.initStyle(StageStyle.UTILITY);
@@ -111,7 +109,6 @@ public class DiscardResourcesController implements Controller {
             // Specify modality of the new window: interactions are only possible on the second window
             primaryStage.initModality(Modality.WINDOW_MODAL);
             primaryStage.initOwner(this.owner);
-            // the websocket event calls the handle method in game screen way more than once and for preventing it:
             primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -120,6 +117,49 @@ public class DiscardResourcesController implements Controller {
 
         this.discardButton.setText("Discard 0/" + amountToDiscard);
         this.discardButton.setDisable(true);
+        this.decResource1Btn.setDisable(true);
+        this.decResource2Btn.setDisable(true);
+        this.decResource3Btn.setDisable(true);
+        this.decResource4Btn.setDisable(true);
+        this.decResource5Btn.setDisable(true);
+
+
+        // Create HashMap because of possible NullPointerExceptions and disable increase button if player does not
+        // have the particular resource
+        if (player.resources().get(EARTH_CACTUS) != null) {
+            this.resources.put(EARTH_CACTUS, player.resources().get(EARTH_CACTUS));
+        } else {
+            this.resources.put(EARTH_CACTUS, 0);
+            incResource1Btn.setDisable(true);
+        }
+
+        if (player.resources().get(MARS_BAR) != null) {
+            this.resources.put(MARS_BAR, player.resources().get(MARS_BAR));
+        } else {
+            this.resources.put(MARS_BAR, 0);
+            incResource2Btn.setDisable(true);
+        }
+
+        if (player.resources().get(MOON_ROCK) != null) {
+            this.resources.put(MOON_ROCK, player.resources().get(MOON_ROCK));
+        } else {
+            this.resources.put(MOON_ROCK, 0);
+            incResource3Btn.setDisable(true);
+        }
+
+        if (player.resources().get(NEPTUNE_CRYSTAL) != null) {
+            this.resources.put(NEPTUNE_CRYSTAL, player.resources().get(NEPTUNE_CRYSTAL));
+        } else {
+            this.resources.put(NEPTUNE_CRYSTAL, 0);
+            incResource4Btn.setDisable(true);
+        }
+
+        if (player.resources().get(VENUS_GRAIN) != null) {
+            this.resources.put(VENUS_GRAIN, player.resources().get(VENUS_GRAIN));
+        } else {
+            this.resources.put(VENUS_GRAIN, 0);
+            incResource5Btn.setDisable(true);
+        }
 
         allLabels.add(amountEarthCactus);
         allLabels.add(amountMarsBar);
@@ -127,7 +167,7 @@ public class DiscardResourcesController implements Controller {
         allLabels.add(amountNeptuneCrystal);
         allLabels.add(amountVenusGrain);
 
-        return this.root;
+        return root;
     }
 
     // Handle every increase/decrease button separately
@@ -135,7 +175,7 @@ public class DiscardResourcesController implements Controller {
     // Disable increasing when the player has not more than the chosen amount of resources to avoid wrong requests
     public void onIncreaseRes1ButtonPressed() {
         int currentAmount = Integer.parseInt(this.amountEarthCactus.getText());
-        if (currentAmount < this.amountToDiscard && currentAmount < this.player.resources().get(EARTH_CACTUS)) {
+        if (currentAmount < this.amountToDiscard && currentAmount < resources.get(EARTH_CACTUS)) {
             currentAmount += 1;
             this.amountEarthCactus.setText(String.valueOf(currentAmount));
             this.checkChosenResources();
@@ -144,7 +184,7 @@ public class DiscardResourcesController implements Controller {
         if (currentAmount > 0) {
             this.decResource1Btn.setDisable(false);
         }
-        if (currentAmount == player.resources().get(EARTH_CACTUS)) {
+        if (currentAmount == resources.get(EARTH_CACTUS)) {
             // disable button, when already enough of this resource selected
             this.incResource1Btn.setDisable(true);
         }
@@ -152,7 +192,7 @@ public class DiscardResourcesController implements Controller {
 
     public void onIncreaseRes2ButtonPressed() {
         int currentAmount = Integer.parseInt(this.amountMarsBar.getText());
-        if (currentAmount < this.amountToDiscard && currentAmount < this.player.resources().get(MARS_BAR)) {
+        if (currentAmount < this.amountToDiscard && currentAmount < resources.get(MARS_BAR)) {
             currentAmount += 1;
             this.amountMarsBar.setText(String.valueOf(currentAmount));
             this.checkChosenResources();
@@ -161,7 +201,7 @@ public class DiscardResourcesController implements Controller {
         if (currentAmount > 0) {
             this.decResource2Btn.setDisable(false);
         }
-        if (currentAmount == player.resources().get(MARS_BAR)) {
+        if (currentAmount == resources.get(MARS_BAR)) {
             // disable button, when already enough of this resource selected
             this.incResource2Btn.setDisable(true);
         }
@@ -169,7 +209,7 @@ public class DiscardResourcesController implements Controller {
 
     public void onIncreaseRes3ButtonPressed() {
         int currentAmount = Integer.parseInt(this.amountMoonRock.getText());
-        if (currentAmount < this.amountToDiscard && currentAmount < this.player.resources().get(MOON_ROCK)) {
+        if (currentAmount < this.amountToDiscard && currentAmount < resources.get(MOON_ROCK)) {
             currentAmount += 1;
             this.amountMoonRock.setText(String.valueOf(currentAmount));
             this.checkChosenResources();
@@ -178,7 +218,7 @@ public class DiscardResourcesController implements Controller {
         if (currentAmount > 0) {
             this.decResource3Btn.setDisable(false);
         }
-        if (currentAmount == player.resources().get(MOON_ROCK)) {
+        if (currentAmount == resources.get(MOON_ROCK)) {
             // disable button, when already enough of this resource selected
             this.incResource3Btn.setDisable(true);
         }
@@ -186,7 +226,7 @@ public class DiscardResourcesController implements Controller {
 
     public void onIncreaseRes4ButtonPressed() {
         int currentAmount = Integer.parseInt(this.amountNeptuneCrystal.getText());
-        if (currentAmount < this.amountToDiscard && currentAmount < this.player.resources().get(NEPTUNE_CRYSTAL)) {
+        if (currentAmount < this.amountToDiscard && currentAmount < resources.get(NEPTUNE_CRYSTAL)) {
             currentAmount += 1;
             this.amountNeptuneCrystal.setText(String.valueOf(currentAmount));
             this.checkChosenResources();
@@ -195,7 +235,7 @@ public class DiscardResourcesController implements Controller {
         if (currentAmount > 0) {
             this.decResource4Btn.setDisable(false);
         }
-        if (currentAmount == player.resources().get(NEPTUNE_CRYSTAL)) {
+        if (currentAmount == resources.get(NEPTUNE_CRYSTAL)) {
             // disable button, when already enough of this resource selected
             this.incResource4Btn.setDisable(true);
         }
@@ -203,7 +243,7 @@ public class DiscardResourcesController implements Controller {
 
     public void onIncreaseRes5ButtonPressed() {
         int currentAmount = Integer.parseInt(this.amountVenusGrain.getText());
-        if (currentAmount < this.amountToDiscard && currentAmount < this.player.resources().get(VENUS_GRAIN)) {
+        if (currentAmount < this.amountToDiscard && currentAmount < resources.get(VENUS_GRAIN)) {
             currentAmount += 1;
             this.amountVenusGrain.setText(String.valueOf(currentAmount));
             this.checkChosenResources();
@@ -212,7 +252,7 @@ public class DiscardResourcesController implements Controller {
         if (currentAmount > 0) {
             this.decResource5Btn.setDisable(false);
         }
-        if (currentAmount == player.resources().get(VENUS_GRAIN)) {
+        if (currentAmount == resources.get(VENUS_GRAIN)) {
             // disable button, when already enough of this resource selected
             this.incResource5Btn.setDisable(true);
         }
@@ -228,7 +268,7 @@ public class DiscardResourcesController implements Controller {
 
         // disable button when 0 reached, enable increasing again when decreasing amount from max. number needed
         // for discarding
-        if (currentAmount < player.resources().get(EARTH_CACTUS)) {
+        if (currentAmount < resources.get(EARTH_CACTUS)) {
             this.incResource1Btn.setDisable(false);
         }
         if (currentAmount == 0) {
@@ -246,7 +286,7 @@ public class DiscardResourcesController implements Controller {
 
         // disable button when 0 reached, enable increasing again when decreasing amount from max. number
         // needed for discarding
-        if (currentAmount < player.resources().get(MARS_BAR)) {
+        if (currentAmount < resources.get(MARS_BAR)) {
             this.incResource2Btn.setDisable(false);
         }
         if (currentAmount == 0) {
@@ -264,7 +304,7 @@ public class DiscardResourcesController implements Controller {
 
         // disable button when 0 reached, enable increasing again when decreasing
         // amount from max. number needed for discarding
-        if (currentAmount < player.resources().get(MOON_ROCK)) {
+        if (currentAmount < resources.get(MOON_ROCK)) {
             this.incResource3Btn.setDisable(false);
         }
         if (currentAmount == 0) {
@@ -282,7 +322,7 @@ public class DiscardResourcesController implements Controller {
 
         // disable button when 0 reached, enable increasing again when decreasing amount from max. number needed
         // for discarding
-        if (currentAmount < player.resources().get(NEPTUNE_CRYSTAL)) {
+        if (currentAmount < resources.get(NEPTUNE_CRYSTAL)) {
             this.incResource4Btn.setDisable(false);
         }
         if (currentAmount == 0) {
@@ -299,7 +339,7 @@ public class DiscardResourcesController implements Controller {
         }
 
         // enable increase button again, when the required amount of resources to drop is not reached yet
-        if (currentAmount < player.resources().get(VENUS_GRAIN)) {
+        if (currentAmount < resources.get(VENUS_GRAIN)) {
             this.incResource5Btn.setDisable(false);
         }
         if (currentAmount == 0) {
@@ -322,20 +362,17 @@ public class DiscardResourcesController implements Controller {
 
     // The discard button is only enabled when the correct amount of resources is chosen
     public void onDiscardButtonPressed() {
-        // Create a HashMap and make post request to the server for dropping resources
-        HashMap<String, Integer> resources = new HashMap<>() {{
-            // Documentation of the server says values have to be negative for taking off resources
-            put(VENUS_GRAIN, (-1) * Integer.parseInt(amountVenusGrain.getText()));
-            put(MARS_BAR, (-1) * Integer.parseInt(amountMarsBar.getText()));
-            put(MOON_ROCK, (-1) * Integer.parseInt(amountMoonRock.getText()));
-            put(EARTH_CACTUS, (-1) * Integer.parseInt(amountEarthCactus.getText()));
-            put(NEPTUNE_CRYSTAL, (-1) * Integer.parseInt(amountNeptuneCrystal.getText()));
-        }};
+        // Values have to be negative for taking off resources
+        this.resources.put(VENUS_GRAIN, (-1) * Integer.parseInt(amountVenusGrain.getText()));
+        this.resources.put(MARS_BAR, (-1) * Integer.parseInt(amountMarsBar.getText()));
+        this.resources.put(MOON_ROCK, (-1) * Integer.parseInt(amountMoonRock.getText()));
+        this.resources.put(EARTH_CACTUS, (-1) * Integer.parseInt(amountEarthCactus.getText()));
+        this.resources.put(NEPTUNE_CRYSTAL, (-1) * Integer.parseInt(amountNeptuneCrystal.getText()));
 
         pioneersService.move(gameID, DROP_ACTION, null, null, null, null, null, null, resources)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(
-                        // TODO: result -> after success display a notification and close the stage/window automatically
+                        // after success display a notification and close the stage/window automatically
                         result -> {
                             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Successfully dropped resources");
                             // Change style of alert
