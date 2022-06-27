@@ -28,137 +28,189 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameLobbyController implements Controller {
 
-	private final ObservableList<Member> members = FXCollections.observableArrayList();
-	private final ObservableList<User> playerList = FXCollections.observableArrayList();
+    private final ObservableList<Member> members = FXCollections.observableArrayList();
 
-	@FXML
-	public Label idTitleLabel;
-	@FXML
-	public Button idLeaveButton;
-	@FXML
-	public ScrollPane idUserInLobby;
-	@FXML
-	public Button idReadyButton;
-	@FXML
-	public Button idStartGameButton;
-	@FXML
-	public VBox idUserList;
-	@FXML
-	public VBox idChatContainer;
-	@FXML
-	public ComboBox<Label> colorPicker = new ComboBox<>();
+    private final ObservableList<Member> spectatorMember = FXCollections.observableArrayList();
 
-	private final App app;
-	private final MemberService memberService;
-	private final UserService userService;
-	private final MessageService messageService;
-	private final GameService gameService;
-	private final Provider<LobbyController> lobbyController;
-	private final Provider<GameScreenController> gameScreenController;
-	private MessageViewSubController messageViewSubController;
-	private MemberListSubcontroller memberListSubcontroller;
-	private final EventListener eventListener;
-	private final GameIDStorage gameIDStorage;
-	private final MemberIDStorage memberIDStorage;
-	private final IDStorage idStorage;
+    private final ObservableList<User> allUsers = FXCollections.observableArrayList();
+    private final ObservableList<User> playerList = FXCollections.observableArrayList();
 
-	private Game game;
-	private final CompositeDisposable disposable = new CompositeDisposable();
+    @FXML
+    public Label idTitleLabel;
+    @FXML
+    public Button idLeaveButton;
+    @FXML
+    public ScrollPane idUserInLobby;
+    @FXML
+    public Button idReadyButton;
+    @FXML
+    public Button idStartGameButton;
+    @FXML
+    public VBox idUserList;
+    @FXML
+    public VBox idChatContainer;
+    @FXML
+    public ComboBox<Label> colorPicker = new ComboBox<>();
 
-	@Inject
-	public GameLobbyController(App app,
-							   MemberService memberService,
-							   UserService userService,
-							   MessageService messageService,
-							   GameService gameService,
-							   Provider<LobbyController> lobbyController,
-							   Provider<GameScreenController> gameScreenController,
-							   EventListener eventListener,
-							   IDStorage idStorage,
-							   GameIDStorage gameIDStorage,
-							   MemberIDStorage memberIDStorage) {
-		this.app = app;
-		this.memberService = memberService;
-		this.userService = userService;
-		this.messageService = messageService;
-		this.gameService = gameService;
-		this.lobbyController = lobbyController;
-		this.gameScreenController = gameScreenController;
-		this.eventListener = eventListener;
-		this.gameIDStorage = gameIDStorage;
-		this.memberIDStorage = memberIDStorage;
-		this.idStorage = idStorage;
-	}
+    private final App app;
+    private final MemberService memberService;
+    private final UserService userService;
+    private final MessageService messageService;
+    private final GameService gameService;
+    private final Provider<LobbyController> lobbyController;
+    private final Provider<GameScreenController> gameScreenController;
+    //Button for spectator
+    public VBox spectatorIds;
+    //player Numbers Label
+    public Label playersNumberId;
+    //player LabelID
+    public Label spectatorLabelId;
 
-	@Override
-	public void init() {
-		// get all game members
-		memberService
-				.getAllGameMembers(this.gameIDStorage.getId())
-				.observeOn(FX_SCHEDULER)
-				.subscribe(col -> {
-					this.members.setAll(col);
-					int ready = 0;
-					for (Member member : members) {
-						if (member.ready()) {
-							ready++;
-						}
-					}
-					if (ready >= 2) {
-						idStartGameButton.disableProperty().set(false);
-					}
-					this.userService.findAllUsers()
-							.observeOn(FX_SCHEDULER)
-							.subscribe(event -> {
-								for (User user : event) {
-									for (Member member : members) {
-										if (user._id().equals(member.userId())) {
-											this.playerList.add(user);
-										}
-									}
-								}
-							});
-				});
+    private MessageViewSubController messageViewSubController;
+    private MemberListSubcontroller memberListSubcontroller;
 
-		// listen to members
-		disposable.add(eventListener
-				.listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
-				.observeOn(FX_SCHEDULER)
-				.subscribe(event -> {
-					final Member member = event.data();
-					if (event.event().endsWith(CREATED)) {
-						if (!members.contains(member)) {
-							members.add(member);
-							userService.findOne(member.userId())
-									.observeOn(FX_SCHEDULER)
-									.subscribe(this.playerList::add);
-						}
-					} else if (event.event().endsWith(DELETED)) {
-						members.remove(member);
-						if (member.userId().equals(idStorage.getID())) {
-							app.show(lobbyController.get());
-						}
+    private MemberListSubcontroller memberListSpectatorSubcontroller;
+    private final EventListener eventListener;
+    private final GameIDStorage gameIDStorage;
+    private final MemberIDStorage memberIDStorage;
+    private final IDStorage idStorage;
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
-					} else if (event.event().endsWith(UPDATED)) {
-						for (Member updatedMember : this.members) {
-							if (updatedMember.userId().equals(member.userId())) {
-								this.members.set(this.members.indexOf(updatedMember), member);
-								break;
-							}
-						}
-						int readyMembers = 0;
-						for (Member members : this.members) {
-							if (members.ready()) {
-								readyMembers += 1;
-							}
-						}
-						this.idStartGameButton.disableProperty().set(readyMembers < 2 || readyMembers != members.size());
-					}
-					this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-				}));
+    private Game game;
+
+    private String lastColorPicked = "";
+
+    @Inject
+    public GameLobbyController(App app,
+                               MemberService memberService,
+                               UserService userService,
+                               MessageService messageService,
+                               GameService gameService,
+                               Provider<LobbyController> lobbyController,
+                               Provider<GameScreenController> gameScreenController,
+                               EventListener eventListener,
+                               IDStorage idStorage,
+                               GameIDStorage gameIDStorage,
+                               MemberIDStorage memberIDStorage) {
+        this.app = app;
+        this.memberService = memberService;
+        this.userService = userService;
+        this.messageService = messageService;
+        this.gameService = gameService;
+        this.lobbyController = lobbyController;
+        this.gameScreenController = gameScreenController;
+        this.eventListener = eventListener;
+        this.gameIDStorage = gameIDStorage;
+        this.memberIDStorage = memberIDStorage;
+        this.idStorage = idStorage;
+    }
+
+    @Override
+    public void init() {
+        // get all game members
+        memberService
+                .getAllGameMembers(this.gameIDStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(col -> {
+                    this.members.setAll(col);
+                    int ready = 0;
+                    for(Member member : members){
+                        if(member.ready()){
+                            ready++;
+                        }
+                    }
+                    if(ready>=2){
+                        idStartGameButton.disableProperty().set(false);
+                    }
+                    this.userService.findAllUsers()
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(event -> {
+                                for (User user : event) {
+                                    for (Member member : members) {
+                                        if (user._id().equals(member.userId())) {
+                                            this.playerList.add(user);
+                                        }
+                                    }
+                                }
+
+                            });
+                });
+
+        // listen to members
+        disposable.add(eventListener
+                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    final Member member = event.data();
+                    if (event.event().endsWith(CREATED)) {
+
+                        if (!members.contains(member)) {
+                            members.add(member);
+                            userService.findOne(member.userId())
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(this.playerList::add);
+                        }
+
+                    } else if (event.event().endsWith(DELETED)) {
+                        if(members.contains(member)) {
+                            members.remove(member);
+                        }else {
+                            spectatorMember.remove(member);
+                        }
+                        if (member.userId().equals(idStorage.getID())) {
+                            app.show(lobbyController.get());
+                        }
+
+                    } else if (event.event().endsWith(UPDATED)) {
+                        for (Member updatedMember : this.members) {
+                            if (updatedMember.userId().equals(member.userId()) && member.spectator()) {
+
+                                //this.members.set(this.members.indexOf(updatedMember), member);
+                                spectatorMember.add(member);
+                                members.remove(updatedMember);
+                                this.playersNumberId.setText("Players "+members.size()+"/6");
+                                break;
+                            } else if(updatedMember.userId().equals(member.userId()) && !member.spectator()){
+                                this.members.set(this.members.indexOf(updatedMember), member);
+                                break;
+                            }
+                        }
+                        for (Member upSpectatorMember:this.spectatorMember){
+                            if (upSpectatorMember.userId().equals(member.userId()) && !member.spectator()) {
+                                //this.members.set(this.members.indexOf(updatedMember), member);
+                                spectatorMember.remove(upSpectatorMember);
+                                members.add(member);
+                                this.playersNumberId.setText("Players "+members.size()+"/6");
+                                break;
+                            }
+                        }
+                        int readyMembers = 0;
+                        for (Member members : this.members) {
+                            if (members.ready()) {
+                                readyMembers += 1;
+                            }
+                        }
+                        for(Member member1:this.spectatorMember){
+                            if(member1.ready()){
+                                readyMembers +=1;
+                            }
+                        }
+                        this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
+                                +spectatorMember.size());// || members.size() == 0);
+
+                        this.idUserList.getChildren().clear();
+                        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+                        this.spectatorIds.getChildren().clear();
+                        this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
+                    }
+
+                    //this.spectatorIds.getChildren().setAll(members.stream().map(this::renderSpectatorMember).toList());
+
+                }));
 
 		//listen to the game
 		disposable.add(eventListener
@@ -214,6 +266,8 @@ public class GameLobbyController implements Controller {
 		playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList()));
 
 		addColorOnComboBox(colorPicker);
+        this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
+        playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList()));
 
 		// disable start button when entering game lobby
 		idStartGameButton.disableProperty().set(true);
@@ -285,22 +339,22 @@ public class GameLobbyController implements Controller {
 
 		List<String> allColors = createdColors(createdColors);
 
-		//remove color from allcolors if it belongs to a member
-		for (Member member : members) {
-			if (member.color() != null) {
-				allColors.remove(member.color());
-			}
-		}
+        //remove color from allcolors if it belongs to a member
+        for (Member member : members) {
+            if (member.color() != null && !member.spectator()) {
+                allColors.remove(member.color());
+            }
+        }
 
-		//give color to member that do not have colors
-		for (Member member : members) {
-			if (member.color() == null || member.color().equals("#000000")) {
-				memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), member.spectator())
-						.subscribe();
-				allColors.remove(0);
-			}
-		}
-	}
+        //give color to member that do not have colors
+        for (Member member : members) {
+            if ((member.color() == null || member.color().equals("#000000"))) {
+                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0),member.spectator())
+                        .subscribe();
+                allColors.remove(0);
+            }
+        }
+    }
 
 	//change String into hascode for colors
 	private List<String> createdColors(List<Label> createdColors) {
@@ -313,16 +367,31 @@ public class GameLobbyController implements Controller {
 		return colorNames;
 	}
 
-	private Node renderMember(Member member) {
-		for (User user : playerList) {
-			if (user._id().equals(member.userId())) {
-				this.memberListSubcontroller = new MemberListSubcontroller(member, user);
-				break;
-			}
-		}
+    private Node renderMember(Member member) {
+        //sets the size of player
+        this.playersNumberId.setText("Players "+members.size()+"/6");
+        for (User user : playerList) {
+            if (user._id().equals(member.userId()) && !member.spectator()) {
+                this.memberListSubcontroller = new MemberListSubcontroller(member, user);
+                 break;
+            }
+        }
 
-		return memberListSubcontroller.render();
-	}
+        return memberListSubcontroller.render();
+
+    }
+
+    //render spectators
+    private Node renderSpectatorMember(Member member) {
+        for (User user : playerList) {
+            if (user._id().equals(member.userId()) && member.spectator()) {
+                this.memberListSpectatorSubcontroller = new MemberListSubcontroller(member, user);
+                break;
+            }
+        }
+
+        return memberListSpectatorSubcontroller.render();
+    }
 
 	private void addColorOnComboBox(ComboBox<Label> comboBox) {
 
@@ -363,22 +432,54 @@ public class GameLobbyController implements Controller {
 		Color c = Color.web(label.getText().toLowerCase());
 		String pickedColor = "#" + c.toString().substring(2, 8);
 
-		boolean chose = true;
-		boolean ready = false;
-		boolean spectator = false;
-		List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
-		for (Member member : memberList) {
-			if (member.color() != null && member.color().equals(pickedColor)) {
-				chose = false;
-			}
-			if (member.userId().equals(idStorage.getID())) {
-				ready = member.ready();
-				spectator = member.spectator();
-			}
-		}
-		if (chose) {
-			memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), ready, pickedColor, spectator).
-					observeOn(FX_SCHEDULER).subscribe();
-		}
-	}
+        boolean chose = true;
+        boolean ready = false;
+        boolean spectator = false;
+        List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        for (Member member : memberList) {
+            if (member.color() != null && member.color().equals(pickedColor)) {
+                chose = false;
+            }
+            if (member.userId().equals(idStorage.getID())) {
+                ready = member.ready();
+                spectator = member.spectator();
+            }
+        }
+        if (chose) {
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), ready, pickedColor, spectator).
+                    observeOn(FX_SCHEDULER).subscribe();
+        }
+    }
+
+
+    //changes between Spectator and Player
+    public void onCheckBox(ActionEvent event) {
+        //get all the members that are currently in the game
+        List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        boolean ready = false;
+        boolean spectator = false;
+        for (Member member : memberList) {
+            if (member.userId().equals(idStorage.getID())) {
+                ready = member.ready();
+                spectator = member.spectator();
+            }
+        }
+
+        if(!spectator) {
+            //makes ready button invisible
+            this.idReadyButton.setText("Not Ready");
+            this.idReadyButton.setDisable(true);
+
+            this.colorPicker.setDisable(true);
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, "#000000", true)
+                    .subscribe();
+        } else {
+            //makes ready button visible
+            this.idReadyButton.setText("Ready");
+            this.idReadyButton.setDisable(false);
+            this.colorPicker.setDisable(false);
+            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), !ready, null, false)
+                    .subscribe();
+        }
+    }
 }

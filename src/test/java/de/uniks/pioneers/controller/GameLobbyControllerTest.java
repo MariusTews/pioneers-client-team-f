@@ -76,7 +76,7 @@ class GameLobbyControllerTest extends ApplicationTest {
         when(memberService.leave("id", "4")).thenReturn(Observable.just(new Member("0:00",
                 "0:30", "id", "4", false, "#000000",false)));
 
-        write("\t\t\t\t\t");
+        write("\t\t\t\t\t\t");
         type(KeyCode.SPACE);
 
         verify(memberService).leave("id", "4");
@@ -89,7 +89,7 @@ class GameLobbyControllerTest extends ApplicationTest {
         when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30",
                                                         "id", "name", "owner", 1, false,new GameSettings(2,10))));
 
-        write("\t\t\t\t\t");
+        write("\t\t\t\t\t\t");
         type(KeyCode.SPACE);
 
         verify(gameService).deleteGame("id");
