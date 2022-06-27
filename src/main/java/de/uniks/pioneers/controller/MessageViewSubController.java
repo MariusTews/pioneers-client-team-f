@@ -189,18 +189,27 @@ public class MessageViewSubController implements Controller {
             imageView.setImage(new Image(this.userHash.get(m.sender()).avatar()));
         }
         box.getChildren().add(imageView);
+
+        //member for checking whether it is spectator or not
+        Member member = memberHash.get(this.userHash.get(m.sender())._id());
+
         // Label with message
         Label label = new Label();
         // Format the message label and display the whole message with line breaks
         label.setMinWidth(100);
         label.setMaxWidth(250);
         label.setWrapText(true);
-        label.setText(m.body());
+        if(member.spectator()) {
+            label.setText("\n" + m.body());
+        }else {
+            label.setText(m.body());
+        }
         label.setTextFill(Color.WHITE);
         this.initRightClick(label, m._id(), m.sender());
 
         // Label with colored username
         Label nameLabel = coloredUsername(m);
+
 
         box.getChildren().addAll(nameLabel, label);
         this.idMessageView.getChildren().add(box);
@@ -252,10 +261,17 @@ public class MessageViewSubController implements Controller {
 
     // Return the username label colored with the chosen color
     private Label coloredUsername(Message m) {
+        //member for checking whether it is spectator or not
+        Member member = memberHash.get(this.userHash.get(m.sender())._id());
+
         Label username = new Label();
         username.setMinWidth(50);
         // Set username as text, default is black which shall be white later
-        username.setText(userHash.get(m.sender()).name() + ":");
+        if(member.spectator()) {
+            username.setText("(Spectator) \n" + userHash.get(m.sender()).name() + ":");
+        }else {
+            username.setText(userHash.get(m.sender()).name() + ":");
+        }
 
         // get the color of the game member from memberHash
         String color = memberHash.get(m.sender()).color();

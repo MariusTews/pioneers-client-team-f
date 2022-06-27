@@ -5,8 +5,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<HBox id="gameView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<HBox id="gameView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="de.uniks.pioneers.controller.GameScreenController">
     <VBox maxHeight="900.0" prefHeight="900.0" prefWidth="500.0">
         <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0">
@@ -21,7 +20,7 @@
         </Pane>
     </VBox>
     <VBox prefHeight="900.0" prefWidth="650.0">
-        <Pane prefHeight="150.0" prefWidth="650.0"/>
+        <Pane fx:id="spectatorPaneId" prefHeight="150.0" prefWidth="650.0"/>
         <ScrollPane fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="600.0" prefWidth="650.0"
                     vbarPolicy="NEVER" vvalue="0.5"/>
         <Pane id="roll" prefHeight="150.0" prefWidth="650.0">
