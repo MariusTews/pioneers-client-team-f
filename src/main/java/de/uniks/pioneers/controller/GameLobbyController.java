@@ -75,7 +75,7 @@ public class GameLobbyController implements Controller {
 
     private MemberListSubcontroller memberListSpectatorSubcontroller;
     private final EventListener eventListener;
-    private final GameIDStorage gameIDStorage;
+    private final GameStorage gameStorage;
     private final MemberIDStorage memberIDStorage;
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -94,7 +94,7 @@ public class GameLobbyController implements Controller {
                                Provider<GameScreenController> gameScreenController,
                                EventListener eventListener,
                                IDStorage idStorage,
-                               GameIDStorage gameIDStorage,
+                               GameStorage gameStorage,
                                MemberIDStorage memberIDStorage) {
         this.app = app;
         this.memberService = memberService;
@@ -104,7 +104,7 @@ public class GameLobbyController implements Controller {
         this.lobbyController = lobbyController;
         this.gameScreenController = gameScreenController;
         this.eventListener = eventListener;
-        this.gameIDStorage = gameIDStorage;
+        this.gameStorage = gameStorage;
         this.memberIDStorage = memberIDStorage;
         this.idStorage = idStorage;
     }
@@ -113,7 +113,7 @@ public class GameLobbyController implements Controller {
     public void init() {
         // get all game members
         memberService
-                .getAllGameMembers(this.gameIDStorage.getId())
+                .getAllGameMembers(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.members.setAll(col);
@@ -142,7 +142,7 @@ public class GameLobbyController implements Controller {
 
         // listen to members
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
+                .listen("games." + this.gameStorage.getId() + ".members.*.*", Member.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Member member = event.data();
@@ -214,7 +214,7 @@ public class GameLobbyController implements Controller {
 
 		//listen to the game
 		disposable.add(eventListener
-				.listen("games." + this.gameIDStorage.getId() + ".*.*", Message.class)
+				.listen("games." + this.gameStorage.getId() + ".*.*", Message.class)
 				.observeOn(FX_SCHEDULER)
 				.subscribe(event -> {
 					if (event.event().endsWith("state" + CREATED)) {
@@ -224,7 +224,7 @@ public class GameLobbyController implements Controller {
 				}));
 
 		// initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
-		this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+		this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
 				userService, messageService, memberIDStorage, memberService);
 		messageViewSubController.init();
 	}
@@ -254,10 +254,12 @@ public class GameLobbyController implements Controller {
 		}
 
 		gameService
-				.findOneGame(this.gameIDStorage.getId())
+				.findOneGame(this.gameStorage.getId())
 				.observeOn(FX_SCHEDULER)
 				.subscribe(result -> {
 					this.game = result;
+					this.gameStorage.setSize(result.settings().mapRadius());
+					this.gameStorage.setVictoryPoints(result.settings().victoryPoints());
 					this.idTitleLabel.setText("Welcome to " + this.game.name());
 				});
 
@@ -280,18 +282,18 @@ public class GameLobbyController implements Controller {
 
 	public void leave(ActionEvent ignoredEvent) {
 		gameService
-				.findOneGame(gameIDStorage.getId())
+				.findOneGame(gameStorage.getId())
 				.observeOn(FX_SCHEDULER)
 				.subscribe(result -> {
 					if ((int) result.members() == 1 || result.owner().equals(idStorage.getID())) {
 						gameService
-								.deleteGame(gameIDStorage.getId())
+								.deleteGame(gameStorage.getId())
 								.observeOn(FX_SCHEDULER)
 								.subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
 								});
 					} else {
 						memberService
-								.leave(gameIDStorage.getId(), idStorage.getID())
+								.leave(gameStorage.getId(), idStorage.getID())
 								.observeOn(FX_SCHEDULER)
 								.subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
 								});
@@ -303,10 +305,10 @@ public class GameLobbyController implements Controller {
 		for (Member member : this.members) {
 			if (member.userId().equals(idStorage.getID())) {
 				if (member.ready()) {
-					memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), false, member.color(), member.spectator()).subscribe();
+					memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), false, member.color(), member.spectator()).subscribe();
 					this.idReadyButton.setText("Ready");
 				} else {
-					memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, member.color(), member.spectator()).subscribe();
+					memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), true, member.color(), member.spectator()).subscribe();
 					this.idReadyButton.setText("Not Ready");
 				}
 			}
@@ -316,7 +318,7 @@ public class GameLobbyController implements Controller {
 	public void startGame(ActionEvent ignoredEvent) {
 		//give all the players color
 		giveAllThePlayersColor();
-		gameService.updateGame(gameIDStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints())
+		gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints())
 				.observeOn(FX_SCHEDULER)
 				.doOnError(error -> {
 					if ("HTTP 403 ".equals(error.getMessage())) {
@@ -372,14 +374,12 @@ public class GameLobbyController implements Controller {
         this.playersNumberId.setText("Players "+members.size()+"/6");
         for (User user : playerList) {
             if (user._id().equals(member.userId()) && !member.spectator()) {
-                this.memberListSubcontroller = new MemberListSubcontroller(member, user);
-                 break;
-            }
-        }
-
-        return memberListSubcontroller.render();
-
-    }
+				this.memberListSubcontroller = new MemberListSubcontroller(member, user);
+				break;
+			}
+		}
+		return memberListSubcontroller.render();
+	}
 
     //render spectators
     private Node renderSpectatorMember(Member member) {
@@ -389,7 +389,6 @@ public class GameLobbyController implements Controller {
                 break;
             }
         }
-
         return memberListSpectatorSubcontroller.render();
     }
 
@@ -435,7 +434,7 @@ public class GameLobbyController implements Controller {
         boolean chose = true;
         boolean ready = false;
         boolean spectator = false;
-        List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        List<Member> memberList = memberService.getAllGameMembers(gameStorage.getId()).blockingFirst();
         for (Member member : memberList) {
             if (member.color() != null && member.color().equals(pickedColor)) {
                 chose = false;
@@ -446,16 +445,15 @@ public class GameLobbyController implements Controller {
             }
         }
         if (chose) {
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), ready, pickedColor, spectator).
+            memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), ready, pickedColor, spectator).
                     observeOn(FX_SCHEDULER).subscribe();
         }
     }
 
-
     //changes between Spectator and Player
     public void onCheckBox(ActionEvent event) {
         //get all the members that are currently in the game
-        List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        List<Member> memberList = memberService.getAllGameMembers(gameStorage.getId()).blockingFirst();
         boolean ready = false;
         boolean spectator = false;
         for (Member member : memberList) {
@@ -471,14 +469,14 @@ public class GameLobbyController implements Controller {
             this.idReadyButton.setDisable(true);
 
             this.colorPicker.setDisable(true);
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, "#000000", true)
+            memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), true, "#000000", true)
                     .subscribe();
         } else {
             //makes ready button visible
             this.idReadyButton.setText("Ready");
             this.idReadyButton.setDisable(false);
             this.colorPicker.setDisable(false);
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), !ready, null, false)
+            memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), !ready, null, false)
                     .subscribe();
         }
     }

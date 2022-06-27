@@ -42,7 +42,7 @@ public class GameLobbyViewTest extends ApplicationTest {
 	@Mock
 	EventListener eventListener;
 	@Spy
-	GameIDStorage gameIDStorage;
+	GameStorage gameStorage;
 
 	@InjectMocks
 	GameLobbyController gameLobbyController;
@@ -60,7 +60,7 @@ public class GameLobbyViewTest extends ApplicationTest {
 
 		Game g = new Game("0", "0", "g1", "g", "u1", 2, true, new GameSettings(2, 10));
 
-		when(gameIDStorage.getId()).thenReturn("g1");
+		when(gameStorage.getId()).thenReturn("g1");
 		when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(m1, m2).buffer(2));
 		when(userService.findAllUsers()).thenReturn(Observable.just(u1, u2).buffer(2));
 		when(eventListener.listen(any(), any())).thenReturn(Observable.empty());

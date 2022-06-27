@@ -41,7 +41,7 @@ class GameLobbyControllerTest extends ApplicationTest {
     EventListener eventListener;
 
     @Spy
-    GameIDStorage gameIDStorage;
+	GameStorage gameStorage;
 
     @Spy
     IDStorage idStorage;
@@ -59,13 +59,12 @@ class GameLobbyControllerTest extends ApplicationTest {
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
                 "id", "name", "owner", 2, false,new GameSettings(2,10))));
-        when(gameIDStorage.getId()).thenReturn("id");
+        when(gameStorage.getId()).thenReturn("id");
 
 
         // start application
         final App app = new App(gameLobbyController);
         app.start(stage);
-
     }
 
 
@@ -93,6 +92,5 @@ class GameLobbyControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
 
         verify(gameService).deleteGame("id");
-
     }
 }

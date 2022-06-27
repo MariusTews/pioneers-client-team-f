@@ -44,7 +44,7 @@ public class GameScreenController implements Controller {
     private final Provider<LobbyController> lobbyController;
 
     @FXML
-    public Pane mapPane;
+    public ScrollPane mapPane;
     @FXML
     public Pane chatPane;
     @FXML
@@ -68,7 +68,7 @@ public class GameScreenController implements Controller {
 
     private final App app;
 
-    private final GameIDStorage gameIDStorage;
+    private final GameStorage gameStorage;
     private final IDStorage idStorage;
     //specatator pane
     public Pane spectatorPaneId;
@@ -97,7 +97,7 @@ public class GameScreenController implements Controller {
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
                                 App app,
-                                GameIDStorage gameIDStorage,
+                                GameStorage gameStorage,
                                 IDStorage idStorage,
                                 PioneersService pioneersService,
                                 EventListener eventListener,
@@ -108,7 +108,7 @@ public class GameScreenController implements Controller {
                                 MemberService memberService) {
         this.lobbyController = lobbyController;
         this.app = app;
-        this.gameIDStorage = gameIDStorage;
+        this.gameStorage = gameStorage;
         this.idStorage = idStorage;
         this.pioneersService = pioneersService;
         this.eventListener = eventListener;
@@ -135,7 +135,7 @@ public class GameScreenController implements Controller {
 
                     //get all the members
                     memberService
-                            .getAllGameMembers(gameIDStorage.getId())
+                            .getAllGameMembers(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe( c ->{
                                 this.members.setAll(c);
@@ -143,14 +143,14 @@ public class GameScreenController implements Controller {
 
                     // Listen to the State to handle the event
                     disposable.add(eventListener
-                            .listen("games." + this.gameIDStorage.getId() + ".state.*", State.class)
+                            .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
                             .observeOn(FX_SCHEDULER)
                             .subscribe(this::handleStateEvents));
 
 
                     // Check if expected move is founding-roll after joining the game
                     pioneersService
-                            .findOneState(gameIDStorage.getId())
+                            .findOneState(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe(r -> {
                                 if (r.expectedMoves().get(0).action().equals("founding-roll")) {
@@ -159,7 +159,7 @@ public class GameScreenController implements Controller {
                             });
 
                     pioneersService
-                            .findAllPlayers(this.gameIDStorage.getId())
+                            .findAllPlayers(this.gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe(c -> {
                                 for (Member member:this.members) {
@@ -178,25 +178,25 @@ public class GameScreenController implements Controller {
                 });
         // Listen to the Moves to handle the event
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".moves.*." + "created", Move.class)
+                .listen("games." + this.gameStorage.getId() + ".moves.*." + "created", Move.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleMoveEvents));
 
         // Listen to the players for recognizing if achievements changed
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".players.*.*", Player.class)
+                .listen("games." + this.gameStorage.getId() + ".players.*.*", Player.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handlePlayerEvent));
 
         //Listen to the Building to handle the event
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".buildings.*.*", Building.class)
+                .listen("games." + this.gameStorage.getId() + ".buildings.*.*", Building.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleBuildingEvents));
 
 
         // Initialize sub controller for ingame chat, add listener and load all messages
-        this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
+        this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
@@ -237,9 +237,9 @@ public class GameScreenController implements Controller {
             }
         });
 
-        this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(app, gameStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
-        mapPane.getChildren().setAll(gameFieldSubController.render());
+        mapPane.setContent(gameFieldSubController.render());
 
         /*
         * Render trading sub view
@@ -393,7 +393,7 @@ public class GameScreenController implements Controller {
     // diceRoll if the current move is roll
     public void diceRoll() {
         if (nextMoveLabel.getText().equals("roll")) {
-            pioneersService.move(gameIDStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement")
+            pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement")
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                     }, Throwable::printStackTrace);
@@ -402,19 +402,19 @@ public class GameScreenController implements Controller {
 
     // automatic foundingDiceRoll after joining the game
     public void foundingDiceRoll() {
-        pioneersService.move(gameIDStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
+        pioneersService.move(gameStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
                 .observeOn(FX_SCHEDULER)
                 .subscribe();
     }
 
     public void onLeave(ActionEvent ignoredEvent) {
         if ((players.size() + playerOwnView.size()) == 2) {
-            gameService.findOneGame(this.gameIDStorage.getId())
+            gameService.findOneGame(this.gameStorage.getId())
                     .observeOn(FX_SCHEDULER).
                     subscribe(col -> {
                         if (col.owner().equals(idStorage.getID())) {
                             gameService.
-                                    deleteGame(this.gameIDStorage.getId()).
+                                    deleteGame(this.gameStorage.getId()).
                                     observeOn(FX_SCHEDULER).
                                     subscribe(onSuccess ->
                                             this.app.show(lobbyController.get()), onError -> {
@@ -430,12 +430,11 @@ public class GameScreenController implements Controller {
     }
 
     public void finishTurn() {
-        pioneersService.move(gameIDStorage.getId(), "build", null, null, null, null, null)
+        pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                 }, onError -> {
                 });
-
     }
 
     private void startTime() {
@@ -449,17 +448,22 @@ public class GameScreenController implements Controller {
         //gets called every second to reduce the timer by one second
         KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
             seconds[0]--;
-            timerLabel.setText("" + (seconds[0]/60) + ":" + seconds[0]%60 );
+            if (seconds[0]%60 >9) {
+                timerLabel.setText("" + (seconds[0] / 60) + ":" + seconds[0] % 60);
+            } else {
+                timerLabel.setText("" + (seconds[0] / 60) + ":0" + seconds[0] % 60);
+            }
+
             if (seconds[0] <= 0) {
                 timeline.stop();
                 //current Move is founding-settlement
                 if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-settlement")) {
                     //get all valid settlementPosition in dependence of map
                     List<String> validPositions = getAllValidPositions();
-                    //get all incalid settlementPositions
+                    //get all invalid settlementPositions
                     List<String> allInvalidSettlementCoordinates = getAllInvalidSettlementCoordinates();
 
-                    //remove invalidsettlementPositions from validPositions
+                    //remove invalid settlementPositions from validPositions
                     for (String string : allInvalidSettlementCoordinates) {
                         validPositions.remove(string);
                     }
@@ -488,9 +492,9 @@ public class GameScreenController implements Controller {
                     String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
                     //place chosen settlement and road
-                    pioneersService.move(gameIDStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement")
+                    pioneersService.move(gameStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement")
                             .observeOn(FX_SCHEDULER)
-                            .subscribe(result -> pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
+                            .subscribe(result -> pioneersService.move(gameStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
                                     .observeOn(FX_SCHEDULER)
                                     .subscribe());
 
@@ -518,7 +522,7 @@ public class GameScreenController implements Controller {
                     String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
                     //place chosen and road
-                    pioneersService.move(gameIDStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
+                    pioneersService.move(gameStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
                             .observeOn(FX_SCHEDULER)
                             .subscribe();
 
@@ -540,12 +544,12 @@ public class GameScreenController implements Controller {
 
     public List<String> getAllValidPositions() {
         //get current map
-        Map map = pioneersService.findAllTiles(gameIDStorage.getId()).blockingFirst();
+        Map map = pioneersService.findAllTiles(gameStorage.getId()).blockingFirst();
         List<String> allTileCoordinates = new ArrayList<>();
         List<String> allWaterTileCoordinates = new ArrayList<>();
 
-        //TODOs: get size from server in V3(workaround)
-        int gameFieldSize = 2;
+        int gameFieldSize = this.gameStorage.getSize();
+
         for (Tile tile : map.tiles()) {
             allTileCoordinates.add("x" + tile.x().toString() + "y" + tile.y() + "z" + tile.z());
         }
@@ -600,7 +604,7 @@ public class GameScreenController implements Controller {
     }
 
     public List<String> getAllInvalidSettlementCoordinates() {
-        List<Building> allBuildings = pioneersService.findAllBuildings(gameIDStorage.getId()).blockingFirst();
+        List<Building> allBuildings = pioneersService.findAllBuildings(gameStorage.getId()).blockingFirst();
         List<String> allInvalidSettlementCoordinates = new ArrayList<>();
         for (Building building : allBuildings) {
             if (building.side().intValue() == 0) {
@@ -664,5 +668,4 @@ public class GameScreenController implements Controller {
     public GameFieldSubController getGameFieldSubController() {
         return gameFieldSubController;
     }
-
 }
