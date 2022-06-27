@@ -5,7 +5,7 @@
     -fx-background-image: url("../assets/yellow_panel.png");
     -fx-background-position: center;
     -fx-background-repeat: stretch;
-    -fx-background-size: 200 350;
+    -fx-background-size: 205 355;
 }
 
 .button:focused {
@@ -14,25 +14,23 @@
 
 .button.discard {
     -fx-background-image: url("../assets/yellow_button.png");
-    -fx-background-size: auto;
+    -fx-background-size: 175 38;
     -fx-background-position: center;
+    -fx-background-repeat: stretch;
     -fx-text-fill: darkblue;
-}
-
-#discardResources {
-
 }
 
 .label.amount {
     -fx-background-image: url("../assets/yellow_border.png");
     -fx-background-position: center;
+    -fx-background-size: 30 30;
     -fx-text-fill: darkblue;
 }
 
 .button.amount {
     -fx-background-color: transparent;
     -fx-text-fill: white;
-    -fx-font-size: 20;
+    -fx-font-size: 18;
 }
 
 #cactus {
@@ -47,7 +45,7 @@
     -fx-image: url("../assets/moon_rock.png");
 }
 
-#neptun {
+#neptune {
     -fx-image: url("../assets/neptun_crystals.png");
 }
 
