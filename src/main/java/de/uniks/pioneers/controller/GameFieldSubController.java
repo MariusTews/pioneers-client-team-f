@@ -126,6 +126,7 @@ public class GameFieldSubController implements Controller {
 		}
 
 		for (Tile tile : map.tiles()) {
+
 			int x = (int) tile.x();
 			int y = (int) tile.y();
 			int z = (int) tile.z();
@@ -141,11 +142,13 @@ public class GameFieldSubController implements Controller {
 			if (z < 0) {
 				stringZ = "zM" + Math.abs(z);
 			}
-			HexSubController hexSubController = new HexSubController((Polygon) parent.lookup("#" + stringX + stringY + stringZ), tile);
-
-
-			hexSubController.init();
-			this.hexSubControllers.add(hexSubController);
+			for (Node node: hexagons) {
+				if (node.getId().equals(stringX+stringY+stringZ)) {
+					HexSubController hexSubController = new HexSubController((Polygon) node, tile);
+					hexSubController.init();
+					this.hexSubControllers.add(hexSubController);
+				}
+			}
 
 			// Set number token on tiles
 			Label label = (Label) parent.lookup("#" + stringX + stringY + stringZ + "_label");
