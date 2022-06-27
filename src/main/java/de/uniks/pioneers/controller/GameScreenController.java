@@ -132,9 +132,7 @@ public class GameScreenController implements Controller {
                     memberService
                             .getAllGameMembers(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
-                            .subscribe( c ->{
-                                this.members.setAll(c);
-                            });
+                            .subscribe(this.members::setAll);
 
                     // Listen to the State to handle the event
                     disposable.add(eventListener
@@ -335,7 +333,7 @@ public class GameScreenController implements Controller {
                 runDiscardOnce = false;
                 for (Player p : this.playerOwnView) {
                     if (p.userId().equals(currentPlayer._id())) {
-                        DiscardResourcesController discard = new DiscardResourcesController(p, this.gameIDStorage.getId(),
+                        DiscardResourcesController discard = new DiscardResourcesController(p, this.gameStorage.getId(),
                                 this.pioneersService, currentPlayerLabel.getScene().getWindow());
                         discard.render();
                         // Deleting the controller is not needed, because the garbage collector should delete the controller
@@ -438,7 +436,7 @@ public class GameScreenController implements Controller {
     public void finishTurn() {
         // TODO: just temporary till rob is implemented
         if (nextMoveLabel.getText().equals(ROB_ACTION)) {
-            pioneersService.move(gameIDStorage.getId(), ROB_ACTION, 1, 1, 1, null, null, null, null)
+            pioneersService.move(gameStorage.getId(), ROB_ACTION, 1, 1, 1, null, null, null, null)
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                     }, onError -> {

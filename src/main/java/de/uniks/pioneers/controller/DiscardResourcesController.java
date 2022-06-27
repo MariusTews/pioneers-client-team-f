@@ -100,8 +100,8 @@ public class DiscardResourcesController implements Controller {
         try {
             root = loader.load();
             this.primaryStage = new Stage();
-            // TODO: Set to UNDECORATED or TRANSPARENT (without white background) to remove minimize, maximize AND close button of stage
-            primaryStage.initStyle(StageStyle.UTILITY);
+            // Set to UNDECORATED or TRANSPARENT (without white background) to remove minimize, maximize and close button of stage
+            primaryStage.initStyle(StageStyle.TRANSPARENT);
             Scene scene = new Scene(root, 200, 350);
             scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/DiscardResourcesStyle.css")).toString());
             primaryStage.setScene(scene);
