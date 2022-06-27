@@ -389,7 +389,6 @@ public class GameLobbyController implements Controller {
                 break;
             }
         }
-
         return memberListSpectatorSubcontroller.render();
     }
 
@@ -451,11 +450,10 @@ public class GameLobbyController implements Controller {
         }
     }
 
-
     //changes between Spectator and Player
     public void onCheckBox(ActionEvent event) {
         //get all the members that are currently in the game
-        List<Member> memberList = memberService.getAllGameMembers(gameIDStorage.getId()).blockingFirst();
+        List<Member> memberList = memberService.getAllGameMembers(gameStorage.getId()).blockingFirst();
         boolean ready = false;
         boolean spectator = false;
         for (Member member : memberList) {
@@ -471,14 +469,14 @@ public class GameLobbyController implements Controller {
             this.idReadyButton.setDisable(true);
 
             this.colorPicker.setDisable(true);
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), true, "#000000", true)
+            memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), true, "#000000", true)
                     .subscribe();
         } else {
             //makes ready button visible
             this.idReadyButton.setText("Ready");
             this.idReadyButton.setDisable(false);
             this.colorPicker.setDisable(false);
-            memberService.statusUpdate(gameIDStorage.getId(), idStorage.getID(), !ready, null, false)
+            memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), !ready, null, false)
                     .subscribe();
         }
     }

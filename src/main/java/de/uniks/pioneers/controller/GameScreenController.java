@@ -130,7 +130,7 @@ public class GameScreenController implements Controller {
 
                     //get all the members
                     memberService
-                            .getAllGameMembers(gameIDStorage.getId())
+                            .getAllGameMembers(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe( c ->{
                                 this.members.setAll(c);
@@ -653,5 +653,4 @@ public class GameScreenController implements Controller {
     public GameFieldSubController getGameFieldSubController() {
         return gameFieldSubController;
     }
-
 }
