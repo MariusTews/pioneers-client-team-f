@@ -111,7 +111,6 @@ public class GameScreenController implements Controller {
 
     @Override
     public void init() {
-
         // For later : userHash is needed in MessageViewSubController too,
         // improvement would be to not initialize the hash twice.
         // Get all users for the username and avatar. Save in HashMap to find the user by his/her ID
@@ -175,7 +174,6 @@ public class GameScreenController implements Controller {
         this.messageViewSubController = new MessageViewSubController(eventListener, gameIDStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
-
     }
 
 
@@ -310,24 +308,27 @@ public class GameScreenController implements Controller {
             User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
             currentPlayerLabel.setText(currentPlayer.name());
 
-            // TODO: open screen for discarding resources if its current player's screen + state is drop
-            // TODO: enters more than one time this method: delete runDiscardOnce variable or find another solution
+            // open screen for discarding resources if its current player's screen + state is drop
+            // enters more than one time this method: runDiscardOnce variable or find another solution
             if ((currentMove.equals(DROP_ACTION)) && currentPlayer._id().equals(idStorage.getID()) && runDiscardOnce) {
-                // TODO: initialize and render the discard resources view -> open new window (new stage)
+                // initialize and render the discard resources view -> open new window (new stage)
                 // get the current player and open the window for dropping resources
                 runDiscardOnce = false;
                 for (Player p : this.playerOwnView) {
                     if (p.userId().equals(currentPlayer._id())) {
-                        System.out.println("found player");
                         DiscardResourcesController discard = new DiscardResourcesController(p, this.gameIDStorage.getId(),
-                                                this.pioneersService, currentPlayerLabel.getScene().getWindow());
+                                this.pioneersService, currentPlayerLabel.getScene().getWindow());
                         discard.render();
                         // Deleting the controller is not needed, because the garbage collector should delete the controller
-                        // after closing the window (??)
+                        // after closing the window
                     }
                 }
             }
-            // TODO: set runDiscardOnce on true again, when another action appears
+
+            // set runDiscardOnce on true again, when another action appears
+            if (!currentMove.equals(DROP_ACTION)) {
+                runDiscardOnce = true;
+            }
         }
     }
 
@@ -416,12 +417,21 @@ public class GameScreenController implements Controller {
     }
 
     public void finishTurn() {
-        pioneersService.move(gameIDStorage.getId(), "build", null, null, null, null, null, null, null)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                }, onError -> {
-                });
+        // TODO: just temporary till rob is implemented
+        if (nextMoveLabel.getText().equals(ROB_ACTION)) {
+            pioneersService.move(gameIDStorage.getId(), ROB_ACTION, 1, 1, 1, null, null, null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                    }, onError -> {
+                    });
 
+        } else {
+            pioneersService.move(gameIDStorage.getId(), "build", null, null, null, null, null, null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                    }, onError -> {
+                    });
+        }
     }
 
     private void startTime() {
@@ -435,7 +445,7 @@ public class GameScreenController implements Controller {
         //gets called every second to reduce the timer by one second
         KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
             seconds[0]--;
-            timerLabel.setText("" + (seconds[0]/60) + ":" + seconds[0]%60 );
+            timerLabel.setText("" + (seconds[0] / 60) + ":" + seconds[0] % 60);
             if (seconds[0] <= 0) {
                 timeline.stop();
                 //current Move is founding-settlement
