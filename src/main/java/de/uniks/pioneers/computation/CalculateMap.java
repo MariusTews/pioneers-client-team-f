@@ -66,15 +66,20 @@ public class CalculateMap {
 
 	private void buildRoad(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, double rotation, boolean harbour) {
 		//creates a road at the given coordinate
-		double roadPos1 = -20.0;
+		double roadPos1 = -15.0;
 		double roadPos2 = -5.0;
 		double roadPos3 = 5.0;
-		double roadPos4 = 20.0;
+		double roadPos4 = 15.0;
+		double roadPos5 = 20.0;
+		double roadPos6 = -20.0;
+		double roadPos7 = 0.0;
 
 		Polygon road = new Polygon(
 				roadPos2, roadPos1,
+				roadPos7, roadPos6,
 				roadPos3, roadPos1,
 				roadPos3, roadPos4,
+				roadPos7, roadPos5,
 				roadPos2, roadPos4
 		);
 
@@ -362,9 +367,7 @@ public class CalculateMap {
 		String id = "";
 		// parse coordinates to ID
 		// warnings are false and need to be ignored
-		if ((x < 0) && (y < 0) && (z < 0)) {
-			id = "xM" + x * (-1) + "yM" + y * (-1) + "zM" + z * (-1);
-		} else if ((x < 0) && (y < 0) && (z >= 0)) {
+		if ((x < 0) && (y < 0) && (z >= 0)) {
 			id = "xM" + x * (-1) + "yM" + y * (-1) + "z" + z;
 		} else if ((x < 0) && (y >= 0) && (z < 0)) {
 			id = "xM" + x * (-1) + "y" + y + "zM" + z * (-1);
