@@ -53,6 +53,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameStorage.getId()).thenReturn("02");
+        when(gameStorage.getSize()).thenReturn(2);
         when(idStorage.getID()).thenReturn("01");
 
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
