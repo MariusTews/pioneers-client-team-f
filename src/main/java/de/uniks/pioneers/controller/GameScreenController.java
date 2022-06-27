@@ -19,6 +19,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -63,6 +64,13 @@ public class GameScreenController implements Controller {
     public Button leave;
     @FXML
     public Pane userViewPane;
+    @FXML
+    public ImageView diceImage;
+    @FXML
+    public Pane tradingSubView;
+    @FXML
+    public VBox rightScreenArea;
+
     private final App app;
 
     private final GameStorage gameStorage;
@@ -83,6 +91,7 @@ public class GameScreenController implements Controller {
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
+    private TradingSubController tradingSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
@@ -139,6 +148,7 @@ public class GameScreenController implements Controller {
                             .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
                             .observeOn(FX_SCHEDULER)
                             .subscribe(this::handleStateEvents));
+
 
                     // Check if expected move is founding-roll after joining the game
                     pioneersService
@@ -231,6 +241,16 @@ public class GameScreenController implements Controller {
         this.gameFieldSubController = new GameFieldSubController(app, gameStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
+
+        /*
+        * Render trading sub view
+        * hand over own player to trading sub view
+        * */
+        //this.tradingSubController = new TradingSubController(app, gameIDStorage, pioneersService, idStorage, eventListener, playerOwnView.get(0));
+        this.tradingSubController = new TradingSubController(app, gameIDStorage, pioneersService, idStorage, eventListener, null);
+
+        tradingSubController.init();
+        this.rightScreenArea.getChildren().add(1, tradingSubController.render());
 
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
@@ -383,6 +403,7 @@ public class GameScreenController implements Controller {
                 return subCon.getParent();
             }
         }
+
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
                 this.calculateVP(player));
