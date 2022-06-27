@@ -61,6 +61,10 @@ public class GameScreenController implements Controller {
     public Label timerLabel;
     @FXML
     public ImageView diceImage;
+    @FXML
+    public Pane tradingSubView;
+    @FXML
+    public VBox rightScreenArea;
 
     private final App app;
 
@@ -83,6 +87,7 @@ public class GameScreenController implements Controller {
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
+    private TradingSubController tradingSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
@@ -235,6 +240,16 @@ public class GameScreenController implements Controller {
         this.gameFieldSubController = new GameFieldSubController(app, gameIDStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.getChildren().setAll(gameFieldSubController.render());
+
+        /*
+        * Render trading sub view
+        * hand over own player to trading sub view
+        * */
+        //this.tradingSubController = new TradingSubController(app, gameIDStorage, pioneersService, idStorage, eventListener, playerOwnView.get(0));
+        this.tradingSubController = new TradingSubController(app, gameIDStorage, pioneersService, idStorage, eventListener, null);
+
+        tradingSubController.init();
+        this.rightScreenArea.getChildren().add(1, tradingSubController.render());
 
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
