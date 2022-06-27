@@ -66,7 +66,6 @@ class LobbyControllerTest extends ApplicationTest {
         // start application
         final App app = new App(lobbyController);
         app.start(stage);
-
     }
 
 

@@ -266,5 +266,4 @@ public class MessageViewSubController implements Controller {
         }
         return username;
     }
-
 }

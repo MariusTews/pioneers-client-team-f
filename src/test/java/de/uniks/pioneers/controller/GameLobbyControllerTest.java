@@ -65,7 +65,6 @@ class GameLobbyControllerTest extends ApplicationTest {
         // start application
         final App app = new App(gameLobbyController);
         app.start(stage);
-
     }
 
 
@@ -93,6 +92,5 @@ class GameLobbyControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
 
         verify(gameService).deleteGame("id");
-
     }
 }

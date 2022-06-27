@@ -82,5 +82,4 @@ public class MemberServiceTest {
 		assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000, spectator=false]", member.toString());
 		verify(gameMembersApiService).patch("testGame", "testUser", new UpdateMemberDto(false, "#000000", false));
 	}
-
 }

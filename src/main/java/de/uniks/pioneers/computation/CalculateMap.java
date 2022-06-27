@@ -42,7 +42,6 @@ public class CalculateMap {
 		String id = createId(x, y, z) + "_" + side;
 		circle.setId(id);
 		pane.getChildren().add(circle);
-		//circle.setVisible(false);
 		circle.setFill(Color.TRANSPARENT);
 		circle.setLayoutX(xCoordinate);
 		circle.setLayoutY(yCoordinate);

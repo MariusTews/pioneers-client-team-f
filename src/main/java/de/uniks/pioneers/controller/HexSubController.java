@@ -1,9 +1,7 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Tile;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -12,7 +10,6 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Objects;
 
 public class HexSubController implements Controller {
@@ -37,7 +34,6 @@ public class HexSubController implements Controller {
 
     @Override
     public void destroy() {
-
     }
 
     @Override

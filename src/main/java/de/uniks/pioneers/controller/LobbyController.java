@@ -154,8 +154,6 @@ public class LobbyController implements Controller {
                 .listen("global." + LOBBY_ID + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleAllTabMessages));
-
-
     }
 
     @Override
@@ -648,7 +646,6 @@ public class LobbyController implements Controller {
                                         getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
                                 alert.showAndWait();
                             }
-
                         })
                         .subscribe(result -> app.show(gameLobbyController.get()), onError -> {
                         }));

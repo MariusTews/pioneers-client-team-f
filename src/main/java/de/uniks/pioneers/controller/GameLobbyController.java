@@ -322,7 +322,6 @@ public class GameLobbyController implements Controller {
 				break;
 			}
 		}
-
 		return memberListSubcontroller.render();
 	}
 
