@@ -34,7 +34,7 @@ public class MessageViewSubController implements Controller {
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
     private final CompositeDisposable disposable = new CompositeDisposable();
     private final EventListener eventListener;
-    private final GameIDStorage gameIDStorage;
+    private final GameStorage gameStorage;
     private final MemberIDStorage memberIDStorage;
 
     private final UserService userService;
@@ -54,13 +54,13 @@ public class MessageViewSubController implements Controller {
 
     @Inject
     public MessageViewSubController(EventListener eventListener,
-                                    GameIDStorage gameIDStorage,
+                                    GameStorage gameStorage,
                                     UserService userService,
                                     MessageService messageService,
                                     MemberIDStorage memberIDStorage,
                                     MemberService memberService) {
         this.eventListener = eventListener;
-        this.gameIDStorage = gameIDStorage;
+        this.gameStorage = gameStorage;
         this.userService = userService;
         this.messageService = messageService;
         this.memberIDStorage = memberIDStorage;
@@ -80,7 +80,7 @@ public class MessageViewSubController implements Controller {
 
                     // get all messages and initial load
                     messageService
-                            .getAllMessages(GAMES, this.gameIDStorage.getId())
+                            .getAllMessages(GAMES, this.gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe(col -> {
                                 this.messages.setAll(col);
@@ -90,7 +90,7 @@ public class MessageViewSubController implements Controller {
 
         // init. memberHash to not request the color of the member via REST every single time the messages are loaded
         memberService
-                .getAllGameMembers(this.gameIDStorage.getId())
+                .getAllGameMembers(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                     for (Member member : result) {
@@ -100,7 +100,7 @@ public class MessageViewSubController implements Controller {
 
         // listen to game lobby messages
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".messages.*.*", Message.class)
+                .listen("games." + this.gameStorage.getId() + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Message message = event.data();
@@ -117,7 +117,7 @@ public class MessageViewSubController implements Controller {
 
         // listen to game members, only relevant for the game lobby chat where color is chosen
         disposable.add(eventListener
-                .listen("games." + this.gameIDStorage.getId() + ".members.*.*", Member.class)
+                .listen("games." + this.gameStorage.getId() + ".members.*.*", Member.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     final Member member = event.data();
@@ -163,7 +163,7 @@ public class MessageViewSubController implements Controller {
     private void checkMessageField() {
         if (!this.idMessageField.getText().isEmpty()) {
             messageService
-                    .send(GAMES, this.gameIDStorage.getId(), idMessageField.getText())
+                    .send(GAMES, this.gameStorage.getId(), idMessageField.getText())
                     .observeOn(FX_SCHEDULER)
                     .subscribe();
             this.idMessageField.clear();
@@ -230,7 +230,7 @@ public class MessageViewSubController implements Controller {
         menuItem.setOnAction(event -> {
             if (sender.equals(this.memberIDStorage.getId())) {
                 messageService
-                        .delete(GAMES, this.gameIDStorage.getId(), messageId)
+                        .delete(GAMES, this.gameStorage.getId(), messageId)
                         .observeOn(FX_SCHEDULER)
                         .subscribe();
                 // the message is deleted from the chat view as soon as the listener detects DELETED in event
@@ -282,5 +282,4 @@ public class MessageViewSubController implements Controller {
         }
         return username;
     }
-
 }

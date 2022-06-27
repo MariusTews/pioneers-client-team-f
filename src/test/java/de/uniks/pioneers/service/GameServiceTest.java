@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class GameServiceTest {
 	@Spy
-	GameIDStorage gameIDStorage;
+	GameStorage gameStorage;
 
 	@Spy
 	MemberIDStorage memberIDStorage;
@@ -39,7 +39,7 @@ class GameServiceTest {
 		when(gamesApiService.create(any())).thenReturn(Observable.just(new Game("0:30", "15:50", "1337", "testGame", "01", 3, false, new GameSettings(2, 10))));
 		Game game = gameService.create("testGame", "123", 2, 10).blockingFirst();
 		assertEquals("Game[createdAt=0:30, updatedAt=15:50, _id=1337, name=testGame, owner=01, members=3, started=false, settings=GameSettings[mapRadius=2, victoryPoints=10]]", game.toString());
-		assertEquals("1337", gameIDStorage.getId());
+		assertEquals("1337", gameStorage.getId());
 		assertEquals("01", memberIDStorage.getId());
 
 		verify(gamesApiService).create(new CreateGameDto("testGame", false, new GameSettings(2, 10), "123"));

@@ -1,9 +1,7 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Tile;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -12,7 +10,6 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Objects;
 
 public class HexSubController implements Controller {
@@ -37,21 +34,12 @@ public class HexSubController implements Controller {
 
     @Override
     public void destroy() {
-
     }
 
     @Override
     public Parent render() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/GameFieldSubView.fxml"));
-        loader.setControllerFactory(c -> this);
-        final Parent parent;
-        try {
-            parent = loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return parent;
+        //this method needs to be pressed because this subController implements controller therefore the method is empty
+        return null;
     }
 
     // Mouse hovers over field
