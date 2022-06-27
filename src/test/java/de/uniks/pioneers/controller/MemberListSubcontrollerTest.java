@@ -33,7 +33,7 @@ class MemberListSubcontrollerTest extends ApplicationTest {
         Label ready = lookup("#idReady").query();
 
         Assertions.assertEquals("ImageView[id=idAvatar, styleClass=image-view]", avatar.toString());
-        Assertions.assertEquals("Username", name.getText());
-        Assertions.assertEquals("-not ready-", ready.getText());
+        Assertions.assertEquals("", name.getText());
+        Assertions.assertEquals("", ready.getText());
     }
 }

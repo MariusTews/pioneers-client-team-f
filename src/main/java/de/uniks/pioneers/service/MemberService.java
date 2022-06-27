@@ -14,13 +14,13 @@ public class MemberService {
 	private final GameMembersApiService gameMembersApiService;
 
 	// id of game and member needed when joining
-	private final GameIDStorage gameIDStorage;
+	private final GameStorage gameStorage;
 	private final MemberIDStorage memberIDStorage;
 
 	@Inject
-	public MemberService(GameMembersApiService gameMembersApiService, GameIDStorage gameIDStorage, MemberIDStorage memberIDStorage) {
+	public MemberService(GameMembersApiService gameMembersApiService, GameStorage gameStorage, MemberIDStorage memberIDStorage) {
 		this.gameMembersApiService = gameMembersApiService;
-		this.gameIDStorage = gameIDStorage;
+		this.gameStorage = gameStorage;
 		this.memberIDStorage = memberIDStorage;
 	}
 
@@ -32,7 +32,7 @@ public class MemberService {
 		return gameMembersApiService
 				.create(gameID, new CreateMemberDto(false, "#000000", false, password))
 				.doOnNext(result -> {
-					this.gameIDStorage.setId(result.gameId());
+					this.gameStorage.setId(result.gameId());
 					this.memberIDStorage.setId(result.userId());
 				});
 	}
