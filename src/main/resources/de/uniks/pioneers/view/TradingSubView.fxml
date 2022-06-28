@@ -26,12 +26,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="giveCactusLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0" textFill="#0d37d1">
+                        <Label fx:id="giveCactusLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0" textFill="#0d37d1">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="giveCactusPlusButton" mnemonicParsing="false" onAction="#giveCactusPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="giveCactusPlusButton" mnemonicParsing="false" onAction="#giveCactusPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -50,12 +50,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="giveMarsLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="giveMarsLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="giveMarsPlusButton" mnemonicParsing="false" onAction="#giveMarsPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="giveMarsPlusButton" mnemonicParsing="false" onAction="#giveMarsPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -74,12 +74,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="giveMoonLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="giveMoonLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="giveMoonPlusButton" mnemonicParsing="false" onAction="#giveMoonPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="giveMoonPlusButton" mnemonicParsing="false" onAction="#giveMoonPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -98,12 +98,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="giveNeptunLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="giveNeptunLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="giveNeptunPlusButton" mnemonicParsing="false" onAction="#giveNeptunPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="giveNeptunPlusButton" mnemonicParsing="false" onAction="#giveNeptunPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -122,12 +122,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="giveVenusLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="giveVenusLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="giveVenusPlusButton" mnemonicParsing="false" onAction="#giveVenusPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="giveVenusPlusButton" mnemonicParsing="false" onAction="#giveVenusPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -151,12 +151,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="receiveCactusLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="receiveCactusLabel" alignment="CENTER" minWidth="23.0" prefHeight="17.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="receiveCactusPlusButton" mnemonicParsing="false" onAction="#receiveCactusPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="receiveCactusPlusButton" mnemonicParsing="false" onAction="#receiveCactusPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -175,12 +175,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="receiveMarsLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="receiveMarsLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="receiveMarsPlusButton" mnemonicParsing="false" onAction="#receiveMarsPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="receiveMarsPlusButton" mnemonicParsing="false" onAction="#receiveMarsPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -199,12 +199,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="receiveMoonLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="receiveMoonLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="receiveMoonPlusButton" mnemonicParsing="false" onAction="#receiveMoonPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="receiveMoonPlusButton" mnemonicParsing="false" onAction="#receiveMoonPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -223,12 +223,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="receiveNeptunLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="receiveNeptunLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="receiveNeptunPlusButton" mnemonicParsing="false" onAction="#receiveNeptunPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="receiveNeptunPlusButton" mnemonicParsing="false" onAction="#receiveNeptunPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -247,12 +247,12 @@
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Label fx:id="receiveVenusLabel" alignment="CENTER" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                        <Label fx:id="receiveVenusLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="receiveVenusPlusButton" mnemonicParsing="false" onAction="#receiveVenusPlusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="+">
+                        <Button fx:id="receiveVenusPlusButton" mnemonicParsing="false" onAction="#receiveVenusPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>

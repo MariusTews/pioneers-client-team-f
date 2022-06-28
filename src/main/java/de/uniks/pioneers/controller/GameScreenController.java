@@ -242,15 +242,6 @@ public class GameScreenController implements Controller {
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
 
-        /*
-        * Render trading sub view
-        * hand over own player to trading sub view
-        * */
-        //this.tradingSubController = new TradingSubController(app, gameIDStorage, pioneersService, idStorage, eventListener, playerOwnView.get(0));
-        this.tradingSubController = new TradingSubController(app, gameStorage, pioneersService, idStorage, eventListener, null);
-        tradingSubController.init();
-        this.rightScreenArea.getChildren().add(1, tradingSubController.render());
-
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
 
@@ -263,13 +254,22 @@ public class GameScreenController implements Controller {
         this.playerOwnView.addListener((ListChangeListener<? super Player>) c ->
                 this.userViewPane.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
+        /*
+         * Render trading sub view
+         * hand over own player to trading sub view
+         * */
+
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener, null);
+        tradingSubController.init();
+        this.rightScreenArea.getChildren().add(1, tradingSubController.render());
+
         return parent;
     }
 
     private Node renderSingleUser(Player player) {
         UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
         userSubView.init();
-
+        this.tradingSubController.setPlayer(player);
         return userSubView.render();
     }
 
@@ -280,8 +280,6 @@ public class GameScreenController implements Controller {
         if (move.action().equals("roll")) {
             diceSumLabel.setText(Integer.toString(move.roll()));
         }
-
-
     }
 
     private int calculateVP(Player player) {
