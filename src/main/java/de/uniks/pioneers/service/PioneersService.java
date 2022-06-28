@@ -48,8 +48,7 @@ public class PioneersService {
                                  String type, String target, HashMap<String, Integer> resources) {
         if (action.equals(DROP_ACTION) && resources != null) {
             return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null,
-                    new ResourcesDto(resources.get(VENUS_GRAIN), resources.get(MARS_BAR), resources.get(MOON_ROCK),
-                            resources.get(EARTH_CACTUS), resources.get(NEPTUNE_CRYSTAL)), null, null));
+                    resources, null, null));
         } else if (action.equals(ROB_ACTION)) {
             return this.pioneersApiService.create(gameId, new CreateMoveDto(action, new RobDto(x, y, z, target), null, null, null));
         } else if (x == null && y == null && z == null && side == null && type == null) {

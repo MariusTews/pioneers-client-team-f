@@ -38,13 +38,11 @@ class DiscardResourcesControllerTest extends ApplicationTest {
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
-
         // open new window therefore starting via app is not needed (discard window has another root)
         DiscardResourcesController discardResourcesController = new DiscardResourcesController(new Player("01", "00",
                 Color.DARKORCHID.toString(), true,6, resources, null,2,
                 2,null), "01", pioneersService, null);
         discardResourcesController.render();
-
     }
 
     @Test
