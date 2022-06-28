@@ -108,7 +108,7 @@ public class CircleSubController implements Controller {
 					.subscribe(move -> {
 						String action = move.expectedMoves().get(0).action();
 						if (side == 0 || side == 6) {
-							this.pioneersService.move(gameStorage.getId(), action, x, y, z, side, "settlement")
+							this.pioneersService.move(gameStorage.getId(), action, x, y, z, side, "settlement", null, null)
 									.observeOn(FX_SCHEDULER)
 									.doOnError(error -> {
 										String[] building = nextMove.action().split("-");
@@ -123,7 +123,7 @@ public class CircleSubController implements Controller {
 									}, onError -> {
 									});
 						} else {
-							this.pioneersService.move(gameStorage.getId(), action, x, y, z, side, "road")
+							this.pioneersService.move(gameStorage.getId(), action, x, y, z, side, "road", null, null)
 									.observeOn(FX_SCHEDULER)
 									.doOnError(error -> {
 										String[] building = nextMove.action().split("-");
@@ -142,7 +142,7 @@ public class CircleSubController implements Controller {
 		} else {//if you build a new building in round-loop
 			if (build != null) {
 
-				this.pioneersService.move(gameStorage.getId(), "build", x, y, z, side, build)
+				this.pioneersService.move(gameStorage.getId(), "build", x, y, z, side, build, null, null)
 						.observeOn(FX_SCHEDULER)
 						.subscribe();
 

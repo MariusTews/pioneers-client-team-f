@@ -400,7 +400,7 @@ public class GameLobbyController implements Controller {
 		comboBox.setVisibleRowCount(300);
 		//This makes sure the color are presented in the strings and
 		//border will be shown on Labels
-		comboBox.setCellFactory(listView -> new ListCell<Label>() {
+		comboBox.setCellFactory(listView -> new ListCell<>() {
 			public void updateItem(Label label, boolean empty) {
 				super.updateItem(label, empty);
 				if (label != null) {

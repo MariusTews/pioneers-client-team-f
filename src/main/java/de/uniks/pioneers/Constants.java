@@ -63,6 +63,13 @@ public class Constants {
     public static final String SETTLEMENT = "settlement";
     public static final String CITY = "city";
     public static final int AMOUNT_SETTLEMENTS_CITIES = 13;
+    public static final String VENUS_GRAIN = "grain";
+    public static final String MARS_BAR = "brick";
+    public static final String MOON_ROCK = "ore";
+    public static final String EARTH_CACTUS = "lumber";
+    public static final String NEPTUNE_CRYSTAL = "wool";
+    public static final String DROP_ACTION = "drop";
+    public static final String ROB_ACTION = "rob";
 
     //Array of Colors as Strings for the Label text
     public static final String[] COLORSTRINGARRAY = {"RED", "BLUE", "ORANGE", "DARKORCHID", "TEAL", "ROSYBROWN",

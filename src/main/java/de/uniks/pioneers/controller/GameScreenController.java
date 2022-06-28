@@ -33,7 +33,7 @@ import static de.uniks.pioneers.Constants.*;
 
 public class GameScreenController implements Controller {
 
-    private final ObservableList<Player> players = FXCollections.observableArrayList();
+    private final ObservableList<Player> opponents = FXCollections.observableArrayList();
 
     private final ObservableList<Player> playerOwnView = FXCollections.observableArrayList();
 
@@ -88,6 +88,7 @@ public class GameScreenController implements Controller {
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
     private final Timeline timeline = new Timeline();
+    private boolean runDiscardOnce = true;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -116,7 +117,6 @@ public class GameScreenController implements Controller {
 
     @Override
     public void init() {
-
         // For later : userHash is needed in MessageViewSubController too,
         // improvement would be to not initialize the hash twice.
         // Get all users for the username and avatar. Save in HashMap to find the user by his/her ID
@@ -132,16 +132,13 @@ public class GameScreenController implements Controller {
                     memberService
                             .getAllGameMembers(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
-                            .subscribe( c ->{
-                                this.members.setAll(c);
-                            });
+                            .subscribe(this.members::setAll);
 
                     // Listen to the State to handle the event
                     disposable.add(eventListener
                             .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
                             .observeOn(FX_SCHEDULER)
                             .subscribe(this::handleStateEvents));
-
 
                     // Check if expected move is founding-roll after joining the game
                     pioneersService
@@ -162,7 +159,7 @@ public class GameScreenController implements Controller {
                                         //this checks if the player is oppenent or spectator or yourself
                                         if (!player.userId().equals(idStorage.getID()) && member.userId()
                                                 .equals(player.userId()) ) {
-                                            players.add(player);
+                                            opponents.add(player);
                                         } else if (player.userId().equals(idStorage.getID()) && member.userId()
                                                 .equals(player.userId())){
                                             playerOwnView.add(player);
@@ -194,7 +191,6 @@ public class GameScreenController implements Controller {
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
-
     }
 
 
@@ -241,7 +237,7 @@ public class GameScreenController implements Controller {
 
         // Render opponent loads the opponent view everytime the members list is changed
         // render opponents when achievements change
-        this.players.addListener((ListChangeListener<? super Player>) c ->
+        this.opponents.addListener((ListChangeListener<? super Player>) c ->
                 this.opponentsView.getChildren().setAll(c.getList().stream().map(this::renderOpponent).toList()));
 
         //userSubView
@@ -285,19 +281,19 @@ public class GameScreenController implements Controller {
                 }
             }
 
-            for (Player p : players) {
+            for (Player p : opponents) {
                 if (p.userId().equals(player.userId())) {
                     this.removeOpponent(p);
-                    players.set(players.indexOf(p), player);
+                    opponents.set(opponents.indexOf(p), player);
                 }
             }
         } else if (playerEvent.event().endsWith(CREATED)) {
             if (!player.userId().equals(idStorage.getID())) {
-                this.players.add(player);
+                this.opponents.add(player);
                 this.opponentsView.getChildren().add(renderOpponent(player));
             }
         } else if (playerEvent.event().endsWith(DELETED)) {
-            if (players.size() < 2) {
+            if (opponents.size() < 2) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 // Set style
                 DialogPane dialogPane = alert.getDialogPane();
@@ -313,7 +309,7 @@ public class GameScreenController implements Controller {
                     this.app.show(lobbyController.get());
                 }
             }
-            this.players.remove(player);
+            this.opponents.remove(player);
             this.removeOpponent(player);
         }
     }
@@ -323,9 +319,33 @@ public class GameScreenController implements Controller {
 
         if (stateEvent.event().endsWith(UPDATED)) {
             // change the nextMoveLabel to the current move
-            nextMoveLabel.setText(state.expectedMoves().get(0).action());
+            String currentMove = state.expectedMoves().get(0).action();
+            nextMoveLabel.setText(currentMove);
             // change the currentPlayerLabel to the current player
-            currentPlayerLabel.setText(this.userHash.get(state.expectedMoves().get(0).players().get(0)).name());
+            User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
+            currentPlayerLabel.setText(currentPlayer.name());
+
+            // open screen for discarding resources if its current player's screen + state is drop
+            // enters more than one time this method: runDiscardOnce variable or find another solution
+            if ((currentMove.equals(DROP_ACTION)) && currentPlayer._id().equals(idStorage.getID()) && runDiscardOnce) {
+                // initialize and render the discard resources view -> open new window (new stage)
+                // get the current player and open the window for dropping resources
+                runDiscardOnce = false;
+                for (Player p : this.playerOwnView) {
+                    if (p.userId().equals(currentPlayer._id())) {
+                        DiscardResourcesController discard = new DiscardResourcesController(p, this.gameStorage.getId(),
+                                this.pioneersService, currentPlayerLabel.getScene().getWindow());
+                        discard.render();
+                        // Deleting the controller is not needed, because the garbage collector should delete the controller
+                        // after closing the window
+                    }
+                }
+            }
+
+            // set runDiscardOnce on true again, when another action appears
+            if (!currentMove.equals(DROP_ACTION)) {
+                runDiscardOnce = true;
+            }
         }
     }
 
@@ -364,7 +384,6 @@ public class GameScreenController implements Controller {
             }
         }
 
-
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
                 this.calculateVP(player));
         opponentSubCons.add(opponentCon);
@@ -378,7 +397,7 @@ public class GameScreenController implements Controller {
     // diceRoll if the current move is roll
     public void diceRoll() {
         if (nextMoveLabel.getText().equals("roll")) {
-            pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement")
+            pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement", null, null)
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                     }, Throwable::printStackTrace);
@@ -387,13 +406,13 @@ public class GameScreenController implements Controller {
 
     // automatic foundingDiceRoll after joining the game
     public void foundingDiceRoll() {
-        pioneersService.move(gameStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement")
+        pioneersService.move(gameStorage.getId(), "founding-roll", 0, 0, 0, 0, "settlement", null, null)
                 .observeOn(FX_SCHEDULER)
                 .subscribe();
     }
 
     public void onLeave(ActionEvent ignoredEvent) {
-        if ((players.size() + playerOwnView.size()) == 2) {
+        if ((opponents.size() + playerOwnView.size()) == 2) {
             gameService.findOneGame(this.gameStorage.getId())
                     .observeOn(FX_SCHEDULER).
                     subscribe(col -> {
@@ -415,11 +434,21 @@ public class GameScreenController implements Controller {
     }
 
     public void finishTurn() {
-        pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                }, onError -> {
-                });
+        // TODO: just temporary till rob is implemented
+        if (nextMoveLabel.getText().equals(ROB_ACTION)) {
+            pioneersService.move(gameStorage.getId(), ROB_ACTION, 1, 1, 1, null, null, null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                    }, onError -> {
+                    });
+
+        } else {
+            pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null, null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                    }, onError -> {
+                    });
+        }
     }
 
     private void startTime() {
@@ -477,9 +506,9 @@ public class GameScreenController implements Controller {
                     String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
                     //place chosen settlement and road
-                    pioneersService.move(gameStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement")
+                    pioneersService.move(gameStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement", null, null)
                             .observeOn(FX_SCHEDULER)
-                            .subscribe(result -> pioneersService.move(gameStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
+                            .subscribe(result -> pioneersService.move(gameStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road", null, null)
                                     .observeOn(FX_SCHEDULER)
                                     .subscribe());
 
@@ -507,7 +536,7 @@ public class GameScreenController implements Controller {
                     String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
                     //place chosen and road
-                    pioneersService.move(gameStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road")
+                    pioneersService.move(gameStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road", null, null)
                             .observeOn(FX_SCHEDULER)
                             .subscribe();
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.Pane?>
+<Pane id="discardResources" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="210.0"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.DiscardResourcesController">
+   <Button fx:id="incResource1Btn" layoutX="140.0" layoutY="35.0" mnemonicParsing="false" onAction="#onIncreaseRes1ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="+" />
+   <Button fx:id="incResource2Btn" layoutX="140.0" layoutY="85.0" mnemonicParsing="false" onAction="#onIncreaseRes2ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="+" />
+   <Button fx:id="incResource3Btn" layoutX="140.0" layoutY="135.0" mnemonicParsing="false" onAction="#onIncreaseRes3ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="+" />
+   <ImageView id="cactus" fitHeight="32.0" fitWidth="30.0" layoutX="20.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true" />
+   <ImageView id="mars" fitHeight="32.0" fitWidth="30.0" layoutX="20.0" layoutY="90.0" pickOnBounds="true" preserveRatio="true" />
+   <ImageView id="moon" fitHeight="32.0" fitWidth="30.0" layoutX="20.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true" />
+   <ImageView id="neptune" fitHeight="32.0" fitWidth="30.0" layoutX="20.0" layoutY="190.0" pickOnBounds="true" preserveRatio="true" />
+   <ImageView id="venus" fitHeight="32.0" fitWidth="30.0" layoutX="20.0" layoutY="240.0" pickOnBounds="true" preserveRatio="true" />
+   <Button fx:id="discardButton" layoutX="15.0" layoutY="298.0" mnemonicParsing="false" onAction="#onDiscardButtonPressed" prefHeight="38.0" prefWidth="174.0" styleClass="discard" text="discard" />
+   <Button fx:id="incResource4Btn" layoutX="140.0" layoutY="185.0" mnemonicParsing="false" onAction="#onIncreaseRes4ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="+" />
+   <Button fx:id="incResource5Btn" layoutX="140.0" layoutY="235.0" mnemonicParsing="false" onAction="#onIncreaseRes5ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="+" />
+   <Button fx:id="decResource1Btn" layoutX="70.0" layoutY="35.0" mnemonicParsing="false" onAction="#onDecreaseRes1ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="-" />
+   <Label fx:id="amountEarthCactus" alignment="CENTER" layoutX="110.0" layoutY="40.0" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="0" textAlignment="CENTER" />
+   <Button fx:id="decResource2Btn" layoutX="70.0" layoutY="85.0" mnemonicParsing="false" onAction="#onDecreaseRes2ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="-" />
+   <Button fx:id="decResource3Btn" layoutX="70.0" layoutY="135.0" mnemonicParsing="false" onAction="#onDecreaseRes3ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="-" />
+   <Button fx:id="decResource4Btn" layoutX="70.0" layoutY="185.0" mnemonicParsing="false" onAction="#onDecreaseRes4ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="-" />
+   <Button fx:id="decResource5Btn" layoutX="70.0" layoutY="235.0" mnemonicParsing="false" onAction="#onDecreaseRes5ButtonPressed" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="-" />
+   <Label fx:id="amountMarsBar" alignment="CENTER" layoutX="110.0" layoutY="90.0" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="0" textAlignment="CENTER" />
+   <Label fx:id="amountMoonRock" alignment="CENTER" layoutX="110.0" layoutY="140.0" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="0" textAlignment="CENTER" />
+   <Label fx:id="amountNeptuneCrystal" alignment="CENTER" layoutX="110.0" layoutY="190.0" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="0" textAlignment="CENTER" />
+   <Label fx:id="amountVenusGrain" alignment="CENTER" layoutX="110.0" layoutY="240.0" prefHeight="25.0" prefWidth="30.0" styleClass="amount" text="0" textAlignment="CENTER" />
+</Pane>

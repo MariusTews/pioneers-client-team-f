@@ -20,27 +20,27 @@ import java.io.IOException;
 public class OpponentSubController implements Controller {
 
     @FXML
-    VBox singleOpponentView;
+    public VBox singleOpponentView;
     @FXML
-    ImageView avatarImageView;
+    public ImageView avatarImageView;
     @FXML
-    Label usernameLabel;
+    public Label usernameLabel;
     @FXML
-    Label victoryPointsLabel;
+    public Label victoryPointsLabel;
     @FXML
-    HBox resourcesView;
+    public HBox resourcesView;
     @FXML
-    ImageView earthCactusImage;
+    public ImageView earthCactusImage;
     @FXML
-    ImageView marsBarImage;
+    public ImageView marsBarImage;
     @FXML
-    ImageView moonRockImage;
+    public ImageView moonRockImage;
     @FXML
-    ImageView neptunCrystalsImage;
+    public ImageView neptunCrystalsImage;
     @FXML
-    ImageView venusGrainImage;
+    public ImageView venusGrainImage;
     @FXML
-    Label totalResourcesLabel;
+    public Label totalResourcesLabel;
 
     private final Player opponent;
     private final User opponentAsUser;
