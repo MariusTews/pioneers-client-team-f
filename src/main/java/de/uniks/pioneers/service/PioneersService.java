@@ -1,13 +1,16 @@
 package de.uniks.pioneers.service;
 
+import de.uniks.pioneers.Constants;
 import de.uniks.pioneers.dto.CreateBuildingDto;
 import de.uniks.pioneers.dto.CreateMoveDto;
+import de.uniks.pioneers.dto.RobDto;
 import de.uniks.pioneers.dto.UpdatePlayerDto;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.PioneersApiService;
 import io.reactivex.rxjava3.core.Observable;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 
 public class PioneersService {
@@ -51,6 +54,10 @@ public class PioneersService {
 		}
 	}
 
+	public Observable<Move> tradeBank(String gameId, HashMap<String, Integer> resources) {
+		return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, resources, Constants.BANK_ID, null));
+	}
+
 	public Observable<Player> updatePlayer(String gameId, String userId, boolean active) {
 		return this.pioneersApiService.updatePlayer(gameId, userId, new UpdatePlayerDto(active));
 	}
@@ -61,5 +68,9 @@ public class PioneersService {
 
 	public Observable<Move> findOneMove(String gameId, String moveId) {
 		return this.pioneersApiService.findOneMove(gameId, moveId);
+	}
+
+	public Observable<Move> rob(String gameId, String oppId) {
+		return pioneersApiService.create(gameId, new CreateMoveDto("rob", new RobDto(-1, 0, 1, oppId), null, null, null));
 	}
 }
