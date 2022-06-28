@@ -58,9 +58,13 @@ public class PioneersService {
         }
     }
 
-    public Observable<Player> updatePlayer(String gameId, String userId, boolean active) {
-        return this.pioneersApiService.updatePlayer(gameId, userId, new UpdatePlayerDto(active));
-    }
+    public Observable<Move> tradeBank(String gameId, HashMap<String, Integer> resources) {
+		return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, resources, Constants.BANK_ID, null));
+	}
+
+	public Observable<Player> updatePlayer(String gameId, String userId, boolean active) {
+		return this.pioneersApiService.updatePlayer(gameId, userId, new UpdatePlayerDto(active));
+	}
 
     public Observable<List<Move>> findAllMoves(String gameId) {
         return this.pioneersApiService.findAllMoves(gameId);
@@ -69,4 +73,8 @@ public class PioneersService {
     public Observable<Move> findOneMove(String gameId, String moveId) {
         return this.pioneersApiService.findOneMove(gameId, moveId);
     }
+
+	public Observable<Move> rob(String gameId, String oppId) {
+		return pioneersApiService.create(gameId, new CreateMoveDto("rob", new RobDto(-1, 0, 1, oppId), null, null, null));
+	}
 }

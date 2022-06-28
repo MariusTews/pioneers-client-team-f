@@ -247,8 +247,7 @@ public class GameScreenController implements Controller {
         * hand over own player to trading sub view
         * */
         //this.tradingSubController = new TradingSubController(app, gameIDStorage, pioneersService, idStorage, eventListener, playerOwnView.get(0));
-        this.tradingSubController = new TradingSubController(app, gameIDStorage, pioneersService, idStorage, eventListener, null);
-
+        this.tradingSubController = new TradingSubController(app, gameStorage, pioneersService, idStorage, eventListener, null);
         tradingSubController.init();
         this.rightScreenArea.getChildren().add(1, tradingSubController.render());
 
@@ -281,6 +280,8 @@ public class GameScreenController implements Controller {
         if (move.action().equals("roll")) {
             diceSumLabel.setText(Integer.toString(move.roll()));
         }
+
+
     }
 
     private int calculateVP(Player player) {
