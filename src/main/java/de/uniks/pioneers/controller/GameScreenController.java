@@ -241,15 +241,6 @@ public class GameScreenController implements Controller {
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
 
-        /*
-        * Render trading sub view
-        * hand over own player to trading sub view
-        * */
-        //this.tradingSubController = new TradingSubController(app, gameIDStorage, pioneersService, idStorage, eventListener, playerOwnView.get(0));
-        this.tradingSubController = new TradingSubController(app, gameStorage, pioneersService, idStorage, eventListener, null);
-        tradingSubController.init();
-        this.rightScreenArea.getChildren().add(1, tradingSubController.render());
-
         // Show chat and load the messages
         chatPane.getChildren().setAll(messageViewSubController.render());
 
@@ -262,13 +253,22 @@ public class GameScreenController implements Controller {
         this.playerOwnView.addListener((ListChangeListener<? super Player>) c ->
                 this.userPaneId.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
+        /*
+         * Render trading sub view
+         * hand over own player to trading sub view
+         * */
+
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener, null);
+        tradingSubController.init();
+        this.rightScreenArea.getChildren().add(1, tradingSubController.render());
+
         return parent;
     }
 
     private Node renderSingleUser(Player player) {
         UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
         userSubView.init();
-
+        this.tradingSubController.setPlayer(player);
         return userSubView.render();
     }
 
@@ -279,8 +279,6 @@ public class GameScreenController implements Controller {
         if (move.action().equals("roll")) {
             diceSumLabel.setText(Integer.toString(move.roll()));
         }
-
-
     }
 
     private int calculateVP(Player player) {
@@ -342,16 +340,6 @@ public class GameScreenController implements Controller {
             nextMoveLabel.setText(state.expectedMoves().get(0).action());
             // change the currentPlayerLabel to the current player
             currentPlayerLabel.setText(this.userHash.get(state.expectedMoves().get(0).players().get(0)).name());
-
-            //TODO: remove
-            if(state.expectedMoves().get(0).action().equals("rob")) {
-                if (userHash.get(idStorage.getID()).name().equals(currentPlayerLabel.getText())) {
-                    System.out.println(players.size());
-                    pioneersService.rob(gameStorage.getId(), players.get(0).userId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe();
-                }
-            }
         }
     }
 
@@ -441,11 +429,25 @@ public class GameScreenController implements Controller {
     }
 
     public void finishTurn() {
-        pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null)
+        /*pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                 }, onError -> {
-                });
+                });*/
+        if (nextMoveLabel.getText().equals("rob")) {
+            pioneersService.rob(gameStorage.getId(),null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                    }, onError -> {
+                    });
+
+        } else {
+            pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                    }, onError -> {
+                    });
+        }
     }
 
     private void startTime() {

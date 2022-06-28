@@ -71,6 +71,6 @@ public class PioneersService {
 	}
 
 	public Observable<Move> rob(String gameId, String oppId) {
-		return pioneersApiService.create(gameId, new CreateMoveDto("rob", new RobDto(-1, 0, 1, oppId), null, null, null));
+		return pioneersApiService.create(gameId, new CreateMoveDto("rob", new RobDto(1, 1, 1, oppId), null, null, null));
 	}
 }

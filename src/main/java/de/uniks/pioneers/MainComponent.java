@@ -2,6 +2,7 @@ package de.uniks.pioneers;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import de.uniks.pioneers.controller.GameScreenController;
 import de.uniks.pioneers.controller.LoginController;
 
 import javax.inject.Singleton;
@@ -10,6 +11,8 @@ import javax.inject.Singleton;
 @Singleton
 public interface MainComponent {
     LoginController loginController();
+    //TODO: remove
+    //GameScreenController gameScreenController();
 
     @Component.Builder
     interface Builder {
