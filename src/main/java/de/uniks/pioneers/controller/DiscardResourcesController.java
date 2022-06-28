@@ -123,7 +123,6 @@ public class DiscardResourcesController implements Controller {
         this.decResource4Btn.setDisable(true);
         this.decResource5Btn.setDisable(true);
 
-
         // Create HashMap because of possible NullPointerExceptions and disable increase button if player does not
         // have the particular resource
         if (player.resources().get(EARTH_CACTUS) != null) {
