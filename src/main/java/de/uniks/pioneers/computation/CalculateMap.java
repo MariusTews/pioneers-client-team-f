@@ -237,11 +237,21 @@ public class CalculateMap {
 		double paneVariableSize = 216;
 
 		//create a map with double the needed size
-		map.setMinWidth((paneBaseSize + paneVariableSize * size) * 2);
-		map.setMinHeight((paneBaseSize + paneVariableSize * size) * 2);
+		double mapSize = (paneBaseSize + paneVariableSize * size) * 2;
+		double center = 0.0;
 
-		double center = (paneBaseSize + paneVariableSize * size);
+		//make small maps appear in the center of the scroll pane
+		if (mapSize < 1600) {
+			map.setMinWidth(1600);
+			map.setMinHeight(1600);
+			center = 800;
 
+		} else {
+			map.setMinWidth(mapSize);
+			map.setMinHeight(mapSize);
+
+			center = mapSize / 2;
+		}
 		int z = size * (-1);
 
 		while (z <= size) {
@@ -302,7 +312,7 @@ public class CalculateMap {
 				buildWaterTile(map, getxCoordinate(center, -i, waterMax), getyCoordinate(center, waterMax), -i, waterMin + i, waterMax, 5);
 			}
 		}
-
+		map.setStyle("-fx-background: transparent; -fx-background-color: transparent; ");
 		return map;
 	}
 
