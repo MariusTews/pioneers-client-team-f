@@ -62,7 +62,7 @@ public class GameScreenController implements Controller {
     @FXML
     public Button leave;
     @FXML
-    public Pane userView;
+    public Pane userViewPane;
     private final App app;
 
     private final GameStorage gameStorage;
@@ -242,7 +242,7 @@ public class GameScreenController implements Controller {
 
         //userSubView
         this.playerOwnView.addListener((ListChangeListener<? super Player>) c ->
-                this.userView.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
+                this.userViewPane.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
         return parent;
     }

@@ -14,7 +14,7 @@
                     style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
             <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0"/>
         </ScrollPane>
-        <Pane fx:id="userView" layoutX="20.0" layoutY="580.0" prefHeight="320.0" prefWidth="500.0"/>
+        <Pane fx:id="userViewPane" layoutX="20.0" layoutY="580.0" prefHeight="320.0" prefWidth="500.0"/>
     </Pane>
     <ScrollPane hbarPolicy="NEVER" layoutX="500.0" pannable="true" prefHeight="150.0" prefWidth="650.0"
                 style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
