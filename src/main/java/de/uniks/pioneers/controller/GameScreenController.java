@@ -349,9 +349,23 @@ public class GameScreenController implements Controller {
     }
 
     private void winnerScreen(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
+        HashMap<String, Number> userNumberPoints = new HashMap<>();
+       //This saves username and their respective points from game in hashmap
         for (User user:this.allUser) {
+            for (Player p: playerOwnView) {
+                if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
+                    userNumberPoints.put(user.name(),p.victoryPoints());
+                }
+            }
 
+            for (Player p: opponents) {
+                if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
+                    userNumberPoints.put(user.name(),p.victoryPoints());
+                }
+            }
         }
+
+
     }
 
     private void handleStateEvents(Event<State> stateEvent) {
