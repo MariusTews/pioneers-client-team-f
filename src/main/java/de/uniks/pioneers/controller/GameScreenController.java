@@ -101,6 +101,8 @@ public class GameScreenController implements Controller {
     private final Timeline timeline = new Timeline();
     private boolean runDiscardOnce = true;
 
+    private WinnerController winnerController;
+
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
                                 App app,
@@ -365,7 +367,10 @@ public class GameScreenController implements Controller {
             }
         }
 
-
+        if (userNumberPoints.containsValue(0)){
+               winnerController =  new WinnerController(userNumberPoints);
+               winnerController.render();
+        }
     }
 
     private void handleStateEvents(Event<State> stateEvent) {
