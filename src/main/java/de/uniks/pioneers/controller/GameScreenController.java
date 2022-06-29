@@ -39,7 +39,12 @@ public class GameScreenController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
 
+    private final ObservableList<Member> spectatorMember = FXCollections.observableArrayList();
+
     private final Provider<LobbyController> lobbyController;
+
+    //all Users
+    private final ArrayList<User> allUser = new ArrayList<>();
 
     @FXML
     public ScrollPane mapPane;
@@ -62,6 +67,10 @@ public class GameScreenController implements Controller {
     @FXML
     public Button leave;
     @FXML
+
+    //specatator pane
+    public Pane spectatorPaneId;
+
     public Pane userViewPane;
     private final App app;
 
@@ -83,6 +92,8 @@ public class GameScreenController implements Controller {
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
+
+    private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
@@ -124,6 +135,7 @@ public class GameScreenController implements Controller {
                 .findAllUsers()
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
+                    this.allUser.addAll(result);
                     for (User user : result) {
                         this.userHash.put(user._id(), user);
                     }
@@ -132,7 +144,14 @@ public class GameScreenController implements Controller {
                     memberService
                             .getAllGameMembers(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
-                            .subscribe(this.members::setAll);
+                            .subscribe( c ->{
+                                for (Member member:c){
+                                    if(member.spectator() && member.gameId().equals(this.gameStorage.getId())){
+                                        this.spectatorMember.add(member);
+                                    }
+                                }
+                                this.members.setAll(c);
+                            });
 
                     // Listen to the State to handle the event
                     disposable.add(eventListener
@@ -244,7 +263,21 @@ public class GameScreenController implements Controller {
         this.playerOwnView.addListener((ListChangeListener<? super Player>) c ->
                 this.userViewPane.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
+        //spectator
+        this.spectatorMember.addListener((ListChangeListener<? super Member>) c ->
+                this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
+
         return parent;
+    }
+
+    private Node renderSpectator(Member member) {
+        for(User user: allUser){
+            if(member.userId().equals(user._id())){
+                this.spectatorViewController = new SpectatorViewController(user);
+                break;
+            }
+        }
+        return  spectatorViewController.render();
     }
 
     private Node renderSingleUser(Player player) {
@@ -287,6 +320,7 @@ public class GameScreenController implements Controller {
                     opponents.set(opponents.indexOf(p), player);
                 }
             }
+            winnerScreen(playerOwnView,opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
             if (!player.userId().equals(idStorage.getID())) {
                 this.opponents.add(player);
@@ -311,6 +345,12 @@ public class GameScreenController implements Controller {
             }
             this.opponents.remove(player);
             this.removeOpponent(player);
+        }
+    }
+
+    private void winnerScreen(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
+        for (User user:this.allUser) {
+
         }
     }
 

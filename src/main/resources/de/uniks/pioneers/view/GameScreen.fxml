@@ -4,6 +4,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 <Pane id="gameView" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="de.uniks.pioneers.controller.GameScreenController">
     <ScrollPane fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="900.0"
@@ -16,9 +17,12 @@
         </ScrollPane>
         <Pane fx:id="userViewPane" layoutX="20.0" layoutY="580.0" prefHeight="320.0" prefWidth="500.0"/>
     </Pane>
-    <ScrollPane hbarPolicy="NEVER" layoutX="500.0" pannable="true" prefHeight="150.0" prefWidth="650.0"
+    <ScrollPane fx:id="spectatorPane" hbarPolicy="NEVER" layoutX="500.0" pannable="true" prefHeight="150.0" prefWidth="650.0"
                 style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
-        <HBox fx:id="spectatorView" prefHeight="150.0" prefWidth="650.0"/>
+        <HBox fx:id="spectatorPaneId" prefHeight="150.0" prefWidth="650.0">
+            <padding>
+                <Insets right="10.0" />
+            </padding></HBox>
     </ScrollPane>
     <Pane id="roll" layoutX="500.0" layoutY="736.6666870117188" prefHeight="150.0" prefWidth="650.0">
         <ImageView fitHeight="83.0" fitWidth="92.0" layoutX="347.0" layoutY="30.0" onMouseClicked="#onMouseClicked"
