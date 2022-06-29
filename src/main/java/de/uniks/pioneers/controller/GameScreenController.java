@@ -19,7 +19,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -36,8 +36,6 @@ public class GameScreenController implements Controller {
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
 
     private final ObservableList<Player> playerOwnView = FXCollections.observableArrayList();
-
-    private final ObservableList<Player> playerSpectator = FXCollections.observableArrayList();
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
 
@@ -60,17 +58,18 @@ public class GameScreenController implements Controller {
     @FXML
     public Label timerLabel;
     @FXML
-    public ImageView diceImage;
-
+    public HBox spectatorView;
+    @FXML
+    public Button leave;
+    @FXML
+    public Pane userView;
     private final App app;
 
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
-    //specatator pane
-    public Pane spectatorPaneId;
-	public Button leave;
 
-	private String lastBuildingPosition;
+
+    private String lastBuildingPosition;
 
     private final PioneersService pioneersService;
     private final EventListener eventListener;
@@ -80,7 +79,7 @@ public class GameScreenController implements Controller {
     private final GameService gameService;
     private final MessageService messageService;
     private final MemberService memberService;
-    public Pane userPaneId;
+
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
@@ -243,7 +242,7 @@ public class GameScreenController implements Controller {
 
         //userSubView
         this.playerOwnView.addListener((ListChangeListener<? super Player>) c ->
-                this.userPaneId.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
+                this.userView.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
         return parent;
     }

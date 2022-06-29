@@ -14,11 +14,11 @@
                     style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
             <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0"/>
         </ScrollPane>
-        <Pane fx:id="userPaneId" layoutX="20.0" layoutY="580.0" prefHeight="320.0" prefWidth="500.0"/>
+        <Pane fx:id="userView" layoutX="20.0" layoutY="580.0" prefHeight="320.0" prefWidth="500.0"/>
     </Pane>
     <ScrollPane hbarPolicy="NEVER" layoutX="500.0" pannable="true" prefHeight="150.0" prefWidth="650.0"
                 style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
-        <HBox fx:id="spectatorPaneId" prefHeight="150.0" prefWidth="650.0"/>
+        <HBox fx:id="spectatorView" prefHeight="150.0" prefWidth="650.0"/>
     </ScrollPane>
     <Pane id="roll" layoutX="500.0" layoutY="736.6666870117188" prefHeight="150.0" prefWidth="650.0">
         <ImageView fitHeight="83.0" fitWidth="92.0" layoutX="347.0" layoutY="30.0" onMouseClicked="#onMouseClicked"
