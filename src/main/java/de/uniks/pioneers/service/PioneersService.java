@@ -59,7 +59,7 @@ public class PioneersService {
     }
 
     public Observable<Move> tradeBank(String gameId, HashMap<String, Integer> resources) {
-		return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, resources, Constants.BANK_ID, null));
+		return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, resources, BANK_ID, null));
 	}
 
 	public Observable<Player> updatePlayer(String gameId, String userId, boolean active) {

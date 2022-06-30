@@ -70,6 +70,8 @@ public class GameScreenController implements Controller {
     public Pane tradingSubView;
     @FXML
     public VBox rightScreenArea;
+    @FXML
+    public Pane tradingPane;
 
     private final App app;
 
@@ -261,7 +263,7 @@ public class GameScreenController implements Controller {
 
         this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener, null);
         tradingSubController.init();
-        this.rightScreenArea.getChildren().add(1, tradingSubController.render());
+        this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
         return parent;
     }
@@ -339,7 +341,7 @@ public class GameScreenController implements Controller {
         if (stateEvent.event().endsWith(UPDATED)) {
             // change the nextMoveLabel to the current move
             String currentMove = state.expectedMoves().get(0).action();
-            nextMoveLabel.setText(currentMove);
+             nextMoveLabel.setText(currentMove);
             // change the currentPlayerLabel to the current player
             User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
             currentPlayerLabel.setText(currentPlayer.name());
