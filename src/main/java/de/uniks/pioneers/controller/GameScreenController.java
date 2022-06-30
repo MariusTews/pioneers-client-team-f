@@ -162,6 +162,8 @@ public class GameScreenController implements Controller {
                             .observeOn(FX_SCHEDULER)
                             .subscribe(this::handleStateEvents));
 
+                    //TODO:This needs to be handled separelty so spectator does not
+                    //get access to it
                     // Check if expected move is founding-roll after joining the game
                     pioneersService
                             .findOneState(gameStorage.getId())
@@ -331,22 +333,6 @@ public class GameScreenController implements Controller {
                 this.opponentsView.getChildren().add(renderOpponent(player));
             }
         } else if (playerEvent.event().endsWith(DELETED)) {
-            if (opponents.size() < 2) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                // Set style
-                DialogPane dialogPane = alert.getDialogPane();
-                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                alert.setContentText("You are the Winner!!!");
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isEmpty()) {
-                    this.app.show(lobbyController.get());
-                } else if (result.get() == ButtonType.OK) {
-                    this.app.show(lobbyController.get());
-                } else if (result.get() == ButtonType.CANCEL) {
-                    this.app.show(lobbyController.get());
-                }
-            }
             this.opponents.remove(player);
             this.removeOpponent(player);
         }
