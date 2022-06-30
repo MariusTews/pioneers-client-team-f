@@ -62,7 +62,7 @@ class LobbyControllerTest extends ApplicationTest {
         // empty init
         when(groupService.getAll()).thenReturn(Observable.empty());
         when(userService.findAllUsers()).thenReturn(Observable.empty());
-        when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
+        //when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         when(gameService.findAllGames()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
 
