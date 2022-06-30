@@ -265,15 +265,6 @@ public class GameScreenController implements Controller {
         tradingSubController.init();
         this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
-        /*
-         * Render trading sub view
-         * hand over own player to trading sub view
-         * */
-
-        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener, null);
-        tradingSubController.init();
-        this.rightScreenArea.getChildren().add(1, tradingSubController.render());
-
         return parent;
     }
 
