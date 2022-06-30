@@ -37,6 +37,8 @@ import static de.uniks.pioneers.Constants.*;
 public class LobbyController implements Controller {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
+
+    private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Game> games = FXCollections.observableArrayList();
     private final ObservableList<Group> groups = FXCollections.observableArrayList();
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
@@ -95,6 +97,8 @@ public class LobbyController implements Controller {
     private final Provider<EditUserController> editUserController;
     private final Provider<GameScreenController> gameScreenController;
 
+    private final PioneersService pioneersService;
+
     private final CompositeDisposable disposable = new CompositeDisposable();
     public Button rejoinButton;
     private Disposable tabDisposable;
@@ -118,7 +122,8 @@ public class LobbyController implements Controller {
                            Provider<CreateGameController> createGameController,
                            Provider<GameLobbyController> gameLobbyController,
                            Provider<EditUserController> editUserController,
-                           Provider<GameScreenController> gameScreenController) {
+                           Provider<GameScreenController> gameScreenController,
+                           PioneersService pioneersService) {
 
         this.app = app;
         this.idStorage = idStorage;
@@ -136,11 +141,18 @@ public class LobbyController implements Controller {
         this.gameLobbyController = gameLobbyController;
         this.editUserController = editUserController;
         this.gameScreenController = gameScreenController;
+        this.pioneersService = pioneersService;
     }
 
     @Override
     public void init() {
 
+        if(this.gameStorage.getId() != null) {
+            memberService.getAllGameMembers(this.gameStorage.getId())
+                    .observeOn(FX_SCHEDULER).subscribe(c -> {
+                        this.members.setAll(c);
+                    });
+        }
         gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
         groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this::loadGroups);
@@ -686,6 +698,22 @@ public class LobbyController implements Controller {
 
     //reactivate for the possibility of joining the game
     public void onRejoin() {
-        this.app.show(gameScreenController.get());
+        boolean changeToPlayer = false;
+        for (Member m: this.members) {
+            if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())
+                && m.spectator()){
+                this.app.show(gameScreenController.get());
+                changeToPlayer = true;
+                break;
+            }
+        }
+        if(!changeToPlayer) {
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(onSuccess -> {
+                        this.app.show(gameScreenController.get());
+                    });
+        }
+
     }
 }

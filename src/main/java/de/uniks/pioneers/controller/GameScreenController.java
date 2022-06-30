@@ -376,7 +376,7 @@ public class GameScreenController implements Controller {
         }
 
         for (List<String> s: userNumberPoints.values()) {
-            if(s.contains("0")) {
+            if(s.contains("10")) {
                 winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                 ,pioneersService, gameStorage, idStorage);
                 winnerController.render();
@@ -488,6 +488,7 @@ public class GameScreenController implements Controller {
             if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())){
                 this.app.show(lobbyController.get());
                 changeToPlayer = true;
+                break;
             }
         }
         //this distinguish between player and spectator

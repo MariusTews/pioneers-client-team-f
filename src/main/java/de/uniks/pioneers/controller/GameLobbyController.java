@@ -78,6 +78,7 @@ public class GameLobbyController implements Controller {
     private final GameStorage gameStorage;
     private final MemberIDStorage memberIDStorage;
     private final IDStorage idStorage;
+
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private Game game;
