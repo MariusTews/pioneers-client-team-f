@@ -149,6 +149,7 @@ public class GameScreenController implements Controller {
                             .observeOn(FX_SCHEDULER)
                             .subscribe( c ->{
                                 for (Member member:c){
+
                                     if(member.spectator() && member.gameId().equals(this.gameStorage.getId())){
                                         this.spectatorMember.add(member);
                                     }
@@ -362,9 +363,9 @@ public class GameScreenController implements Controller {
         }
 
         for (List<String> s: userNumberPoints.values()) {
-            if(s.contains("10")) {
+            if(s.contains("0")) {
                 winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
-                ,pioneersService, gameStorage, idStorage);
+                ,pioneersService, gameStorage, idStorage,gameService,app,lobbyController);
                 winnerController.render();
             }
         }
