@@ -43,14 +43,14 @@
             </Label>
             <Label fx:id="currentPlayerLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="38.0" layoutY="93.0" prefHeight="39.0" prefWidth="436.0">
             </Label>
-            <Pane id="timer" layoutX="175.0" layoutY="135.0" prefHeight="74.0" prefWidth="150.0">
+            <Pane id="timer" layoutX="175.0" layoutY="131.0" prefHeight="74.0" prefWidth="150.0">
                 <Label alignment="CENTER" contentDisplay="CENTER" layoutX="-18.0" layoutY="2.0" prefHeight="24.0" prefWidth="189.0" text="Remaining time">
                 </Label>
                 <Label id="remainingTime" fx:id="timerLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="-24.0" layoutY="40.0" prefHeight="24.0" prefWidth="200.0">
                 </Label>
             </Pane>
-            <Button fx:id="finishTurnButton" contentDisplay="CENTER" layoutX="142.0" layoutY="199.0" mnemonicParsing="false" onAction="#finishTurn" prefHeight="58.0" prefWidth="189.0" styleClass="greenButton" text="Move" />
+            <Button fx:id="finishTurnButton" contentDisplay="CENTER" layoutX="142.0" layoutY="190.0" mnemonicParsing="false" onAction="#finishTurn" prefHeight="58.0" prefWidth="189.0" styleClass="greenButton" text="Move" />
         </Pane>
-      <Pane fx:id="chatPane" layoutX="45.0" layoutY="540.0" prefHeight="198.0" prefWidth="510.0" />
+      <Pane fx:id="chatPane" layoutX="48.0" layoutY="571.0" prefHeight="326.0" prefWidth="510.0" />
     </Pane>
 </Pane>

@@ -204,7 +204,7 @@ public class TradingSubController implements Controller{
         if (this.giveCactusMinusButton.disableProperty().get()) {
             makeButtonVisible(this.giveCactusMinusButton);
         }
-        //System.out.println(player.resources().toString());
+        System.out.println(player.resources().toString());
     }
 
     public void giveMarsMinusButtonPressed(ActionEvent event) {
