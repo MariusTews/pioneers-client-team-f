@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.UPDATED;
 
 public class GameScreenController implements Controller {
 
@@ -351,25 +352,33 @@ public class GameScreenController implements Controller {
     }
 
     private void winnerScreen(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
-        HashMap<String, Number> userNumberPoints = new HashMap<>();
+        HashMap<String, List<String>> userNumberPoints = new HashMap<>();
        //This saves username and their respective points from game in hashmap
         for (User user:this.allUser) {
             for (Player p: playerOwnView) {
                 if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
-                    userNumberPoints.put(user.name(),p.victoryPoints());
+                    List<String> ls = new ArrayList<>();
+                    ls.add(p.color());
+                    ls.add(p.victoryPoints().toString());
+                    userNumberPoints.put(user.name(),ls);
                 }
             }
 
             for (Player p: opponents) {
                 if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
-                    userNumberPoints.put(user.name(),p.victoryPoints());
+                    List<String> ls = new ArrayList<>();
+                    ls.add(p.color());
+                    ls.add(p.victoryPoints().toString());
+                    userNumberPoints.put(user.name(),ls);
                 }
             }
         }
 
-        if (userNumberPoints.containsValue(0)){
-               winnerController =  new WinnerController(userNumberPoints);
-               winnerController.render();
+        for (List<String> s: userNumberPoints.values()) {
+            if(s.contains("0")) {
+                winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow());
+                winnerController.render();
+            }
         }
     }
 
@@ -470,26 +479,23 @@ public class GameScreenController implements Controller {
                 .subscribe();
     }
 
+    //update GameStatus when leaving game
     public void onLeave(ActionEvent ignoredEvent) {
-        if ((opponents.size() + playerOwnView.size()) == 2) {
-            gameService.findOneGame(this.gameStorage.getId())
-                    .observeOn(FX_SCHEDULER).
-                    subscribe(col -> {
-                        if (col.owner().equals(idStorage.getID())) {
-                            gameService.
-                                    deleteGame(this.gameStorage.getId()).
-                                    observeOn(FX_SCHEDULER).
-                                    subscribe(onSuccess ->
-                                            this.app.show(lobbyController.get()), onError -> {
-                                    });
-                        } else {
-                            this.app.show(lobbyController.get());
-                        }
-                    });
-
-        } else {
-            this.app.show(lobbyController.get());
+        boolean changeToPlayer = false;
+        for (Member m: spectatorMember) {
+            if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())){
+                this.app.show(lobbyController.get());
+                changeToPlayer = true;
+            }
         }
+        //this distinguish between player and spectator
+        if(!changeToPlayer){
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false)
+                    .observeOn(FX_SCHEDULER).subscribe(onSuccess -> {
+                        this.app.show(lobbyController.get());
+                    });
+        }
+
     }
 
     public void finishTurn() {
