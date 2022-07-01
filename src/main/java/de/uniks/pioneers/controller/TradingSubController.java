@@ -1,9 +1,6 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
-import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
@@ -17,11 +14,10 @@ import javafx.scene.control.Label;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.RESOURCES;
 
 public class TradingSubController implements Controller{
     @FXML
@@ -89,30 +85,22 @@ public class TradingSubController implements Controller{
     @FXML
     public Button offerBankButton;
 
-    private Parent parent;
     private final GameStorage gameStorage;
     private final PioneersService pioneersService;
     private final IDStorage idStorage;
-    private final EventListener eventListener;
     private Player player;
 
     // hashMaps for resources
     private final HashMap<String, Integer> giveResources = new HashMap<>();
     private final HashMap<String, Integer> receiveResources = new HashMap<>();
 
-    private List<Label> labelList = new ArrayList<>();
-
-
     @Inject
     public TradingSubController(GameStorage gameStorage,
                                 PioneersService pioneersService,
-                                IDStorage idStorage,
-                                EventListener eventListener, Player player) {
+                                IDStorage idStorage) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
         this.idStorage = idStorage;
-        this.eventListener = eventListener;
-        this.player = player;
     }
 
     @Override
@@ -129,18 +117,6 @@ public class TradingSubController implements Controller{
         this.receiveResources.put("ore", 0);
         this.receiveResources.put("wool", 0);
         this.receiveResources.put("grain", 0);
-
-        // init labels
-        this.labelList.add(giveCactusLabel);
-        this.labelList.add(giveMarsLabel);
-        this.labelList.add(giveMoonLabel);
-        this.labelList.add(giveNeptunLabel);
-        this.labelList.add(giveVenusLabel);
-        this.labelList.add(receiveCactusLabel);
-        this.labelList.add(receiveMarsLabel);
-        this.labelList.add(receiveMoonLabel);
-        this.labelList.add(receiveNeptunLabel);
-        this.labelList.add(receiveVenusLabel);
 
         pioneersService
                 .findAllPlayers(this.gameStorage.getId())
@@ -182,7 +158,6 @@ public class TradingSubController implements Controller{
         makeButtonInvisible(receiveNeptunMinusButton);
         makeButtonInvisible(receiveVenusMinusButton);
 
-        this.parent = parent;
         return parent;
     }
 
@@ -204,7 +179,6 @@ public class TradingSubController implements Controller{
         if (this.giveCactusMinusButton.disableProperty().get()) {
             makeButtonVisible(this.giveCactusMinusButton);
         }
-        System.out.println(player.resources().toString());
     }
 
     public void giveMarsMinusButtonPressed(ActionEvent event) {
@@ -422,9 +396,7 @@ public class TradingSubController implements Controller{
                 }
             }
         }
-        /*for(Label label : labelList) {
-            label.setText("0");
-        }*/
+
         this.giveCactusLabel.setText("0");
         this.giveMarsLabel.setText("0");
         this.giveMoonLabel.setText("0");
@@ -435,7 +407,6 @@ public class TradingSubController implements Controller{
         this.receiveMoonLabel.setText("0");
         this.receiveNeptunLabel.setText("0");
         this.receiveVenusLabel.setText("0");
-        System.out.println(player.resources().toString());
     }
 
     public void setPlayer(Player player) {

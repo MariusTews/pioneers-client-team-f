@@ -79,12 +79,6 @@ public class GameScreenController implements Controller {
 
     public Pane userViewPane;
     @FXML
-    public ImageView diceImage;
-    @FXML
-    public Pane tradingSubView;
-    @FXML
-    public VBox rightScreenArea;
-    @FXML
     public Pane tradingPane;
 
     private final App app;
@@ -200,14 +194,14 @@ public class GameScreenController implements Controller {
                             .findAllPlayers(this.gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe(c -> {
-                                for (Member member:this.members) {
+                                for (Member member : this.members) {
                                     for (Player player : c) {
                                         //this checks if the player is oppenent or spectator or yourself
                                         if (!player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId()) ) {
+                                                .equals(player.userId())) {
                                             opponents.add(player);
                                         } else if (player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId())){
+                                                .equals(player.userId())) {
                                             playerOwnView.add(player);
                                         }
                                     }
@@ -296,7 +290,7 @@ public class GameScreenController implements Controller {
          * hand over own player to trading sub view
          * */
 
-        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener, null);
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage);
         tradingSubController.init();
         this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
@@ -407,7 +401,7 @@ public class GameScreenController implements Controller {
         if (stateEvent.event().endsWith(UPDATED)) {
             // change the nextMoveLabel to the current move
             String currentMove = state.expectedMoves().get(0).action();
-             nextMoveLabel.setText(currentMove);
+            nextMoveLabel.setText(currentMove);
             // change the currentPlayerLabel to the current player
             User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
             currentPlayerLabel.setText(currentPlayer.name());
@@ -548,7 +542,7 @@ public class GameScreenController implements Controller {
         //gets called every second to reduce the timer by one second
         KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
             seconds[0]--;
-            if (seconds[0]%60 >9) {
+            if (seconds[0] % 60 > 9) {
                 timerLabel.setText("" + (seconds[0] / 60) + ":" + seconds[0] % 60);
             } else {
                 timerLabel.setText("" + (seconds[0] / 60) + ":0" + seconds[0] % 60);
