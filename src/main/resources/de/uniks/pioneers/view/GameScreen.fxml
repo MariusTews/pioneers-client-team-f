@@ -20,7 +20,7 @@
         </ScrollPane>
         <Pane fx:id="userViewPane" layoutX="20.0" layoutY="580.0" prefHeight="320.0" prefWidth="500.0" />
     </Pane>
-    <ScrollPane fx:id="spectatorPane"hbarPolicy="NEVER" layoutX="500.0" pannable="true" prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
+    <ScrollPane hbarPolicy="NEVER" layoutX="500.0" pannable="true" prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
         <HBox fx:id="spectatorPaneId" prefHeight="150.0" prefWidth="650.0" >
             <padding>
                 <Insets right="10.0" />
