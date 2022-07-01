@@ -4,7 +4,6 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
-import de.uniks.pioneers.model.Map;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -20,6 +19,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -28,9 +30,12 @@ import javafx.util.Duration;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.UPDATED;
 
 public class GameScreenController implements Controller {
 
@@ -40,7 +45,12 @@ public class GameScreenController implements Controller {
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
 
+    private final ObservableList<Member> spectatorMember = FXCollections.observableArrayList();
+
     private final Provider<LobbyController> lobbyController;
+
+    //all Users
+    private final ArrayList<User> allUser = new ArrayList<>();
 
     @FXML
     public ScrollPane mapPane;
@@ -63,6 +73,10 @@ public class GameScreenController implements Controller {
     @FXML
     public Button leave;
     @FXML
+
+    //specatator pane
+    public Pane spectatorPaneId;
+
     public Pane userViewPane;
     @FXML
     public ImageView diceImage;
@@ -94,12 +108,16 @@ public class GameScreenController implements Controller {
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private TradingSubController tradingSubController;
+
+    private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
     private final Timeline timeline = new Timeline();
     private boolean runDiscardOnce = true;
+
+    private WinnerController winnerController;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -135,6 +153,7 @@ public class GameScreenController implements Controller {
                 .findAllUsers()
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
+                    this.allUser.addAll(result);
                     for (User user : result) {
                         this.userHash.put(user._id(), user);
                     }
@@ -143,14 +162,18 @@ public class GameScreenController implements Controller {
                     memberService
                             .getAllGameMembers(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
-                            .subscribe(this.members::setAll);
-
-                    // Listen to the State to handle the event
-                    disposable.add(eventListener
-                            .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(this::handleStateEvents));
-
+                            .subscribe( c ->{
+                                for (Member member:c){
+                                    if(member.spectator() && member.gameId().equals(this.gameStorage.getId())){
+                                        this.spectatorMember.add(member);
+                                    }
+                                }
+                                //this needs to be hier
+                                //otherwise spectator throws 403 error
+                                for (Member m: c){
+                                    if(!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
+                                            m.userId().equals(this.idStorage.getID())){
+                                        //get access to it
 
                     // Check if expected move is founding-roll after joining the game
                     pioneersService
@@ -159,8 +182,19 @@ public class GameScreenController implements Controller {
                             .subscribe(r -> {
                                 if (r.expectedMoves().get(0).action().equals("founding-roll")) {
                                     foundingDiceRoll();
+                                }});
+                                        break;
+                                    }
                                 }
+
+                                this.members.setAll(c);
                             });
+
+                    // Listen to the State to handle the event
+                    disposable.add(eventListener
+                            .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(this::handleStateEvents));
 
                     pioneersService
                             .findAllPlayers(this.gameStorage.getId())
@@ -240,6 +274,7 @@ public class GameScreenController implements Controller {
             }
         });
 
+
         this.gameFieldSubController = new GameFieldSubController(app, gameStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
@@ -265,7 +300,21 @@ public class GameScreenController implements Controller {
         tradingSubController.init();
         this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
+        //spectator
+        this.spectatorMember.addListener((ListChangeListener<? super Member>) c ->
+                this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
+
         return parent;
+    }
+
+    private Node renderSpectator(Member member) {
+        for(User user: allUser){
+            if(member.userId().equals(user._id())){
+                this.spectatorViewController = new SpectatorViewController(user);
+                break;
+            }
+        }
+        return  spectatorViewController.render();
     }
 
     private Node renderSingleUser(Player player) {
@@ -308,30 +357,47 @@ public class GameScreenController implements Controller {
                     opponents.set(opponents.indexOf(p), player);
                 }
             }
+            winnerScreen(playerOwnView,opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
             if (!player.userId().equals(idStorage.getID())) {
                 this.opponents.add(player);
                 this.opponentsView.getChildren().add(renderOpponent(player));
             }
         } else if (playerEvent.event().endsWith(DELETED)) {
-            if (opponents.size() < 2) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                // Set style
-                DialogPane dialogPane = alert.getDialogPane();
-                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                alert.setContentText("You are the Winner!!!");
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isEmpty()) {
-                    this.app.show(lobbyController.get());
-                } else if (result.get() == ButtonType.OK) {
-                    this.app.show(lobbyController.get());
-                } else if (result.get() == ButtonType.CANCEL) {
-                    this.app.show(lobbyController.get());
-                }
-            }
             this.opponents.remove(player);
             this.removeOpponent(player);
+        }
+    }
+
+    private void winnerScreen(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
+        HashMap<String, List<String>> userNumberPoints = new HashMap<>();
+       //This saves username and their respective points from game in hashmap
+        for (User user:this.allUser) {
+            for (Player p: playerOwnView) {
+                if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
+                    List<String> ls = new ArrayList<>();
+                    ls.add(p.color());
+                    ls.add(p.victoryPoints().toString());
+                    userNumberPoints.put(user.name(),ls);
+                }
+            }
+
+            for (Player p: opponents) {
+                if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
+                    List<String> ls = new ArrayList<>();
+                    ls.add(p.color());
+                    ls.add(p.victoryPoints().toString());
+                    userNumberPoints.put(user.name(),ls);
+                }
+            }
+        }
+
+        for (List<String> s: userNumberPoints.values()) {
+            if(s.contains("10")) {
+                winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
+                , gameStorage, idStorage,gameService,app,lobbyController);
+                winnerController.render();
+            }
         }
     }
 
@@ -433,26 +499,24 @@ public class GameScreenController implements Controller {
                 .subscribe();
     }
 
+    //update GameStatus when leaving game
     public void onLeave(ActionEvent ignoredEvent) {
-        if ((opponents.size() + playerOwnView.size()) == 2) {
-            gameService.findOneGame(this.gameStorage.getId())
-                    .observeOn(FX_SCHEDULER).
-                    subscribe(col -> {
-                        if (col.owner().equals(idStorage.getID())) {
-                            gameService.
-                                    deleteGame(this.gameStorage.getId()).
-                                    observeOn(FX_SCHEDULER).
-                                    subscribe(onSuccess ->
-                                            this.app.show(lobbyController.get()), onError -> {
-                                    });
-                        } else {
-                            this.app.show(lobbyController.get());
-                        }
-                    });
-
-        } else {
-            this.app.show(lobbyController.get());
+        boolean changeToPlayer = false;
+        for (Member m: spectatorMember) {
+            if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())){
+                this.app.show(lobbyController.get());
+                changeToPlayer = true;
+                break;
+            }
         }
+        //this distinguish between player and spectator
+        if(!changeToPlayer){
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false)
+                    .observeOn(FX_SCHEDULER).subscribe(onSuccess -> {
+                        this.app.show(lobbyController.get());
+                    });
+        }
+
     }
 
     public void finishTurn() {

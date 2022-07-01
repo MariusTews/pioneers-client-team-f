@@ -135,3 +135,11 @@
     -fx-font-size: 14;
     -fx-text-fill: #666666;
 }
+
+#spectatorNameId{
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-position: top,right;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 200 60;
+
+}

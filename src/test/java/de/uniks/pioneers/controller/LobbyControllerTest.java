@@ -32,6 +32,9 @@ class LobbyControllerTest extends ApplicationTest {
     MessageService messageService;
 
     @Mock
+    MemberService memberService;
+
+    @Mock
     GameService gameService;
 
     @Mock
