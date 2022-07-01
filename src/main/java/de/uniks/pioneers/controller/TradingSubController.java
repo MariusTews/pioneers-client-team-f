@@ -389,7 +389,6 @@ public class TradingSubController implements Controller{
                                                 }
                                             });
                                 });
-
                         this.giveResources.replaceAll((k, v) -> v = 0);
                         this.receiveResources.replaceAll((k, v) -> v = 0);
                     }
