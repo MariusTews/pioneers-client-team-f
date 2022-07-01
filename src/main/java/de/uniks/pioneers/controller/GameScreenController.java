@@ -149,11 +149,29 @@ public class GameScreenController implements Controller {
                             .observeOn(FX_SCHEDULER)
                             .subscribe( c ->{
                                 for (Member member:c){
-
                                     if(member.spectator() && member.gameId().equals(this.gameStorage.getId())){
                                         this.spectatorMember.add(member);
                                     }
                                 }
+                                //this needs to be hier
+                                //otherwise spectator throws 403 error
+                                for (Member m: c){
+                                    if(!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
+                                            m.userId().equals(this.idStorage.getID())){
+                                        //get access to it
+                                        // Check if expected move is founding-roll after joining the game
+                                        pioneersService
+                                                .findOneState(gameStorage.getId())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe(r -> {
+                                                    if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                                        foundingDiceRoll();
+                                                    }
+                                                });
+                                        break;
+                                    }
+                                }
+
                                 this.members.setAll(c);
                             });
 
@@ -162,18 +180,6 @@ public class GameScreenController implements Controller {
                             .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
                             .observeOn(FX_SCHEDULER)
                             .subscribe(this::handleStateEvents));
-
-                    //TODO:This needs to be handled separelty so spectator does not
-                    //get access to it
-                    // Check if expected move is founding-roll after joining the game
-                    pioneersService
-                            .findOneState(gameStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(r -> {
-                                if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                    foundingDiceRoll();
-                                }
-                            });
 
                     pioneersService
                             .findAllPlayers(this.gameStorage.getId())
@@ -363,7 +369,7 @@ public class GameScreenController implements Controller {
         }
 
         for (List<String> s: userNumberPoints.values()) {
-            if(s.contains("0")) {
+            if(s.contains("10")) {
                 winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                 ,pioneersService, gameStorage, idStorage,gameService,app,lobbyController);
                 winnerController.render();

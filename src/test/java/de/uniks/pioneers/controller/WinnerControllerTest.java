@@ -59,7 +59,8 @@ public class WinnerControllerTest extends ApplicationTest {
         pointsAndValues.add("6");
         userNamePAndV.put("Syd",pointsAndValues);
 
-        WinnerController winnerController = new WinnerController(userNamePAndV,null,pioneersService,gameStorage,idStorage, gameService, app, lobbyController);
+        WinnerController winnerController = new WinnerController(userNamePAndV,null,pioneersService,gameStorage
+                ,idStorage, gameService, app, lobbyController);
         winnerController.render();
 
     }
@@ -71,6 +72,8 @@ public class WinnerControllerTest extends ApplicationTest {
 
         Label loserTitel = lookup("#loserTitel").query();
         Assertions.assertThat(loserTitel.getText().equals("Loser"));
+
+        Assertions.assertThat(!userNamePAndV.isEmpty());
     }
 
 }
