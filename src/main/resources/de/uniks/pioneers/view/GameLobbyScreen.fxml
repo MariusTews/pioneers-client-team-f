@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="600.0" prefWidth="1010.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      prefHeight="600.0" prefWidth="1010.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="de.uniks.pioneers.controller.GameLobbyController">
     <Pane prefHeight="100.0">
         <Label fx:id="idTitleLabel" layoutX="10.0" layoutY="30.0" styleClass="whiteTitle">
