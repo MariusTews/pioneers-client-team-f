@@ -1,0 +1,25 @@
+#winnerVBox{
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 220 289;
+}
+
+#winnerTitel{
+    -fx-font-size: 18;
+    -fx-text-fill: #000000;
+}
+
+#winnerName{
+    -fx-font-size: 22;
+}
+
+#loserTitel{
+    -fx-font-size: 18;
+    -fx-text-fill: #000000;
+}
+
+#closeGameButtonId{
+    -fx-border-color: #0096FF;
+    -fx-border-insets: 4px;
+}

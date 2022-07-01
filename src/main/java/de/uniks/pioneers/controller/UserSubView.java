@@ -19,11 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.uniks.pioneers.Constants.AMOUNT_SETTLEMENTS_CITIES;
-import static de.uniks.pioneers.Constants.CITY;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
-import static de.uniks.pioneers.Constants.SETTLEMENT;
 
 public class UserSubView implements Controller {
 
