@@ -8,11 +8,16 @@ import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import kong.unirest.json.JSONObject;
 
 import javax.inject.Inject;
@@ -20,6 +25,7 @@ import javax.inject.Provider;
 import java.io.IOException;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.JSON_NAME;
 
 public class LoginController implements Controller {
     private final App app;
@@ -87,6 +93,15 @@ public class LoginController implements Controller {
         final BooleanBinding usernameLengthMin = Bindings.greaterThan(1, usernameTextField.lengthProperty());
         final BooleanBinding usernameLengthMax = Bindings.greaterThan(33, usernameTextField.lengthProperty());
         loginButton.disableProperty().bind(length.or(usernameLengthMin.or(usernameLengthMax.not())));
+
+        //this makes sure enter key works while loginging in
+        parent.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
+            if(event.getCode() == KeyCode.ENTER){
+                if(!(length.or(usernameLengthMin.or(usernameLengthMax.not())).get())){
+                    loginButtonPressed();
+                }
+            }
+        });
 
         return parent;
     }
