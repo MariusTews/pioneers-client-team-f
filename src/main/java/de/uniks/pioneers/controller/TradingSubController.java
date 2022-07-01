@@ -19,7 +19,7 @@ import java.util.HashMap;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
 
-public class TradingSubController implements Controller{
+public class TradingSubController implements Controller {
     @FXML
     public Button giveCactusMinusButton;
     @FXML
@@ -122,11 +122,11 @@ public class TradingSubController implements Controller{
                 .findAllPlayers(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(c -> {
-                        for (Player player : c) {
-                            if (player.userId().equals(idStorage.getID())){
-                                this.player = player;
-                            }
+                    for (Player player : c) {
+                        if (player.userId().equals(idStorage.getID())) {
+                            this.player = player;
                         }
+                    }
                 });
     }
 
@@ -161,24 +161,22 @@ public class TradingSubController implements Controller{
         return parent;
     }
 
-
+    /*
+     * Every minus button:
+     *   check, if amount of resource is above 0
+     *   decrease amount, if pressed
+     *   make button invisible, if amount equals 0
+     * Every plus button:
+     *   increase amount of resource until value of available resource
+     *   make minus button visible, if value is increased
+     * */
 
     public void giveCactusMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.giveCactusLabel.getText()) > 0) {
-            this.giveResources.put("lumber", this.giveResources.get("lumber") - 1);
-            this.giveCactusLabel.setText(String.valueOf(this.giveResources.get("lumber")));
-        }
-        if (this.giveCactusLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "lumber", this.giveCactusLabel, true, giveCactusPlusButton);
     }
 
     public void giveCactusPlusButtonPressed(ActionEvent event) {
-        this.giveResources.put("lumber", this.giveResources.get("lumber") + 1);
-        this.giveCactusLabel.setText(String.valueOf(this.giveResources.get("lumber")));
-        if (this.giveCactusMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.giveCactusMinusButton);
-        }
+        plusAction(event, "lumber", this.giveCactusLabel, true, giveCactusMinusButton);
     }
 
     public void giveMarsMinusButtonPressed(ActionEvent event) {
@@ -343,6 +341,45 @@ public class TradingSubController implements Controller{
         }
     }
 
+
+    // Additional methods
+    private void minusAction(ActionEvent event, String resource, Label label, boolean give, Button plusButton) {
+
+        if (Integer.parseInt(label.getText()) > 0) {
+            if (give) {
+                this.giveResources.put(resource, this.giveResources.get(resource) - 1);
+                label.setText(String.valueOf(this.giveResources.get(resource)));
+            } else {
+                this.receiveResources.put(resource, this.receiveResources.get(resource) - 1);
+                label.setText(String.valueOf(this.receiveResources.get(resource)));
+            }
+        }
+        if (label.getText().equals("0")) {
+            makeButtonInvisible((Button) event.getSource());
+        }
+        if (plusButton.disableProperty().get()) {
+            makeButtonVisible(plusButton);
+        }
+    }
+
+    private void plusAction(ActionEvent event, String resource, Label label, boolean give, Button minusButton) {
+        if (checkAmount(label, resource, give)) {
+            if (give) {
+                this.giveResources.put(resource, this.giveResources.get(resource) + 1);
+                label.setText(String.valueOf(this.giveResources.get(resource)));
+            } else {
+                this.receiveResources.put(resource, this.receiveResources.get(resource) + 1);
+                label.setText(String.valueOf(this.receiveResources.get(resource)));
+            }
+        }
+        if (minusButton.disableProperty().get()) {
+            makeButtonVisible(minusButton);
+        }
+        if (!checkAmount(label, resource, give)) {
+            makeButtonInvisible((Button) event.getSource());
+        }
+    }
+
     private void makeButtonVisible(Button button) {
         button.setVisible(true);
         button.disableProperty().set(false);
@@ -353,23 +390,34 @@ public class TradingSubController implements Controller{
         button.setVisible(false);
     }
 
+    private boolean checkAmount(Label label, String resource, boolean give) {
+        if (give) {
+            return Integer.parseInt(label.getText()) < player.resources().get(resource);
+        }
+        return Integer.parseInt(label.getText()) <= 1;
+    }
+
     public void offerPlayerButtonPressed(ActionEvent event) {
     }
 
     public void offerBankButtonPressed(ActionEvent event) {
+        // create hashMap for move: positive val are given, negative val are taken
+        HashMap<String, Integer> tmp = new HashMap<>();
+        tmp.put("grain", 0);
+        tmp.put("brick", 0);
+        tmp.put("ore", 0);
+        tmp.put("lumber", 0);
+        tmp.put("wool", 0);
+
+        // check, if more than one sort of resources was chosen
+
+
         // 4:1
         // check for every resource available, if amount to give is 4 and to receive is 1
         for (String giveRes : RESOURCES) {
             if (this.giveResources.get(giveRes) == 4) {
                 for (String receiveRes : RESOURCES) {
                     if (this.receiveResources.get(receiveRes) == 1) {
-                        // create hashMap for move: positive val are given, negative val are taken
-                        HashMap<String, Integer> tmp = new HashMap<>();
-                        tmp.put("grain", 0);
-                        tmp.put("brick", 0);
-                        tmp.put("ore", 0);
-                        tmp.put("lumber", 0);
-                        tmp.put("wool", 0);
                         // put the chosen values
                         tmp.put(giveRes, -4);
                         tmp.put(receiveRes, 1);
@@ -383,7 +431,7 @@ public class TradingSubController implements Controller{
                                             .observeOn(FX_SCHEDULER)
                                             .subscribe(c -> {
                                                 for (Player player : c) {
-                                                    if (player.userId().equals(idStorage.getID())){
+                                                    if (player.userId().equals(idStorage.getID())) {
                                                         this.player = player;
                                                     }
                                                 }
