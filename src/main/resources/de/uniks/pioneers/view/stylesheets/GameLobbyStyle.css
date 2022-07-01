@@ -58,3 +58,11 @@
     -fx-background-radius: 30;
     -fx-border-radius: 30;
 }
+#gameSettings {
+    -fx-background-image: url("../assets/green_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 980 50;
+    -fx-font-size: 30;
+    -fx-text-fill: #cc0000;
+}
