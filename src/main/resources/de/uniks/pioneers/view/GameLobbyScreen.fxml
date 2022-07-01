@@ -1,82 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameLobbyController">
-   <HBox alignment="CENTER_RIGHT" prefHeight="90.0" prefWidth="640.0">
-      <Label fx:id="idTitleLabel" styleClass="whiteTitle">
-      </Label>
-      <Pane prefHeight="78.0" prefWidth="86.0" />
-      <Button fx:id="idLeaveButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#leave" prefHeight="45.0" prefWidth="110.0" styleClass="blueButton" text="Leave">
-      </Button>
-   </HBox>
-   <HBox prefHeight="335.0" prefWidth="640.0">
-      <VBox prefHeight="329.0" prefWidth="234.0" styleClass="backgroundPlayerStyle" >
-         <children>
-            <Label fx:id="playersNumberId" alignment="CENTER" prefHeight="16.0" prefWidth="232.0" styleClass="playersNumberStyle" text="Players" />
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="600.0" prefWidth="1010.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.uniks.pioneers.controller.GameLobbyController">
+    <Pane prefHeight="100.0">
+        <Label fx:id="idTitleLabel" layoutX="10.0" layoutY="30.0" styleClass="whiteTitle">
+        </Label>
+        <Button fx:id="idLeaveButton" contentDisplay="CENTER" layoutX="750.0" layoutY="15.0" mnemonicParsing="false"
+                onAction="#leave" prefHeight="45.0" prefWidth="110.0" styleClass="blueButton" text="Leave">
+        </Button>
+    </Pane>
+    <HBox prefHeight="335.0" prefWidth="640.0">
+        <VBox prefHeight="329.0" prefWidth="234.0">
+            <HBox.margin>
+                <Insets left="10.0"/>
+            </HBox.margin>
+            <Label fx:id="playersNumberId" alignment="CENTER" prefHeight="16.0" prefWidth="232.0"
+                   styleClass="playersNumberStyle" text="Players"/>
             <ScrollPane fx:id="idUserInLobby" prefHeight="313.0" prefWidth="241.0" styleClass="memberList">
-               <VBox fx:id="idUserList" alignment="TOP_CENTER" prefHeight="310.0" prefWidth="232.0">
-                  <fx:include source="MemberListSubView.fxml" />
-               </VBox>
+                <VBox fx:id="idUserList" alignment="TOP_CENTER" prefHeight="310.0" prefWidth="232.0">
+                    <fx:include source="MemberListSubView.fxml"/>
+                </VBox>
             </ScrollPane>
-         </children>
-         <HBox.margin>
-            <Insets left="10.0" />
-         </HBox.margin>
-      </VBox>
-      <VBox fx:id="idChatContainer" prefHeight="350.0" prefWidth="500.0">
-         <HBox.margin>
-            <Insets left="10.0" top="20.0" />
-         </HBox.margin>
-      </VBox>
-      <VBox prefHeight="200.0" prefWidth="234.0">
-         <children>
-            <Label fx:id="spectatorLabelId" alignment="CENTER" prefHeight="16.0" prefWidth="232.0" styleClass="spectatorTitleStyle" text="Spectator" />
+        </VBox>
+        <VBox fx:id="idChatContainer" prefHeight="350.0" prefWidth="500.0">
+            <HBox.margin>
+                <Insets left="10.0" top="20.0"/>
+            </HBox.margin>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="234.0">
+            <Label fx:id="spectatorLabelId" alignment="CENTER" prefHeight="16.0" prefWidth="232.0"
+                   styleClass="spectatorTitleStyle" text="Spectator"/>
             <ScrollPane fx:id="idUserInLobby1" prefHeight="313.0" prefWidth="241.0" styleClass="memberList">
-               <content>
-                  <VBox fx:id="spectatorIds" alignment="TOP_CENTER" prefHeight="310.0" prefWidth="232.0">
-                     <children>
-                        <fx:include source="MemberListSubView.fxml" />
-                     </children>
-                  </VBox>
-               </content>
+                <VBox fx:id="spectatorIds" alignment="TOP_CENTER" prefHeight="310.0" prefWidth="232.0">
+                    <fx:include source="MemberListSubView.fxml"/>
+                </VBox>
             </ScrollPane>
-         </children>
-      </VBox>
-   </HBox>
-   <HBox alignment="CENTER_RIGHT" prefHeight="92.0" prefWidth="640.0">
-      <ComboBox fx:id="colorPicker" onAction="#colorPicked" prefHeight="24.0" prefWidth="210.0" promptText="Choose color">
-         <HBox.margin>
-            <Insets right="100.0" />
-         </HBox.margin>
-      </ComboBox>
-      <VBox prefHeight="87.0" prefWidth="134.0">
-         <children>
-            <Label fx:id="spectatorId" alignment="CENTER" prefHeight="41.0" prefWidth="134.0" styleClass="spectatorStyle" text="Spectator" />
-            <CheckBox fx:id="checkBoxId" mnemonicParsing="false" onAction="#onCheckBox" prefHeight="18.0" prefWidth="31.0" styleClass="checkboxStyle">
-               <VBox.margin>
-                  <Insets left="50.0" top="10.0" />
-               </VBox.margin>
+        </VBox>
+    </HBox>
+    <Label id="gameSettings" fx:id="settingsLabel" alignment="CENTER" prefHeight="50.0" prefWidth="1000.0"
+           text="Settings: Map Size = 10  Required VP = 10" textFill="#cc0000">
+        <font>
+            <Font size="36.0"/>
+        </font>
+    </Label>
+    <Pane prefHeight="100.0" prefWidth="1100.0">
+        <ComboBox fx:id="colorPicker" layoutX="10.0" layoutY="38.0" onAction="#colorPicked" prefHeight="24.0"
+                  prefWidth="210.0" promptText="Choose color"/>
+        <VBox alignment="CENTER" layoutX="340.0" prefHeight="100.0" prefWidth="134.0" spacing="5.0">
+            <Label fx:id="spectatorId" alignment="CENTER" prefHeight="30.0" prefWidth="134.0"
+                   styleClass="spectatorStyle" text="Spectator"/>
+            <CheckBox fx:id="checkBoxId" mnemonicParsing="false" onAction="#onCheckBox" prefHeight="18.0"
+                      prefWidth="18.0" styleClass="checkboxStyle">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
             </CheckBox>
-         </children>
-      </VBox>
-      <Button fx:id="idReadyButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#ready" prefHeight="35.0" prefWidth="66.0" styleClass="blueButton" text="Ready">
-         <HBox.margin>
-            <Insets />
-         </HBox.margin>
-      </Button>
-      <Button fx:id="idStartGameButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#startGame" prefHeight="35.0" prefWidth="70.0" styleClass="greyButton" text="Start">
-         <HBox.margin>
-            <Insets />
-         </HBox.margin>
-      </Button>
-   </HBox>
+        </VBox>
+        <Button fx:id="idReadyButton" contentDisplay="CENTER" layoutX="500.0" layoutY="30.0" mnemonicParsing="false"
+                onAction="#ready" prefHeight="35.0" prefWidth="66.0" styleClass="blueButton" text="Ready"/>
+        <Button fx:id="idStartGameButton" contentDisplay="CENTER" layoutX="700.0" layoutY="30.0" mnemonicParsing="false"
+                onAction="#startGame" prefHeight="35.0" prefWidth="70.0" styleClass="greyButton" text="Start"/>
+    </Pane>
 </VBox>
