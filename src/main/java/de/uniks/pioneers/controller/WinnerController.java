@@ -5,7 +5,6 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.service.GameService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -38,8 +37,6 @@ public class WinnerController implements Controller {
 
     private HashMap<String, List<String>> userNumberPoints ;
 
-    private final PioneersService pioneersService;
-
     private final GameStorage gameStorage;
 
     private final IDStorage idStorage;
@@ -54,11 +51,10 @@ public class WinnerController implements Controller {
 
     @Inject
     public WinnerController(HashMap<String, List<String>> userNumberPoints, Window window,
-                            PioneersService pioneersService, GameStorage gameStorage, IDStorage idStorage,
+                             GameStorage gameStorage, IDStorage idStorage,
                             GameService gameService, App app, Provider<LobbyController> lobbyController) {
         this.userNumberPoints = userNumberPoints;
         this.owner = window;
-        this.pioneersService = pioneersService;
         this.gameStorage = gameStorage;
         this.idStorage = idStorage;
         this.gameService = gameService;

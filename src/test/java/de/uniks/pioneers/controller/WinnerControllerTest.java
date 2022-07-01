@@ -4,10 +4,8 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.service.GameService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,12 +29,7 @@ public class WinnerControllerTest extends ApplicationTest {
     IDStorage idStorage;
 
     @Mock
-    PioneersService pioneersService;
-
-    @Mock
     GameService gameService;
-
-    Window  window;
 
     Provider<LobbyController> lobbyController;
 
@@ -59,7 +52,7 @@ public class WinnerControllerTest extends ApplicationTest {
         pointsAndValues.add("6");
         userNamePAndV.put("Syd",pointsAndValues);
 
-        WinnerController winnerController = new WinnerController(userNamePAndV,null,pioneersService,gameStorage
+        WinnerController winnerController = new WinnerController(userNamePAndV,null,gameStorage
                 ,idStorage, gameService, app, lobbyController);
         winnerController.render();
 

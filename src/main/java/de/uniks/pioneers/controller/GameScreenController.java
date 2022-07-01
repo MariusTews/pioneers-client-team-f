@@ -374,7 +374,7 @@ public class GameScreenController implements Controller {
         for (List<String> s: userNumberPoints.values()) {
             if(s.contains("10")) {
                 winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
-                ,pioneersService, gameStorage, idStorage,gameService,app,lobbyController);
+                , gameStorage, idStorage,gameService,app,lobbyController);
                 winnerController.render();
             }
         }
