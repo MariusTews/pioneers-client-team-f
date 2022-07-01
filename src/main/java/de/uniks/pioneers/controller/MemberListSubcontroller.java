@@ -16,46 +16,43 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 public class MemberListSubcontroller implements Controller {
-    @FXML
-    public ImageView idAvatar;
-    @FXML
-    public Label idUsername;
-    @FXML
-    public Label idReady;
-    private final Member member;
-    private final User user;
-    public Circle circleId;
+	@FXML
+	public ImageView idAvatar;
+	@FXML
+	public Label idUsername;
+	@FXML
+	public Label idReady;
+	private final Member member;
+	private final User user;
+	public Circle circleId;
 
-    private String userId;
+	@Inject
+	public MemberListSubcontroller(Member member, User user) {
+		this.member = member;
+		this.user = user;
+	}
 
+	@Override
+	public void init() {
 
-    @Inject
-    public MemberListSubcontroller(Member member, User user) {
-        this.member = member;
-        this.user = user;
-    }
+	}
 
-    @Override
-    public void init() {
+	@Override
+	public void destroy() {
 
-    }
+	}
 
-    @Override
-    public void destroy() {
-
-    }
-
-    @Override
-    public Parent render() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/MemberListSubView.fxml"));
-        loader.setControllerFactory(c -> this);
-        final Parent parent;
-        try {
-            parent = loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+	@Override
+	public Parent render() {
+		final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/MemberListSubView.fxml"));
+		loader.setControllerFactory(c -> this);
+		final Parent parent;
+		try {
+			parent = loader.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 
 
 		// set username and avatar
@@ -98,16 +95,12 @@ public class MemberListSubcontroller implements Controller {
 					this.idReady.setText(user.name());
 				}
 
-                if (user.avatar() != null) {
-                    this.idAvatar.setImage(new Image(user.avatar()));
-                }
-            }
-        }
+				if (user.avatar() != null) {
+					this.idAvatar.setImage(new Image(user.avatar()));
+				}
+			}
+		}
 
-        return parent;
-    }
-
-    public String getId(){
-        return userId;
-    }
+		return parent;
+	}
 }

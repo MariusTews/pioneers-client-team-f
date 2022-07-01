@@ -24,8 +24,6 @@ public class App extends Application {
     public App(){
         final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
         controller = mainComponent.loginController();
-        //TODO: remove
-        //controller = mainComponent.gameScreenController();
     }
 
     public App(Controller controller){
