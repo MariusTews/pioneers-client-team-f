@@ -357,7 +357,7 @@ public class TradingSubController implements Controller{
     }
 
     public void offerBankButtonPressed(ActionEvent event) {
-        // 4:1
+        // 4:1 trade with bank
         // check for every resource available, if amount to give is 4 and to receive is 1
         for (String giveRes : RESOURCES) {
             if (this.giveResources.get(giveRes) == 4) {
