@@ -155,7 +155,7 @@ class GameScreenControllerTest extends ApplicationTest {
     @Test
     void finishTurn() {
         when(pioneersService.move(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
-        write("\t");
+        write("\t\t\t\t\t\t\t\t\t\t\t\t\t");
         type(KeyCode.SPACE);
         verify(pioneersService).move("02", "build", null, null, null, null, null, null, null);
     }

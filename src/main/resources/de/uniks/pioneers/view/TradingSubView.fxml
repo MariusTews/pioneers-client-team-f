@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="tradingSubView" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="237.0" prefWidth="212.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.TradingSubController">
+   <children>
+      <HBox alignment="TOP_CENTER" prefHeight="281.0" prefWidth="298.0">
+         <children>
+            <VBox id="giveTradeView" alignment="CENTER" prefHeight="182.0" prefWidth="103.0">
+               <children>
+                  <Label text="Give" />
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="cactus" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="giveCactusMinusButton" mnemonicParsing="false" onAction="#giveCactusMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="giveCactusLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0" textFill="#0d37d1">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="giveCactusPlusButton" mnemonicParsing="false" onAction="#giveCactusPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="mars" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="giveMarsMinusButton" mnemonicParsing="false" onAction="#giveMarsMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="giveMarsLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="giveMarsPlusButton" mnemonicParsing="false" onAction="#giveMarsPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="moon" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="giveMoonMinusButton" mnemonicParsing="false" onAction="#giveMoonMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="giveMoonLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="giveMoonPlusButton" mnemonicParsing="false" onAction="#giveMoonPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="neptun" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="giveNeptunMinusButton" mnemonicParsing="false" onAction="#giveNeptunMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="giveNeptunLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="giveNeptunPlusButton" mnemonicParsing="false" onAction="#giveNeptunPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="venus" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="giveVenusMinusButton" mnemonicParsing="false" onAction="#giveVenusMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="giveVenusLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="giveVenusPlusButton" mnemonicParsing="false" onAction="#giveVenusPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox id="receiveTradeView" alignment="CENTER" prefHeight="182.0" prefWidth="103.0">
+               <children>
+                  <Label text="Receive" />
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="cactus" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="receiveCactusMinusButton" mnemonicParsing="false" onAction="#receiveCactusMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="receiveCactusLabel" alignment="CENTER" minWidth="23.0" prefHeight="17.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="receiveCactusPlusButton" mnemonicParsing="false" onAction="#receiveCactusPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="mars" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="receiveMarsMinusButton" mnemonicParsing="false" onAction="#receiveMarsMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="receiveMarsLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="receiveMarsPlusButton" mnemonicParsing="false" onAction="#receiveMarsPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="moon" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="receiveMoonMinusButton" mnemonicParsing="false" onAction="#receiveMoonMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="receiveMoonLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="receiveMoonPlusButton" mnemonicParsing="false" onAction="#receiveMoonPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="neptun" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="receiveNeptunMinusButton" mnemonicParsing="false" onAction="#receiveNeptunMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="receiveNeptunLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="receiveNeptunPlusButton" mnemonicParsing="false" onAction="#receiveNeptunPlusButtonPressed" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
+                     <children>
+                        <ImageView id="venus" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Button fx:id="receiveVenusMinusButton" mnemonicParsing="false" onAction="#receiveVenusMinusButtonPressed" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="-">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Label fx:id="receiveVenusLabel" alignment="CENTER" minWidth="23.0" prefWidth="20.0" style="-fx-background-color: white;" text="0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="receiveVenusPlusButton" mnemonicParsing="false" onAction="#receiveVenusPlusButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-color: transparent;" text="+">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <Button id="offerPlayer" fx:id="offerPlayerButton" mnemonicParsing="false" onAction="#offerPlayerButtonPressed" prefHeight="25.0" prefWidth="210.0" text="Offer player">
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </Button>
+      <Button id="offerBank" fx:id="offerBankButton" mnemonicParsing="false" onAction="#offerBankButtonPressed" prefHeight="25.0" prefWidth="210.0" text="Offer bank" />
+   </children>
+</VBox>

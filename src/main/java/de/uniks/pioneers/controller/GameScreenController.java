@@ -17,6 +17,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -76,6 +78,9 @@ public class GameScreenController implements Controller {
     public Pane spectatorPaneId;
 
     public Pane userViewPane;
+    @FXML
+    public Pane tradingPane;
+
     private final App app;
 
     private final GameStorage gameStorage;
@@ -96,6 +101,7 @@ public class GameScreenController implements Controller {
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
+    private TradingSubController tradingSubController;
 
     private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -162,15 +168,15 @@ public class GameScreenController implements Controller {
                                     if(!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
                                             m.userId().equals(this.idStorage.getID())){
                                         //get access to it
-                                        // Check if expected move is founding-roll after joining the game
-                                        pioneersService
-                                                .findOneState(gameStorage.getId())
-                                                .observeOn(FX_SCHEDULER)
-                                                .subscribe(r -> {
-                                                    if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                                        foundingDiceRoll();
-                                                    }
-                                                });
+
+                    // Check if expected move is founding-roll after joining the game
+                    pioneersService
+                            .findOneState(gameStorage.getId())
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(r -> {
+                                if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                    foundingDiceRoll();
+                                }});
                                         break;
                                     }
                                 }
@@ -188,14 +194,14 @@ public class GameScreenController implements Controller {
                             .findAllPlayers(this.gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe(c -> {
-                                for (Member member:this.members) {
+                                for (Member member : this.members) {
                                     for (Player player : c) {
                                         //this checks if the player is oppenent or spectator or yourself
                                         if (!player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId()) ) {
+                                                .equals(player.userId())) {
                                             opponents.add(player);
                                         } else if (player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId())){
+                                                .equals(player.userId())) {
                                             playerOwnView.add(player);
                                         }
                                     }
@@ -279,6 +285,15 @@ public class GameScreenController implements Controller {
         this.playerOwnView.addListener((ListChangeListener<? super Player>) c ->
                 this.userViewPane.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
+        /*
+         * Render trading sub view
+         * hand over own player to trading sub view
+         * */
+
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage);
+        tradingSubController.init();
+        this.tradingPane.getChildren().setAll(this.tradingSubController.render());
+
         //spectator
         this.spectatorMember.addListener((ListChangeListener<? super Member>) c ->
                 this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
@@ -299,7 +314,7 @@ public class GameScreenController implements Controller {
     private Node renderSingleUser(Player player) {
         UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
         userSubView.init();
-
+        this.tradingSubController.setPlayer(player);
         return userSubView.render();
     }
 
@@ -450,6 +465,7 @@ public class GameScreenController implements Controller {
             }
         }
 
+
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
                 this.calculateVP(player));
         opponentSubCons.add(opponentCon);
@@ -526,7 +542,7 @@ public class GameScreenController implements Controller {
         //gets called every second to reduce the timer by one second
         KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
             seconds[0]--;
-            if (seconds[0]%60 >9) {
+            if (seconds[0] % 60 > 9) {
                 timerLabel.setText("" + (seconds[0] / 60) + ":" + seconds[0] % 60);
             } else {
                 timerLabel.setText("" + (seconds[0] / 60) + ":0" + seconds[0] % 60);
