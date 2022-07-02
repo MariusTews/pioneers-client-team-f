@@ -172,179 +172,93 @@ public class TradingSubController implements Controller {
      * */
 
     public void giveCactusMinusButtonPressed(ActionEvent event) {
-        minusAction(event, "lumber", this.giveCactusLabel, true, giveCactusPlusButton);
+        minusAction(event, "lumber", giveCactusLabel, true, giveCactusPlusButton);
     }
 
     public void giveCactusPlusButtonPressed(ActionEvent event) {
-        plusAction(event, "lumber", this.giveCactusLabel, true, giveCactusMinusButton);
+        plusAction(event, "lumber", giveCactusLabel, true, giveCactusMinusButton);
     }
 
     public void giveMarsMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.giveMarsLabel.getText()) > 0) {
-            this.giveResources.put("brick", this.giveResources.get("brick") - 1);
-            this.giveMarsLabel.setText(String.valueOf(this.giveResources.get("brick")));
-        }
-        if (this.giveMarsLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "brick", giveMarsLabel, true, giveMarsPlusButton);
     }
 
     public void giveMarsPlusButtonPressed(ActionEvent event) {
-        this.giveResources.put("brick", this.giveResources.get("brick") + 1);
-        this.giveMarsLabel.setText(String.valueOf(this.giveResources.get("brick")));
-        if (this.giveMarsMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.giveMarsMinusButton);
-        }
+        plusAction(event, "brick", giveMarsLabel, true, giveMarsMinusButton);
     }
 
     public void giveMoonMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.giveMoonLabel.getText()) > 0) {
-            this.giveResources.put("ore", this.giveResources.get("ore") - 1);
-            this.giveMoonLabel.setText(String.valueOf(this.giveResources.get("ore")));
-        }
-        if (this.giveMoonLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "ore", giveMoonLabel, true, giveMoonPlusButton);
     }
 
     public void giveMoonPlusButtonPressed(ActionEvent event) {
-        this.giveResources.put("ore", this.giveResources.get("ore") + 1);
-        this.giveMoonLabel.setText(String.valueOf(this.giveResources.get("ore")));
-        if (this.giveMoonMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.giveMoonMinusButton);
-        }
+        plusAction(event, "ore", giveMoonLabel, true, giveMoonMinusButton);
     }
 
     public void giveNeptunMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.giveNeptunLabel.getText()) > 0) {
-            this.giveResources.put("wool", this.giveResources.get("wool") - 1);
-            this.giveNeptunLabel.setText(String.valueOf(this.giveResources.get("wool")));
-        }
-        if (this.giveNeptunLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "wool", giveNeptunLabel, true, giveNeptunPlusButton);
     }
 
     public void giveNeptunPlusButtonPressed(ActionEvent event) {
-        this.giveResources.put("wool", this.giveResources.get("wool") + 1);
-        this.giveNeptunLabel.setText(String.valueOf(this.giveResources.get("wool")));
-        if (this.giveNeptunMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.giveNeptunMinusButton);
-        }
+        plusAction(event, "wool", giveNeptunLabel, true, giveNeptunMinusButton);
     }
 
     public void giveVenusMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.giveVenusLabel.getText()) > 0) {
-            this.giveResources.put("grain", this.giveResources.get("grain") - 1);
-            this.giveVenusLabel.setText(String.valueOf(this.giveResources.get("grain")));
-        }
-        if (this.giveVenusLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "grain", giveVenusLabel, true, giveVenusPlusButton);
     }
 
     public void giveVenusPlusButtonPressed(ActionEvent event) {
-        this.giveResources.put("grain", this.giveResources.get("grain") + 1);
-        this.giveVenusLabel.setText(String.valueOf(this.giveResources.get("grain")));
-        if (this.giveVenusMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.giveVenusMinusButton);
-        }
+        plusAction(event, "grain", giveVenusLabel, true, giveVenusMinusButton);
     }
 
     public void receiveCactusMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.receiveCactusLabel.getText()) > 0) {
-            this.receiveResources.put("lumber", this.receiveResources.get("lumber") - 1);
-            this.receiveCactusLabel.setText(String.valueOf(this.receiveResources.get("lumber")));
-        }
-        if (this.receiveCactusLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "lumber", receiveCactusLabel, false, receiveCactusPlusButton);
     }
 
     public void receiveCactusPlusButtonPressed(ActionEvent event) {
-        this.receiveResources.put("lumber", this.receiveResources.get("lumber") + 1);
-        this.receiveCactusLabel.setText(String.valueOf(this.receiveResources.get("lumber")));
-        if (this.receiveCactusMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.receiveCactusMinusButton);
-        }
+        plusAction(event, "lumber", receiveCactusLabel, false, receiveCactusMinusButton);
     }
 
     public void receiveMarsMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.receiveMarsLabel.getText()) > 0) {
-            this.receiveResources.put("brick", this.receiveResources.get("brick") - 1);
-            this.receiveMarsLabel.setText(String.valueOf(this.receiveResources.get("brick")));
-        }
-        if (this.receiveMarsLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "brick", receiveMarsLabel, false, receiveMarsPlusButton);
     }
 
     public void receiveMarsPlusButtonPressed(ActionEvent event) {
-        this.receiveResources.put("brick", this.receiveResources.get("brick") + 1);
-        this.receiveMarsLabel.setText(String.valueOf(this.receiveResources.get("brick")));
-        if (this.receiveMarsMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.receiveMarsMinusButton);
-        }
+        plusAction(event, "brick", receiveMarsLabel, false, receiveMarsMinusButton);
     }
 
     public void receiveMoonMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.receiveMoonLabel.getText()) > 0) {
-            this.receiveResources.put("ore", this.receiveResources.get("ore") - 1);
-            this.receiveMoonLabel.setText(String.valueOf(this.receiveResources.get("ore")));
-        }
-        if (this.receiveMoonLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "ore", receiveMoonLabel, false, receiveMoonPlusButton);
     }
 
     public void receiveMoonPlusButtonPressed(ActionEvent event) {
-        this.receiveResources.put("ore", this.receiveResources.get("ore") + 1);
-        this.receiveMoonLabel.setText(String.valueOf(this.receiveResources.get("ore")));
-        if (this.receiveMoonMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.receiveMoonMinusButton);
-        }
+        plusAction(event, "ore", receiveMoonLabel, false, receiveMoonMinusButton);
     }
 
     public void receiveNeptunMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.receiveNeptunLabel.getText()) > 0) {
-            this.receiveResources.put("wool", this.receiveResources.get("wool") - 1);
-            this.receiveNeptunLabel.setText(String.valueOf(this.receiveResources.get("wool")));
-        }
-        if (this.receiveNeptunLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "wool", receiveNeptunLabel, false, receiveNeptunPlusButton);
     }
 
     public void receiveNeptunPlusButtonPressed(ActionEvent event) {
-        this.receiveResources.put("wool", this.receiveResources.get("wool") + 1);
-        this.receiveNeptunLabel.setText(String.valueOf(this.receiveResources.get("wool")));
-        if (this.receiveNeptunMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.receiveNeptunMinusButton);
-        }
+        plusAction(event, "wool", receiveNeptunLabel, false, receiveNeptunMinusButton);
     }
 
     public void receiveVenusMinusButtonPressed(ActionEvent event) {
-        if (Integer.parseInt(this.receiveVenusLabel.getText()) > 0) {
-            this.receiveResources.put("grain", this.receiveResources.get("grain") - 1);
-            this.receiveVenusLabel.setText(String.valueOf(this.receiveResources.get("grain")));
-        }
-        if (this.receiveVenusLabel.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
-        }
+        minusAction(event, "grain", receiveVenusLabel, false, receiveVenusPlusButton);
     }
 
     public void receiveVenusPlusButtonPressed(ActionEvent event) {
-        this.receiveResources.put("grain", this.receiveResources.get("grain") + 1);
-        this.receiveVenusLabel.setText(String.valueOf(this.receiveResources.get("grain")));
-        if (this.receiveVenusMinusButton.disableProperty().get()) {
-            makeButtonVisible(this.receiveVenusMinusButton);
-        }
+        plusAction(event, "grain", receiveVenusLabel, false, receiveVenusMinusButton);
     }
 
-
     // Additional methods
-    private void minusAction(ActionEvent event, String resource, Label label, boolean give, Button plusButton) {
 
+    /*
+     * decrease the label
+     * differentiate between giving and receiving resource labels
+     * enable plus button or disable the minus button, when certain limits are reached
+     * */
+    private void minusAction(ActionEvent event, String resource, Label label, boolean give, Button plusButton) {
         if (Integer.parseInt(label.getText()) > 0) {
             if (give) {
                 this.giveResources.put(resource, this.giveResources.get(resource) - 1);
@@ -362,16 +276,28 @@ public class TradingSubController implements Controller {
         }
     }
 
+    /*
+     *  increase the label
+     *  check amount of resources, so it can't get greater and disable the plus button if so
+     * */
+    //TODO: nullPointerException when calling player
+
     private void plusAction(ActionEvent event, String resource, Label label, boolean give, Button minusButton) {
-        if (checkAmount(label, resource, give)) {
-            if (give) {
-                this.giveResources.put(resource, this.giveResources.get(resource) + 1);
-                label.setText(String.valueOf(this.giveResources.get(resource)));
-            } else {
+        if (give) {
+            // player not null prevents exceptions, when the button is pressed and the player hasn't any resources
+            if (player.resources().get(resource) != null) {
+                if (checkAmount(label, resource, true)) {
+                    this.giveResources.put(resource, this.giveResources.get(resource) + 1);
+                    label.setText(String.valueOf(this.giveResources.get(resource)));
+                }
+            }
+        } else {
+            if (checkAmount(label, resource, false)) {
                 this.receiveResources.put(resource, this.receiveResources.get(resource) + 1);
                 label.setText(String.valueOf(this.receiveResources.get(resource)));
             }
         }
+
         if (minusButton.disableProperty().get()) {
             makeButtonVisible(minusButton);
         }
@@ -394,7 +320,7 @@ public class TradingSubController implements Controller {
         if (give) {
             return Integer.parseInt(label.getText()) < player.resources().get(resource);
         }
-        return Integer.parseInt(label.getText()) <= 1;
+        return Integer.parseInt(label.getText()) < 1;
     }
 
     public void offerPlayerButtonPressed(ActionEvent event) {
@@ -412,7 +338,7 @@ public class TradingSubController implements Controller {
         // check, if more than one sort of resources was chosen
 
 
-        // 4:1
+        // 4:1 trade with bank
         // check for every resource available, if amount to give is 4 and to receive is 1
         for (String giveRes : RESOURCES) {
             if (this.giveResources.get(giveRes) == 4) {
