@@ -111,7 +111,6 @@ public class TradingSubController implements Controller {
         this.giveResources.put("ore", 0);
         this.giveResources.put("wool", 0);
         this.giveResources.put("grain", 0);
-
         this.receiveResources.put("lumber", 0);
         this.receiveResources.put("brick", 0);
         this.receiveResources.put("ore", 0);
