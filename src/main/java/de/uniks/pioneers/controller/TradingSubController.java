@@ -280,7 +280,6 @@ public class TradingSubController implements Controller {
      *  increase the label
      *  check amount of resources, so it can't get greater and disable the plus button if so
      * */
-    //TODO: nullPointerException when calling player
 
     private void plusAction(ActionEvent event, String resource, Label label, boolean give, Button minusButton) {
         if (give) {
@@ -334,9 +333,6 @@ public class TradingSubController implements Controller {
         tmp.put("ore", 0);
         tmp.put("lumber", 0);
         tmp.put("wool", 0);
-
-        // check, if more than one sort of resources was chosen
-
 
         // 4:1 trade with bank
         // check for every resource available, if amount to give is 4 and to receive is 1
