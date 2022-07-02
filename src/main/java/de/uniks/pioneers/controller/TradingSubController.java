@@ -324,14 +324,6 @@ public class TradingSubController implements Controller {
         return Integer.parseInt(label.getText()) < 1;
     }
 
-    private void alert() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "You can only select one type of resource when trading with the bank");
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-        alert.showAndWait();
-    }
-
     public void offerPlayerButtonPressed(ActionEvent event) {
     }
 
@@ -358,7 +350,11 @@ public class TradingSubController implements Controller {
         }
 
         if (checkGiveRes > 1 || checkReceiveRes > 1) {
-            alert();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You can only select one type of resource when trading with the bank");
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+            alert.showAndWait();
         } else {
             // 4:1 trade with bank
             // check for every resource available, if amount to give is 4 and to receive is 1
