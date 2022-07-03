@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class CreateGameController implements Controller {
 	private final Provider<GameLobbyController> gameLobbyController;
 	private final Provider<LobbyController> lobbyController;
@@ -89,6 +90,7 @@ public class CreateGameController implements Controller {
 		final LobbyController controller = lobbyController.get();
 		this.app.show(controller);
 	}
+
 
 	public void createGameButtonPressed() {
 

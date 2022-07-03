@@ -2,7 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
@@ -12,7 +12,6 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -32,8 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.UPDATED;
 
+
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameScreenController implements Controller {
 
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
@@ -482,7 +482,7 @@ public class GameScreenController implements Controller {
     }
 
     //update GameStatus when leaving game
-    public void onLeave(ActionEvent ignoredEvent) {
+    public void onLeave() {
         boolean changeToPlayer = false;
         for (Member m: spectatorMember) {
             if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())){

@@ -17,6 +17,7 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class SignUpController implements Controller {
     @FXML
     public TextField usernameTextField;

@@ -6,7 +6,6 @@ import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -28,6 +27,7 @@ import java.util.Optional;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ALL")
 public class EditUserController implements Controller {
     private final Provider<LobbyController> lobbyController;
     private final Provider<LoginController> loginController;
@@ -84,6 +84,7 @@ public class EditUserController implements Controller {
 
     }
 
+
     @Override
     public Parent render() {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/EditUser.fxml"));
@@ -134,6 +135,7 @@ public class EditUserController implements Controller {
         }
     }
 
+
     public void deleteButtonPressed() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         // Change style of alert
@@ -150,6 +152,7 @@ public class EditUserController implements Controller {
                     .subscribe(suc -> app.show(loginController.get()), error->{});
         }
     }
+
 
 
     public String encodeFileToBase64Binary(File file) {
@@ -169,6 +172,7 @@ public class EditUserController implements Controller {
     }
 
 
+
     public void updateAvatar() {
         if (pictureFile == null) {
             user.subscribe(u -> avatar = u.avatar());
@@ -177,6 +181,7 @@ public class EditUserController implements Controller {
             avatar = encodeFileToBase64Binary(pictureFile);
         }
     }
+
 
     public void updateUser(String id, String name, String password, String repeatPassword, String avatar) {
         if (avatar != null) {

@@ -4,7 +4,6 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Tile;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
@@ -26,8 +25,8 @@ public class HexSubController implements Controller {
     @Override
     public void init() {
         // Add mouse listeners
-        this.view.setOnMouseEntered(this::onFieldMouseHoverEnter);
-        this.view.setOnMouseExited(this::onFieldMouseHoverExit);
+        this.view.setOnMouseEntered(event -> onFieldMouseHoverEnter());
+        this.view.setOnMouseExited(event -> onFieldMouseHoverExit());
         setPolygonColor();
     }
 
@@ -43,13 +42,13 @@ public class HexSubController implements Controller {
     }
 
     // Mouse hovers over field
-    private void onFieldMouseHoverEnter(MouseEvent event) {
+    private void onFieldMouseHoverEnter() {
         // Change the view
         this.view.setStroke(Color.RED);
     }
 
     // Mouse leaves the field
-    private void onFieldMouseHoverExit(MouseEvent event) {
+    private void onFieldMouseHoverExit() {
         // Change the view
         this.view.setStroke(Color.BLACK);
     }

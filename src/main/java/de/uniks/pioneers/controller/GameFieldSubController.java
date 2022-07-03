@@ -1,6 +1,6 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.computation.CalculateMap;
 import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.Map;
@@ -26,6 +26,7 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameFieldSubController implements Controller {
 
 	private final ObservableList<Player> players = FXCollections.observableArrayList();

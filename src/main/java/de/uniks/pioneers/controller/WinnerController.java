@@ -28,6 +28,7 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class WinnerController implements Controller {
     public Label winnerTitel;
     public Label winnerName;

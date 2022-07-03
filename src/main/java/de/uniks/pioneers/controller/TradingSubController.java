@@ -22,6 +22,7 @@ import java.util.Objects;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class TradingSubController implements Controller {
     @FXML
     public Button giveCactusMinusButton;

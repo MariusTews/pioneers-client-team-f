@@ -1,7 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.model.ExpectedMove;
 import de.uniks.pioneers.model.State;
 import de.uniks.pioneers.service.GameStorage;
@@ -13,7 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
@@ -26,6 +25,7 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class CircleSubController implements Controller {
 
 	private final Circle view;
@@ -62,9 +62,9 @@ public class CircleSubController implements Controller {
 	@Override
 	public void init() {
 		// Add mouse listeners
-		this.view.setOnMouseEntered(this::onFieldMouseHoverEnter);
-		this.view.setOnMouseExited(this::onFieldMouseHoverExit);
-		this.view.setOnMouseClicked(this::onFieldClicked);
+		this.view.setOnMouseEntered(event1 -> onFieldMouseHoverEnter());
+		this.view.setOnMouseExited(event1 -> onFieldMouseHoverExit());
+		this.view.setOnMouseClicked(mouseEvent -> onFieldClicked());
 
 		//get coordinates from fx:id
 		String id = this.view.getId();
@@ -90,7 +90,8 @@ public class CircleSubController implements Controller {
 	}
 
 
-	private void onFieldClicked(MouseEvent mouseEvent) {
+
+	private void onFieldClicked() {
 		//if it's not your turn
 		if (!yourTurn(nextMove)) {
 			Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not your turn!");
@@ -204,7 +205,7 @@ public class CircleSubController implements Controller {
 	}
 
 	// Mouse hovers over field
-	private void onFieldMouseHoverEnter(MouseEvent event) {
+	private void onFieldMouseHoverEnter() {
 		// Change the view
 		if (this.view.getFill().equals(Color.TRANSPARENT)) {
 			this.view.setFill(Color.GRAY);
@@ -212,7 +213,7 @@ public class CircleSubController implements Controller {
 	}
 
 	// Mouse leaves the field
-	private void onFieldMouseHoverExit(MouseEvent event) {
+	private void onFieldMouseHoverExit() {
 		// Change the view
 		if (this.view.getFill().equals(Color.GRAY)) {
 			this.view.setFill(Color.TRANSPARENT);

@@ -1,6 +1,6 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
+
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;

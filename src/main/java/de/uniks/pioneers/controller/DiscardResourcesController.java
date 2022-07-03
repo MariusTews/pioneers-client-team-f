@@ -25,6 +25,7 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DiscardResourcesController implements Controller {
     @FXML
     public Button incResource1Btn;
