@@ -9,12 +9,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
@@ -333,37 +336,59 @@ public class TradingSubController implements Controller {
         tmp.put("lumber", 0);
         tmp.put("wool", 0);
 
-        // 4:1 trade with bank
-        // check for every resource available, if amount to give is 4 and to receive is 1
-        for (String giveRes : RESOURCES) {
-            if (this.giveResources.get(giveRes) == 4) {
-                for (String receiveRes : RESOURCES) {
-                    if (this.receiveResources.get(receiveRes) == 1) {
-                        // put the chosen values
-                        tmp.put(giveRes, -4);
-                        tmp.put(receiveRes, 1);
+        // check for mixed resources
+        int checkGiveRes = 0;
+        int checkReceiveRes = 0;
 
-                        // trade move
-                        this.pioneersService.tradeBank(this.gameStorage.getId(), tmp)
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe(result -> {
-                                    pioneersService
-                                            .findAllPlayers(this.gameStorage.getId())
-                                            .observeOn(FX_SCHEDULER)
-                                            .subscribe(c -> {
-                                                for (Player player : c) {
-                                                    if (player.userId().equals(idStorage.getID())) {
-                                                        this.player = player;
+        for (String res : RESOURCES) {
+            if (this.giveResources.get(res) > 0) {
+                checkGiveRes++;
+            }
+            if (this.receiveResources.get(res) > 0) {
+                checkReceiveRes++;
+            }
+        }
+
+        if (checkGiveRes > 1 || checkReceiveRes > 1) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You can only select one type of resource when trading with the bank");
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+            alert.showAndWait();
+        } else {
+            // 4:1 trade with bank
+            // check for every resource available, if amount to give is 4 and to receive is 1
+            for (String giveRes : RESOURCES) {
+                if (this.giveResources.get(giveRes) == 4) {
+                    for (String receiveRes : RESOURCES) {
+                        if (this.receiveResources.get(receiveRes) == 1) {
+                            // put the chosen values
+                            tmp.put(giveRes, -4);
+                            tmp.put(receiveRes, 1);
+
+                            // trade move
+                            this.pioneersService.tradeBank(this.gameStorage.getId(), tmp)
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(result -> {
+                                        pioneersService
+                                                .findAllPlayers(this.gameStorage.getId())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe(c -> {
+                                                    for (Player player : c) {
+                                                        if (player.userId().equals(idStorage.getID())) {
+                                                            this.player = player;
+                                                        }
                                                     }
-                                                }
-                                            });
-                                });
-                        this.giveResources.replaceAll((k, v) -> v = 0);
-                        this.receiveResources.replaceAll((k, v) -> v = 0);
+                                                });
+                                    });
+                        }
                     }
                 }
             }
         }
+
+        this.giveResources.replaceAll((k, v) -> v = 0);
+        this.receiveResources.replaceAll((k, v) -> v = 0);
 
         this.giveCactusLabel.setText("0");
         this.giveMarsLabel.setText("0");
