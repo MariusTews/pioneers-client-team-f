@@ -1,7 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.GameSettings;
 import de.uniks.pioneers.model.Member;
@@ -28,9 +28,6 @@ class GameLobbyControllerTest extends ApplicationTest {
     UserService userService;
 
     @Mock
-    MessageService messageService;
-
-    @Mock
     MemberService memberService;
 
     @Mock
@@ -45,9 +42,6 @@ class GameLobbyControllerTest extends ApplicationTest {
 
     @Spy
     IDStorage idStorage;
-
-    @Spy
-    MemberIDStorage memberIDStorage;
 
     @InjectMocks
     GameLobbyController gameLobbyController;
