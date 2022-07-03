@@ -149,9 +149,7 @@ public class LobbyController implements Controller {
 
         if(this.gameStorage.getId() != null) {
             memberService.getAllGameMembers(this.gameStorage.getId())
-                    .observeOn(FX_SCHEDULER).subscribe(c -> {
-                        this.members.setAll(c);
-                    });
+                    .observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
         }
         gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
@@ -342,7 +340,7 @@ public class LobbyController implements Controller {
                 return subCon.getParent();
             }
         }
-        UserListSubController userCon = new UserListSubController(this.app, this, user, idStorage);
+        UserListSubController userCon = new UserListSubController(this, user, idStorage);
         userSubCons.add(userCon);
         return userCon.render();
     }
@@ -647,7 +645,7 @@ public class LobbyController implements Controller {
         dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
                 .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         dialog.showAndWait()
-                .ifPresent(password -> this.memberService.join(idStorage.getID(), game._id(), password)
+                .ifPresent(password -> this.memberService.join(game._id(), password)
                         .observeOn(FX_SCHEDULER)
                         .doOnError(error -> {
                             if ("HTTP 403 ".equals(error.getMessage())) {
@@ -710,9 +708,7 @@ public class LobbyController implements Controller {
         if(!changeToPlayer) {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
                     .observeOn(FX_SCHEDULER)
-                    .subscribe(onSuccess -> {
-                        this.app.show(gameScreenController.get());
-                    });
+                    .subscribe(onSuccess -> this.app.show(gameScreenController.get()));
         }
 
     }

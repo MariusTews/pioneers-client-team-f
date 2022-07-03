@@ -91,7 +91,7 @@ public class LoginController implements Controller {
         final BooleanBinding usernameLengthMax = Bindings.greaterThan(33, usernameTextField.lengthProperty());
         loginButton.disableProperty().bind(length.or(usernameLengthMin.or(usernameLengthMax.not())));
 
-        //this makes sure enter key works while loginging in
+        //this makes sure enter key works while logging in
         parent.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
             if(event.getCode() == KeyCode.ENTER){
                 if(!(length.or(usernameLengthMin.or(usernameLengthMax.not())).get())){

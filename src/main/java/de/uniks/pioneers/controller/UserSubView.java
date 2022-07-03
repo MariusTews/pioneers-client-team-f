@@ -68,7 +68,6 @@ public class UserSubView implements Controller {
     private void attachTOSubview() {
         for (User user : this.users) {
             if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
-                //this.attachResources(player.resources());
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
                 this.victoryPoints.setText(vicPoints + "/10");
@@ -138,7 +137,7 @@ public class UserSubView implements Controller {
         }
     }
 
-    //name is set to namelabel and color aswell
+    //name is set to nameLabel and color as well
     //and attach picture
     private void attachName(String n, String color) {
         this.name.setText(n + " (YOU)");

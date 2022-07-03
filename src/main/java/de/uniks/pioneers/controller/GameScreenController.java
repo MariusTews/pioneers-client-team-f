@@ -20,7 +20,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -67,12 +66,10 @@ public class GameScreenController implements Controller {
     @FXML
     public Label timerLabel;
     @FXML
-    public HBox spectatorView;
-    @FXML
     public Button leave;
     @FXML
 
-    //specatator pane
+    //spectator pane
     public Pane spectatorPaneId;
 
     public Pane userViewPane;
@@ -108,8 +105,6 @@ public class GameScreenController implements Controller {
     private final HashMap<String, User> userHash = new HashMap<>();
     private final Timeline timeline = new Timeline();
     private boolean runDiscardOnce = true;
-
-    private WinnerController winnerController;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -160,8 +155,7 @@ public class GameScreenController implements Controller {
                                         this.spectatorMember.add(member);
                                     }
                                 }
-                                //this needs to be hier
-                                //otherwise spectator throws 403 error
+                                //Added to prevent 403 error
                                 for (Member m: c){
                                     if(!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
                                             m.userId().equals(this.idStorage.getID())){
@@ -193,7 +187,7 @@ public class GameScreenController implements Controller {
                             .subscribe(c -> {
                                 for (Member member : this.members) {
                                     for (Player player : c) {
-                                        //this checks if the player is oppenent or spectator or yourself
+                                        //this checks if the player is opponent or spectator or yourself
                                         if (!player.userId().equals(idStorage.getID()) && member.userId()
                                                 .equals(player.userId())) {
                                             opponents.add(player);
@@ -224,7 +218,7 @@ public class GameScreenController implements Controller {
                 .subscribe(this::handleBuildingEvents));
 
 
-        // Initialize sub controller for ingame chat, add listener and load all messages
+        // Initialize sub controller for inGame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
@@ -266,7 +260,7 @@ public class GameScreenController implements Controller {
         });
 
 
-        this.gameFieldSubController = new GameFieldSubController(app, gameStorage, pioneersService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(gameStorage, pioneersService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
 
@@ -364,30 +358,27 @@ public class GameScreenController implements Controller {
         HashMap<String, List<String>> userNumberPoints = new HashMap<>();
        //This saves username and their respective points from game in hashmap
         for (User user:this.allUser) {
-            for (Player p: playerOwnView) {
-                if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
-                    List<String> ls = new ArrayList<>();
-                    ls.add(p.color());
-                    ls.add(p.victoryPoints().toString());
-                    userNumberPoints.put(user.name(),ls);
-                }
-            }
+            save(playerOwnView, userNumberPoints, user);
 
-            for (Player p: opponents) {
-                if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
-                    List<String> ls = new ArrayList<>();
-                    ls.add(p.color());
-                    ls.add(p.victoryPoints().toString());
-                    userNumberPoints.put(user.name(),ls);
-                }
-            }
+            save(opponents, userNumberPoints, user);
         }
 
         for (List<String> s: userNumberPoints.values()) {
             if(s.contains("10")) {
-                winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
-                , gameStorage, idStorage,gameService,app,lobbyController);
+                WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
+                        , gameStorage, idStorage, gameService, app, lobbyController);
                 winnerController.render();
+            }
+        }
+    }
+
+    private void save(ObservableList<Player> playerList, HashMap<String, List<String>> userNumberPoints, User user) {
+        for (Player p: playerList) {
+            if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
+                List<String> ls = new ArrayList<>();
+                ls.add(p.color());
+                ls.add(p.victoryPoints().toString());
+                userNumberPoints.put(user.name(),ls);
             }
         }
     }
@@ -473,7 +464,7 @@ public class GameScreenController implements Controller {
         diceRoll();
     }
 
-    // diceRoll if the current move is roll
+    // diceRoll if the current move is "roll"
     public void diceRoll() {
         if (nextMoveLabel.getText().equals("roll")) {
             pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement", null, null)
@@ -500,12 +491,10 @@ public class GameScreenController implements Controller {
                 break;
             }
         }
-        //this distinguish between player and spectator
+        //this distinguishes between player and spectator
         if(!changeToPlayer){
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false)
-                    .observeOn(FX_SCHEDULER).subscribe(onSuccess -> {
-                        this.app.show(lobbyController.get());
-                    });
+                    .observeOn(FX_SCHEDULER).subscribe(onSuccess -> this.app.show(lobbyController.get()));
         }
 
     }
@@ -644,36 +633,36 @@ public class GameScreenController implements Controller {
         for (Tile tile : map.tiles()) {
             allTileCoordinates.add("x" + tile.x().toString() + "y" + tile.y() + "z" + tile.z());
         }
-        //top right fixed watertile it always appears in any map size
+        //top right fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + (gameFieldSize + 1) + "y" + 0 + "z" + ((gameFieldSize + 1) * (-1)));
         for (int i = 1; i <= gameFieldSize; i++) {
-            //top right watertile side
+            //top right waterTile side
             allWaterTileCoordinates.add("x" + (gameFieldSize + 1) + "y" + (-i) + "z" + ((gameFieldSize + 1) * (-1) + i));
-            //top watertile side
+            //top waterTile side
             allWaterTileCoordinates.add("x" + (gameFieldSize + 1 - i) + "y" + i + "z" + ((gameFieldSize + 1) * (-1)));
         }
-        //top left fixed watertile it always appears in any map size
+        //top left fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + 0 + "y" + (gameFieldSize + 1) + "z" + ((gameFieldSize + 1) * (-1)));
         for (int i = 1; i <= gameFieldSize; i++) {
             //top left water side
             allWaterTileCoordinates.add("x" + (-i) + "y" + (gameFieldSize + 1) + "z" + ((gameFieldSize + 1) * (-1) + i));
         }
-        //far left fixed watertile it always appears in any map size
+        //far left fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + (gameFieldSize + 1) + "z" + 0);
         for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom left watertile side
+            //bottom left waterTile side
             allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + (gameFieldSize + 1 - i) + "z" + i);
         }
-        //bottom left fixed watertile it always appears in any map size
+        //bottom left fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + 0 + "z" + (gameFieldSize + 1));
         for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom watertile side
+            //bottom waterTile side
             allWaterTileCoordinates.add("x" + ((gameFieldSize + 1 - i) * (-1)) + "y" + (-i) + "z" + (gameFieldSize + 1));
         }
-        //bottom right fixed watertile it always appears in any map size
+        //bottom right fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + 0 + "y" + ((gameFieldSize + 1) * (-1)) + "z" + (gameFieldSize + 1));
         for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom right watertile side
+            //bottom right waterTile side
             allWaterTileCoordinates.add("x" + i + "y" + ((gameFieldSize + 1) * (-1)) + "z" + (gameFieldSize + 1 - i));
         }
 

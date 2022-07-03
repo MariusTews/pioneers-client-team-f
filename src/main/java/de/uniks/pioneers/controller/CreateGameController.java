@@ -3,7 +3,6 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.service.GameService;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -86,12 +85,12 @@ public class CreateGameController implements Controller {
 		return parent;
 	}
 
-	public void backToLobbyButtonPressed(ActionEvent event) {
+	public void backToLobbyButtonPressed() {
 		final LobbyController controller = lobbyController.get();
 		this.app.show(controller);
 	}
 
-	public void createGameButtonPressed(ActionEvent event) {
+	public void createGameButtonPressed() {
 
 		if (gameNameTextField.getText().length() > 32 || gameNameTextField.getText().length() < 1) {
 			Alert alert = new Alert(Alert.AlertType.INFORMATION, "the name of the game must be \nbetween 1 and 32 characters!");
@@ -113,7 +112,7 @@ public class CreateGameController implements Controller {
 		}
 	}
 
-	public void mapSizeMinusButtonPressed(ActionEvent event) {
+	public void mapSizeMinusButtonPressed() {
 		//reduces mapSize by One if - Button is Pressed
 		if (mapSize > 0) {
 			this.mapSizeLabel.setText("" + (--mapSize));
@@ -130,7 +129,7 @@ public class CreateGameController implements Controller {
 		}
 	}
 
-	public void mapSizePlusButtonPressed(ActionEvent event) {
+	public void mapSizePlusButtonPressed() {
 		//increases mapSize by One if + Button is Pressed
 		if (mapSize < 10) {
 			this.mapSizeLabel.setText("" + (++mapSize));
@@ -147,7 +146,7 @@ public class CreateGameController implements Controller {
 		}
 	}
 
-	public void victoryPointsMinusButtonPressed(ActionEvent event) {
+	public void victoryPointsMinusButtonPressed() {
 		//reduces victoryPoints by One if - Button is Pressed
 		if (victoryPoints > 3) {
 			this.victoryPointsLabel.setText("" + (--victoryPoints));
@@ -164,7 +163,7 @@ public class CreateGameController implements Controller {
 		}
 	}
 
-	public void victoryPointsPlusButtonPressed(ActionEvent event) {
+	public void victoryPointsPlusButtonPressed() {
 		//increases victoryPoints by One if + Button is Pressed
 		if (victoryPoints < 15) {
 			this.victoryPointsLabel.setText("" + (++victoryPoints));

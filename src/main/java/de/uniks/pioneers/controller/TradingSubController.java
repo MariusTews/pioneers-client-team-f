@@ -324,10 +324,10 @@ public class TradingSubController implements Controller {
         return Integer.parseInt(label.getText()) < 1;
     }
 
-    public void offerPlayerButtonPressed(ActionEvent event) {
+    public void offerPlayerButtonPressed() {
     }
 
-    public void offerBankButtonPressed(ActionEvent event) {
+    public void offerBankButtonPressed() {
         // create hashMap for move: positive val are given, negative val are taken
         HashMap<String, Integer> tmp = new HashMap<>();
         tmp.put("grain", 0);
@@ -369,18 +369,16 @@ public class TradingSubController implements Controller {
                             // trade move
                             this.pioneersService.tradeBank(this.gameStorage.getId(), tmp)
                                     .observeOn(FX_SCHEDULER)
-                                    .subscribe(result -> {
-                                        pioneersService
-                                                .findAllPlayers(this.gameStorage.getId())
-                                                .observeOn(FX_SCHEDULER)
-                                                .subscribe(c -> {
-                                                    for (Player player : c) {
-                                                        if (player.userId().equals(idStorage.getID())) {
-                                                            this.player = player;
-                                                        }
+                                    .subscribe(result -> pioneersService
+                                            .findAllPlayers(this.gameStorage.getId())
+                                            .observeOn(FX_SCHEDULER)
+                                            .subscribe(c -> {
+                                                for (Player player : c) {
+                                                    if (player.userId().equals(idStorage.getID())) {
+                                                        this.player = player;
                                                     }
-                                                });
-                                    });
+                                                }
+                                            }));
                         }
                     }
                 }

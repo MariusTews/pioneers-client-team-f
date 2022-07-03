@@ -36,7 +36,7 @@ public class UserListSubController implements Controller {
     private String id;
 
     @Inject
-    public UserListSubController(App app, LobbyController lobbyController, User user, IDStorage idStorage) {
+    public UserListSubController(LobbyController lobbyController, User user, IDStorage idStorage) {
 
         this.lobbyController = lobbyController;
         this.user = user;

@@ -28,14 +28,13 @@ import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class CircleSubController implements Controller {
 
-	private Parent parent;
 	private final Circle view;
-	private Polygon road;
+	private final Polygon road;
 	private final PioneersService pioneersService;
 	private final GameStorage gameStorage;
 	private final IDStorage idStorage;
 	private final EventListener eventListener;
-	private List<Node> buildingCircles;
+	private final List<Node> buildingCircles;
 	private final GameFieldSubController gameFieldSubController;
 	private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -47,10 +46,9 @@ public class CircleSubController implements Controller {
 	private String build = null;
 
 	@Inject
-	public CircleSubController(Parent parent, Circle view, Polygon road, PioneersService pioneersService,
+	public CircleSubController(Circle view, Polygon road, PioneersService pioneersService,
 							   GameStorage gameStorage, IDStorage idStorage, EventListener eventListener,
 							   List<Node> buildingCircles, GameFieldSubController gameFieldSubController) {
-		this.parent = parent;
 		this.view = view;
 		this.road = road;
 		this.pioneersService = pioneersService;
@@ -68,7 +66,7 @@ public class CircleSubController implements Controller {
 		this.view.setOnMouseExited(this::onFieldMouseHoverExit);
 		this.view.setOnMouseClicked(this::onFieldClicked);
 
-		//get coordinates from fxid
+		//get coordinates from fx:id
 		String id = this.view.getId();
 		id = (id.replace("M", "-"));
 		id = id.substring(1);
@@ -110,30 +108,14 @@ public class CircleSubController implements Controller {
 						if (side == 0 || side == 6) {
 							this.pioneersService.move(gameStorage.getId(), action, x, y, z, side, "settlement", null, null)
 									.observeOn(FX_SCHEDULER)
-									.doOnError(error -> {
-										String[] building = nextMove.action().split("-");
-										Alert alert = new Alert(Alert.AlertType.INFORMATION, "you can't place that " + building[1] + " here!");
-										// Set style
-										DialogPane dialogPane = alert.getDialogPane();
-										dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-												.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-										alert.showAndWait();
-									})
+									.doOnError(error -> notAllowedToPlace())
 									.subscribe(onSuc -> {
 									}, onError -> {
 									});
 						} else {
 							this.pioneersService.move(gameStorage.getId(), action, x, y, z, side, "road", null, null)
 									.observeOn(FX_SCHEDULER)
-									.doOnError(error -> {
-										String[] building = nextMove.action().split("-");
-										Alert alert = new Alert(Alert.AlertType.INFORMATION, "you can't place that " + building[1] + " here!");
-										// Set style
-										DialogPane dialogPane = alert.getDialogPane();
-										dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-												.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-										alert.showAndWait();
-									})
+									.doOnError(error -> notAllowedToPlace())
 									.subscribe(onSuc -> {
 									}, onError -> {
 									});
@@ -149,6 +131,16 @@ public class CircleSubController implements Controller {
 				this.gameFieldSubController.build(null);
 			}
 		}
+	}
+
+	private void notAllowedToPlace() {
+		String[] building = nextMove.action().split("-");
+		Alert alert = new Alert(Alert.AlertType.INFORMATION, "you can't place that " + building[1] + " here!");
+		// Set style
+		DialogPane dialogPane = alert.getDialogPane();
+		dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+				.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+		alert.showAndWait();
 	}
 
 	public Boolean yourTurn(ExpectedMove move) {

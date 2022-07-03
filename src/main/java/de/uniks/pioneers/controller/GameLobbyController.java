@@ -176,7 +176,7 @@ public class GameLobbyController implements Controller {
 								members.remove(updatedMember);
 								this.playersNumberId.setText("Players " + members.size() + "/6");
 								break;
-							} else if (updatedMember.userId().equals(member.userId()) && !member.spectator()) {
+							} else if (updatedMember.userId().equals(member.userId())) {
 								this.members.set(this.members.indexOf(updatedMember), member);
 								break;
 							}
@@ -452,7 +452,7 @@ public class GameLobbyController implements Controller {
 	}
 
 	//changes between Spectator and Player
-	public void onCheckBox(ActionEvent event) {
+	public void onCheckBox() {
 		//get all the members that are currently in the game
 		List<Member> memberList = memberService.getAllGameMembers(gameStorage.getId()).blockingFirst();
 		boolean ready = false;

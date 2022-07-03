@@ -2,7 +2,6 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,8 +14,8 @@ import java.io.IOException;
 public class RulesScreenController implements Controller {
     @FXML
     public Button backButton;
-    private App app;
-    private Provider<LobbyController> lobbyController;
+    private final App app;
+    private final Provider<LobbyController> lobbyController;
 
     @Inject
     public RulesScreenController(App app,
@@ -50,7 +49,7 @@ public class RulesScreenController implements Controller {
         return parent;
     }
 
-    public void backButtonPressed(ActionEvent event) {
+    public void backButtonPressed() {
         final LobbyController controller = lobbyController.get();
         app.show(controller);
     }
