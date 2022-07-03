@@ -14,14 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BasicSettingsTest extends ApplicationTest {
 
     private Stage stage;
-    private App app;
 
     @Override
     public void start(Stage stage) {
         // start application
         this.stage = stage;
-        this.app = new App();
-        this.app.start(stage);
+        App app = new App();
+        app.start(stage);
     }
 
     @Test
@@ -32,7 +31,7 @@ public class BasicSettingsTest extends ApplicationTest {
     @Test
     public void testWindowIcon() {
 
-        Image image1 = new Image(App.class.getResource("FATARI_logo.png").toString());
+        Image image1 = new Image(Objects.requireNonNull(App.class.getResource("FATARI_logo.png")).toString());
         Image image2 = stage.getIcons().get(0);
 
         for (int i = 0; i < image1.getWidth(); i++) {
