@@ -42,7 +42,7 @@
             </ScrollPane>
         </VBox>
     </HBox>
-    <Label id="gameSettings" fx:id="settingsLabel" alignment="CENTER" prefHeight="50.0" prefWidth="1000.0"
+    <Label id="gameSettings" fx:id="settingsLabel" alignment="CENTER" prefHeight="50.0" prefWidth="950.0"
            text="Settings: Map Size = 10  Required VP = 10" textFill="#cc0000">
         <font>
             <Font size="36.0"/>
