@@ -27,6 +27,7 @@ public class ColorControllerTest extends ApplicationTest {
 
     @Test
     public void coloTest(){
+        //Todo: test makes no sense and needs to be adjusted
         Label a1 = new Label();
         a1.setText("GREEN");
         a1.setTextFill(Color.GREEN);

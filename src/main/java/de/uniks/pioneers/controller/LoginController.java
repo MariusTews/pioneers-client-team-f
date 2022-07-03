@@ -8,7 +8,6 @@ import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,8 +21,9 @@ import javax.inject.Provider;
 import java.io.IOException;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.JSON_NAME;
 
+
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class LoginController implements Controller {
     private final App app;
     private final AuthService authService;
@@ -84,14 +84,14 @@ public class LoginController implements Controller {
             rememberMeCheckBox.setSelected(true);
         }
 
-        signUpHyperlink.setOnAction(this::signUPHyperlinkPressed);
+        signUpHyperlink.setOnAction(event1 -> signUPHyperlinkPressed());
 
         final BooleanBinding length = Bindings.greaterThan(8, userPasswordField.lengthProperty());
         final BooleanBinding usernameLengthMin = Bindings.greaterThan(1, usernameTextField.lengthProperty());
         final BooleanBinding usernameLengthMax = Bindings.greaterThan(33, usernameTextField.lengthProperty());
         loginButton.disableProperty().bind(length.or(usernameLengthMin.or(usernameLengthMax.not())));
 
-        //this makes sure enter key works while loginging in
+        //this makes sure enter key works while logging in
         parent.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
             if(event.getCode() == KeyCode.ENTER){
                 if(!(length.or(usernameLengthMin.or(usernameLengthMax.not())).get())){
@@ -128,7 +128,7 @@ public class LoginController implements Controller {
         login(usernameTextField.getText(), userPasswordField.getText());
     }
 
-    public void signUPHyperlinkPressed(ActionEvent event) {
+    public void signUPHyperlinkPressed() {
         final SignUpController controller = signUpController.get();
         app.show(controller);
     }

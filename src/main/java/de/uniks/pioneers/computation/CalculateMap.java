@@ -52,13 +52,13 @@ public class CalculateMap {
 		ImageView imageView = new ImageView();
 		imageView.setFitHeight(40);
 		imageView.setFitWidth(40);
+		String id;
 		if (Harbour) {
-			String id = createId(x, y, z) + "_HarbourImage";
-			imageView.setId(id);
+			id = createId(x, y, z) + "_HarbourImage";
 		} else {
-			String id = createId(x, y, z) + "_RobberImage";
-			imageView.setId(id);
+			id = createId(x, y, z) + "_RobberImage";
 		}
+		imageView.setId(id);
 		pane.getChildren().add(imageView);
 		imageView.setLayoutX(xCoordinate - 20);
 		imageView.setLayoutY(yCoordinate - 20);
@@ -238,7 +238,7 @@ public class CalculateMap {
 
 		//create a map with double the needed size
 		double mapSize = (paneBaseSize + paneVariableSize * size) * 2;
-		double center = 0.0;
+		double center;
 
 		//make small maps appear in the center of the scroll pane
 		if (mapSize < 1600) {
@@ -383,13 +383,13 @@ public class CalculateMap {
 			id = "xM" + x * (-1) + "y" + y + "zM" + z * (-1);
 		} else if ((x >= 0) && (y < 0) && (z < 0)) {
 			id = "x" + x + "yM" + y * (-1) + "zM" + z * (-1);
-		} else if ((x < 0) && (y >= 0) && (z >= 0)) {
+		} else if (x < 0 && y >= 0) {
 			id = "xM" + x * (-1) + "y" + y + "z" + z;
-		} else if ((x >= 0) && (y < 0) && (z >= 0)) {
+		} else if (x >= 0 && y < 0) {
 			id = "x" + x + "yM" + y * (-1) + "z" + z;
-		} else if ((x >= 0) && (y >= 0) && (z < 0)) {
+		} else if (x >= 0 && z < 0) {
 			id = "x" + x + "y" + y + "zM" + z * (-1);
-		} else if ((x >= 0) && (y >= 0) && (z >= 0)) {
+		} else if (x >= 0) {
 			id = "x" + x + "y" + y + "z" + z;
 		}
 		return id;

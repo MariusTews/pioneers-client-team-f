@@ -6,7 +6,6 @@ import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import org.glassfish.grizzly.nio.RegisterChannelResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,8 +18,6 @@ import org.testfx.matcher.control.LabeledMatchers;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +31,7 @@ class SignUpControllerTest extends ApplicationTest {
     SignUpController signUpController;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         new App(signUpController).start(stage);
     }
 

@@ -4,14 +4,15 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="spectatorBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="137.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.SpectatorViewController">
-   <children>
-      <Label fx:id="spectatorNameId" alignment="CENTER" prefHeight="44.0" prefWidth="147.0" text="Spectator">
-         <VBox.margin>
-            <Insets />
-         </VBox.margin></Label>
-   </children>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="59.0" prefWidth="137.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.uniks.pioneers.controller.SpectatorViewController">
    <padding>
-      <Insets top="10.0" />
+      <Insets top="10.0"/>
    </padding>
+   <Label fx:id="spectatorNameId" alignment="CENTER" prefHeight="44.0" prefWidth="147.0" text="Spectator">
+      <VBox.margin>
+         <Insets/>
+      </VBox.margin>
+   </Label>
 </VBox>

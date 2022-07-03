@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class SpectatorViewController implements Controller{
 
-    private  User user;
+    private final User user;
     @FXML
     public Label spectatorNameId;
 

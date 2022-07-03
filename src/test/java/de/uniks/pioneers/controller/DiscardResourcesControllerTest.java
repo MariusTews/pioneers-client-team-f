@@ -28,7 +28,7 @@ class DiscardResourcesControllerTest extends ApplicationTest {
     @Mock
     PioneersService pioneersService;
 
-    HashMap<String, Integer> resources = new HashMap<>() {{
+     final HashMap<String, Integer> resources = new HashMap<>() {{
         put(VENUS_GRAIN, 1);
         put(MOON_ROCK, 2);
         put(MARS_BAR, 3);
@@ -138,7 +138,7 @@ class DiscardResourcesControllerTest extends ApplicationTest {
 
         Button discardButton = lookup("#discardButton").query();
 
-        // change amount of mars bar and assert that disable property and amount label changes
+        // change amount of marsBar and assert that disable property and amount label changes
         clickOn(incResource2Btn);
         clickOn(incResource2Btn);
         clickOn(incResource2Btn);

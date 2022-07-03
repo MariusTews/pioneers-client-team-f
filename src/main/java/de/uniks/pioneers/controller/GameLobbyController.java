@@ -2,7 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
@@ -12,7 +12,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -29,6 +28,7 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameLobbyController implements Controller {
 
 	private final ObservableList<Member> members = FXCollections.observableArrayList();
@@ -52,7 +52,7 @@ public class GameLobbyController implements Controller {
 	@FXML
 	public VBox idChatContainer;
 	@FXML
-	public ComboBox<Label> colorPicker = new ComboBox<>();
+	public final ComboBox<Label> colorPicker = new ComboBox<>();
 	@FXML
 	public Label settingsLabel;
 	@FXML
@@ -176,7 +176,7 @@ public class GameLobbyController implements Controller {
 								members.remove(updatedMember);
 								this.playersNumberId.setText("Players " + members.size() + "/6");
 								break;
-							} else if (updatedMember.userId().equals(member.userId()) && !member.spectator()) {
+							} else if (updatedMember.userId().equals(member.userId())) {
 								this.members.set(this.members.indexOf(updatedMember), member);
 								break;
 							}
@@ -281,7 +281,7 @@ public class GameLobbyController implements Controller {
 		return parent;
 	}
 
-	public void leave(ActionEvent ignoredEvent) {
+	public void leave() {
 		gameService
 				.findOneGame(gameStorage.getId())
 				.observeOn(FX_SCHEDULER)
@@ -302,7 +302,7 @@ public class GameLobbyController implements Controller {
 				});
 	}
 
-	public void ready(ActionEvent ignoredEvent) {
+	public void ready() {
 		for (Member member : this.members) {
 			if (member.userId().equals(idStorage.getID())) {
 				if (member.ready()) {
@@ -316,7 +316,7 @@ public class GameLobbyController implements Controller {
 		}
 	}
 
-	public void startGame(ActionEvent ignoredEvent) {
+	public void startGame() {
 		//give all the players color
 		giveAllThePlayersColor();
 		gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints())
@@ -426,7 +426,7 @@ public class GameLobbyController implements Controller {
 	}
 
 	//color event, if color is picked then send color
-	public void colorPicked(ActionEvent ignoredEvent) {
+	public void colorPicked() {
 		Label label = colorPicker.getSelectionModel().getSelectedItem();
 
 		Color c = Color.web(label.getText().toLowerCase());
@@ -452,7 +452,7 @@ public class GameLobbyController implements Controller {
 	}
 
 	//changes between Spectator and Player
-	public void onCheckBox(ActionEvent event) {
+	public void onCheckBox() {
 		//get all the members that are currently in the game
 		List<Member> memberList = memberService.getAllGameMembers(gameStorage.getId()).blockingFirst();
 		boolean ready = false;

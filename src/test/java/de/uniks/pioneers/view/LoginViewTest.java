@@ -12,15 +12,11 @@ import org.testfx.framework.junit5.ApplicationTest;
 
 public class LoginViewTest extends ApplicationTest {
 
-    private Stage stage;
-    private App app;
-
     @Override
     public void start(Stage stage) {
         // start application
-        this.stage = stage;
-        this.app = new App();
-        this.app.start(stage);
+        App app = new App();
+        app.start(stage);
     }
 
     @Test
