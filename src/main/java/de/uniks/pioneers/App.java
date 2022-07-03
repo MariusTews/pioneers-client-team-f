@@ -65,6 +65,7 @@ public class App extends Application {
         stage.getIcons().add(image);
     }
 
+    @SuppressWarnings("unused")
     private void setTaskbarIcon() {
         if (GraphicsEnvironment.isHeadless()) {
             return;
