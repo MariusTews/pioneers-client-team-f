@@ -17,8 +17,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -169,18 +167,17 @@ public class GameScreenController implements Controller {
                                             m.userId().equals(this.idStorage.getID())){
                                         //get access to it
 
-                    // Check if expected move is founding-roll after joining the game
-                    pioneersService
-                            .findOneState(gameStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(r -> {
-                                if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                    foundingDiceRoll();
-                                }});
-                                        break;
+                                    // Check if expected move is founding-roll after joining the game
+                                        pioneersService
+                                            .findOneState(gameStorage.getId())
+                                                .observeOn(FX_SCHEDULER)
+                                                    .subscribe(r -> {
+                                                        if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                                                foundingDiceRoll();
+                                                        }});
+                                                        break;
                                     }
                                 }
-
                                 this.members.setAll(c);
                             });
 
