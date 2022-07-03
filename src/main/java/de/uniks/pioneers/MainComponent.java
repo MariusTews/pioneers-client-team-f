@@ -11,8 +11,6 @@ import javax.inject.Singleton;
 @Singleton
 public interface MainComponent {
     LoginController loginController();
-    //TODO: remove
-    //GameScreenController gameScreenController();
 
     @Component.Builder
     interface Builder {
