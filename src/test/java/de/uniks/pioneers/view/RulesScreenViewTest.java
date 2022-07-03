@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class RulesScreenViewTest extends ApplicationTest {
-    private Stage stage;
     private App app;
 
     @Spy
@@ -31,7 +30,6 @@ class RulesScreenViewTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         // start application
-        this.stage = stage;
         this.app = new App(rulesScreenController);
         this.app.start(stage);
     }

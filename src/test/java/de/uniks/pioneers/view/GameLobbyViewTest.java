@@ -1,7 +1,7 @@
 package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
