@@ -62,7 +62,7 @@ public class CalculateMap {
 		} else {
 			id = createId(x, y, z) + "_RobberImage";
 			imageView.setLayoutX(xCoordinate - 20);
-			imageView.setLayoutY(yCoordinate -50);
+			imageView.setLayoutY(yCoordinate - 50);
 		}
 		imageView.setId(id);
 		pane.getChildren().add(imageView);

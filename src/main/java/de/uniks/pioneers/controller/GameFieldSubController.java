@@ -1,20 +1,20 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
-import de.uniks.pioneers.model.Building;
-import de.uniks.pioneers.model.Map;
-import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.Tile;
+import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -23,8 +23,9 @@ import javafx.scene.shape.Polygon;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameFieldSubController implements Controller {
