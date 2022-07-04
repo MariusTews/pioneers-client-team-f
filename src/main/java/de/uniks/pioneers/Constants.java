@@ -70,6 +70,7 @@ public class Constants {
     public static final String NEPTUNE_CRYSTAL = "wool";
     public static final String DROP_ACTION = "drop";
     public static final String ROB_ACTION = "rob";
+    public static final String ROAD = "road";
 
     //Array of Colors as Strings for the Label text
     public static final String[] COLORSTRINGARRAY = {"RED", "BLUE", "ORANGE", "DARKORCHID", "TEAL", "ROSYBROWN",
