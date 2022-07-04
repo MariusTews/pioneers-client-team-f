@@ -103,6 +103,7 @@ public class CalculateMap {
 		// For easier Harbour placement Ids are corresponding to the harbour location id +1 and -1
 		// example harbour at pos 9 has roads 8 and 10 visible
 		if (harbour) {
+			road.setFill(Color.SILVER);
 			if (rotation == 0.0) {
 				String id = createId(x, y, z) + "_" + 6 + "_HarbourRoad";
 				road.setId(id);
