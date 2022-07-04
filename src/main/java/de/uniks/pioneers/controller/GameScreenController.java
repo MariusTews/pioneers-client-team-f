@@ -16,9 +16,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
+import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.computation.CalculateMap.createId;
 
 public class GameScreenController implements Controller {
 
@@ -89,6 +90,7 @@ public class GameScreenController implements Controller {
     private final HashMap<String, User> userHash = new HashMap<>();
     private final Timeline timeline = new Timeline();
     private boolean runDiscardOnce = true;
+    private Point3D currentRobPlace;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -193,7 +195,6 @@ public class GameScreenController implements Controller {
         messageViewSubController.init();
     }
 
-
     @Override
     public void destroy() {
         if (this.messageViewSubController != null) {
@@ -228,7 +229,7 @@ public class GameScreenController implements Controller {
             }
         });
 
-        this.gameFieldSubController = new GameFieldSubController(app, gameStorage, pioneersService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(app, gameStorage, pioneersService, userService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
 
@@ -294,6 +295,8 @@ public class GameScreenController implements Controller {
             }
         } else if (playerEvent.event().endsWith(DELETED)) {
             if (opponents.size() < 2) {
+                // set cursor back to default if the player wins while rob action
+                this.mapPane.getScene().setCursor(Cursor.DEFAULT);
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 // Set style
                 DialogPane dialogPane = alert.getDialogPane();
@@ -346,7 +349,39 @@ public class GameScreenController implements Controller {
             if (!currentMove.equals(DROP_ACTION)) {
                 runDiscardOnce = true;
             }
+
+            // change the cursor when action is "rob" instead of alert (or notification),
+            //  remove the image from cursor, when leaving the game or when placing robber
+            if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID())) {
+                Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/robber.png")).toString());
+                currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth()/2, image.getHeight()/2));
+            } else {
+                currentPlayerLabel.getScene().setCursor(Cursor.DEFAULT);
+            }
+
+            if (state.robber() != null && !state.robber().equals(currentRobPlace)) {
+                // update the view and place the robber on new tile
+                this.updateRobView(state.robber());
+            }
         }
+    }
+
+    // update view when robber was set
+    private void updateRobView(Point3D newCoordinates) {
+        Scene scene = this.mapPane.getScene();
+        // find fx:id of the existing ImageView by already available method: first delete image from old tile
+        if (currentRobPlace != null) {
+            ImageView oldRobImageView = (ImageView) scene.lookup("#" +
+                    createId(currentRobPlace.x().intValue(), currentRobPlace.y().intValue(), currentRobPlace.z().intValue()) + "_RobberImage");
+            oldRobImageView.setImage(null);
+        }
+        // set image of robber on new tile
+        ImageView robImageView = (ImageView) scene.lookup("#" +
+                createId(newCoordinates.x().intValue(), newCoordinates.y().intValue(), newCoordinates.z().intValue()) + "_RobberImage");
+        robImageView.setImage(new Image(Objects.requireNonNull(Main.class
+                .getResource("view/assets/robber.png")).toString()));
+
+        currentRobPlace = newCoordinates;
     }
 
     private void handleBuildingEvents(Event<Building> buildingEvent) {
@@ -412,6 +447,8 @@ public class GameScreenController implements Controller {
     }
 
     public void onLeave(ActionEvent ignoredEvent) {
+        // If the player leaves the game before placing the robber, the cursor has to be set back to default
+        mapPane.getScene().setCursor(Cursor.DEFAULT);
         if ((opponents.size() + playerOwnView.size()) == 2) {
             gameService.findOneGame(this.gameStorage.getId())
                     .observeOn(FX_SCHEDULER).
@@ -434,21 +471,11 @@ public class GameScreenController implements Controller {
     }
 
     public void finishTurn() {
-        // TODO: just temporary till rob is implemented
-        if (nextMoveLabel.getText().equals(ROB_ACTION)) {
-            pioneersService.move(gameStorage.getId(), ROB_ACTION, 1, 1, 1, null, null, null, null)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                    }, onError -> {
-                    });
-
-        } else {
-            pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null, null, null)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                    }, onError -> {
-                    });
-        }
+        pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null, null, null)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                }, onError -> {
+                });
     }
 
     private void startTime() {
