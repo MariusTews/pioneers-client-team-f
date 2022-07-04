@@ -124,23 +124,9 @@ public class GameFieldSubController implements Controller {
 
 		for (Tile tile : map.tiles()) {
 
-			int x = (int) tile.x();
-			int y = (int) tile.y();
-			int z = (int) tile.z();
-			String stringX = "x" + x;
-			String stringY = "y" + y;
-			String stringZ = "z" + z;
-			if (x < 0) {
-				stringX = "xM" + Math.abs(x);
-			}
-			if (y < 0) {
-				stringY = "yM" + Math.abs(y);
-			}
-			if (z < 0) {
-				stringZ = "zM" + Math.abs(z);
-			}
-			for (Node node: hexagons) {
-				if (node.getId().equals(stringX+stringY+stringZ)) {
+			String id = parseId((Integer) tile.x(), (Integer) tile.y(), (Integer) tile.z());
+			for (Node node : hexagons) {
+				if (node.getId().equals(id)) {
 					HexSubController hexSubController = new HexSubController((Polygon) node, tile);
 					hexSubController.init();
 					this.hexSubControllers.add(hexSubController);
@@ -148,7 +134,7 @@ public class GameFieldSubController implements Controller {
 			}
 
 			// Set number token on tiles
-			Label label = (Label) parent.lookup("#" + stringX + stringY + stringZ + "_label");
+			Label label = (Label) parent.lookup("#" + id + "_label");
 			if (label != null) {
 				label.setText("" + tile.numberToken());
 
@@ -209,5 +195,22 @@ public class GameFieldSubController implements Controller {
 
 	public ObservableList<Player> getPlayers() {
 		return players;
+	}
+
+	private String parseId(int x, int y, int z) {
+		String stringX = "x" + x;
+		String stringY = "y" + y;
+		String stringZ = "z" + z;
+		if (x < 0) {
+			stringX = "xM" + Math.abs(x);
+		}
+		if (y < 0) {
+			stringY = "yM" + Math.abs(y);
+		}
+		if (z < 0) {
+			stringZ = "zM" + Math.abs(z);
+		}
+
+		return stringX + stringY + stringZ;
 	}
 }
