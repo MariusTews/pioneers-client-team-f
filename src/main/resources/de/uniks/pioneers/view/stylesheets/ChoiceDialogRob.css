@@ -1,19 +1,19 @@
 .dialog-pane {
-    -fx-background-color: #1ea7e1;
+    -fx-background-color: #e86a17;
 }
 
 .dialog-pane .header-panel {
-    -fx-background-color: #1ea7e1;
+    -fx-background-color: #e86a17;
 }
 
 .dialog-pane > .content.label {
-    -fx-background-color: #1ea7e1;
+    -fx-background-color: #e86a17;
     -fx-text-fill: white;
     -fx-font-size: 14px;
 }
 
 .dialog-pane .label {
-    -fx-background-color: #1ea7e1;
+    -fx-background-color: #e86a17;
     -fx-text-fill: white;
     -fx-font-size: 20px;
     -fx-font-family: "KenVector Future Regular";

@@ -180,9 +180,9 @@ public class HexSubController implements Controller {
         }
         // Pop up with selection of the player's names
         ChoiceDialog choosingTarget = new ChoiceDialog(userHash.keySet().iterator().next(), userHash.keySet());
+        // set stylesheet
         choosingTarget.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
-                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-        // TODO: new stylesheet, set the text in the stylesheet
+                .getResource("view/stylesheets/ChoiceDialogRob.css")).toExternalForm());
         choosingTarget.setHeaderText("Rob from");
         // remove close/maximize/minimize button
         choosingTarget.initStyle(StageStyle.UNDECORATED);
