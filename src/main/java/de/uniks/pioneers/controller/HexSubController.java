@@ -7,11 +7,13 @@ import de.uniks.pioneers.service.UserService;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
+import javafx.stage.StageStyle;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -176,7 +178,17 @@ public class HexSubController implements Controller {
             // return the only name in the list, choice dialog is not needed
             return owners.iterator().next();
         }
-        return null;
+        // Pop up with selection of the player's names
+        ChoiceDialog choosingTarget = new ChoiceDialog(userHash.keySet().iterator().next(), userHash.keySet());
+        choosingTarget.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
+                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        // TODO: new stylesheet, set the text in the stylesheet
+        choosingTarget.setHeaderText("Rob from");
+        // remove close/maximize/minimize button
+        choosingTarget.initStyle(StageStyle.UNDECORATED);
+        // Get the chosen target and make a server request with this target
+        choosingTarget.showAndWait();
+        return this.userHash.get((String) choosingTarget.getSelectedItem());
     }
 
     private void setPolygonColor() {
