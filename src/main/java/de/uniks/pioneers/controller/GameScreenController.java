@@ -357,6 +357,8 @@ public class GameScreenController implements Controller {
     }
 
     private void winnerScreen(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
+        // If winner screen appears during rob move - change cursor back to default
+        this.mapPane.getScene().setCursor(Cursor.DEFAULT);
         HashMap<String, List<String>> userNumberPoints = new HashMap<>();
        //This saves username and their respective points from game in hashmap
         for (User user:this.allUser) {
@@ -529,6 +531,9 @@ public class GameScreenController implements Controller {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false)
                     .observeOn(FX_SCHEDULER).subscribe(onSuccess -> this.app.show(lobbyController.get()));
         }
+
+        // If player leaves during rob move - change cursor back to default
+        this.mapPane.getScene().setCursor(Cursor.DEFAULT);
     }
 
     public void finishTurn() {
