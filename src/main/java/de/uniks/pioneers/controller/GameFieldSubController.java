@@ -143,6 +143,9 @@ public class GameFieldSubController implements Controller {
 				}
 			}
 		}
+
+		loadHarbors(map);
+
 		List<Node> circles = new ArrayList<>();
 		circles.addAll(roadCircles);
 		circles.addAll(buildingCircles);
@@ -164,6 +167,96 @@ public class GameFieldSubController implements Controller {
 						idStorage, eventListener, buildingCircles, this);
 				circleSubController.init();
 				this.circleSubControllers.add(circleSubController);
+			}
+		}
+	}
+
+	private void loadHarbors(Map map) {
+		for (Harbor harbor : map.harbors()) {
+			String id = "";
+
+			switch ((int) harbor.side()) {
+				case 1 -> {
+					id = parseId((Integer) harbor.x() + 1, (Integer) harbor.y(), (Integer) harbor.z() - 1);
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_0_HarbourRoad") || harborRoad.getId().equals(id + "_2_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 3 -> {
+					id = parseId((Integer) harbor.x() + 1, (Integer) harbor.y() - 1, (Integer) harbor.z());
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_2_HarbourRoad") || harborRoad.getId().equals(id + "_4_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 5 -> {
+					id = parseId((Integer) harbor.x(), (Integer) harbor.y() - 1, (Integer) harbor.z() + 1);
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_4_HarbourRoad") || harborRoad.getId().equals(id + "_6_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 7 -> {
+					id = parseId((Integer) harbor.x() - 1, (Integer) harbor.y(), (Integer) harbor.z() + 1);
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_6_HarbourRoad") || harborRoad.getId().equals(id + "_8_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 9 -> {
+					id = parseId((Integer) harbor.x() - 1, (Integer) harbor.y() + 1, (Integer) harbor.z());
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_8_HarbourRoad") || harborRoad.getId().equals(id + "_10_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 11 -> {
+					id = parseId((Integer) harbor.x(), (Integer) harbor.y() + 1, (Integer) harbor.z() - 1);
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_10_HarbourRoad") || harborRoad.getId().equals(id + "_0_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+			}
+
+			if (!id.equals("")) {
+
+				ImageView imageView = (ImageView) parent.lookup("#" + id + "_HarbourImage");
+				if (harbor.type() != null) {
+					switch (harbor.type()) {
+						case MOON_ROCK -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/moon_rock.png")).toString());
+							imageView.setImage(image);
+						}
+						case NEPTUNE_CRYSTAL -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/neptun_crystals.png")).toString());
+							imageView.setImage(image);
+						}
+						case MARS_BAR -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/mars_bar.png")).toString());
+							imageView.setImage(image);
+						}
+						case VENUS_GRAIN -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/venus_grain.png")).toString());
+							imageView.setImage(image);
+						}
+						case EARTH_CACTUS -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/earth_cactus.png")).toString());
+							imageView.setImage(image);
+						}
+					}
+				} else {
+					Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/harbor.png")).toString());
+					imageView.setImage(image);
+				}
+				imageView.toFront();
 			}
 		}
 	}
