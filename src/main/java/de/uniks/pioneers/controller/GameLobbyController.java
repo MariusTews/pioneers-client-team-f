@@ -240,6 +240,7 @@ public class GameLobbyController implements Controller {
 		disposable.dispose();
 	}
 
+
 	@Override
 	public Parent render() {
 		// load UI elements

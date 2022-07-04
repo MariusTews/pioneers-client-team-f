@@ -31,8 +31,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 import static de.uniks.pioneers.Constants.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class LobbyController implements Controller {
 
@@ -82,6 +86,8 @@ public class LobbyController implements Controller {
 
     private final GameStorage gameStorage;
 
+    private final RefreshTokenStorage refreshTokenStorage;
+
     private final UserService userService;
     private final GameService gameService;
     private final GroupService groupService;
@@ -107,10 +113,13 @@ public class LobbyController implements Controller {
     String ownUsername = "";
     String ownAvatar = null;
 
+    private final ScheduledExecutorService scheduler =
+            Executors.newScheduledThreadPool(1);
+
     @Inject
     public LobbyController(App app,
                            IDStorage idStorage,
-                           GameStorage gameStorage, UserService userService,
+                           GameStorage gameStorage, RefreshTokenStorage refreshTokenStorage, UserService userService,
                            GameService gameService,
                            GroupService groupService,
                            MessageService messageService,
@@ -128,6 +137,7 @@ public class LobbyController implements Controller {
         this.app = app;
         this.idStorage = idStorage;
         this.gameStorage = gameStorage;
+        this.refreshTokenStorage = refreshTokenStorage;
         this.userService = userService;
         this.gameService = gameService;
         this.groupService = groupService;
@@ -166,6 +176,10 @@ public class LobbyController implements Controller {
                 .listen("global." + LOBBY_ID + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleAllTabMessages));
+
+        //refreshed Token and runs for three hour
+        beepForThreeHour();
+
     }
 
     @Override
@@ -178,6 +192,23 @@ public class LobbyController implements Controller {
 
         disposable.dispose();
     }
+
+    //call refresh Token every 30 minutes to refreshToken and ActiveToken
+    public void beepForThreeHour() {
+        String refreshToken = this.refreshTokenStorage.getRefreshToken();
+        final Runnable beeper = new Runnable() {
+            public void run() {
+                authService.refreshToken(refreshToken).
+                        observeOn(FX_SCHEDULER).subscribe();
+            }
+        };
+        final ScheduledFuture<?> beeperHandle =
+                scheduler.scheduleAtFixedRate(beeper, 10, 30*60, SECONDS);
+        scheduler.schedule(new Runnable() {
+            public void run() { beeperHandle.cancel(true); }
+        }, 180 * 60, SECONDS);
+    }
+
 
     @Override
     public Parent render() {
@@ -710,9 +741,8 @@ public class LobbyController implements Controller {
         if(!changeToPlayer) {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
                     .observeOn(FX_SCHEDULER)
-                    .subscribe(onSuccess -> {
-                        this.app.show(gameScreenController.get());
-                    });
+                    .subscribe();
+            this.app.show(gameScreenController.get());
         }
 
     }

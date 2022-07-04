@@ -17,8 +17,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -174,8 +172,11 @@ public class GameScreenController implements Controller {
                             .findOneState(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe(r -> {
-                                if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                    foundingDiceRoll();
+                                System.out.println(r);
+                                if(!r.expectedMoves().isEmpty()) {
+                                    if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                        foundingDiceRoll();
+                                    }
                                 }});
                                         break;
                                     }
