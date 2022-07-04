@@ -66,12 +66,12 @@ public class CalculateMap {
 
 	private void buildRoad(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, double rotation, boolean harbour) {
 		//creates a road at the given coordinate
-		double roadPos1 = -15.0;
+		double roadPos1 = -20.0;
 		double roadPos2 = -5.0;
 		double roadPos3 = 5.0;
-		double roadPos4 = 15.0;
-		double roadPos5 = 20.0;
-		double roadPos6 = -20.0;
+		double roadPos4 = 20.0;
+		double roadPos5 = 25.0;
+		double roadPos6 = -25.0;
 		double roadPos7 = 0.0;
 
 		Polygon road = new Polygon(
