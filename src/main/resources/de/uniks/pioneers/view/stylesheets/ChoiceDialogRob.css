@@ -1,9 +1,14 @@
+.root {
+    -fx-font-family: "KenVector Future Regular";
+}
+
 .dialog-pane {
     -fx-background-color: #e86a17;
 }
 
 .dialog-pane .header-panel {
     -fx-background-color: #e86a17;
+    -fx-mark-color: grey;
 }
 
 .dialog-pane > .content.label {
@@ -16,13 +21,11 @@
     -fx-background-color: #e86a17;
     -fx-text-fill: white;
     -fx-font-size: 20px;
-    -fx-font-family: "KenVector Future Regular";
 }
 
 .dialog-pane .button {
     -fx-background-image: url("../assets/grey_button.png");
     -fx-background-size: auto;
     -fx-text-fill: dimgrey;
-    -fx-font-family: "KenVector Future Regular";
     -fx-font-size: 18px;
 }
