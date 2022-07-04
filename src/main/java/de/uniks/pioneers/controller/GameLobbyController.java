@@ -52,7 +52,7 @@ public class GameLobbyController implements Controller {
 	@FXML
 	public VBox idChatContainer;
 	@FXML
-	public final ComboBox<Label> colorPicker = new ComboBox<>();
+	public ComboBox<Label> colorPicker = new ComboBox<>();
 	@FXML
 	public Label settingsLabel;
 	@FXML
