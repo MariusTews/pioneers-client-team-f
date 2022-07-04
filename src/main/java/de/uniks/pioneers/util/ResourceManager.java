@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ResourceManager {
-    private static Path configFilePath = Path.of("./config.json");
+    private static final Path configFilePath = Path.of("./config.json");
 
     static {
         if (!Files.exists(configFilePath)) {

@@ -22,11 +22,11 @@ import java.util.Objects;
 @ExtendWith(MockitoExtension.class)
 public class OpponentSubControllerTest extends ApplicationTest {
     // Create resources hash
-    HashMap<String, Integer> resources = new HashMap<>() {{
+    final  HashMap<String, Integer> resources = new HashMap<>() {{
         put("unknown", 3);
     }};
     // Get the path of an image
-    String avatar = Objects.requireNonNull(App.class.getResource("defaultPicture.png")).toString();
+    final String avatar = Objects.requireNonNull(App.class.getResource("defaultPicture.png")).toString();
 
     @InjectMocks
     OpponentSubController opponentSubController = new OpponentSubController(new Player("01", "00",

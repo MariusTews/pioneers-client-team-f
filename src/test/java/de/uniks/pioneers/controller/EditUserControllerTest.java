@@ -20,9 +20,9 @@ import org.testfx.matcher.base.NodeMatchers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.testfx.api.FxAssert.verifyThat;
 
@@ -41,7 +41,7 @@ class EditUserControllerTest extends ApplicationTest {
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
 
-        File file = new File(Main.class.getResource("defaultPicture.png").getFile());
+        File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
         when(userService.findOne(any())).thenReturn(Observable.just(new User("1234","12345","01", "Alice","offline",
@@ -77,7 +77,7 @@ class EditUserControllerTest extends ApplicationTest {
 
     @Test
     void updateUser() {
-        File file = new File(Main.class.getResource("defaultPicture.png").getFile());
+        File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
         when(userService.userUpdate(any(),any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("1234","12345","01","Alice","offline",avatar,new ArrayList<>())));

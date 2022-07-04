@@ -9,7 +9,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
@@ -48,9 +47,9 @@ public class HexSubController implements Controller {
     @Override
     public void init() {
         // Add mouse listeners
-        this.view.setOnMouseEntered(this::onFieldMouseHoverEnter);
-        this.view.setOnMouseExited(this::onFieldMouseHoverExit);
-        this.view.setOnMouseClicked(this::onTileClicked);
+        this.view.setOnMouseEntered(event -> onFieldMouseHoverEnter());
+        this.view.setOnMouseExited(event -> onFieldMouseHoverExit());
+        this.view.setOnMouseClicked(event -> onTileClicked());
         setPolygonColor();
     }
 
@@ -65,19 +64,19 @@ public class HexSubController implements Controller {
     }
 
     // Mouse hovers over field
-    private void onFieldMouseHoverEnter(MouseEvent event) {
+    private void onFieldMouseHoverEnter() {
         // Change the view
         this.view.setStroke(Color.RED);
     }
 
     // Mouse leaves the field
-    private void onFieldMouseHoverExit(MouseEvent event) {
+    private void onFieldMouseHoverExit() {
         // Change the view
         this.view.setStroke(Color.BLACK);
     }
 
     // check if the correct player clicked while rob action, check coordinates (if valid field)
-    private void onTileClicked(MouseEvent event) {
+    private void onTileClicked() {
         Point3D tileCoordinates = new Point3D(tile.x(), tile.y(), tile.z());
 
         // Make a server request to find out who the current player is and which action is expected

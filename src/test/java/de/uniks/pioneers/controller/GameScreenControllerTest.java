@@ -1,7 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
@@ -155,7 +155,7 @@ class GameScreenControllerTest extends ApplicationTest {
     @Test
     void finishTurn() {
         when(pioneersService.move(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
-        write("\t");
+        write("\t\t\t\t\t\t\t\t\t\t\t\t\t");
         type(KeyCode.SPACE);
         verify(pioneersService).move("02", "build", null, null, null, null, null, null, null);
     }

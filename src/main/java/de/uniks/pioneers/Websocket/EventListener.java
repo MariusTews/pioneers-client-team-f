@@ -1,4 +1,4 @@
-package de.uniks.pioneers.Websocket;
+package de.uniks.pioneers.websocket;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -58,7 +58,7 @@ public class EventListener {
                     }
 
                     final T data = mapper.treeToValue(node.get("data"), type);
-                    emitter.onNext(new Event<T>(event, data));
+                    emitter.onNext(new Event<>(event, data));
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }

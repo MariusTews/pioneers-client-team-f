@@ -28,7 +28,7 @@ public class MemberService {
 		return gameMembersApiService.findAll(gameId);
 	}
 
-	public Observable<Member> join(String userId, String gameID, String password) {
+	public Observable<Member> join(String gameID, String password) {
 		return gameMembersApiService
 				.create(gameID, new CreateMemberDto(false, "#000000", false, password))
 				.doOnNext(result -> {

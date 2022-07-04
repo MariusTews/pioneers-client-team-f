@@ -2,7 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
@@ -11,7 +11,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -34,9 +33,12 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class LobbyController implements Controller {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
+
+    private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Game> games = FXCollections.observableArrayList();
     private final ObservableList<Group> groups = FXCollections.observableArrayList();
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
@@ -95,13 +97,12 @@ public class LobbyController implements Controller {
     private final Provider<EditUserController> editUserController;
     private final Provider<GameScreenController> gameScreenController;
 
+    private final PioneersService pioneersService;
+
     private final CompositeDisposable disposable = new CompositeDisposable();
     public Button rejoinButton;
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
-
-    String ownUsername = "";
-    String ownAvatar = null;
 
     @Inject
     public LobbyController(App app,
@@ -118,7 +119,8 @@ public class LobbyController implements Controller {
                            Provider<CreateGameController> createGameController,
                            Provider<GameLobbyController> gameLobbyController,
                            Provider<EditUserController> editUserController,
-                           Provider<GameScreenController> gameScreenController) {
+                           Provider<GameScreenController> gameScreenController,
+                           PioneersService pioneersService) {
 
         this.app = app;
         this.idStorage = idStorage;
@@ -136,11 +138,16 @@ public class LobbyController implements Controller {
         this.gameLobbyController = gameLobbyController;
         this.editUserController = editUserController;
         this.gameScreenController = gameScreenController;
+        this.pioneersService = pioneersService;
     }
 
     @Override
     public void init() {
 
+        if(this.gameStorage.getId() != null) {
+            memberService.getAllGameMembers(this.gameStorage.getId())
+                    .observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
+        }
         gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
         groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this::loadGroups);
@@ -238,12 +245,12 @@ public class LobbyController implements Controller {
         }
     }
 
-    public void rulesButtonPressed(ActionEvent ignoredEvent) {
+    public void rulesButtonPressed() {
         final RulesScreenController controller = rulesScreenController.get();
         app.show(controller);
     }
 
-    public void logoutButtonPressed(ActionEvent ignoredEvent) {
+    public void logoutButtonPressed() {
         logout();
     }
 
@@ -257,16 +264,16 @@ public class LobbyController implements Controller {
                 });
     }
 
-    public void sendButtonPressed(ActionEvent ignoredEvent) {
+    public void sendButtonPressed() {
         checkMessageField();
     }
 
-    public void editButtonPressed(ActionEvent ignoredEvent) {
+    public void editButtonPressed() {
         final EditUserController controller = editUserController.get();
         app.show(controller);
     }
 
-    public void createGameButtonPressed(ActionEvent ignoredEvent) {
+    public void createGameButtonPressed() {
         //makes sure if user in game or not , and depending on that
         //allows user to create the game
         if (this.gameStorage.getId() != null) {
@@ -319,10 +326,6 @@ public class LobbyController implements Controller {
 
     private Node renderUser(User user) {
         if (user._id().equals(this.idStorage.getID())) {
-            if (user.avatar() != null) {
-                this.ownAvatar = user.avatar();
-            }
-            this.ownUsername = user.name();
             this.userWelcomeLabel.setText(WELCOME + user.name() + "!");
         }
         for (UserListSubController subCon : this.userSubCons) {
@@ -330,7 +333,7 @@ public class LobbyController implements Controller {
                 return subCon.getParent();
             }
         }
-        UserListSubController userCon = new UserListSubController(this.app, this, user, idStorage);
+        UserListSubController userCon = new UserListSubController(this, user, idStorage);
         userSubCons.add(userCon);
         return userCon.render();
     }
@@ -491,9 +494,6 @@ public class LobbyController implements Controller {
 
         for (User user : users) {
             memberHash.put(user._id(), user);
-            if (user._id().equals(this.idStorage.getID())) {
-                this.ownUsername = user.name();
-            }
         }
 
         List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
@@ -635,7 +635,7 @@ public class LobbyController implements Controller {
         dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
                 .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         dialog.showAndWait()
-                .ifPresent(password -> this.memberService.join(idStorage.getID(), game._id(), password)
+                .ifPresent(password -> this.memberService.join(game._id(), password)
                         .observeOn(FX_SCHEDULER)
                         .doOnError(error -> {
                             if ("HTTP 403 ".equals(error.getMessage())) {
@@ -686,6 +686,20 @@ public class LobbyController implements Controller {
 
     //reactivate for the possibility of joining the game
     public void onRejoin() {
-        this.app.show(gameScreenController.get());
+        boolean changeToPlayer = false;
+        for (Member m: this.members) {
+            if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())
+                && m.spectator()){
+                this.app.show(gameScreenController.get());
+                changeToPlayer = true;
+                break;
+            }
+        }
+        if(!changeToPlayer) {
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(onSuccess -> this.app.show(gameScreenController.get()));
+        }
+
     }
 }

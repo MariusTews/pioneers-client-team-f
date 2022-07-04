@@ -1,76 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
-<HBox id="gameView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="de.uniks.pioneers.controller.GameScreenController">
-    <VBox maxHeight="900.0" prefHeight="900.0" prefWidth="500.0">
-        <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0">
-            <VBox.margin>
-                <Insets top="20.0"/>
-            </VBox.margin>
-        </VBox>
-        <Pane fx:id="userPaneId" prefHeight="320.0" prefWidth="500.0">
-            <VBox.margin>
-                <Insets bottom="20.0" left="20.0"/>
-            </VBox.margin>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.geometry.Insets?>
+<Pane id="gameView" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
+    <ScrollPane fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" layoutX="14.0" layoutY="14.0" pannable="true"
+                prefHeight="900.0" prefWidth="1600.0"
+                style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER"
+                vvalue="0.5">
+    </ScrollPane>
+    <Pane>
+        <ScrollPane hbarPolicy="NEVER" layoutY="20.0" pannable="true" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
+            <VBox fx:id="opponentsView" prefHeight="580.0" prefWidth="500.0" />
+        </ScrollPane>
+        <Pane fx:id="userViewPane" layoutX="20.0" layoutY="580.0" prefHeight="320.0" prefWidth="500.0" />
+    </Pane>
+    <ScrollPane hbarPolicy="NEVER" layoutX="500.0" pannable="true" prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
+        <HBox fx:id="spectatorPaneId" prefHeight="150.0" prefWidth="650.0" >
+            <padding>
+                <Insets right="10.0" />
+            </padding></HBox>
+    </ScrollPane>
+    <Pane id="roll" layoutX="500.0" layoutY="736.6666870117188" prefHeight="150.0" prefWidth="650.0">
+        <ImageView fitHeight="83.0" fitWidth="92.0" layoutX="347.0" layoutY="30.0" onMouseClicked="#onMouseClicked" pickOnBounds="true" preserveRatio="true">
+            <Image url="@assets/dice-icons8.png" />
+        </ImageView>
+        <Label id="diceSum" fx:id="diceSumLabel" alignment="CENTER" layoutX="211.0" layoutY="34.0" prefHeight="83.0" prefWidth="92.0" text="12">
+        </Label>
+    </Pane>
+    <Pane layoutX="1100.0" prefHeight="914.0" prefWidth="510.0">
+        <Pane prefHeight="61.0" prefWidth="500.0">
+            <Button id="bigButton" fx:id="leave" contentDisplay="CENTER" layoutX="127.0" layoutY="14.0" mnemonicParsing="false" onAction="#onLeave" prefHeight="39.0" prefWidth="81.0" styleClass="greenButton" text="Leave" />
         </Pane>
-    </VBox>
-    <VBox prefHeight="900.0" prefWidth="650.0">
-        <Pane fx:id="spectatorPaneId" prefHeight="150.0" prefWidth="650.0"/>
-        <ScrollPane fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="600.0" prefWidth="650.0"
-                    vbarPolicy="NEVER" vvalue="0.5"/>
-        <Pane id="roll" prefHeight="150.0" prefWidth="650.0">
-            <ImageView fitHeight="83.0" fitWidth="92.0" layoutX="347.0" layoutY="30.0" onMouseClicked="#onMouseClicked"
-                       pickOnBounds="true" preserveRatio="true">
-                <Image url="@assets/dice-icons8.png"/>
-            </ImageView>
-            <Label id="diceSum" fx:id="diceSumLabel" alignment="CENTER" layoutX="211.0" layoutY="34.0" prefHeight="83.0"
-                   prefWidth="92.0" text="12">
+      <Pane fx:id="tradingPane" layoutX="225.0" layoutY="82.0" prefHeight="150.0" prefWidth="275.0" />
+        <Pane id="currentGameState" layoutX="64.0" layoutY="343.0" prefHeight="126.0" prefWidth="500.0">
+            <Label alignment="CENTER" contentDisplay="TOP" layoutX="133.0" layoutY="-1.0" prefHeight="33.0" prefWidth="246.0" text="NEXT MOVE">
             </Label>
-            <VBox.margin>
-                <Insets bottom="20.0"/>
-            </VBox.margin>
-        </Pane>
-    </VBox>
-    <VBox prefHeight="900.0" prefWidth="450.0">
-        <Pane prefHeight="100.0" prefWidth="500.0">
-            <Button id="bigButton" fx:id="leave" contentDisplay="CENTER" layoutX="127.0" layoutY="14.0"
-                    mnemonicParsing="false" onAction="#onLeave" prefHeight="39.0" prefWidth="81.0"
-                    styleClass="greenButton" text="Leave"/>
-        </Pane>
-        <Pane id="currentGameState" prefHeight="480.0" prefWidth="500.0">
-            <Label alignment="CENTER" contentDisplay="TOP" layoutX="109.0" layoutY="14.0" prefHeight="61.0"
-                   prefWidth="246.0" text="NEXT MOVE">
+            <Label fx:id="nextMoveLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="38.0" layoutY="27.0" prefHeight="39.0" prefWidth="436.0">
             </Label>
-            <Label fx:id="nextMoveLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="60.0"
-                   prefHeight="61.0" prefWidth="436.0">
+            <Label alignment="CENTER" contentDisplay="TOP" layoutX="133.0" layoutY="58.0" prefHeight="33.0" prefWidth="246.0" text="CURRENT PLAYER">
             </Label>
-            <Label alignment="CENTER" contentDisplay="TOP" layoutX="109.0" layoutY="121.0" prefHeight="61.0"
-                   prefWidth="246.0" text="CURRENT PLAYER">
+            <Label fx:id="currentPlayerLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="38.0" layoutY="93.0" prefHeight="39.0" prefWidth="436.0">
             </Label>
-            <Label fx:id="currentPlayerLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="7.0" layoutY="167.0"
-                   prefHeight="61.0" prefWidth="436.0">
-            </Label>
-            <Button fx:id="finishTurnButton" contentDisplay="CENTER" layoutX="131.0" layoutY="381.0"
-                    mnemonicParsing="false" onAction="#finishTurn" prefHeight="58.0" prefWidth="189.0"
-                    styleClass="greenButton" text="Move"/>
-            <Pane id="timer" layoutX="170.0" layoutY="254.0" prefHeight="103.0" prefWidth="150.0">
-                <Label alignment="CENTER" contentDisplay="CENTER" layoutX="-18.0" layoutY="-3.0" prefHeight="61.0"
-                       prefWidth="189.0" text="Remaining time">
+            <Pane id="timer" layoutX="175.0" layoutY="131.0" prefHeight="74.0" prefWidth="150.0">
+                <Label alignment="CENTER" contentDisplay="CENTER" layoutX="-18.0" layoutY="2.0" prefHeight="24.0" prefWidth="189.0" text="Remaining time">
                 </Label>
-                <Label id="remainingTime" fx:id="timerLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="-24.0"
-                       layoutY="49.0" prefHeight="61.0" prefWidth="200.0">
+                <Label id="remainingTime" fx:id="timerLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="-24.0" layoutY="40.0" prefHeight="24.0" prefWidth="200.0">
                 </Label>
             </Pane>
+            <Button fx:id="finishTurnButton" contentDisplay="CENTER" layoutX="142.0" layoutY="190.0" mnemonicParsing="false" onAction="#finishTurn" prefHeight="58.0" prefWidth="189.0" styleClass="greenButton" text="Move" />
         </Pane>
-        <Pane fx:id="chatPane" prefHeight="320.0" prefWidth="500.0">
-            <VBox.margin>
-                <Insets bottom="20.0"/>
-            </VBox.margin>
-        </Pane>
-    </VBox>
-</HBox>
+      <Pane fx:id="chatPane" layoutX="48.0" layoutY="571.0" prefHeight="326.0" prefWidth="510.0" />
+    </Pane>
+</Pane>

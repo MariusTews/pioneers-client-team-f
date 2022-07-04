@@ -3,7 +3,7 @@ package de.uniks.pioneers;
 
 import dagger.Module;
 import dagger.Provides;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;

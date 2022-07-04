@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 class DirectChatStorageTest {
 
-	private DirectChatStorage storage = new DirectChatStorage();
+	private final DirectChatStorage storage = new DirectChatStorage();
 
 	@Test
 	void testGroupId() {

@@ -1,7 +1,6 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.computation.CalculateMap;
 import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.Map;
@@ -28,6 +27,7 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameFieldSubController implements Controller {
 
 	private final ObservableList<Player> players = FXCollections.observableArrayList();
@@ -56,8 +56,7 @@ public class GameFieldSubController implements Controller {
 	private final List<CircleSubController> circleSubControllers = new ArrayList<>();
 
 	@Inject
-	public GameFieldSubController(App app,
-								  GameStorage gameStorage,
+	public GameFieldSubController(GameStorage gameStorage,
 								  PioneersService pioneersService,
 								  UserService userService,
 								  IDStorage idStorage,
@@ -171,7 +170,7 @@ public class GameFieldSubController implements Controller {
 			node.toFront();
 			for (Node road : roads) {
 				if (road.getId().contains(node.getId())) {
-					CircleSubController circleSubController = new CircleSubController(parent,
+					CircleSubController circleSubController = new CircleSubController(
 							(Circle) node, (Polygon) road, pioneersService, gameStorage,
 							idStorage, eventListener, buildingCircles, this);
 					circleSubController.init();
@@ -179,7 +178,7 @@ public class GameFieldSubController implements Controller {
 				}
 			}
 			if (node.getId().endsWith("_0") || node.getId().endsWith("_6")) {
-				CircleSubController circleSubController = new CircleSubController(parent,
+				CircleSubController circleSubController = new CircleSubController(
 						(Circle) node, null, pioneersService, gameStorage,
 						idStorage, eventListener, buildingCircles, this);
 				circleSubController.init();

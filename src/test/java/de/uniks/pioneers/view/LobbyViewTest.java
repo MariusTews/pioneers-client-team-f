@@ -1,12 +1,8 @@
 package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.DaggerTestComponent;
-import de.uniks.pioneers.MainComponent;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.controller.LobbyController;
-import de.uniks.pioneers.controller.LoginController;
-import de.uniks.pioneers.controller.RulesScreenController;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
@@ -36,11 +32,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class LobbyViewTest extends ApplicationTest {
-	@Mock
-	RulesScreenController rulesScreenController;
-
-	@Mock
-	LoginController loginController;
 
 	@Mock
 	UserService userService;
@@ -70,7 +61,7 @@ public class LobbyViewTest extends ApplicationTest {
 	LobbyController lobbyController;
 
 	@Override
-	public void start(Stage stage) throws Exception {
+	public void start(Stage stage) {
 		when(idStorage.getID()).thenReturn("4");
 		when(gameStorage.getId()).thenReturn("");
 		when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "627cf3c93496bc00158f3859", "testGame", "1", 2, false, new GameSettings(2, 10)),
@@ -87,7 +78,6 @@ public class LobbyViewTest extends ApplicationTest {
 
 
 		final App app = new App(null);
-		MainComponent testComponent = DaggerTestComponent.builder().mainapp(app).build();
 		app.start(stage);
 		app.show(lobbyController);
 	}
@@ -115,7 +105,7 @@ public class LobbyViewTest extends ApplicationTest {
 
 		Assertions.assertThat(chatMessage.getText()).isEqualTo("");
 
-		// Assert that a message can be wrote
+		// Assert that a message can be written
 		clickOn(chatMessage);
 		write("test");
 		Assertions.assertThat(chatMessage.getText()).isEqualTo("test");
