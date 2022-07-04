@@ -55,13 +55,17 @@ public class CalculateMap {
 		String id;
 		if (Harbour) {
 			id = createId(x, y, z) + "_HarbourImage";
+			imageView.setLayoutX(xCoordinate - 30);
+			imageView.setLayoutY(yCoordinate - 30);
+			imageView.setFitHeight(60);
+			imageView.setFitWidth(60);
 		} else {
 			id = createId(x, y, z) + "_RobberImage";
+			imageView.setLayoutX(xCoordinate - 20);
+			imageView.setLayoutY(yCoordinate -50);
 		}
 		imageView.setId(id);
 		pane.getChildren().add(imageView);
-		imageView.setLayoutX(xCoordinate - 20);
-		imageView.setLayoutY(yCoordinate - 20);
 	}
 
 	private void buildRoad(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, double rotation, boolean harbour) {
