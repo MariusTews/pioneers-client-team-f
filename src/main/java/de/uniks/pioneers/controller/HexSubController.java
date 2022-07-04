@@ -7,6 +7,7 @@ import de.uniks.pioneers.service.UserService;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -15,13 +16,11 @@ import javafx.scene.shape.Polygon;
 import javafx.stage.StageStyle;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static de.uniks.pioneers.Constants.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class HexSubController implements Controller {
 
     private final Polygon view;
@@ -81,42 +80,52 @@ public class HexSubController implements Controller {
 
         // Make a server request to find out who the current player is and which action is expected
         this.checkSurrounding();
-        this.pioneersService.findOneState(gameID)
+        // For the names of the players a server request on all users is needed
+        this.userService.findAllUsers()
                 .observeOn(FX_SCHEDULER)
-                // TODO: how to prevent subscribe warnings?
-                .subscribe(move -> {
-                    ExpectedMove currentMove = move.expectedMoves().get(0);
-                    // check that the current player clicked while rob action and did not choose the same tile for rob again
-                    // move.robber() is null when placing the robber for the first time
-                    if (currentMove.action().equals(ROB_ACTION) && currentMove.players().get(0).equals(playerID)
-                            && (move.robber() == null || !move.robber().equals(tileCoordinates))) {
-                        pioneersService.move(gameID, ROB_ACTION, tile.x(), tile.y(), tile.z(), null, null,
-                                        this.chooseTarget(), null)
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe(result -> {
-                                    // set cursor back to default for the current player -> the view is updated for all in GameScreenController
-                                    view.getScene().setCursor(Cursor.DEFAULT);
-                                }, onError -> {
+                .subscribe(users -> {
+                    for (User user : users) {
+                        if (this.owners.contains(user._id())) {
+                            this.userHash.put(user.name(), user._id());
+                        }
+                    }
 
-                                });
-                    } else if (move.robber() != null && move.robber().equals(tileCoordinates)) {
-                        // Show alert if not the current player clicked while "rob" action
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION, """
+                    this.pioneersService.findOneState(gameID)
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(move -> {
+                                ExpectedMove currentMove = move.expectedMoves().get(0);
+                                // check that the current player clicked while rob action and did not choose the same tile for rob again
+                                // move.robber() is null when placing the robber for the first time
+                                if (currentMove.action().equals(ROB_ACTION) && currentMove.players().get(0).equals(playerID)
+                                        && (move.robber() == null || !move.robber().equals(tileCoordinates))) {
+                                    pioneersService.move(gameID, ROB_ACTION, tile.x(), tile.y(), tile.z(), null, null,
+                                                    this.chooseTarget(), null)
+                                            .observeOn(FX_SCHEDULER)
+                                            .subscribe(result -> {
+                                                // set cursor back to default for the current player -> the view is updated for all in GameScreenController
+                                                view.getScene().setCursor(Cursor.DEFAULT);
+                                            }, onError -> {
+
+                                            });
+                                } else if (move.robber() != null && move.robber().equals(tileCoordinates)) {
+                                    // Show alert if not the current player clicked while "rob" action
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, """
                                 You are not able\s
                                 to place the robber\s
                                 on the same tile again!""");
-                        // set style
-                        alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
-                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                        alert.showAndWait();
-                    } else {
-                        // Show alert if not the current player clicked while "rob" action
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not your turn or wrong move!");
-                        // set style
-                        alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
-                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                        alert.showAndWait();
-                    }
+                                    // set style
+                                    alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
+                                            .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                    alert.showAndWait();
+                                } else {
+                                    // Show alert if not the current player clicked while "rob" action
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not your turn or wrong move!");
+                                    // set style
+                                    alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
+                                            .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                    alert.showAndWait();
+                                }
+                            });
                 });
     }
 
@@ -126,7 +135,6 @@ public class HexSubController implements Controller {
         // Get all buildings
         this.pioneersService.findAllBuildings(gameID)
                 .observeOn(FX_SCHEDULER)
-                // TODO: how to prevent subscribe warnings?
                 .subscribe(buildings -> {
                     // Filter all buildings on the map, get the owner of the buildings who surround the clicked tile
                     for (Building building : buildings) {
@@ -156,17 +164,6 @@ public class HexSubController implements Controller {
                         }
                     }
 
-                    // For the names of the players a server request on all users is needed
-                    this.userService.findAllUsers()
-                            .observeOn(FX_SCHEDULER)
-                            // TODO: how to prevent subscribe warnings?
-                            .subscribe(users -> {
-                                for (User user : users) {
-                                    if (this.owners.contains(user._id())) {
-                                        this.userHash.put(user.name(), user._id());
-                                    }
-                                }
-                            });
                 });
     }
 
@@ -177,8 +174,9 @@ public class HexSubController implements Controller {
             // return the only name in the list, choice dialog is not needed
             return owners.iterator().next();
         }
-        // Pop up with selection of the player's names
-        ChoiceDialog choosingTarget = new ChoiceDialog(userHash.keySet().iterator().next(), userHash.keySet());
+        // Pop up with selection of the player's names, remove cancel button
+        ChoiceDialog choosingTarget = new ChoiceDialog(this.userHash.keySet().iterator().next(), this.userHash.keySet());
+        choosingTarget.getDialogPane().lookupButton(ButtonType.CANCEL).setVisible(false);
         // set stylesheet
         choosingTarget.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
                 .getResource("view/stylesheets/ChoiceDialogRob.css")).toExternalForm());
