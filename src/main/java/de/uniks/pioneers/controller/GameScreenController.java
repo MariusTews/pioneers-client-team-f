@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 import static de.uniks.pioneers.computation.CalculateMap.createId;
@@ -74,6 +75,8 @@ public class GameScreenController implements Controller {
     public Button leave;
     @FXML
     //spectator pane
+    public Pane spectatorPaneId;
+
     public Pane userViewPane;
     @FXML
     public Pane tradingPane;
@@ -259,7 +262,7 @@ public class GameScreenController implements Controller {
             }
         });
 
-        this.gameFieldSubController = new GameFieldSubController(gameStorage, pioneersService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(gameStorage, pioneersService, userService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
 
