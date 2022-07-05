@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -323,8 +324,12 @@ public class GameLobbyController implements Controller {
 				.observeOn(FX_SCHEDULER)
 				.doOnError(error -> {
 					if ("HTTP 403 ".equals(error.getMessage())) {
-						new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!")
-								.showAndWait();
+						Alert alert = new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!");
+                        // Set alert stylesheet
+                        DialogPane dialogPane = alert.getDialogPane();
+                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                        alert.showAndWait();
 					}
 				})
 				.subscribe(onSuccess -> {
