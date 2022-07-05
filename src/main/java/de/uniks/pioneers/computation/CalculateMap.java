@@ -38,7 +38,7 @@ public class CalculateMap {
 
 	private void buildCircle(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, int side) {
 		//creates a Circle at the given coordinate
-		Circle circle = new Circle(10);
+		Circle circle = new Circle(15);
 		String id = createId(x, y, z) + "_" + side;
 		circle.setId(id);
 		pane.getChildren().add(circle);
@@ -61,7 +61,8 @@ public class CalculateMap {
 		imageView.setId(id);
 		pane.getChildren().add(imageView);
 		imageView.setLayoutX(xCoordinate - 20);
-		imageView.setLayoutY(yCoordinate - 20);
+		// adjust robber image position (above the number token)
+		imageView.setLayoutY(yCoordinate - 50);
 	}
 
 	private void buildRoad(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, double rotation, boolean harbour) {
@@ -372,7 +373,7 @@ public class CalculateMap {
 		return center + (yOffset * z);
 	}
 
-	private String createId(int x, int y, int z) {
+	public static String createId(int x, int y, int z) {
 
 		String id = "";
 		// parse coordinates to ID

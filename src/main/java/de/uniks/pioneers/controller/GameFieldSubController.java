@@ -9,6 +9,7 @@ import de.uniks.pioneers.model.Tile;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,6 +42,7 @@ public class GameFieldSubController implements Controller {
 	private final List<Node> hexagons = new ArrayList<>();
 
 	private final IDStorage idStorage;
+	private final UserService userService;
 
 	private Parent parent;
 	private final GameStorage gameStorage;
@@ -56,10 +58,12 @@ public class GameFieldSubController implements Controller {
 	@Inject
 	public GameFieldSubController(GameStorage gameStorage,
 								  PioneersService pioneersService,
+								  UserService userService,
 								  IDStorage idStorage,
 								  EventListener eventListener) {
 		this.gameStorage = gameStorage;
 		this.pioneersService = pioneersService;
+		this.userService = userService;
 		this.idStorage = idStorage;
 		this.eventListener = eventListener;
 	}
@@ -141,7 +145,8 @@ public class GameFieldSubController implements Controller {
 			}
 			for (Node node: hexagons) {
 				if (node.getId().equals(stringX+stringY+stringZ)) {
-					HexSubController hexSubController = new HexSubController((Polygon) node, tile);
+					HexSubController hexSubController = new HexSubController((Polygon) node, tile,
+							this.gameStorage.getId(), this.idStorage.getID(), this.pioneersService, this.userService);
 					hexSubController.init();
 					this.hexSubControllers.add(hexSubController);
 				}
