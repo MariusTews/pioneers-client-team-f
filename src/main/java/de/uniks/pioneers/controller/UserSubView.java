@@ -45,7 +45,6 @@ public class UserSubView implements Controller {
     public Pane settlementPane;
     public Pane roadPane;
     public Pane cityPane;
-    private Parent parent;
 
     @Inject
     public UserSubView(IDStorage idStorage, UserService userService, Player player,int victoryPoints, GameFieldSubController gameFieldSubController) {
@@ -161,7 +160,6 @@ public class UserSubView implements Controller {
             e.printStackTrace();
             return null;
         }
-        this.parent = parent;
         this.road.disableProperty().set(true);
         this.sett.disableProperty().set(true);
         this.city.disableProperty().set(true);

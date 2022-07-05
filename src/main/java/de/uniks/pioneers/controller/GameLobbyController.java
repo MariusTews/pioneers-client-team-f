@@ -52,6 +52,7 @@ public class GameLobbyController implements Controller {
 	public VBox idUserList;
 	@FXML
 	public VBox idChatContainer;
+	@SuppressWarnings("CanBeFinal")
 	@FXML
 	public ComboBox<Label> colorPicker = new ComboBox<>();
 	@FXML

@@ -381,7 +381,6 @@ public class CalculateMap {
 
 		String id = "";
 		// parse coordinates to ID
-		// warnings are false and need to be ignored
 		if ((x < 0) && (y < 0) && (z >= 0)) {
 			id = "xM" + x * (-1) + "yM" + y * (-1) + "z" + z;
 		} else if ((x < 0) && (y >= 0) && (z < 0)) {
