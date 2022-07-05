@@ -1,21 +1,21 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
-import de.uniks.pioneers.model.Building;
-import de.uniks.pioneers.model.Map;
-import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.Tile;
+import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -24,8 +24,9 @@ import javafx.scene.shape.Polygon;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameFieldSubController implements Controller {
@@ -128,23 +129,9 @@ public class GameFieldSubController implements Controller {
 
 		for (Tile tile : map.tiles()) {
 
-			int x = (int) tile.x();
-			int y = (int) tile.y();
-			int z = (int) tile.z();
-			String stringX = "x" + x;
-			String stringY = "y" + y;
-			String stringZ = "z" + z;
-			if (x < 0) {
-				stringX = "xM" + Math.abs(x);
-			}
-			if (y < 0) {
-				stringY = "yM" + Math.abs(y);
-			}
-			if (z < 0) {
-				stringZ = "zM" + Math.abs(z);
-			}
-			for (Node node: hexagons) {
-				if (node.getId().equals(stringX+stringY+stringZ)) {
+			String id = parseId((Integer) tile.x(), (Integer) tile.y(), (Integer) tile.z());
+			for (Node node : hexagons) {
+				if (node.getId().equals(id)) {
 					HexSubController hexSubController = new HexSubController((Polygon) node, tile,
 							this.gameStorage.getId(), this.idStorage.getID(), this.pioneersService, this.userService);
 					hexSubController.init();
@@ -153,7 +140,7 @@ public class GameFieldSubController implements Controller {
 			}
 
 			// Set number token on tiles
-			Label label = (Label) parent.lookup("#" + stringX + stringY + stringZ + "_label");
+			Label label = (Label) parent.lookup("#" + id + "_label");
 			if (label != null) {
 				label.setText("" + tile.numberToken());
 
@@ -162,6 +149,9 @@ public class GameFieldSubController implements Controller {
 				}
 			}
 		}
+
+		loadHarbors(map);
+
 		List<Node> circles = new ArrayList<>();
 		circles.addAll(roadCircles);
 		circles.addAll(buildingCircles);
@@ -183,6 +173,96 @@ public class GameFieldSubController implements Controller {
 						idStorage, eventListener, buildingCircles, this);
 				circleSubController.init();
 				this.circleSubControllers.add(circleSubController);
+			}
+		}
+	}
+
+	private void loadHarbors(Map map) {
+		for (Harbor harbor : map.harbors()) {
+			String id = "";
+
+			switch ((int) harbor.side()) {
+				case 1 -> {
+					id = parseId((Integer) harbor.x() + 1, (Integer) harbor.y(), (Integer) harbor.z() - 1);
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_0_HarbourRoad") || harborRoad.getId().equals(id + "_2_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 3 -> {
+					id = parseId((Integer) harbor.x() + 1, (Integer) harbor.y() - 1, (Integer) harbor.z());
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_2_HarbourRoad") || harborRoad.getId().equals(id + "_4_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 5 -> {
+					id = parseId((Integer) harbor.x(), (Integer) harbor.y() - 1, (Integer) harbor.z() + 1);
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_4_HarbourRoad") || harborRoad.getId().equals(id + "_6_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 7 -> {
+					id = parseId((Integer) harbor.x() - 1, (Integer) harbor.y(), (Integer) harbor.z() + 1);
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_6_HarbourRoad") || harborRoad.getId().equals(id + "_8_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 9 -> {
+					id = parseId((Integer) harbor.x() - 1, (Integer) harbor.y() + 1, (Integer) harbor.z());
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_8_HarbourRoad") || harborRoad.getId().equals(id + "_10_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+				case 11 -> {
+					id = parseId((Integer) harbor.x(), (Integer) harbor.y() + 1, (Integer) harbor.z() - 1);
+					for (Node harborRoad : harbourRoads) {
+						if (harborRoad.getId().equals(id + "_10_HarbourRoad") || harborRoad.getId().equals(id + "_0_HarbourRoad")) {
+							harborRoad.setVisible(true);
+						}
+					}
+				}
+			}
+
+			if (!id.equals("")) {
+
+				ImageView imageView = (ImageView) parent.lookup("#" + id + "_HarbourImage");
+				if (harbor.type() != null) {
+					switch (harbor.type()) {
+						case MOON_ROCK -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/moon_rock.png")).toString());
+							imageView.setImage(image);
+						}
+						case NEPTUNE_CRYSTAL -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/neptun_crystals.png")).toString());
+							imageView.setImage(image);
+						}
+						case MARS_BAR -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/mars_bar.png")).toString());
+							imageView.setImage(image);
+						}
+						case VENUS_GRAIN -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/venus_grain.png")).toString());
+							imageView.setImage(image);
+						}
+						case EARTH_CACTUS -> {
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/earth_cactus.png")).toString());
+							imageView.setImage(image);
+						}
+					}
+				} else {
+					Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/harbor.png")).toString());
+					imageView.setImage(image);
+				}
+				imageView.toFront();
 			}
 		}
 	}
@@ -214,5 +294,22 @@ public class GameFieldSubController implements Controller {
 
 	public ObservableList<Player> getPlayers() {
 		return players;
+	}
+
+	private String parseId(int x, int y, int z) {
+		String stringX = "x" + x;
+		String stringY = "y" + y;
+		String stringZ = "z" + z;
+		if (x < 0) {
+			stringX = "xM" + Math.abs(x);
+		}
+		if (y < 0) {
+			stringY = "yM" + Math.abs(y);
+		}
+		if (z < 0) {
+			stringZ = "zM" + Math.abs(z);
+		}
+
+		return stringX + stringY + stringZ;
 	}
 }
