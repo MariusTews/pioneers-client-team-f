@@ -2,10 +2,10 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -14,13 +14,10 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
+import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.*;
-import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -153,27 +150,28 @@ public class GameScreenController implements Controller {
                     memberService
                             .getAllGameMembers(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
-                            .subscribe( c ->{
-                                for (Member member:c){
-                                    if(member.spectator() && member.gameId().equals(this.gameStorage.getId())){
+                            .subscribe(c -> {
+                                for (Member member : c) {
+                                    if (member.spectator() && member.gameId().equals(this.gameStorage.getId())) {
                                         this.spectatorMember.add(member);
                                     }
                                 }
                                 //Added to prevent 403 error
-                                for (Member m: c){
-                                    if(!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
-                                            m.userId().equals(this.idStorage.getID())){
+                                for (Member m : c) {
+                                    if (!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
+                                            m.userId().equals(this.idStorage.getID())) {
                                         //get access to it
 
-                                    // Check if expected move is founding-roll after joining the game
+                                        // Check if expected move is founding-roll after joining the game
                                         pioneersService
-                                            .findOneState(gameStorage.getId())
+                                                .findOneState(gameStorage.getId())
                                                 .observeOn(FX_SCHEDULER)
-                                                    .subscribe(r -> {
-                                                        if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                                                foundingDiceRoll();
-                                                        }});
-                                                        break;
+                                                .subscribe(r -> {
+                                                    if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                                        foundingDiceRoll();
+                                                    }
+                                                });
+                                        break;
                                     }
                                 }
                                 this.members.setAll(c);
@@ -295,13 +293,13 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSpectator(Member member) {
-        for(User user: allUser){
-            if(member.userId().equals(user._id())){
+        for (User user : allUser) {
+            if (member.userId().equals(user._id())) {
                 this.spectatorViewController = new SpectatorViewController(user);
                 break;
             }
         }
-        return  spectatorViewController.render();
+        return spectatorViewController.render();
     }
 
     private Node renderSingleUser(Player player) {
@@ -344,7 +342,7 @@ public class GameScreenController implements Controller {
                     opponents.set(opponents.indexOf(p), player);
                 }
             }
-            winnerScreen(playerOwnView,opponents);
+            winnerScreen(playerOwnView, opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
             if (!player.userId().equals(idStorage.getID())) {
                 this.opponents.add(player);
@@ -360,15 +358,15 @@ public class GameScreenController implements Controller {
         // If winner screen appears during rob move - change cursor back to default
         this.mapPane.getScene().setCursor(Cursor.DEFAULT);
         HashMap<String, List<String>> userNumberPoints = new HashMap<>();
-       //This saves username and their respective points from game in hashmap
-        for (User user:this.allUser) {
+        //This saves username and their respective points from game in hashmap
+        for (User user : this.allUser) {
             save(playerOwnView, userNumberPoints, user);
 
             save(opponents, userNumberPoints, user);
         }
 
-        for (List<String> s: userNumberPoints.values()) {
-            if(s.contains("10")) {
+        for (List<String> s : userNumberPoints.values()) {
+            if (s.contains("10")) {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                         , gameStorage, idStorage, gameService, app, lobbyController);
                 winnerController.render();
@@ -377,12 +375,12 @@ public class GameScreenController implements Controller {
     }
 
     private void save(ObservableList<Player> playerList, HashMap<String, List<String>> userNumberPoints, User user) {
-        for (Player p: playerList) {
-            if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
+        for (Player p : playerList) {
+            if (p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())) {
                 List<String> ls = new ArrayList<>();
                 ls.add(p.color());
                 ls.add(p.victoryPoints().toString());
-                userNumberPoints.put(user.name(),ls);
+                userNumberPoints.put(user.name(), ls);
             }
         }
     }
@@ -424,7 +422,7 @@ public class GameScreenController implements Controller {
             //  remove the image from cursor, when leaving the game or when placing robber
             if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID())) {
                 Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/robber.png")).toString());
-                currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth()/2, image.getHeight()/2));
+                currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
             } else {
                 currentPlayerLabel.getScene().setCursor(Cursor.DEFAULT);
             }
@@ -519,15 +517,15 @@ public class GameScreenController implements Controller {
     //update GameStatus when leaving game
     public void onLeave() {
         boolean changeToPlayer = false;
-        for (Member m: spectatorMember) {
-            if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())){
+        for (Member m : spectatorMember) {
+            if (m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())) {
                 this.app.show(lobbyController.get());
                 changeToPlayer = true;
                 break;
             }
         }
         //this distinguishes between player and spectator
-        if(!changeToPlayer){
+        if (!changeToPlayer) {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false)
                     .observeOn(FX_SCHEDULER).subscribe(onSuccess -> this.app.show(lobbyController.get()));
         }

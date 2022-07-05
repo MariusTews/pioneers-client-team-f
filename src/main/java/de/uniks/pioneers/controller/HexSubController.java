@@ -16,7 +16,10 @@ import javafx.scene.shape.Polygon;
 import javafx.stage.StageStyle;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -110,9 +113,9 @@ public class HexSubController implements Controller {
                                 } else if (move.robber() != null && move.robber().equals(tileCoordinates)) {
                                     // Show alert if not the current player clicked while "rob" action
                                     Alert alert = new Alert(Alert.AlertType.INFORMATION, """
-                                You are not able\s
-                                to place the robber\s
-                                on the same tile again!""");
+                                            You are not able\s
+                                            to place the robber\s
+                                            on the same tile again!""");
                                     // set style
                                     alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
                                             .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
@@ -175,7 +178,7 @@ public class HexSubController implements Controller {
             return owners.iterator().next();
         }
         // Pop up with selection of the player's names, remove cancel button
-        ChoiceDialog choosingTarget = new ChoiceDialog(this.userHash.keySet().iterator().next(), this.userHash.keySet());
+        ChoiceDialog<String> choosingTarget = new ChoiceDialog<>(this.userHash.keySet().iterator().next(), this.userHash.keySet());
         choosingTarget.getDialogPane().lookupButton(ButtonType.CANCEL).setVisible(false);
         // set stylesheet
         choosingTarget.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
@@ -185,7 +188,7 @@ public class HexSubController implements Controller {
         choosingTarget.initStyle(StageStyle.UNDECORATED);
         // Get the chosen target and make a server request with this target
         choosingTarget.showAndWait();
-        return this.userHash.get((String) choosingTarget.getSelectedItem());
+        return this.userHash.get(choosingTarget.getSelectedItem());
     }
 
     private void setPolygonColor() {
