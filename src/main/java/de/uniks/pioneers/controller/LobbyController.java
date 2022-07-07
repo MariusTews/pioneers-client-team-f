@@ -176,7 +176,9 @@ public class LobbyController implements Controller {
                 .subscribe(this::handleAllTabMessages));
 
         //refreshed Token and runs for three hour
-        beepForThreeHour();
+        if(this.gameStorage.getId() == null) {
+            beepForAHour();
+        }
 
     }
 
@@ -191,8 +193,8 @@ public class LobbyController implements Controller {
         disposable.dispose();
     }
 
-    //call refresh Token every 30 minutes to refreshToken and ActiveToken
-    public void beepForThreeHour() {
+    //call this method every 30 minutes to refresh refreshToken and ActiveToken
+    public void beepForAHour() {
         String refreshToken = this.refreshTokenStorage.getRefreshToken();
         final Runnable beeper = new Runnable() {
             public void run() {
@@ -204,7 +206,7 @@ public class LobbyController implements Controller {
                 scheduler.scheduleAtFixedRate(beeper, 10, 30*60, SECONDS);
         scheduler.schedule(new Runnable() {
             public void run() { beeperHandle.cancel(true); }
-        }, 180 * 60, SECONDS);
+        }, 30 * 60, SECONDS);
     }
 
 
