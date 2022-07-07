@@ -5,7 +5,11 @@ import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
+import javafx.event.Event;
+import javafx.event.EventType;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -154,9 +158,13 @@ class GameScreenControllerTest extends ApplicationTest {
 
 
     @Test
-    void finishTurn() {
-        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(Observable.empty());
-        clickOn("#finishTurnButton");
+    void finishTurn()  {
+        when(gameStorage.getId()).thenReturn("02");
+        when(pioneersService.move("02", "build", null, null, null, null, null, null, null)).thenReturn(Observable.empty());
+        for (int i = 0; i<17; i++){
+            type(KeyCode.TAB);
+        }
+        type(KeyCode.SPACE);
         verify(pioneersService).move("02", "build", null, null, null, null, null, null, null);
     }
 
