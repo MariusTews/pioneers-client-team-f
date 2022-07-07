@@ -6,8 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox id="opponentView" fx:id="singleOpponentView" alignment="TOP_CENTER" prefHeight="130.0" prefWidth="216.0"
-      spacing="10.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.OpponentSubController">
+<VBox id="opponentView" fx:id="singleOpponentView" alignment="CENTER" prefHeight="130.0" prefWidth="230.0" spacing="10.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.OpponentSubController">
    <HBox alignment="CENTER" prefHeight="61.0" prefWidth="216.0" spacing="16.0">
       <ImageView fx:id="avatarImageView" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
       <VBox alignment="CENTER" prefHeight="62.0" prefWidth="144.0" spacing="8.0">
@@ -31,7 +30,4 @@
       <VBox.margin>
          <Insets bottom="5.0" />
       </VBox.margin></Label>
-   <padding>
-      <Insets top="10.0" />
-   </padding>
 </VBox>
