@@ -312,4 +312,18 @@ public class GameFieldSubController implements Controller {
 
 		return stringX + stringY + stringZ;
 	}
+
+	public void zoomIn() {
+		if (this.parent.getScaleX() < 2.0) {
+			this.parent.setScaleX(this.parent.getScaleX() + 0.1);
+			this.parent.setScaleY(this.parent.getScaleY() + 0.1);
+		}
+	}
+
+	public void zoomOut() {
+		if (this.parent.getScaleX() > 0.5) {
+			this.parent.setScaleX(this.parent.getScaleX() - 0.1);
+			this.parent.setScaleY(this.parent.getScaleY() - 0.1);
+		}
+	}
 }
