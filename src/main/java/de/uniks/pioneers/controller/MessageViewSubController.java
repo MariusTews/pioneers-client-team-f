@@ -1,7 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
@@ -9,7 +9,6 @@ import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -29,6 +28,7 @@ import java.util.HashMap;
 import static de.uniks.pioneers.Constants.*;
 
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class MessageViewSubController implements Controller {
 
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
@@ -154,7 +154,7 @@ public class MessageViewSubController implements Controller {
         return parent;
     }
 
-    public void send(ActionEvent ignoredEvent) {
+    public void send() {
         this.checkMessageField();
     }
 

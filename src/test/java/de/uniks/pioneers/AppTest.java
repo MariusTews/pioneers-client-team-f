@@ -10,7 +10,7 @@ public class AppTest extends ApplicationTest {
 
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         final App app = new App(null);
         MainComponent testComponent = DaggerTestComponent.builder().mainapp(app).build();
 

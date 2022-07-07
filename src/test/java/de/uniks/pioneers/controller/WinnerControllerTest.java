@@ -37,7 +37,7 @@ public class WinnerControllerTest extends ApplicationTest {
 
     List<String> pointsAndValues;
 
-    HashMap<String, List<String>> userNamePAndV = new HashMap<>();
+   final HashMap<String, List<String>> userNamePAndV = new HashMap<>();
 
 
 
@@ -61,12 +61,12 @@ public class WinnerControllerTest extends ApplicationTest {
     @Test
     public void testParameters(){
         Label winnerTitel = lookup("#winnerTitel").query();
-        Assertions.assertThat(winnerTitel.getText().equals("Winner"));
+        Assertions.assertThat(winnerTitel.getText()).isEqualTo("Winner");
 
         Label loserTitel = lookup("#loserTitel").query();
-        Assertions.assertThat(loserTitel.getText().equals("Loser"));
+        Assertions.assertThat(loserTitel.getText()).isEqualTo("Loser");
 
-        Assertions.assertThat(!userNamePAndV.isEmpty());
+        Assertions.assertThat(!userNamePAndV.isEmpty()).isTrue();
     }
 
 }

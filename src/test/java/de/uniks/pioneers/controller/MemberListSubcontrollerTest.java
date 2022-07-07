@@ -17,13 +17,9 @@ class MemberListSubcontrollerTest extends ApplicationTest {
     @InjectMocks
     MemberListSubcontroller memberListSubcontroller;
 
-    private Stage stage;
-    private App app;
-
     public void start(Stage stage) {
-        this.stage = stage;
-        this.app = new App(memberListSubcontroller);
-        this.app.start(stage);
+        App app = new App(memberListSubcontroller);
+        app.start(stage);
     }
 
     @Test

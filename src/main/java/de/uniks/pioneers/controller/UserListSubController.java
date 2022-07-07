@@ -1,6 +1,6 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
+
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
@@ -36,7 +36,7 @@ public class UserListSubController implements Controller {
     private String id;
 
     @Inject
-    public UserListSubController(App app, LobbyController lobbyController, User user, IDStorage idStorage) {
+    public UserListSubController(LobbyController lobbyController, User user, IDStorage idStorage) {
 
         this.lobbyController = lobbyController;
         this.user = user;

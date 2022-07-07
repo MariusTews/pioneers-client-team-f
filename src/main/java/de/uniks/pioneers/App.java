@@ -24,8 +24,6 @@ public class App extends Application {
     public App(){
         final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
         controller = mainComponent.loginController();
-        //TODO: remove
-        //controller = mainComponent.gameScreenController();
     }
 
     public App(Controller controller){
@@ -67,6 +65,7 @@ public class App extends Application {
         stage.getIcons().add(image);
     }
 
+    @SuppressWarnings("unused")
     private void setTaskbarIcon() {
         if (GraphicsEnvironment.isHeadless()) {
             return;
@@ -98,8 +97,8 @@ public class App extends Application {
             stage.setWidth(900);
             stage.setHeight(600);
         }else if(controller.getClass().equals(GameLobbyController.class)){
-            stage.setWidth(1050);
-            stage.setHeight(510);
+            stage.setWidth(1010);
+            stage.setHeight(600);
         }
     }
 

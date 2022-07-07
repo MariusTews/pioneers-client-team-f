@@ -27,6 +27,6 @@ public class SpectatorViewControllerTest extends ApplicationTest {
     @Test
     public void testParameters(){
         Label userNameLabel = lookup("#spectatorNameId").query();
-        Assertions.assertThat(userNameLabel.getText().equals("Tia"));
+        Assertions.assertThat(userNameLabel.getText()).isEqualTo("Tia");
     }
 }

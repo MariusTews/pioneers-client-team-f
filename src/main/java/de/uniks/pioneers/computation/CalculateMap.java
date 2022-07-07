@@ -38,7 +38,7 @@ public class CalculateMap {
 
 	private void buildCircle(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, int side) {
 		//creates a Circle at the given coordinate
-		Circle circle = new Circle(10);
+		Circle circle = new Circle(15);
 		String id = createId(x, y, z) + "_" + side;
 		circle.setId(id);
 		pane.getChildren().add(circle);
@@ -52,26 +52,30 @@ public class CalculateMap {
 		ImageView imageView = new ImageView();
 		imageView.setFitHeight(40);
 		imageView.setFitWidth(40);
+		String id;
 		if (Harbour) {
-			String id = createId(x, y, z) + "_HarbourImage";
-			imageView.setId(id);
+			id = createId(x, y, z) + "_HarbourImage";
+			imageView.setLayoutX(xCoordinate - 30);
+			imageView.setLayoutY(yCoordinate - 30);
+			imageView.setFitHeight(60);
+			imageView.setFitWidth(60);
 		} else {
-			String id = createId(x, y, z) + "_RobberImage";
-			imageView.setId(id);
+			id = createId(x, y, z) + "_RobberImage";
+			imageView.setLayoutX(xCoordinate - 20);
+			imageView.setLayoutY(yCoordinate - 50);
 		}
+		imageView.setId(id);
 		pane.getChildren().add(imageView);
-		imageView.setLayoutX(xCoordinate - 20);
-		imageView.setLayoutY(yCoordinate - 20);
 	}
 
 	private void buildRoad(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, double rotation, boolean harbour) {
 		//creates a road at the given coordinate
-		double roadPos1 = -15.0;
+		double roadPos1 = -20.0;
 		double roadPos2 = -5.0;
 		double roadPos3 = 5.0;
-		double roadPos4 = 15.0;
-		double roadPos5 = 20.0;
-		double roadPos6 = -20.0;
+		double roadPos4 = 20.0;
+		double roadPos5 = 25.0;
+		double roadPos6 = -25.0;
 		double roadPos7 = 0.0;
 
 		Polygon road = new Polygon(
@@ -99,6 +103,7 @@ public class CalculateMap {
 		// For easier Harbour placement Ids are corresponding to the harbour location id +1 and -1
 		// example harbour at pos 9 has roads 8 and 10 visible
 		if (harbour) {
+			road.setFill(Color.SILVER);
 			if (rotation == 0.0) {
 				String id = createId(x, y, z) + "_" + 6 + "_HarbourRoad";
 				road.setId(id);
@@ -238,7 +243,7 @@ public class CalculateMap {
 
 		//create a map with double the needed size
 		double mapSize = (paneBaseSize + paneVariableSize * size) * 2;
-		double center = 0.0;
+		double center;
 
 		//make small maps appear in the center of the scroll pane
 		if (mapSize < 1600) {
@@ -372,24 +377,23 @@ public class CalculateMap {
 		return center + (yOffset * z);
 	}
 
-	private String createId(int x, int y, int z) {
+	public static String createId(int x, int y, int z) {
 
 		String id = "";
 		// parse coordinates to ID
-		// warnings are false and need to be ignored
 		if ((x < 0) && (y < 0) && (z >= 0)) {
 			id = "xM" + x * (-1) + "yM" + y * (-1) + "z" + z;
 		} else if ((x < 0) && (y >= 0) && (z < 0)) {
 			id = "xM" + x * (-1) + "y" + y + "zM" + z * (-1);
 		} else if ((x >= 0) && (y < 0) && (z < 0)) {
 			id = "x" + x + "yM" + y * (-1) + "zM" + z * (-1);
-		} else if ((x < 0) && (y >= 0) && (z >= 0)) {
+		} else if (x < 0 && y >= 0) {
 			id = "xM" + x * (-1) + "y" + y + "z" + z;
-		} else if ((x >= 0) && (y < 0) && (z >= 0)) {
+		} else if (x >= 0 && y < 0) {
 			id = "x" + x + "yM" + y * (-1) + "z" + z;
-		} else if ((x >= 0) && (y >= 0) && (z < 0)) {
+		} else if (x >= 0 && z < 0) {
 			id = "x" + x + "y" + y + "zM" + z * (-1);
-		} else if ((x >= 0) && (y >= 0) && (z >= 0)) {
+		} else if (x >= 0) {
 			id = "x" + x + "y" + y + "z" + z;
 		}
 		return id;

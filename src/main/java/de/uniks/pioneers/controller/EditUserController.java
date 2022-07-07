@@ -6,7 +6,6 @@ import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -28,6 +27,7 @@ import java.util.Optional;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ALL")
 public class EditUserController implements Controller {
     private final Provider<LobbyController> lobbyController;
     private final Provider<LoginController> loginController;
@@ -84,6 +84,7 @@ public class EditUserController implements Controller {
 
     }
 
+
     @Override
     public Parent render() {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/EditUser.fxml"));
@@ -115,12 +116,12 @@ public class EditUserController implements Controller {
         return parent;
     }
 
-    public void cancelButtonPressed(ActionEvent event) {
+    public void cancelButtonPressed() {
         final LobbyController controller = lobbyController.get();
         this.app.show(controller);
     }
 
-    public void confirmButtonPressed(ActionEvent event) {
+    public void confirmButtonPressed() {
         updateAvatar();
 
         if (newUserNameTextField.getText().equals("") && passwordField.getText().equals("")) {
@@ -134,7 +135,8 @@ public class EditUserController implements Controller {
         }
     }
 
-    public void deleteButtonPressed(ActionEvent event) {
+
+    public void deleteButtonPressed() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         // Change style of alert
         DialogPane dialogPane = alert.getDialogPane();
@@ -144,7 +146,7 @@ public class EditUserController implements Controller {
         alert.getButtonTypes().set(0, ButtonType.YES);
         alert.getButtonTypes().set(1, ButtonType.NO);
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.YES){
+        if (result.isPresent() && result.get() == ButtonType.YES){
             userService.delete(idStorage.getID())
                     .observeOn(FX_SCHEDULER)
                     .subscribe(suc -> app.show(loginController.get()), error->{});
@@ -152,12 +154,15 @@ public class EditUserController implements Controller {
     }
 
 
+
     public String encodeFileToBase64Binary(File file) {
         String encodedFile = null;
         try {
-            FileInputStream fileInputStreamReader = new FileInputStream(file);
-            byte[] bytes = new byte[(int) file.length()];
-            fileInputStreamReader.read(bytes);
+            byte[] bytes;
+            try (FileInputStream fileInputStreamReader = new FileInputStream(file)) {
+                bytes = new byte[(int) file.length()];
+                fileInputStreamReader.read(bytes);
+            }
             encodedFile = Base64.getEncoder().encodeToString(bytes);
         } catch (IOException e) {
             e.printStackTrace();
@@ -165,6 +170,7 @@ public class EditUserController implements Controller {
 
         return "data:image/png;base64," + encodedFile;
     }
+
 
 
     public void updateAvatar() {
@@ -175,6 +181,7 @@ public class EditUserController implements Controller {
             avatar = encodeFileToBase64Binary(pictureFile);
         }
     }
+
 
     public void updateUser(String id, String name, String password, String repeatPassword, String avatar) {
         if (avatar != null) {
@@ -227,7 +234,7 @@ public class EditUserController implements Controller {
                 .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
     }
 
-    public void editPicture(ActionEvent event) {
+    public void editPicture() {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText("what you want to do \nwith your picture?");

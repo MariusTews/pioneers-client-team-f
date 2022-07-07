@@ -5,7 +5,6 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.service.GameService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -29,13 +28,14 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class WinnerController implements Controller {
     public Label winnerTitel;
     public Label winnerName;
     public Label loserTitel;
     public VBox loserBoxId;
 
-    private HashMap<String, List<String>> userNumberPoints ;
+    private final HashMap<String, List<String>> userNumberPoints ;
 
     private final GameStorage gameStorage;
 
@@ -45,7 +45,7 @@ public class WinnerController implements Controller {
     private final Window owner;
     private Stage primaryStage;
 
-    private App app;
+    private final App app;
 
     private final Provider<LobbyController> lobbyController;
 
@@ -123,7 +123,7 @@ public class WinnerController implements Controller {
     }
 
     //this close the winner screen and the whole game Screen
-    public void onClickCloseGame(ActionEvent event) {
+    public void onClickCloseGame() {
         gameService.findOneGame(this.gameStorage.getId()).observeOn(FX_SCHEDULER).
                 doOnError(e->{
                     this.gameStorage.setId(null);

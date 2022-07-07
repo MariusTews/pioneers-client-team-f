@@ -58,3 +58,7 @@
     -fx-background-radius: 30;
     -fx-border-radius: 30;
 }
+#gameSettings {
+    -fx-font-size: 30;
+    -fx-text-fill: #cc0000;
+}

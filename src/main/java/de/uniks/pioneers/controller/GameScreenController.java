@@ -2,25 +2,26 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -31,10 +32,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.UPDATED;
+import static de.uniks.pioneers.computation.CalculateMap.createId;
 
+
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameScreenController implements Controller {
 
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
@@ -67,12 +71,9 @@ public class GameScreenController implements Controller {
     @FXML
     public Label timerLabel;
     @FXML
-    public HBox spectatorView;
-    @FXML
     public Button leave;
     @FXML
-
-    //specatator pane
+    //spectator pane
     public Pane spectatorPaneId;
 
     public Pane userViewPane;
@@ -80,10 +81,8 @@ public class GameScreenController implements Controller {
     public Pane tradingPane;
 
     private final App app;
-
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
-
 
     private String lastBuildingPosition;
 
@@ -108,8 +107,7 @@ public class GameScreenController implements Controller {
     private final HashMap<String, User> userHash = new HashMap<>();
     private final Timeline timeline = new Timeline();
     private boolean runDiscardOnce = true;
-
-    private WinnerController winnerController;
+    private Point3D currentRobPlace;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -154,17 +152,16 @@ public class GameScreenController implements Controller {
                     memberService
                             .getAllGameMembers(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
-                            .subscribe( c ->{
-                                for (Member member:c){
-                                    if(member.spectator() && member.gameId().equals(this.gameStorage.getId())){
+                            .subscribe(c -> {
+                                for (Member member : c) {
+                                    if (member.spectator() && member.gameId().equals(this.gameStorage.getId())) {
                                         this.spectatorMember.add(member);
                                     }
                                 }
-                                //this needs to be hier
-                                //otherwise spectator throws 403 error
-                                for (Member m: c){
-                                    if(!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
-                                            m.userId().equals(this.idStorage.getID())){
+                                //Added to prevent 403 error
+                                for (Member m : c) {
+                                    if (!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
+                                            m.userId().equals(this.idStorage.getID())) {
                                         //get access to it
 
                     // Check if expected move is founding-roll after joining the game
@@ -181,7 +178,6 @@ public class GameScreenController implements Controller {
                                         break;
                                     }
                                 }
-
                                 this.members.setAll(c);
                             });
 
@@ -197,7 +193,7 @@ public class GameScreenController implements Controller {
                             .subscribe(c -> {
                                 for (Member member : this.members) {
                                     for (Player player : c) {
-                                        //this checks if the player is oppenent or spectator or yourself
+                                        //this checks if the player is opponent or spectator or yourself
                                         if (!player.userId().equals(idStorage.getID()) && member.userId()
                                                 .equals(player.userId())) {
                                             opponents.add(player);
@@ -228,12 +224,11 @@ public class GameScreenController implements Controller {
                 .subscribe(this::handleBuildingEvents));
 
 
-        // Initialize sub controller for ingame chat, add listener and load all messages
+        // Initialize sub controller for inGame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
     }
-
 
     @Override
     public void destroy() {
@@ -269,8 +264,7 @@ public class GameScreenController implements Controller {
             }
         });
 
-
-        this.gameFieldSubController = new GameFieldSubController(app, gameStorage, pioneersService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(gameStorage, pioneersService, userService, idStorage, eventListener);
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
 
@@ -303,13 +297,13 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSpectator(Member member) {
-        for(User user: allUser){
-            if(member.userId().equals(user._id())){
+        for (User user : allUser) {
+            if (member.userId().equals(user._id())) {
                 this.spectatorViewController = new SpectatorViewController(user);
                 break;
             }
         }
-        return  spectatorViewController.render();
+        return spectatorViewController.render();
     }
 
     private Node renderSingleUser(Player player) {
@@ -352,7 +346,7 @@ public class GameScreenController implements Controller {
                     opponents.set(opponents.indexOf(p), player);
                 }
             }
-            winnerScreen(playerOwnView,opponents);
+            winnerScreen(playerOwnView, opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
             if (!player.userId().equals(idStorage.getID())) {
                 this.opponents.add(player);
@@ -365,33 +359,32 @@ public class GameScreenController implements Controller {
     }
 
     private void winnerScreen(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
+        // If winner screen appears during rob move - change cursor back to default
+        this.mapPane.getScene().setCursor(Cursor.DEFAULT);
         HashMap<String, List<String>> userNumberPoints = new HashMap<>();
-       //This saves username and their respective points from game in hashmap
-        for (User user:this.allUser) {
-            for (Player p: playerOwnView) {
-                if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
-                    List<String> ls = new ArrayList<>();
-                    ls.add(p.color());
-                    ls.add(p.victoryPoints().toString());
-                    userNumberPoints.put(user.name(),ls);
-                }
-            }
+        //This saves username and their respective points from game in hashmap
+        for (User user : this.allUser) {
+            save(playerOwnView, userNumberPoints, user);
 
-            for (Player p: opponents) {
-                if(p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())){
-                    List<String> ls = new ArrayList<>();
-                    ls.add(p.color());
-                    ls.add(p.victoryPoints().toString());
-                    userNumberPoints.put(user.name(),ls);
-                }
-            }
+            save(opponents, userNumberPoints, user);
         }
 
-        for (List<String> s: userNumberPoints.values()) {
-            if(s.contains("10")) {
-                winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
-                , gameStorage, idStorage,gameService,app,lobbyController);
+        for (List<String> s : userNumberPoints.values()) {
+            if (s.contains("10")) {
+                WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
+                        , gameStorage, idStorage, gameService, app, lobbyController);
                 winnerController.render();
+            }
+        }
+    }
+
+    private void save(ObservableList<Player> playerList, HashMap<String, List<String>> userNumberPoints, User user) {
+        for (Player p : playerList) {
+            if (p.userId().equals(user._id()) && p.gameId().equals(this.gameStorage.getId())) {
+                List<String> ls = new ArrayList<>();
+                ls.add(p.color());
+                ls.add(p.victoryPoints().toString());
+                userNumberPoints.put(user.name(), ls);
             }
         }
     }
@@ -428,7 +421,39 @@ public class GameScreenController implements Controller {
             if (!currentMove.equals(DROP_ACTION)) {
                 runDiscardOnce = true;
             }
+
+            // change the cursor when action is "rob" instead of alert (or notification),
+            //  remove the image from cursor, when leaving the game or when placing robber
+            if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID())) {
+                Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/robber.png")).toString());
+                currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
+            } else {
+                currentPlayerLabel.getScene().setCursor(Cursor.DEFAULT);
+            }
+
+            if (state.robber() != null && !state.robber().equals(currentRobPlace)) {
+                // update the view and place the robber on new tile
+                this.updateRobView(state.robber());
+            }
         }
+    }
+
+    // update view when robber was set
+    private void updateRobView(Point3D newCoordinates) {
+        Scene scene = this.mapPane.getScene();
+        // find fx:id of the existing ImageView by already available method: first delete image from old tile
+        if (currentRobPlace != null) {
+            ImageView oldRobImageView = (ImageView) scene.lookup("#" +
+                    createId(currentRobPlace.x().intValue(), currentRobPlace.y().intValue(), currentRobPlace.z().intValue()) + "_RobberImage");
+            oldRobImageView.setImage(null);
+        }
+        // set image of robber on new tile
+        ImageView robImageView = (ImageView) scene.lookup("#" +
+                createId(newCoordinates.x().intValue(), newCoordinates.y().intValue(), newCoordinates.z().intValue()) + "_RobberImage");
+        robImageView.setImage(new Image(Objects.requireNonNull(Main.class
+                .getResource("view/assets/robber.png")).toString()));
+
+        currentRobPlace = newCoordinates;
     }
 
     private void handleBuildingEvents(Event<Building> buildingEvent) {
@@ -466,7 +491,6 @@ public class GameScreenController implements Controller {
             }
         }
 
-
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
                 this.calculateVP(player));
         opponentSubCons.add(opponentCon);
@@ -477,7 +501,7 @@ public class GameScreenController implements Controller {
         diceRoll();
     }
 
-    // diceRoll if the current move is roll
+    // diceRoll if the current move is "roll"
     public void diceRoll() {
         if (nextMoveLabel.getText().equals("roll")) {
             pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement", null, null)
@@ -495,41 +519,31 @@ public class GameScreenController implements Controller {
     }
 
     //update GameStatus when leaving game
-    public void onLeave(ActionEvent ignoredEvent) {
+    public void onLeave() {
         boolean changeToPlayer = false;
-        for (Member m: spectatorMember) {
-            if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())){
+        for (Member m : spectatorMember) {
+            if (m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())) {
                 this.app.show(lobbyController.get());
                 changeToPlayer = true;
                 break;
             }
         }
-        //this distinguish between player and spectator
-        if(!changeToPlayer){
+        //this distinguishes between player and spectator
+        if (!changeToPlayer) {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false)
-                    .observeOn(FX_SCHEDULER).subscribe(onSuccess -> {
-                        this.app.show(lobbyController.get());
-                    });
+                    .observeOn(FX_SCHEDULER).subscribe(onSuccess -> this.app.show(lobbyController.get()));
         }
 
+        // If player leaves during rob move - change cursor back to default
+        this.mapPane.getScene().setCursor(Cursor.DEFAULT);
     }
 
     public void finishTurn() {
-        // TODO: just temporary till rob is implemented
-        if (nextMoveLabel.getText().equals(ROB_ACTION)) {
-            pioneersService.move(gameStorage.getId(), ROB_ACTION, 1, 1, 1, null, null, null, null)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                    }, onError -> {
-                    });
-
-        } else {
-            pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null, null, null)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                    }, onError -> {
-                    });
-        }
+        pioneersService.move(gameStorage.getId(), "build", null, null, null, null, null, null, null)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> {
+                }, onError -> {
+                });
     }
 
     private void startTime() {
@@ -648,36 +662,36 @@ public class GameScreenController implements Controller {
         for (Tile tile : map.tiles()) {
             allTileCoordinates.add("x" + tile.x().toString() + "y" + tile.y() + "z" + tile.z());
         }
-        //top right fixed watertile it always appears in any map size
+        //top right fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + (gameFieldSize + 1) + "y" + 0 + "z" + ((gameFieldSize + 1) * (-1)));
         for (int i = 1; i <= gameFieldSize; i++) {
-            //top right watertile side
+            //top right waterTile side
             allWaterTileCoordinates.add("x" + (gameFieldSize + 1) + "y" + (-i) + "z" + ((gameFieldSize + 1) * (-1) + i));
-            //top watertile side
+            //top waterTile side
             allWaterTileCoordinates.add("x" + (gameFieldSize + 1 - i) + "y" + i + "z" + ((gameFieldSize + 1) * (-1)));
         }
-        //top left fixed watertile it always appears in any map size
+        //top left fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + 0 + "y" + (gameFieldSize + 1) + "z" + ((gameFieldSize + 1) * (-1)));
         for (int i = 1; i <= gameFieldSize; i++) {
             //top left water side
             allWaterTileCoordinates.add("x" + (-i) + "y" + (gameFieldSize + 1) + "z" + ((gameFieldSize + 1) * (-1) + i));
         }
-        //far left fixed watertile it always appears in any map size
+        //far left fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + (gameFieldSize + 1) + "z" + 0);
         for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom left watertile side
+            //bottom left waterTile side
             allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + (gameFieldSize + 1 - i) + "z" + i);
         }
-        //bottom left fixed watertile it always appears in any map size
+        //bottom left fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + 0 + "z" + (gameFieldSize + 1));
         for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom watertile side
+            //bottom waterTile side
             allWaterTileCoordinates.add("x" + ((gameFieldSize + 1 - i) * (-1)) + "y" + (-i) + "z" + (gameFieldSize + 1));
         }
-        //bottom right fixed watertile it always appears in any map size
+        //bottom right fixed waterTile it always appears in any map size
         allWaterTileCoordinates.add("x" + 0 + "y" + ((gameFieldSize + 1) * (-1)) + "z" + (gameFieldSize + 1));
         for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom right watertile side
+            //bottom right waterTile side
             allWaterTileCoordinates.add("x" + i + "y" + ((gameFieldSize + 1) * (-1)) + "z" + (gameFieldSize + 1 - i));
         }
 

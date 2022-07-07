@@ -38,7 +38,7 @@ public class MemberServiceTest {
 	void join() {
 		when(gameMembersApiService.create(any(), any())).thenReturn(Observable.just(new Member("0:30",
 				"15:50", "01", "02", false, "#000000", false)));
-		Member member = memberService.join("testUser", "testGame", "testPassword").blockingFirst();
+		Member member = memberService.join("testGame", "testPassword").blockingFirst();
 		assertEquals("Member[createdAt=0:30, updatedAt=15:50, gameId=01, userId=02, ready=false, color=#000000, spectator=false]", member.toString());
 		assertEquals("01", gameStorage.getId());
 		assertEquals("02", memberIDStorage.getId());

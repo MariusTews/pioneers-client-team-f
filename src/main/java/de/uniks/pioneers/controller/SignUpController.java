@@ -2,7 +2,6 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -18,6 +17,7 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class SignUpController implements Controller {
     @FXML
     public TextField usernameTextField;
@@ -33,18 +33,15 @@ public class SignUpController implements Controller {
     public Button backButton;
     private final App app;
     private final Provider<LoginController> loginController;
-    private final AuthService authService;
     private final UserService userService;
 
 
     @Inject
     public SignUpController(App app,
                             Provider<LoginController> loginController,
-                            AuthService authService,
                             UserService userService) {
         this.app = app;
         this.loginController = loginController;
-        this.authService = authService;
         this.userService = userService;
     }
 

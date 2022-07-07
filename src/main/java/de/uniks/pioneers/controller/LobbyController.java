@@ -2,7 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
@@ -11,7 +11,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -38,6 +37,7 @@ import java.util.concurrent.ScheduledFuture;
 import static de.uniks.pioneers.Constants.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class LobbyController implements Controller {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
@@ -159,9 +159,7 @@ public class LobbyController implements Controller {
 
         if(this.gameStorage.getId() != null) {
             memberService.getAllGameMembers(this.gameStorage.getId())
-                    .observeOn(FX_SCHEDULER).subscribe(c -> {
-                        this.members.setAll(c);
-                    });
+                    .observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
         }
         gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
@@ -281,12 +279,12 @@ public class LobbyController implements Controller {
         }
     }
 
-    public void rulesButtonPressed(ActionEvent ignoredEvent) {
+    public void rulesButtonPressed() {
         final RulesScreenController controller = rulesScreenController.get();
         app.show(controller);
     }
 
-    public void logoutButtonPressed(ActionEvent ignoredEvent) {
+    public void logoutButtonPressed() {
         logout();
     }
 
@@ -300,16 +298,16 @@ public class LobbyController implements Controller {
                 });
     }
 
-    public void sendButtonPressed(ActionEvent ignoredEvent) {
+    public void sendButtonPressed() {
         checkMessageField();
     }
 
-    public void editButtonPressed(ActionEvent ignoredEvent) {
+    public void editButtonPressed() {
         final EditUserController controller = editUserController.get();
         app.show(controller);
     }
 
-    public void createGameButtonPressed(ActionEvent ignoredEvent) {
+    public void createGameButtonPressed() {
         //makes sure if user in game or not , and depending on that
         //allows user to create the game
         if (this.gameStorage.getId() != null) {
@@ -362,10 +360,6 @@ public class LobbyController implements Controller {
 
     private Node renderUser(User user) {
         if (user._id().equals(this.idStorage.getID())) {
-            if (user.avatar() != null) {
-                this.ownAvatar = user.avatar();
-            }
-            this.ownUsername = user.name();
             this.userWelcomeLabel.setText(WELCOME + user.name() + "!");
         }
         for (UserListSubController subCon : this.userSubCons) {
@@ -373,7 +367,7 @@ public class LobbyController implements Controller {
                 return subCon.getParent();
             }
         }
-        UserListSubController userCon = new UserListSubController(this.app, this, user, idStorage);
+        UserListSubController userCon = new UserListSubController(this, user, idStorage);
         userSubCons.add(userCon);
         return userCon.render();
     }
@@ -534,9 +528,6 @@ public class LobbyController implements Controller {
 
         for (User user : users) {
             memberHash.put(user._id(), user);
-            if (user._id().equals(this.idStorage.getID())) {
-                this.ownUsername = user.name();
-            }
         }
 
         List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
@@ -678,7 +669,7 @@ public class LobbyController implements Controller {
         dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
                 .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         dialog.showAndWait()
-                .ifPresent(password -> this.memberService.join(idStorage.getID(), game._id(), password)
+                .ifPresent(password -> this.memberService.join(game._id(), password)
                         .observeOn(FX_SCHEDULER)
                         .doOnError(error -> {
                             if ("HTTP 403 ".equals(error.getMessage())) {

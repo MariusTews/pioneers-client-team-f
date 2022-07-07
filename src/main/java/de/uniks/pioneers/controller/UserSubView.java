@@ -22,6 +22,7 @@ import java.util.Map;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class UserSubView implements Controller {
 
     private final ArrayList<User> users = new ArrayList<>();
@@ -44,7 +45,6 @@ public class UserSubView implements Controller {
     public Pane settlementPane;
     public Pane roadPane;
     public Pane cityPane;
-    private Parent parent;
 
     @Inject
     public UserSubView(IDStorage idStorage, UserService userService, Player player,int victoryPoints, GameFieldSubController gameFieldSubController) {
@@ -68,7 +68,6 @@ public class UserSubView implements Controller {
     private void attachTOSubview() {
         for (User user : this.users) {
             if (player.userId().equals(this.idStorage.getID()) && user._id().equals(this.idStorage.getID())) {
-                //this.attachResources(player.resources());
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
                 this.victoryPoints.setText(vicPoints + "/10");
@@ -138,7 +137,7 @@ public class UserSubView implements Controller {
         }
     }
 
-    //name is set to namelabel and color aswell
+    //name is set to nameLabel and color as well
     //and attach picture
     private void attachName(String n, String color) {
         this.name.setText(n + " (YOU)");
@@ -161,7 +160,6 @@ public class UserSubView implements Controller {
             e.printStackTrace();
             return null;
         }
-        this.parent = parent;
         this.road.disableProperty().set(true);
         this.sett.disableProperty().set(true);
         this.city.disableProperty().set(true);
@@ -169,10 +167,6 @@ public class UserSubView implements Controller {
         Tooltip.install(this.roadPane, new Tooltip("1 Earth cactus, \n1 Mars bar "));
         Tooltip.install(this.settlementPane, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptun crystals, \n1 Venus grain "));
         Tooltip.install(this.cityPane, new Tooltip("3 Moon rock, \n2 Venus grain "));
-        return parent;
-    }
-
-    public Parent getParent() {
         return parent;
     }
 
