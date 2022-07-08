@@ -6,6 +6,7 @@ import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.service.UserService;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -42,6 +43,7 @@ public class GameFieldSubController implements Controller {
 	private final List<Node> hexagons = new ArrayList<>();
 
 	private final IDStorage idStorage;
+	private final UserService userService;
 
 	private Parent parent;
 	private final GameStorage gameStorage;
@@ -57,10 +59,12 @@ public class GameFieldSubController implements Controller {
 	@Inject
 	public GameFieldSubController(GameStorage gameStorage,
 								  PioneersService pioneersService,
+								  UserService userService,
 								  IDStorage idStorage,
 								  EventListener eventListener) {
 		this.gameStorage = gameStorage;
 		this.pioneersService = pioneersService;
+		this.userService = userService;
 		this.idStorage = idStorage;
 		this.eventListener = eventListener;
 	}
@@ -128,7 +132,8 @@ public class GameFieldSubController implements Controller {
 			String id = parseId((Integer) tile.x(), (Integer) tile.y(), (Integer) tile.z());
 			for (Node node : hexagons) {
 				if (node.getId().equals(id)) {
-					HexSubController hexSubController = new HexSubController((Polygon) node, tile);
+					HexSubController hexSubController = new HexSubController((Polygon) node, tile,
+							this.gameStorage.getId(), this.idStorage.getID(), this.pioneersService, this.userService);
 					hexSubController.init();
 					this.hexSubControllers.add(hexSubController);
 				}
@@ -306,5 +311,19 @@ public class GameFieldSubController implements Controller {
 		}
 
 		return stringX + stringY + stringZ;
+	}
+
+	public void zoomIn() {
+		if (this.parent.getScaleX() < 2.0) {
+			this.parent.setScaleX(this.parent.getScaleX() + 0.1);
+			this.parent.setScaleY(this.parent.getScaleY() + 0.1);
+		}
+	}
+
+	public void zoomOut() {
+		if (this.parent.getScaleX() > 0.5) {
+			this.parent.setScaleX(this.parent.getScaleX() - 0.1);
+			this.parent.setScaleY(this.parent.getScaleY() - 0.1);
+		}
 	}
 }

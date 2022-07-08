@@ -2,12 +2,12 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -51,6 +52,7 @@ public class GameLobbyController implements Controller {
 	public VBox idUserList;
 	@FXML
 	public VBox idChatContainer;
+	@SuppressWarnings("CanBeFinal")
 	@FXML
 	public ComboBox<Label> colorPicker = new ComboBox<>();
 	@FXML
@@ -115,6 +117,7 @@ public class GameLobbyController implements Controller {
 
 	@Override
 	public void init() {
+
 		// get all game members
 		memberService
 				.getAllGameMembers(this.gameStorage.getId())
@@ -130,8 +133,8 @@ public class GameLobbyController implements Controller {
 					if (ready >= 2) {
 						idStartGameButton.disableProperty().set(false);
 					}
-					this.userService.findAllUsers()
-							.observeOn(FX_SCHEDULER)
+					this.userService.findAllUsers().
+							observeOn(FX_SCHEDULER)
 							.subscribe(event -> {
 								for (User user : event) {
 									for (Member member : members) {
@@ -203,6 +206,14 @@ public class GameLobbyController implements Controller {
 						this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
 								+ spectatorMember.size());// || members.size() == 0);
 
+						//checks if combobox has been clicked,if not
+						//then automatically picks color for the user.
+						if(colorPicker.getSelectionModel().isEmpty()){
+							if(readyMembers == members.size() + spectatorMember.size()){
+								giveYourselfColor();
+							}
+						}
+
 						this.idUserList.getChildren().clear();
 						this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
 						this.spectatorIds.getChildren().clear();
@@ -265,10 +276,12 @@ public class GameLobbyController implements Controller {
 				});
 
 		// load game members
+
 		this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
 		playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList()));
 
 		addColorOnComboBox(colorPicker);
+
 		this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
 		playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList()));
 
@@ -317,18 +330,19 @@ public class GameLobbyController implements Controller {
 	}
 
 	public void startGame() {
-		//give all the players color
-		giveAllThePlayersColor();
 		gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints())
 				.observeOn(FX_SCHEDULER)
 				.doOnError(error -> {
 					if ("HTTP 403 ".equals(error.getMessage())) {
-						new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!")
-								.showAndWait();
+						Alert alert = new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!");
+                        // Set alert stylesheet
+                        DialogPane dialogPane = alert.getDialogPane();
+                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                        alert.showAndWait();
 					}
 				})
 				.subscribe(onSuccess -> {
-
 					final GameScreenController controller = gameScreenController.get();
 					this.app.show(controller);
 
@@ -336,7 +350,7 @@ public class GameLobbyController implements Controller {
 				});
 	}
 
-	private void giveAllThePlayersColor() {
+	private void giveYourselfColor() {
 		ColorController controller = new ColorController();
 		List<Label> createdColors = controller.getColor();
 
@@ -351,7 +365,8 @@ public class GameLobbyController implements Controller {
 
 		//give color to member that do not have colors
 		for (Member member : members) {
-			if ((member.color() == null || member.color().equals("#000000"))) {
+			if ((member.color() == null || member.color().equals("#000000"))
+					&& member.userId().equals(this.idStorage.getID()) && !member.spectator()) {
 				memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), member.spectator())
 						.subscribe();
 				allColors.remove(0);
@@ -372,12 +387,20 @@ public class GameLobbyController implements Controller {
 
 	private Node renderMember(Member member) {
 		//sets the size of player
+		//This flag will make sure,
+		//Null Pointer exception will not be thrown
+		//,if there are more Players
+		boolean ch = false;
 		this.playersNumberId.setText("Players " + members.size() + "/6");
 		for (User user : playerList) {
 			if (user._id().equals(member.userId()) && !member.spectator()) {
+				ch = true;
 				this.memberListSubcontroller = new MemberListSubcontroller(member, user);
 				break;
 			}
+		}
+		if(!ch){
+			this.memberListSubcontroller = new MemberListSubcontroller(null,null);
 		}
 		return memberListSubcontroller.render();
 	}
