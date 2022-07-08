@@ -291,11 +291,9 @@ public class TradingSubController implements Controller {
 
         // create hashMap for move: positive val are given, negative val are taken
         HashMap<String, Integer> tmp = new HashMap<>();
-        tmp.put("grain", 0);
-        tmp.put("brick", 0);
-        tmp.put("ore", 0);
-        tmp.put("lumber", 0);
-        tmp.put("wool", 0);
+        for (String res : RESOURCES) {
+            tmp.put(res, 0);
+        }
 
         // check for mixed resources
         int checkGiveRes = 0;
@@ -360,14 +358,6 @@ public class TradingSubController implements Controller {
         this.receiveMoonLabel.setText("0");
         this.receiveNeptunLabel.setText("0");
         this.receiveVenusLabel.setText("0");
-
-        //TODO: remove
-        System.out.println("offerButtonMethod");
-        for (String res : RESOURCES) {
-            System.out.println(res + " = " + harborHashCheck.get(res));
-        }
-        System.out.println("null = " + harborHashCheck.get(null));
-        System.out.println();
     }
 
     // Additional methods
@@ -442,65 +432,54 @@ public class TradingSubController implements Controller {
 
     private void updateHarbors() {
         // get or update all building with sides 0 and 6
-        //pioneersService
-         //       .findAllBuildings(gameStorage.getId())
-         //       .observeOn(FX_SCHEDULER)
-         //       .subscribe(buildings -> {
-                    for (Building building : this.buildings) {
-                        if (building.owner().equals(idStorage.getID()) &&
-                                !playersBuildingsZero.containsValue(building) &&
-                                !playersBuildingsSix.containsValue(building)) {
-                            if (building.side().intValue() == 0) {
-                                playersBuildingsZero.put(new Point3D(building.x(), building.y(), building.z()), building);
-                            }
-                            if (building.side().intValue() == 6) {
-                                playersBuildingsSix.put(new Point3D(building.x(), building.y(), building.z()), building);
-                            }
-                        }
-                    }
-
-                    /*
-                     * update all harbors
-                     * check for a building on a harbors position
-                     * set boolean of that harbor to true
-                     * */
-                    for (Harbor harbor : harbors) {
-                        switch (harbor.side().intValue()) {
-                            case 1 -> {
-                                checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
-                                checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
-                            }
-                            case 3 -> {
-                                checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
-                                checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
-                            }
-                            case 5 -> {
-                                checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
-                                checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
-                            }
-                            case 7 -> {
-                                checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
-                                checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
-                            }
-                            case 9 -> {
-                                checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
-                                checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
-                            }
-                            case 11 -> {
-                                checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
-                                checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
-                            }
-                            default -> {
-                            }
-                        }
-                    }
-               // });
-        System.out.println("out of service in update method");
-        for (String res : RESOURCES) {
-            System.out.println(res + " = " + harborHashCheck.get(res));
+        for (Building building : buildings) {
+            if (building.owner().equals(idStorage.getID()) &&
+                    !playersBuildingsZero.containsValue(building) &&
+                    !playersBuildingsSix.containsValue(building)) {
+                if (building.side().intValue() == 0) {
+                    playersBuildingsZero.put(new Point3D(building.x(), building.y(), building.z()), building);
+                }
+                if (building.side().intValue() == 6) {
+                    playersBuildingsSix.put(new Point3D(building.x(), building.y(), building.z()), building);
+                }
+            }
         }
-        System.out.println("null = " + harborHashCheck.get(null));
-        System.out.println();
+
+        /*
+         * update all harbors
+         * check for a building on a harbors position
+         * set boolean of that harbor to true
+         * */
+        for (Harbor harbor : harbors) {
+            switch (harbor.side().intValue()) {
+                case 1 -> {
+                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
+                }
+                case 3 -> {
+                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
+                }
+                case 5 -> {
+                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                }
+                case 7 -> {
+                    checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                }
+                case 9 -> {
+                    checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
+                }
+                case 11 -> {
+                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
+                }
+                default -> {
+                }
+            }
+        }
     }
 
     private void checkHarborPosZero(Point3D coordinates, String type) {
