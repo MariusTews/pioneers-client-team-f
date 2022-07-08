@@ -1,16 +1,15 @@
 package de.uniks.pioneers.controller;
 
-import com.sun.jdi.BooleanValue;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.dto.CreateBuildingDto;
-import de.uniks.pioneers.model.Point3D;
 import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.Harbor;
 import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.Tile;
+import de.uniks.pioneers.model.Point3D;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.websocket.EventListener;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,10 +21,12 @@ import javafx.scene.control.Label;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
-import static de.uniks.pioneers.Constants.RESOURCES;
+import static de.uniks.pioneers.Constants.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class TradingSubController implements Controller {
@@ -97,36 +98,37 @@ public class TradingSubController implements Controller {
     private final GameStorage gameStorage;
     private final PioneersService pioneersService;
     private final IDStorage idStorage;
+    private final EventListener eventListener;
     private Player player;
 
     // hashMaps for resources
     private final HashMap<String, Integer> giveResources = new HashMap<>();
     private final HashMap<String, Integer> receiveResources = new HashMap<>();
-    private HashMap<String, Boolean> harborHashCheck = new HashMap<>();
+    private final HashMap<Point3D, Building> playersBuildingsZero = new HashMap<>();
+    private final HashMap<Point3D, Building> playersBuildingsSix = new HashMap<>();
+    private final HashMap<String, Boolean> harborHashCheck = new HashMap<>();
     private final List<Harbor> harbors = new ArrayList<>();
+    private final List<Building> buildings = new ArrayList<>();
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     public TradingSubController(GameStorage gameStorage,
                                 PioneersService pioneersService,
-                                IDStorage idStorage) {
+                                IDStorage idStorage,
+                                EventListener eventListener) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
         this.idStorage = idStorage;
+        this.eventListener = eventListener;
     }
 
     @Override
     public void init() {
         // init hashMaps
-        this.giveResources.put("lumber", 0);
-        this.giveResources.put("brick", 0);
-        this.giveResources.put("ore", 0);
-        this.giveResources.put("wool", 0);
-        this.giveResources.put("grain", 0);
-        this.receiveResources.put("lumber", 0);
-        this.receiveResources.put("brick", 0);
-        this.receiveResources.put("ore", 0);
-        this.receiveResources.put("wool", 0);
-        this.receiveResources.put("grain", 0);
+        for (String res : RESOURCES) {
+            this.giveResources.put(res, 0);
+            this.receiveResources.put(res, 0);
+        }
 
         pioneersService
                 .findAllPlayers(this.gameStorage.getId())
@@ -150,30 +152,19 @@ public class TradingSubController implements Controller {
                     }
                 });
 
-        //TODO: experiment
-        pioneersService
-                .findAllTiles(gameStorage.getId())
+        disposable.add(eventListener
+                .listen("games." + gameStorage.getId() + ".buildings.*.*", Building.class)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    for (Harbor harbor : result.harbors()) {
-                        System.out.println("Harbor: " + harbor.type());
-                        System.out.println("(" + harbor.x() + ", " + harbor.y() + ", " + harbor.z() + ")");
-                        System.out.println("Side: " + harbor.side());
-                        System.out.println("");
+                .subscribe(buildingEvent -> {
+                    if (buildingEvent.event().endsWith(CREATED)) {
+                        buildings.add(buildingEvent.data());
                     }
-                    System.out.println("----------------------------------------------------------------------");
-                    for (Tile tile : result.tiles()) {
-                        System.out.println("Tile: " + tile.type());
-                        System.out.println("(" + tile.x() + ", " + tile.y() + ", " + tile.z() + ")");
-                        System.out.println("");
-                    }
-                    System.out.println("----------------------------------------------------------------------");
-                });
+                }));
     }
 
     @Override
     public void destroy() {
-
+        disposable.dispose();
     }
 
     @Override
@@ -296,12 +287,6 @@ public class TradingSubController implements Controller {
     }
 
     public void offerBankButtonPressed() {
-
-        pioneersService
-                .findAllBuildings(gameStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe();
-
         updateHarbors();
 
         // create hashMap for move: positive val are given, negative val are taken
@@ -361,20 +346,7 @@ public class TradingSubController implements Controller {
             }
         }
 
-        //TODO: experiment
-        pioneersService
-                .findAllBuildings(gameStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    for (Building building : result) {
-                        System.out.println("Koord.: " + "(" + building.x() + ", " + building.y() + ", " + building.z() + ")");
-                        System.out.println("Side: " + building.side());
-                        System.out.println("Owner: " + building.owner());
-                        System.out.println("Type: " + building.type());
-                        System.out.println("");
-                    }
-                });
-
+        // clear hashes
         this.giveResources.replaceAll((k, v) -> v = 0);
         this.receiveResources.replaceAll((k, v) -> v = 0);
 
@@ -390,10 +362,12 @@ public class TradingSubController implements Controller {
         this.receiveVenusLabel.setText("0");
 
         //TODO: remove
+        System.out.println("offerButtonMethod");
         for (String res : RESOURCES) {
             System.out.println(res + " = " + harborHashCheck.get(res));
         }
-        System.out.println(harborHashCheck.get(null));
+        System.out.println("null = " + harborHashCheck.get(null));
+        System.out.println();
     }
 
     // Additional methods
@@ -466,20 +440,13 @@ public class TradingSubController implements Controller {
         return Integer.parseInt(label.getText()) < 1;
     }
 
-    //TODO: position hashes to the top
-    private HashMap<Point3D, Building> playersBuildingsZero = new HashMap<>();
-    private HashMap<Point3D, Building> playersBuildingsSix = new HashMap<>();
-
     private void updateHarbors() {
         // get or update all building with sides 0 and 6
-        pioneersService
-                .findAllBuildings(gameStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(buildings -> {
-                    /* search for buildings in the game
-                     * put the buildings that belong to the player in to different hashMaps
-                     * one map contains all buildings with side 0 and one with side 6*/
-                    for (Building building : buildings) {
+        //pioneersService
+         //       .findAllBuildings(gameStorage.getId())
+         //       .observeOn(FX_SCHEDULER)
+         //       .subscribe(buildings -> {
+                    for (Building building : this.buildings) {
                         if (building.owner().equals(idStorage.getID()) &&
                                 !playersBuildingsZero.containsValue(building) &&
                                 !playersBuildingsSix.containsValue(building)) {
@@ -491,43 +458,49 @@ public class TradingSubController implements Controller {
                             }
                         }
                     }
-                });
 
-        /*
-         * update all harbors
-         * check for a building on a harbors position
-         * set boolean of that harbor to true
-         * */
-        for (Harbor harbor : harbors) {
-            switch (harbor.side().intValue()) {
-                case 1 -> {
-                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
-                    checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
-                }
-                case 3 -> {
-                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
-                    checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
-                }
-                case 5 -> {
-                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
-                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
-                }
-                case 7 -> {
-                    checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
-                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
-                }
-                case 9 -> {
-                    checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
-                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
-                }
-                case 11 -> {
-                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
-                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
-                }
-                default -> {
-                }
-            }
+                    /*
+                     * update all harbors
+                     * check for a building on a harbors position
+                     * set boolean of that harbor to true
+                     * */
+                    for (Harbor harbor : harbors) {
+                        switch (harbor.side().intValue()) {
+                            case 1 -> {
+                                checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                                checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
+                            }
+                            case 3 -> {
+                                checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
+                                checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
+                            }
+                            case 5 -> {
+                                checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
+                                checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                            }
+                            case 7 -> {
+                                checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
+                                checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                            }
+                            case 9 -> {
+                                checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
+                                checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
+                            }
+                            case 11 -> {
+                                checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                                checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
+                            }
+                            default -> {
+                            }
+                        }
+                    }
+               // });
+        System.out.println("out of service in update method");
+        for (String res : RESOURCES) {
+            System.out.println(res + " = " + harborHashCheck.get(res));
         }
+        System.out.println("null = " + harborHashCheck.get(null));
+        System.out.println();
     }
 
     private void checkHarborPosZero(Point3D coordinates, String type) {
