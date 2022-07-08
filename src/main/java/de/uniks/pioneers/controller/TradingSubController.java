@@ -315,30 +315,23 @@ public class TradingSubController implements Controller {
                     .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
             alert.showAndWait();
         } else {
-            // 4:1 trade with bank
-            // check for every resource available, if amount to give is 4 and to receive is 1
             for (String giveRes : RESOURCES) {
-                if (this.giveResources.get(giveRes) == 4) {
-                    for (String receiveRes : RESOURCES) {
-                        if (this.receiveResources.get(receiveRes) == 1) {
-                            // put the chosen values
-                            tmp.put(giveRes, -4);
-                            tmp.put(receiveRes, 1);
-
-                            // trade move
-                            this.pioneersService.tradeBank(this.gameStorage.getId(), tmp)
-                                    .observeOn(FX_SCHEDULER)
-                                    .subscribe(result -> pioneersService
-                                            .findAllPlayers(this.gameStorage.getId())
-                                            .observeOn(FX_SCHEDULER)
-                                            .subscribe(c -> {
-                                                for (Player player : c) {
-                                                    if (player.userId().equals(idStorage.getID())) {
-                                                        this.player = player;
-                                                    }
-                                                }
-                                            }));
+                switch (this.giveResources.get(giveRes)) {
+                    case 2 -> {
+                        if (harborHashCheck.get(giveRes)) {
+                            trade(giveRes, 2);
                         }
+                    }
+                    case 3 -> {
+                        if (harborHashCheck.get(null)) {
+                            trade(giveRes, 3);
+                        }
+                    }
+                    case 4 -> {
+                        trade(giveRes, 4);
+                    }
+                    default -> {
+
                     }
                 }
             }
@@ -360,13 +353,44 @@ public class TradingSubController implements Controller {
         this.receiveVenusLabel.setText("0");
     }
 
-    // Additional methods
 
+    // Additional methods
     /*
      * decrease the label
      * differentiate between giving and receiving resource labels
      * enable plus button or disable the minus button, when certain limits are reached
      * */
+
+    private void trade(String giveRes, int amount) {
+        HashMap<String, Integer> tmp = new HashMap<>();
+        for (String res : RESOURCES) {
+            tmp.put(res, 0);
+        }
+
+        for (String receiveRes : RESOURCES) {
+            if (this.receiveResources.get(receiveRes) == 1) {
+                // put the chosen values
+                tmp.put(giveRes, -amount);
+                tmp.put(receiveRes, 1);
+
+                // trade move
+                this.pioneersService
+                        .tradeBank(this.gameStorage.getId(), tmp)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe(result -> pioneersService
+                                .findAllPlayers(this.gameStorage.getId())
+                                .observeOn(FX_SCHEDULER)
+                                .subscribe(c -> {
+                                    for (Player player : c) {
+                                        if (player.userId().equals(idStorage.getID())) {
+                                            this.player = player;
+                                        }
+                                    }
+                                }));
+            }
+        }
+    }
+
     private void minusAction(ActionEvent event, String resource, Label label, boolean give, Button plusButton) {
         if (Integer.parseInt(label.getText()) > 0) {
             if (give) {
