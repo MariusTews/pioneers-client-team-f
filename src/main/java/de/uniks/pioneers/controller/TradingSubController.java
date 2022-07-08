@@ -532,4 +532,8 @@ public class TradingSubController implements Controller {
             harborHashCheck.put(type, true);
         }
     }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
 }
