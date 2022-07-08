@@ -295,7 +295,11 @@ public class TradingSubController implements Controller {
             tmp.put(res, 0);
         }
 
-        // check for mixed resources
+        /*
+         * check for mixed resources
+         * increase count for every label greater 0
+         * when counter is greater than 1, more than one resource were selected
+         * */
         int checkGiveRes = 0;
         int checkReceiveRes = 0;
 
@@ -315,6 +319,7 @@ public class TradingSubController implements Controller {
                     .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
             alert.showAndWait();
         } else {
+            // different conditions for 4:1, 3:1 and 2:1 trades
             for (String giveRes : RESOURCES) {
                 switch (this.giveResources.get(giveRes)) {
                     case 2 -> {
@@ -353,15 +358,14 @@ public class TradingSubController implements Controller {
         this.receiveVenusLabel.setText("0");
     }
 
-
     // Additional methods
-    /*
-     * decrease the label
-     * differentiate between giving and receiving resource labels
-     * enable plus button or disable the minus button, when certain limits are reached
-     * */
 
+    /*
+     * trade a given resource
+     * check, if a receiving resource was selected and make move
+     * */
     private void trade(String giveRes, int amount) {
+        // initialize temporary hashMap for move
         HashMap<String, Integer> tmp = new HashMap<>();
         for (String res : RESOURCES) {
             tmp.put(res, 0);
@@ -369,7 +373,7 @@ public class TradingSubController implements Controller {
 
         for (String receiveRes : RESOURCES) {
             if (this.receiveResources.get(receiveRes) == 1) {
-                // put the chosen values
+                // put the chosen values in hashMap
                 tmp.put(giveRes, -amount);
                 tmp.put(receiveRes, 1);
 
@@ -391,6 +395,11 @@ public class TradingSubController implements Controller {
         }
     }
 
+    /*
+     * decrease the label
+     * differentiate between giving and receiving resource labels
+     * enable plus button or disable the minus button, when certain limits are reached
+     * */
     private void minusAction(ActionEvent event, String resource, Label label, boolean give, Button plusButton) {
         if (Integer.parseInt(label.getText()) > 0) {
             if (give) {
@@ -429,7 +438,7 @@ public class TradingSubController implements Controller {
             }
         }
 
-        if (minusButton.disableProperty().get()) {
+        if (minusButton.disableProperty().get() && Integer.parseInt(label.getText()) > 0) {
             makeButtonVisible(minusButton);
         }
         if (!checkAmount(label, resource, give)) {
@@ -447,9 +456,12 @@ public class TradingSubController implements Controller {
         button.setVisible(false);
     }
 
+    // check amount of resource to give or to receive
     private boolean checkAmount(Label label, String resource, boolean give) {
         if (give) {
-            return Integer.parseInt(label.getText()) < player.resources().get(resource);
+            if (player.resources().get(resource) != null) {
+                return Integer.parseInt(label.getText()) < player.resources().get(resource);
+            }
         }
         return Integer.parseInt(label.getText()) < 1;
     }
@@ -473,6 +485,8 @@ public class TradingSubController implements Controller {
          * update all harbors
          * check for a building on a harbors position
          * set boolean of that harbor to true
+         * reposition coordinates of harbor to the coordinates of building
+         * every side needs different repositioning of the coordinates
          * */
         for (Harbor harbor : harbors) {
             switch (harbor.side().intValue()) {
@@ -506,6 +520,7 @@ public class TradingSubController implements Controller {
         }
     }
 
+    // do the coordinates match on position 0 or 6
     private void checkHarborPosZero(Point3D coordinates, String type) {
         if (playersBuildingsZero.containsKey(coordinates)) {
             harborHashCheck.put(type, true);
@@ -516,9 +531,5 @@ public class TradingSubController implements Controller {
         if (playersBuildingsSix.containsKey(coordinates)) {
             harborHashCheck.put(type, true);
         }
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
     }
 }
