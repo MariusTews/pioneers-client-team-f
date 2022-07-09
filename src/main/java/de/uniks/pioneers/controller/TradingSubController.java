@@ -313,11 +313,7 @@ public class TradingSubController implements Controller {
         }
 
         if (checkGiveRes > 1 || checkReceiveRes > 1) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You can only select one type of resource when trading with the bank");
-            DialogPane dialogPane = alert.getDialogPane();
-            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-            alert.showAndWait();
+            alert("You can only select one type of resource when trading with the bank");
         } else {
             // different conditions for 4:1, 3:1 and 2:1 trades
             for (String giveRes : RESOURCES) {
@@ -325,11 +321,15 @@ public class TradingSubController implements Controller {
                     case 2 -> {
                         if (harborHashCheck.get(giveRes)) {
                             trade(giveRes, 2);
+                        } else {
+                            alert("Trade was not successful. You don't have a building on a matching 2:1 harbor!");
                         }
                     }
                     case 3 -> {
                         if (harborHashCheck.get(null)) {
                             trade(giveRes, 3);
+                        } else {
+                            alert("Trade was not successful. You don't have a building on a 3:1 harbor!");
                         }
                     }
                     case 4 -> {
@@ -359,6 +359,14 @@ public class TradingSubController implements Controller {
     }
 
     // Additional methods
+
+    public void alert(String text) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, text);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        alert.showAndWait();
+    }
 
     /*
      * trade a given resource
