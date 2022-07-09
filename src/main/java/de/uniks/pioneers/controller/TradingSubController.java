@@ -179,16 +179,16 @@ public class TradingSubController implements Controller {
             return null;
         }
 
-        makeButtonInvisible(giveCactusMinusButton);
-        makeButtonInvisible(giveMarsMinusButton);
-        makeButtonInvisible(giveMoonMinusButton);
-        makeButtonInvisible(giveNeptunMinusButton);
-        makeButtonInvisible(giveVenusMinusButton);
-        makeButtonInvisible(receiveCactusMinusButton);
-        makeButtonInvisible(receiveMarsMinusButton);
-        makeButtonInvisible(receiveMoonMinusButton);
-        makeButtonInvisible(receiveNeptunMinusButton);
-        makeButtonInvisible(receiveVenusMinusButton);
+        makeButtonVisible(giveCactusMinusButton, false);
+        makeButtonVisible(giveMarsMinusButton, false);
+        makeButtonVisible(giveMoonMinusButton, false);
+        makeButtonVisible(giveNeptunMinusButton, false);
+        makeButtonVisible(giveVenusMinusButton, false);
+        makeButtonVisible(receiveCactusMinusButton, false);
+        makeButtonVisible(receiveMarsMinusButton, false);
+        makeButtonVisible(receiveMoonMinusButton, false);
+        makeButtonVisible(receiveNeptunMinusButton, false);
+        makeButtonVisible(receiveVenusMinusButton, false);
 
         return parent;
     }
@@ -336,7 +336,6 @@ public class TradingSubController implements Controller {
                         trade(giveRes, 4);
                     }
                     default -> {
-
                     }
                 }
             }
@@ -419,10 +418,10 @@ public class TradingSubController implements Controller {
             }
         }
         if (label.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
+            makeButtonVisible((Button) event.getSource(), false);
         }
         if (plusButton.disableProperty().get()) {
-            makeButtonVisible(plusButton);
+            makeButtonVisible(plusButton, true);
         }
     }
 
@@ -447,21 +446,16 @@ public class TradingSubController implements Controller {
         }
 
         if (minusButton.disableProperty().get() && Integer.parseInt(label.getText()) > 0) {
-            makeButtonVisible(minusButton);
+            makeButtonVisible(minusButton, true);
         }
         if (!checkAmount(label, resource, give)) {
-            makeButtonInvisible((Button) event.getSource());
+            makeButtonVisible((Button) event.getSource(), false);
         }
     }
 
-    private void makeButtonVisible(Button button) {
-        button.setVisible(true);
-        button.disableProperty().set(false);
-    }
-
-    private void makeButtonInvisible(Button button) {
-        button.disableProperty().set(true);
-        button.setVisible(false);
+    private void makeButtonVisible(Button button, boolean visible) {
+        button.setVisible(visible);
+        button.disableProperty().set(!visible);
     }
 
     // check amount of resource to give or to receive
