@@ -8,6 +8,7 @@ import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -15,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,6 +24,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -35,6 +39,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.gameComparator;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -180,6 +185,11 @@ public class LobbyController implements Controller {
             beepForAHour();
         }
 
+        this.app.getStage().setOnCloseRequest(e -> {
+            actionOnclose();
+            e.consume();
+        });
+
     }
 
     @Override
@@ -206,7 +216,7 @@ public class LobbyController implements Controller {
                 scheduler.scheduleAtFixedRate(beeper, 10, 30*60, SECONDS);
         scheduler.schedule(new Runnable() {
             public void run() { beeperHandle.cancel(true); }
-        }, 30 * 60, SECONDS);
+        }, 60 * 60, SECONDS);
     }
 
 
@@ -253,8 +263,21 @@ public class LobbyController implements Controller {
         this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 handleTabSwitching(oldValue, newValue));
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
+
+
         return parent;
     }
+
+    //takes action when the application is forcefully closed
+    //such as logging out
+    private void actionOnclose() {
+        userService.statusUpdate(idStorage.getID(), "offline")
+                .observeOn(FX_SCHEDULER)
+                .subscribe(er -> {
+                    System.exit(0);
+                });
+    }
+
 
     private void handleTabSwitching(Tab oldValue, Tab newValue) {
 

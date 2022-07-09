@@ -9,6 +9,7 @@ import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameLobbyController implements Controller {
@@ -227,6 +229,19 @@ public class GameLobbyController implements Controller {
 		this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
 				userService, messageService, memberIDStorage, memberService);
 		messageViewSubController.init();
+
+		//action when the screen is close
+		this.app.getStage().setOnCloseRequest(e ->{
+			gameService
+					.findOneGame(gameStorage.getId())
+					.observeOn(FX_SCHEDULER)
+					.subscribe(result -> {
+						actionOnCloseScreen(result);
+					});
+			e.consume();
+		});
+
+
 	}
 
 	@Override
@@ -282,6 +297,29 @@ public class GameLobbyController implements Controller {
 		idChatContainer.getChildren().setAll(messageViewSubController.render());
 
 		return parent;
+	}
+
+	//This makes sure the user is offline
+	// and is not  part of the game anymore.
+	private void actionOnCloseScreen(Game result) {
+		if ((int) result.members() == 1 || result.owner().equals(idStorage.getID())) {
+			gameService
+					.deleteGame(gameStorage.getId())
+					.observeOn(FX_SCHEDULER)
+					.subscribe(e -> {
+					});
+		} else {
+			memberService
+					.leave(gameStorage.getId(), idStorage.getID())
+					.observeOn(FX_SCHEDULER)
+					.subscribe();
+		}
+
+		userService.statusUpdate(this.idStorage.getID(), "offline").
+				observeOn(FX_SCHEDULER)
+				.subscribe(e -> {
+					System.exit(0);
+				});
 	}
 
 	public void leave() {

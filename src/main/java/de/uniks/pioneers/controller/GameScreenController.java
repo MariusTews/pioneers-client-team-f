@@ -15,8 +15,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -228,6 +226,12 @@ public class GameScreenController implements Controller {
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
+
+        //Action is performed when the platform is close
+        this.app.getStage().setOnCloseRequest( e -> {
+            actionOnCloseScreen();
+            e.consume();
+        });
     }
 
     @Override
@@ -240,6 +244,7 @@ public class GameScreenController implements Controller {
 
         this.opponentSubCons.forEach(OpponentSubController::destroy);
         this.opponentSubCons.clear();
+
     }
 
     @Override
@@ -294,6 +299,15 @@ public class GameScreenController implements Controller {
                 this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
 
         return parent;
+    }
+
+    private void actionOnCloseScreen() {
+        pioneersService.updatePlayer(this.gameStorage.getId(),this.idStorage.getID(),false).
+                observeOn(FX_SCHEDULER).subscribe();
+        userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
+                .subscribe( s-> {
+                    System.exit(0);
+                });
     }
 
     private Node renderSpectator(Member member) {
@@ -394,46 +408,51 @@ public class GameScreenController implements Controller {
 
         if (stateEvent.event().endsWith(UPDATED)) {
             // change the nextMoveLabel to the current move
-            String currentMove = state.expectedMoves().get(0).action();
-            nextMoveLabel.setText(currentMove);
-            // change the currentPlayerLabel to the current player
-            User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
-            currentPlayerLabel.setText(currentPlayer.name());
+            // checks the if the expected move is empty or not
+            // in some cases it is required
+            if (!state.expectedMoves().isEmpty()) {
+                String currentMove = state.expectedMoves().get(0).action();
+                nextMoveLabel.setText(currentMove);
+                // change the currentPlayerLabel to the current player
+                User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
+                currentPlayerLabel.setText(currentPlayer.name());
 
-            // open screen for discarding resources if its current player's screen + state is drop
-            // enters more than one time this method: runDiscardOnce variable or find another solution
-            if ((currentMove.equals(DROP_ACTION)) && currentPlayer._id().equals(idStorage.getID()) && runDiscardOnce) {
-                // initialize and render the discard resources view -> open new window (new stage)
-                // get the current player and open the window for dropping resources
-                runDiscardOnce = false;
-                for (Player p : this.playerOwnView) {
-                    if (p.userId().equals(currentPlayer._id())) {
-                        DiscardResourcesController discard = new DiscardResourcesController(p, this.gameStorage.getId(),
-                                this.pioneersService, currentPlayerLabel.getScene().getWindow());
-                        discard.render();
-                        // Deleting the controller is not needed, because the garbage collector should delete the controller
-                        // after closing the window
+                // open screen for discarding resources if its current player's screen + state is drop
+                // enters more than one time this method: runDiscardOnce variable or find another solution
+                if ((currentMove.equals(DROP_ACTION)) && currentPlayer._id().equals(idStorage.getID()) && runDiscardOnce) {
+                    // initialize and render the discard resources view -> open new window (new stage)
+                    // get the current player and open the window for dropping resources
+                    runDiscardOnce = false;
+                    for (Player p : this.playerOwnView) {
+                        if (p.userId().equals(currentPlayer._id())) {
+                            DiscardResourcesController discard = new DiscardResourcesController(p, this.gameStorage.getId(),
+                                    this.pioneersService, currentPlayerLabel.getScene().getWindow());
+                            discard.render();
+                            // Deleting the controller is not needed, because the garbage collector should delete the controller
+                            // after closing the window
+                        }
                     }
                 }
-            }
 
-            // set runDiscardOnce on true again, when another action appears
-            if (!currentMove.equals(DROP_ACTION)) {
-                runDiscardOnce = true;
-            }
 
-            // change the cursor when action is "rob" instead of alert (or notification),
-            //  remove the image from cursor, when leaving the game or when placing robber
-            if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID())) {
-                Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/robber.png")).toString());
-                currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
-            } else {
-                currentPlayerLabel.getScene().setCursor(Cursor.DEFAULT);
-            }
+                // set runDiscardOnce on true again, when another action appears
+                if (!currentMove.equals(DROP_ACTION)) {
+                    runDiscardOnce = true;
+                }
 
-            if (state.robber() != null && !state.robber().equals(currentRobPlace)) {
-                // update the view and place the robber on new tile
-                this.updateRobView(state.robber());
+                // change the cursor when action is "rob" instead of alert (or notification),
+                //  remove the image from cursor, when leaving the game or when placing robber
+                if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID())) {
+                    Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/robber.png")).toString());
+                    currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
+                } else {
+                    currentPlayerLabel.getScene().setCursor(Cursor.DEFAULT);
+                }
+
+                if (state.robber() != null && !state.robber().equals(currentRobPlace)) {
+                    // update the view and place the robber on new tile
+                    this.updateRobView(state.robber());
+                }
             }
         }
     }

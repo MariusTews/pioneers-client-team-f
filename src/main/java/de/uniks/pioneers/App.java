@@ -83,6 +83,7 @@ public class App extends Application {
     @Override
     public void stop() {
         cleanup();
+        //System.exit(0);
     }
 
     public void show(Controller controller) {
@@ -107,5 +108,9 @@ public class App extends Application {
             controller.destroy();
             controller = null;
         }
+    }
+
+    public Stage getStage(){
+        return this.stage;
     }
 }
