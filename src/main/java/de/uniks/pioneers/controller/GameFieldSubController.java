@@ -238,23 +238,23 @@ public class GameFieldSubController implements Controller {
 				if (harbor.type() != null) {
 					switch (harbor.type()) {
 						case MOON_ROCK -> {
-							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/moon_rock.png")).toString());
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/moon_rock_harbor.png")).toString());
 							imageView.setImage(image);
 						}
 						case NEPTUNE_CRYSTAL -> {
-							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/neptun_crystals.png")).toString());
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/neptun_crystals_harbor.png")).toString());
 							imageView.setImage(image);
 						}
 						case MARS_BAR -> {
-							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/mars_bar.png")).toString());
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/mars_bar_harbor.png")).toString());
 							imageView.setImage(image);
 						}
 						case VENUS_GRAIN -> {
-							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/venus_grain.png")).toString());
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/venus_grain_harbor.png")).toString());
 							imageView.setImage(image);
 						}
 						case EARTH_CACTUS -> {
-							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/earth_cactus.png")).toString());
+							Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/earth_cactus_harbor.png")).toString());
 							imageView.setImage(image);
 						}
 					}
