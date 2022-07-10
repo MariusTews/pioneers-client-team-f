@@ -20,9 +20,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.util.converter.LocalTimeStringConverter;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.HashMap;
 
 import static de.uniks.pioneers.Constants.*;
@@ -179,6 +181,11 @@ public class MessageViewSubController implements Controller {
     // Renders one message by filling username with the chosen color, initializes mouse hover over message label
     // and right click option for deleting messages. Also adds the image of the user next to the username.
     private void renderOneMessage(Message m) {
+        //get current time using localtime library
+        //and split into Hour and minutes
+        String Hour = String.valueOf(LocalTime.now().getHour());
+        String minute = String.valueOf(LocalTime.now().getMinute());
+        String currentHourAndMinute = Hour + ": " +minute;
         HBox box = new HBox(10);
         box.fillHeightProperty();
         // maybe a flag is needed, so the user's image will not be added in the in-game chat
@@ -200,9 +207,9 @@ public class MessageViewSubController implements Controller {
         label.setMaxWidth(250);
         label.setWrapText(true);
         if(member.spectator()) {
-            label.setText("\n" + m.body());
+            label.setText("\n" + "["+currentHourAndMinute+"]"+" "+m.body());
         }else {
-            label.setText(m.body());
+            label.setText("[" + currentHourAndMinute + "]" + " " + m.body());
         }
         label.setTextFill(Color.WHITE);
         this.initRightClick(label, m._id(), m.sender());
@@ -214,7 +221,6 @@ public class MessageViewSubController implements Controller {
         box.getChildren().addAll(nameLabel, label);
         this.idMessageView.getChildren().add(box);
     }
-
     // Option to delete the own message by right-clicking.
     // Fails when not sender of the message.
     private void initRightClick(Label label, String messageId, String sender) {
