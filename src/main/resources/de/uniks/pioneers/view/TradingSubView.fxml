@@ -11,7 +11,7 @@
       minWidth="-Infinity" prefHeight="237.0" prefWidth="212.0" xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.TradingSubController">
    <HBox alignment="TOP_CENTER" prefHeight="281.0" prefWidth="298.0">
-      <VBox id="giveTradeView" alignment="CENTER" prefHeight="182.0" prefWidth="103.0">
+      <VBox id="tradeView" alignment="CENTER" prefHeight="182.0" prefWidth="103.0">
          <Label text="Give"/>
          <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
             <ImageView id="cactus" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
@@ -144,7 +144,7 @@
             </Button>
          </HBox>
       </VBox>
-      <VBox id="receiveTradeView" alignment="CENTER" prefHeight="182.0" prefWidth="103.0">
+      <VBox id="tradeView" alignment="CENTER" prefHeight="182.0" prefWidth="103.0">
          <Label text="Receive"/>
          <HBox alignment="CENTER" prefHeight="45.0" prefWidth="140.0">
             <ImageView id="cactus" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
@@ -283,12 +283,12 @@
          </HBox>
       </VBox>
    </HBox>
-   <Button id="offerPlayer" fx:id="offerPlayerButton" mnemonicParsing="false" onAction="#offerPlayerButtonPressed"
+   <Button id="offer" fx:id="offerPlayerButton" mnemonicParsing="false" onAction="#offerPlayerButtonPressed"
            prefHeight="25.0" prefWidth="210.0" text="Offer player">
       <VBox.margin>
          <Insets bottom="5.0"/>
       </VBox.margin>
    </Button>
-   <Button id="offerBank" fx:id="offerBankButton" mnemonicParsing="false" onAction="#offerBankButtonPressed"
+   <Button id="offer" fx:id="offerBankButton" mnemonicParsing="false" onAction="#offerBankButtonPressed"
            prefHeight="25.0" prefWidth="210.0" text="Offer bank"/>
 </VBox>
