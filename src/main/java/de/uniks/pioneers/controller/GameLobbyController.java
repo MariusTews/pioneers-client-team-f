@@ -238,7 +238,7 @@ public class GameLobbyController implements Controller {
 				userService, messageService, memberIDStorage, memberService);
 		messageViewSubController.init();
 
-		//action when the screen is close
+		//action when the screen is closed
 		this.app.getStage().setOnCloseRequest(e -> {
 				gameService
 						.findOneGame(gameStorage.getId())

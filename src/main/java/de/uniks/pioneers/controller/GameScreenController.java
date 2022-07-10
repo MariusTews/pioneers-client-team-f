@@ -234,7 +234,7 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        //countup
+        //count up
         countUp();
 
     }
@@ -330,6 +330,7 @@ public class GameScreenController implements Controller {
             e.consume();
         });
 
+
         return parent;
     }
 
@@ -392,6 +393,9 @@ public class GameScreenController implements Controller {
                     opponents.set(opponents.indexOf(p), player);
                 }
             }
+            //sets name of the longest road
+            updateLongestRoad(playerOwnView,opponents);
+            //sets the winner
             winnerScreen(playerOwnView, opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
             if (!player.userId().equals(idStorage.getID())) {
@@ -401,6 +405,35 @@ public class GameScreenController implements Controller {
         } else if (playerEvent.event().endsWith(DELETED)) {
             this.opponents.remove(player);
             this.removeOpponent(player);
+        }
+    }
+
+    //Sets the name of the user who has longestRoad
+    private void updateLongestRoad(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
+        String userId = new String();
+        int longestRoad = 0;
+        for (Player p:playerOwnView) {
+            if(p.longestRoad() != null) {
+                if (((int) p.longestRoad()) > longestRoad) {
+                    userId = p.userId();
+                    longestRoad = (int) p.longestRoad();
+                }
+            }
+        }
+
+        for (Player p :opponents) {
+            if(p.longestRoad() != null) {
+                if (((int) p.longestRoad()) > longestRoad) {
+                    userId = p.userId();
+                    longestRoad = (int) p.longestRoad();
+                }
+            }
+        }
+
+        for (User u: allUser) {
+            if(u._id().equals(userId)){
+                playerLongestRoadLabel.setText(u.name());
+            }
         }
     }
 
@@ -416,7 +449,7 @@ public class GameScreenController implements Controller {
         }
 
         for (List<String> s : userNumberPoints.values()) {
-            if (s.contains("10")) {
+            if (s.contains(this.gameStorage.getVictoryPoints())) {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                         , gameStorage, idStorage, gameService, app, lobbyController);
                 winnerController.render();
