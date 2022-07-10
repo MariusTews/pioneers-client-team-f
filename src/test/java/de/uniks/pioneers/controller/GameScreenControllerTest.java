@@ -38,7 +38,6 @@ class GameScreenControllerTest extends ApplicationTest {
 	@Mock
 	EventListener eventListener;
 
-	@Spy
     @Mock
     App app;
 
