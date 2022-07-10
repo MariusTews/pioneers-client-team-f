@@ -10,8 +10,8 @@
 #userView {
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
-    -fx-background-position: bottom;
-    -fx-background-size: 370 260;
+    -fx-background-position: center;
+    -fx-background-size: 420 300;
 }
 
 #userView .text {
@@ -20,24 +20,26 @@
 
 .button.move {
     -fx-background-image: url("../assets/grey_button.png");
-    -fx-background-size: 100 50;
+    -fx-background-size: 200 50;
     -fx-background-repeat: stretch;
-    -fx-scale-y: 0.9;
-    -fx-scale-x: 0.9;
+    -fx-background-position: center;
     -fx-font-size: 16;
     -fx-text-fill: #666666;
 }
 
 #bigButton {
-    -fx-scale-x: 1.1;
-    -fx-scale-y: 1.1;
+    -fx-pref-width: 200;
+    -fx-pref-height: 50;
+    -fx-background-size: 200 50;
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
     -fx-font-size: 24;
 }
 
 #opponentView {
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
-    -fx-background-position: bottom;
+    -fx-background-position: center;
     -fx-background-size: 230 130;
 }
 
@@ -71,30 +73,33 @@
 /* bottom of the screen: dice roll */
 
 #roll {
-    -fx-background-image: url("../assets/grey_panel.png");
+    -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
-    -fx-background-position: bottom;
-    -fx-background-size: 230 90;
-}
-
-#diceSum {
-    -fx-font-size: 48;
-    -fx-text-fill: dimgrey;
+    -fx-background-position: center;
+    -fx-background-size: 200 100;
 }
 
 /* right side of the screen: current move and player, finish move via button */
 
-#currentGameState {
+#currentMove {
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-repeat: stretch;
-    -fx-background-position: top, right;
-    -fx-background-size: 325 220;
+    -fx-background-position: center;
+    -fx-background-size: 250 60;
+}
+
+#currentPlayer {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 250 60;
 }
 
 #timer {
     -fx-background-image: url("../assets/grey_panel.png");
     -fx-background-size: stretch;
-    -fx-scale-x: 1.1;
+    -fx-background-position: center;
+    -fx-background-size: 150 70;
 }
 
 #remainingTime {
@@ -105,14 +110,14 @@
 #giveTradeView {
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
-    -fx-background-position: bottom;
+    -fx-background-position: center;
     -fx-background-size: 150 281;
 }
 
 #receiveTradeView {
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
-    -fx-background-position: bottom;
+    -fx-background-position: center;
     -fx-background-size: 150 281;
 }
 
@@ -138,8 +143,21 @@
 
 #spectatorNameId{
     -fx-background-image: url("../assets/blue_panel.png");
-    -fx-background-position: top,right;
+    -fx-background-position: center;
     -fx-background-repeat: stretch;
-    -fx-background-size: 200 60;
+    -fx-background-size: 180 60;
+}
 
+#longestRoadContainer {
+    -fx-background-image: url("../assets/red_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 200 100;
+}
+
+#zoomContainer {
+    -fx-background-image: url("../assets/yellow_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 120 100;
 }

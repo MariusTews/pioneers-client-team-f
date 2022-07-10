@@ -57,17 +57,21 @@ public class GameScreenController implements Controller {
     @FXML
     public Pane chatPane;
     @FXML
-    public Label diceSumLabel;
-    @FXML
     public VBox opponentsView;
     @FXML
     public Button finishTurnButton;
+    @FXML
+    public ImageView diceOne;
+    @FXML
+    public ImageView diceTwo;
     @FXML
     public Label nextMoveLabel;
     @FXML
     public Label currentPlayerLabel;
     @FXML
     public Label timerLabel;
+    @FXML
+    public Label playerLongestRoadLabel;
     @FXML
     public Button leave;
     @FXML
@@ -82,7 +86,7 @@ public class GameScreenController implements Controller {
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
 
-    private String lastBuildingPosition;
+	private String lastBuildingPosition;
 
     private final PioneersService pioneersService;
     private final EventListener eventListener;
@@ -332,9 +336,9 @@ public class GameScreenController implements Controller {
     private void handleMoveEvents(Event<Move> moveEvent) {
         Move move = moveEvent.data();
 
-        // if the move is a roll change the diceSumLabel to the roll number
-        if (move.action().equals("roll")) {
-            diceSumLabel.setText(Integer.toString(move.roll()));
+        //if the move is a roll display new dice value
+        if (move.action().equals("roll") || move.action().equals("founding-roll")) {
+            displayDice(move.roll());
         }
     }
 
@@ -516,10 +520,6 @@ public class GameScreenController implements Controller {
                 this.calculateVP(player));
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
-    }
-
-    public void onMouseClicked() {
-        diceRoll();
     }
 
     // diceRoll if the current move is "roll"
@@ -798,4 +798,91 @@ public class GameScreenController implements Controller {
     public GameFieldSubController getGameFieldSubController() {
         return gameFieldSubController;
     }
+
+
+    public void zoomIn() {
+        this.gameFieldSubController.zoomIn();
+    }
+
+    public void zoomOut() {
+        this.gameFieldSubController.zoomOut();
+    }
+
+    public void displayDice(int diceNumber) {
+        this.diceOne.toFront();
+        this.diceTwo.toFront();
+        this.diceTwo.setVisible(true);
+
+        Image image1 = null;
+        Image image2 = null;
+
+        switch (diceNumber) {
+            // according to swagger roll is between 1 and 12
+            case 1 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
+                this.diceTwo.setVisible(false);
+            }
+            case 2 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
+            }
+
+            case 3 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border2.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
+            }
+
+            case 4 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border3.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
+            }
+
+            case 5 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border4.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
+            }
+
+            case 6 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border5.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
+            }
+
+            case 7 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
+            }
+
+            case 8 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border2.png")).toString());
+            }
+
+            case 9 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border3.png")).toString());
+            }
+
+            case 10 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border4.png")).toString());
+            }
+
+            case 11 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border5.png")).toString());
+            }
+
+            case 12 -> {
+                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
+                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
+            }
+        }
+        if (image1 != null) {
+            this.diceOne.setImage(image1);
+        }
+        if (image2 != null) {
+            this.diceTwo.setImage(image2);
+        }
+    }
 }
+
