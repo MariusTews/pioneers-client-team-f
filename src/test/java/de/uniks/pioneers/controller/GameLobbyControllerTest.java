@@ -55,9 +55,8 @@ class GameLobbyControllerTest extends ApplicationTest {
                 "id", "name", "owner", 2, false,new GameSettings(2,10))));
         when(gameStorage.getId()).thenReturn("id");
 
-
         // start application
-        final App app = new App(gameLobbyController);
+        App app = new App(gameLobbyController);
         app.start(stage);
     }
 

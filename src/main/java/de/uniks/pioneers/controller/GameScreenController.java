@@ -227,11 +227,7 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        //Action is performed when the platform is close
-        this.app.getStage().setOnCloseRequest( e -> {
-            actionOnCloseScreen();
-            e.consume();
-        });
+
     }
 
     @Override
@@ -297,6 +293,14 @@ public class GameScreenController implements Controller {
         //spectator
         this.spectatorMember.addListener((ListChangeListener<? super Member>) c ->
                 this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
+
+        //Action is performed when the platform is close
+        if(this.app != null) {
+            this.app.getStage().setOnCloseRequest(e -> {
+                actionOnCloseScreen();
+                e.consume();
+            });
+        }
 
         return parent;
     }

@@ -180,15 +180,18 @@ public class LobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleAllTabMessages));
 
-        //refreshed Token and runs for three hour
+        //refreshed Token and runs for an hour
         if(this.gameStorage.getId() == null) {
             beepForAHour();
         }
 
-        this.app.getStage().setOnCloseRequest(e -> {
-            actionOnclose();
-            e.consume();
-        });
+        if(this.app != null) {
+            this.app.getStage().setOnCloseRequest(e -> {
+                actionOnclose();
+                e.consume();
+            });
+        }
+
 
     }
 
@@ -263,6 +266,7 @@ public class LobbyController implements Controller {
         this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 handleTabSwitching(oldValue, newValue));
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
+
 
 
         return parent;
