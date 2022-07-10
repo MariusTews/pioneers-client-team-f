@@ -38,6 +38,9 @@ class GameScreenControllerTest extends ApplicationTest {
     @Mock
     EventListener eventListener;
 
+    @Mock
+    App app;
+
     @Spy
 	GameStorage gameStorage;
     @Spy
@@ -60,6 +63,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
         Map map = new Map("02", createMap(), createHarbors());
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
+        when(app.getStage()).thenReturn(new Stage());
 
 
         App app = new App(gameScreenController);

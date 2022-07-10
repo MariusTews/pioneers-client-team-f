@@ -295,12 +295,10 @@ public class GameScreenController implements Controller {
                 this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
 
         //Action is performed when the platform is close
-        if(this.app != null) {
-            this.app.getStage().setOnCloseRequest(e -> {
-                actionOnCloseScreen();
-                e.consume();
-            });
-        }
+        this.app.getStage().setOnCloseRequest(e -> {
+            actionOnCloseScreen();
+            e.consume();
+        });
 
         return parent;
     }

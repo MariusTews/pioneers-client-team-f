@@ -185,14 +185,10 @@ public class LobbyController implements Controller {
             beepForAHour();
         }
 
-        if(this.app != null) {
-            this.app.getStage().setOnCloseRequest(e -> {
+        this.app.getStage().setOnCloseRequest(e -> {
                 actionOnclose();
                 e.consume();
-            });
-        }
-
-
+        });
     }
 
     @Override

@@ -57,7 +57,7 @@ public class LobbyViewTest extends ApplicationTest {
 	@Spy
 	IDStorage idStorage;
 
-	@InjectMocks
+	@Spy
 	App app;
 
 	@InjectMocks
@@ -78,6 +78,7 @@ public class LobbyViewTest extends ApplicationTest {
 		when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
 		when(messageService.getAllMessages("global", "627cf3c93496bc00158f3859")).thenReturn(Observable.just(List.of(new Message("1", "1", "5", "1", "Test Message"), new Message("1", "1", "5", "4", "Test Message2"), new Message("1", "1", "5", "1", "Test Message3"))));
 		when(messageService.getAllMessages("groups", "627cf3c93496bc00158f3859")).thenReturn(Observable.just(List.of(new Message("1", "1", "5", "1", "Test Message"), new Message("1", "1", "5", "4", "Test Message2"), new Message("1", "1", "5", "1", "Test Message3"))));
+		when(app.getStage()).thenReturn(new Stage());
 
 		final App app = new App(null);
 		app.start(stage);

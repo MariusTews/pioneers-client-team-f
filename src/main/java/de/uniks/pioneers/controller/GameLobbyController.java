@@ -231,8 +231,7 @@ public class GameLobbyController implements Controller {
 		messageViewSubController.init();
 
 		//action when the screen is close
-		if (this.app != null){
-			this.app.getStage().setOnCloseRequest(e -> {
+		this.app.getStage().setOnCloseRequest(e -> {
 				gameService
 						.findOneGame(gameStorage.getId())
 						.observeOn(FX_SCHEDULER)
@@ -240,9 +239,7 @@ public class GameLobbyController implements Controller {
 							actionOnCloseScreen(result);
 						});
 				e.consume();
-			});
-		}
-
+		});
 
 	}
 
