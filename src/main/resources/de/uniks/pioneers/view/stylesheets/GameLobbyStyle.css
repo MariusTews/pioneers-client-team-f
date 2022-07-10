@@ -8,12 +8,13 @@
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-position: center;
     -fx-background-repeat: stretch;
-    -fx-background-size: 250 325;
-    -fx-background-radius: 30;
-    -fx-border-radius: 30;
+    -fx-background-size: 230 330;
+    -fx-background-color: transparent;
 }
 
-
+#memberList {
+   -fx-text-fill: #ffff;
+}
 
 .combo-box:hover {
     -fx-background-color: darkgrey;
@@ -34,30 +35,11 @@
     -fx-background-color: black;
 }
 
-.label.spectatorStyle{
+.label.spectatorStyle {
     -fx-text-fill:#00FF00 ;
     -fx-border-color: #33D1FF;
 }
 
-.label.playersNumberStyle {
-    -fx-text-fill: #FFFFFF;
-    -fx-background-image: url("../assets/blue_panel.png");
-    -fx-background-position: center;
-    -fx-background-repeat: stretch;
-    -fx-background-size: 240 320;
-    -fx-background-radius: 30;
-    -fx-border-radius: 30;
-}
-
-.label.spectatorTitleStyle {
-    -fx-text-fill: #FFFFFF;
-    -fx-background-image: url("../assets/blue_panel.png");
-    -fx-background-position: center;
-    -fx-background-repeat: stretch;
-    -fx-background-size: 240 320;
-    -fx-background-radius: 30;
-    -fx-border-radius: 30;
-}
 #gameSettings {
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;

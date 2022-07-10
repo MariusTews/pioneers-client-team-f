@@ -72,7 +72,7 @@ public class GameLobbyController implements Controller {
 	private final Provider<LobbyController> lobbyController;
 	private final Provider<GameScreenController> gameScreenController;
 	//Button for spectator
-	public VBox spectatorIds;
+	public VBox spectatorViewId;
 	//player Numbers Label
 	public Label playersNumberId;
 	//player LabelID
@@ -216,8 +216,8 @@ public class GameLobbyController implements Controller {
 
 						this.idUserList.getChildren().clear();
 						this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-						this.spectatorIds.getChildren().clear();
-						this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
+						this.spectatorViewId.getChildren().clear();
+						this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
 					}
 				}));
 
@@ -282,8 +282,8 @@ public class GameLobbyController implements Controller {
 
 		addColorOnComboBox(colorPicker);
 
-		this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
-		playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorIds.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList()));
+		this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
+		playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList()));
 
 		// disable start button when entering game lobby
 		idStartGameButton.disableProperty().set(true);
