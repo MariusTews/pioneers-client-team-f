@@ -31,6 +31,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static de.uniks.pioneers.Constants.*;
 import static de.uniks.pioneers.computation.CalculateMap.createId;
@@ -85,8 +90,9 @@ public class GameScreenController implements Controller {
     private final App app;
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
+    public Label gameScreenCountdown;
 
-	private String lastBuildingPosition;
+    private String lastBuildingPosition;
 
     private final PioneersService pioneersService;
     private final EventListener eventListener;
@@ -108,6 +114,8 @@ public class GameScreenController implements Controller {
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
     private final Timeline timeline = new Timeline();
+
+    private final Timeline timelineGameCountDown = new Timeline();
     private boolean runDiscardOnce = true;
     private Point3D currentRobPlace;
 
@@ -231,7 +239,30 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
+        //countup
+        countUp();
 
+    }
+
+    private void countUp() {
+        final Integer[] startTime = {0};
+        final Integer[] seconds = {startTime[0]};
+
+        timelineGameCountDown.setCycleCount(Timeline.INDEFINITE);
+
+        //gets called every second to reduce the timer by one second
+        KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
+            seconds[0]++;
+            if (seconds[0] % 60 > 9) {
+                gameScreenCountdown.setText("" + (seconds[0] / 60) + ":" + seconds[0] % 60);
+            } else {
+                gameScreenCountdown.setText("" + (seconds[0] / 60) + ":0" + seconds[0] % 60);
+            }
+        });
+
+        timelineGameCountDown.getKeyFrames().setAll(frame);
+        // start timer
+        timelineGameCountDown.playFromStart();
     }
 
     @Override
