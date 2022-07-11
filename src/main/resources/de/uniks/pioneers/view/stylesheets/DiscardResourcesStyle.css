@@ -1,6 +1,6 @@
 /* When the user has to drop resources, a new window opens with the following style(-classes) */
 .root {
-    -fx-font-family: "KenVector Future Regular";
+    -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 14;
     -fx-background-image: url("../assets/yellow_panel.png");
     -fx-background-position: center;
