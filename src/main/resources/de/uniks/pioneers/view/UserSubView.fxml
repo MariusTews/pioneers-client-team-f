@@ -61,21 +61,24 @@
          <Insets left="100.0" right="80.0" />
       </VBox.margin>
    </Label>
-   <HBox prefHeight="52.0" prefWidth="310.0">
+   <HBox prefHeight="52.0" prefWidth="366.0">
       <Pane fx:id="settlementPane">
          <HBox.margin>
-            <Insets left="30.0" right="10.0" />
+            <Insets right="10.0" />
          </HBox.margin>
-         <Button fx:id="sett" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="110.0" styleClass="move" text="SETT." />
+         <Button fx:id="sett" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="120.0" styleClass="move" text="SETT." />
       </Pane>
       <Pane fx:id="roadPane">
-         <Button fx:id="road" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="100.0" styleClass="move" text="Road" />
+         <Button fx:id="road" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="120.0" styleClass="move" text="Road" />
       </Pane>
       <Pane fx:id="cityPane">
          <HBox.margin>
             <Insets left="10.0" />
          </HBox.margin>
-         <Button fx:id="city" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="100.0" styleClass="move" text="City" />
+         <Button fx:id="city" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="120.0" styleClass="move" text="City" />
       </Pane>
+      <VBox.margin>
+         <Insets />
+      </VBox.margin>
    </HBox>
 </VBox>
