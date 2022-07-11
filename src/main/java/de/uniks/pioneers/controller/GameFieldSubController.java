@@ -16,6 +16,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -143,6 +146,7 @@ public class GameFieldSubController implements Controller {
 			Label label = (Label) parent.lookup("#" + id + "_label");
 			if (label != null) {
 				label.setText("" + tile.numberToken());
+				label.setBackground(new Background(new BackgroundFill(Color.GHOSTWHITE, new CornerRadii(5.0), null)));
 
 				if (tile.numberToken() == 7) {
 					label.toBack();
