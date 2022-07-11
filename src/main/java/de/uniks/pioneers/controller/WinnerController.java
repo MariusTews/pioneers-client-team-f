@@ -83,7 +83,7 @@ public class WinnerController implements Controller {
             // Set to UNDECORATED or TRANSPARENT (without white background) to remove minimize, maximize and close button of stage
             primaryStage.initStyle(StageStyle.TRANSPARENT);
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/winner.css")).toString());
+            scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/WinnerStyle.css")).toString());
             primaryStage.setScene(scene);
             primaryStage.setTitle("");
             // Specify modality of the new window: interactions are only possible on the second window

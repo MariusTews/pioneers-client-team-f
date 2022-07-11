@@ -97,7 +97,7 @@
 
 #timer {
     -fx-background-image: url("../assets/grey_panel.png");
-    -fx-background-size: stretch;
+    -fx-background-repeat: stretch;
     -fx-background-position: center;
     -fx-background-size: 150 70;
 }
@@ -115,21 +115,14 @@
     -fx-text-fill: dimgrey;
 }
 
-#giveTradeView {
+#tradeView {
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
     -fx-background-size: 150 281;
 }
 
-#receiveTradeView {
-    -fx-background-image: url("../assets/green_panel.png");
-    -fx-background-repeat: stretch;
-    -fx-background-position: center;
-    -fx-background-size: 150 281;
-}
-
-#offerPlayer {
+#offer {
     -fx-background-image: url("../assets/white_green_button.png");
     -fx-background-repeat: stretch;
     -fx-background-size: 210 25;
@@ -139,17 +132,7 @@
     -fx-text-fill: #666666;
 }
 
-#offerBank {
-    -fx-background-image: url("../assets/white_green_button.png");
-    -fx-background-repeat: stretch;
-    -fx-background-size: 210 25;
-    -fx-scale-x: 1.0;
-    -fx-scale-y: 1.1;
-    -fx-font-size: 14;
-    -fx-text-fill: #666666;
-}
-
-#spectatorNameId{
+#spectatorNameId {
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-position: center;
     -fx-background-repeat: stretch;
