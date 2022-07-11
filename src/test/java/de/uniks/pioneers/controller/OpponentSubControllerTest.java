@@ -53,7 +53,7 @@ public class OpponentSubControllerTest extends ApplicationTest {
         Assertions.assertThat(username.getText()).isEqualTo("bob");
         Assertions.assertThat(username.getTextFill()).isEqualTo(Color.DARKORCHID);
         Assertions.assertThat(totalResources.getText()).isEqualTo("Total resources: 3");
-        Assertions.assertThat(victoryPointsLabel.getText()).isEqualTo("VP: 4/10");
+        Assertions.assertThat(victoryPointsLabel.getText()).isEqualTo("VP: 2/4");
         Assertions.assertThat(opponentSubController.getId()).isEqualTo("00");
         Assertions.assertThat(avatarImage.getUrl()).isEqualTo(avatar);
         Assertions.assertThat(vBox).isEqualTo(opponentSubController.getParent());
