@@ -85,7 +85,11 @@ public class CircleSubController implements Controller {
 				.observeOn(FX_SCHEDULER)
 				.subscribe(event -> {
 					State state = event.data();
-					this.nextMove = state.expectedMoves().get(0);
+					//state needs to be checked
+					//so index out of bound exception doesnt get thrown
+					if(!state.expectedMoves().isEmpty()) {
+						this.nextMove = state.expectedMoves().get(0);
+					}
 				}));
 	}
 

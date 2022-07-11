@@ -26,6 +26,9 @@ class AuthServiceTest {
     @Spy
     IDStorage idStorage;
 
+    @Spy
+    RefreshTokenStorage refreshTokenStorage;
+
     @Mock
     AuthApiService authApiService;
 
@@ -43,6 +46,8 @@ class AuthServiceTest {
         assertEquals("123", result);
 
         assertEquals("accessToken", tokenStorage.getToken());
+
+        assertEquals("refreshToken", refreshTokenStorage.getRefreshToken());
 
         assertEquals("123", idStorage.getID());
 

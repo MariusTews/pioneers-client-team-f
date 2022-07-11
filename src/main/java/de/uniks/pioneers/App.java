@@ -108,4 +108,8 @@ public class App extends Application {
             controller = null;
         }
     }
+
+    public Stage getStage(){
+        return this.stage;
+    }
 }
