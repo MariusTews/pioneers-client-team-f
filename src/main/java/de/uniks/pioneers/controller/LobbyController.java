@@ -35,9 +35,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.GLOBAL;
-import static de.uniks.pioneers.Constants.GLOBAL;
-import static de.uniks.pioneers.Constants.gameComparator;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -112,9 +109,6 @@ public class LobbyController implements Controller {
     public Button rejoinButton;
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
-
-    String ownUsername = "";
-    String ownAvatar = null;
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);

@@ -340,16 +340,12 @@ public class GameScreenController implements Controller {
                     .observeOn(FX_SCHEDULER)
                     .subscribe();
             userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
-                    .subscribe(s -> {
-                        System.exit(0);
-                    });
+                    .subscribe(s -> System.exit(0));
         } else {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false).
                     observeOn(FX_SCHEDULER).subscribe();
             userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
-                    .subscribe(s -> {
-                        System.exit(0);
-                    });
+                    .subscribe(s -> System.exit(0));
         }
     }
 
@@ -424,7 +420,7 @@ public class GameScreenController implements Controller {
 
     //Sets the name of the user who has longestRoad
     private void updateLongestRoad(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
-        String userId = new String();
+        String userId = "";
         int longestRoad = 0;
         for (Player p:playerOwnView) {
             if(p.longestRoad() != null) {
