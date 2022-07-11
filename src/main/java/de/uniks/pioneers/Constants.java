@@ -76,12 +76,12 @@ public class Constants {
     public static final String ROAD = "road";
 
     //Array of Colors as Strings for the Label text
-    public static final String[] COLORSTRINGARRAY = {"RED", "BLUE", "ORANGE", "DARKORCHID", "TEAL", "ROSYBROWN",
-            "GOLD", "OLIVE"};
+    public static final String[] COLORSTRINGARRAY = {"DARKRED", "BLUE", "ORANGE", "DARKVIOLET", "TEAL", "YELLOW",
+            "ROSYBROWN", "OLIVE", "MAGENTA", "AQUA"};
 
     //Array of Colors
-    public static final Color[] COLORARRAY = {Color.RED, Color.BLUE, Color.ORANGE, Color.DARKORCHID, Color.TEAL,
-            Color.ROSYBROWN, Color.GOLD, Color.OLIVE};
+    public static final Color[] COLORARRAY = {Color.DARKRED, Color.BLUE, Color.ORANGE, Color.DARKVIOLET, Color.TEAL,
+            Color.YELLOW, Color.ROSYBROWN, Color.OLIVE, Color.MAGENTA, Color.AQUA};
 
     //Array of resources
     public static final String[] RESOURCES = {"lumber","brick","ore","wool","grain"};
