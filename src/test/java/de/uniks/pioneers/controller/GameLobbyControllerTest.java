@@ -37,6 +37,9 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Mock
     EventListener eventListener;
 
+    @Mock
+    App app;
+
     @Spy
 	GameStorage gameStorage;
 
@@ -54,10 +57,10 @@ class GameLobbyControllerTest extends ApplicationTest {
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
                 "id", "name", "owner", 2, false,new GameSettings(2,10))));
         when(gameStorage.getId()).thenReturn("id");
-
+        when(app.getStage()).thenReturn(new Stage());
 
         // start application
-        final App app = new App(gameLobbyController);
+        App app = new App(gameLobbyController);
         app.start(stage);
     }
 

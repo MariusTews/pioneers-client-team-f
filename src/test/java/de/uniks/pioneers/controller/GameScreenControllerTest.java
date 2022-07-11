@@ -38,7 +38,10 @@ class GameScreenControllerTest extends ApplicationTest {
 	@Mock
 	EventListener eventListener;
 
-	@Spy
+    @Mock
+    App app;
+
+    @Spy
 	GameStorage gameStorage;
 	@Spy
 	IDStorage idStorage;
@@ -59,6 +62,7 @@ class GameScreenControllerTest extends ApplicationTest {
 		when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
 		Map map = new Map("02", createMap(), createHarbors());
 		when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
+		when(app.getStage()).thenReturn(new Stage());
 
 		App app = new App(gameScreenController);
 		app.start(stage);
@@ -160,11 +164,11 @@ class GameScreenControllerTest extends ApplicationTest {
 		verify(pioneersService).move("02", "build", null, null, null, null, null, null, null);
 	}
 
-	@Test
-	void loadValidPositions() {
-		List<String> pos = gameScreenController.getAllValidPositions();
-		Assertions.assertEquals(pos.size(), 54);
-	}
+    @Test
+    void loadValidPositions() {
+        List<String> pos = gameScreenController.getAllValidPositions();
+        Assertions.assertEquals(pos.size(), 54);
+    }
 
 	@Test
 	void possibleRoadPlacements() {
