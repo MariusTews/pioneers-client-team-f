@@ -16,10 +16,12 @@ public class DiceRoll {
 		int firstDice;
 		int secondDice;
 
-		if (diceSum > 6) {
+		if (diceSum > 6 && diceSum < 12) {
 			int minFirstDice = diceSum % 6;
 			firstDice = ThreadLocalRandom.current().nextInt(minFirstDice, 7);
 
+		} else if (diceSum == 12) {
+			firstDice = 6;
 		} else if (diceSum == 1) {
 			firstDice = 1;
 		} else {
