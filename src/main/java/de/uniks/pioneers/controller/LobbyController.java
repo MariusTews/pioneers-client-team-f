@@ -2,10 +2,10 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
@@ -30,8 +30,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 import static de.uniks.pioneers.Constants.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class LobbyController implements Controller {
@@ -82,6 +86,8 @@ public class LobbyController implements Controller {
 
     private final GameStorage gameStorage;
 
+    private final RefreshTokenStorage refreshTokenStorage;
+
     private final UserService userService;
     private final GameService gameService;
     private final GroupService groupService;
@@ -104,10 +110,13 @@ public class LobbyController implements Controller {
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
+    private final ScheduledExecutorService scheduler =
+            Executors.newScheduledThreadPool(1);
+
     @Inject
     public LobbyController(App app,
                            IDStorage idStorage,
-                           GameStorage gameStorage, UserService userService,
+                           GameStorage gameStorage, RefreshTokenStorage refreshTokenStorage, UserService userService,
                            GameService gameService,
                            GroupService groupService,
                            MessageService messageService,
@@ -125,6 +134,7 @@ public class LobbyController implements Controller {
         this.app = app;
         this.idStorage = idStorage;
         this.gameStorage = gameStorage;
+        this.refreshTokenStorage = refreshTokenStorage;
         this.userService = userService;
         this.gameService = gameService;
         this.groupService = groupService;
@@ -161,6 +171,16 @@ public class LobbyController implements Controller {
                 .listen("global." + LOBBY_ID + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleAllTabMessages));
+
+        //refreshed Token and runs for an hour
+        if(this.gameStorage.getId() == null) {
+            beepForAHour();
+        }
+
+        this.app.getStage().setOnCloseRequest(e -> {
+                actionOnclose();
+                e.consume();
+        });
     }
 
     @Override
@@ -173,6 +193,19 @@ public class LobbyController implements Controller {
 
         disposable.dispose();
     }
+
+    //call this method every 30 minutes to refresh refreshToken and ActiveToken
+    public void beepForAHour() {
+        String refreshToken = this.refreshTokenStorage.getRefreshToken();
+        final Runnable beeper = () ->authService.refreshToken(refreshToken).
+                        observeOn(FX_SCHEDULER).subscribe();
+
+        final ScheduledFuture<?> beeperHandle =
+                scheduler.scheduleAtFixedRate(beeper, 10, 30*60, SECONDS);
+        scheduler.schedule(() ->beeperHandle.cancel(true)
+        , 60 * 60, SECONDS);
+    }
+
 
     @Override
     public Parent render() {
@@ -207,6 +240,8 @@ public class LobbyController implements Controller {
             rejoinButton.disableProperty().set(true);
         }
 
+
+
         this.users.addListener((ListChangeListener<? super User>) c -> ((VBox) this.userScrollPane.getContent())
                 .getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList()));
 
@@ -217,8 +252,20 @@ public class LobbyController implements Controller {
         this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 handleTabSwitching(oldValue, newValue));
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
+
+
+
         return parent;
     }
+
+    //takes action when the application is forcefully closed
+    //such as logging out
+    private void actionOnclose() {
+        userService.statusUpdate(idStorage.getID(), "offline")
+                .observeOn(FX_SCHEDULER)
+                .subscribe(er -> System.exit(0));
+    }
+
 
     private void handleTabSwitching(Tab oldValue, Tab newValue) {
 
@@ -516,8 +563,8 @@ public class LobbyController implements Controller {
     }
 
     private void loadGames(List<Game> games) {
-        List<Game> accessible = games.stream().filter(game -> (!game.started() && (int) game.members() < MAX_MEMBERS)).toList();
-        List<Game> notAccessible = games.stream().filter(game -> (game.started() || game.members().equals(MAX_MEMBERS))).toList();
+        List<Game> accessible = games.stream().filter(game ->!(game.started())).toList();
+        List<Game> notAccessible = games.stream().filter(Game::started).toList();
 
         this.games.addAll(accessible);
         this.games.addAll(notAccessible);
@@ -698,7 +745,8 @@ public class LobbyController implements Controller {
         if(!changeToPlayer) {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
                     .observeOn(FX_SCHEDULER)
-                    .subscribe(onSuccess -> this.app.show(gameScreenController.get()));
+                    .subscribe();
+            this.app.show(gameScreenController.get());
         }
 
     }
