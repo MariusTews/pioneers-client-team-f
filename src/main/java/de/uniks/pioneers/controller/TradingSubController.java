@@ -14,10 +14,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -283,17 +287,27 @@ public class TradingSubController implements Controller {
         plusAction(event, "grain", receiveVenusLabel, false, receiveVenusMinusButton);
     }
 
+    private Stage primaryStage;
+
     public void offerPlayerButtonPressed() {
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/Offer.fxml"));
+        loader.setControllerFactory(c -> this);
+        Parent parent;
+        try {
+            parent = loader.load();
+            this.primaryStage = new Stage();
+            primaryStage.initStyle(StageStyle.TRANSPARENT);
+            Scene scene = new Scene(parent, 200, 200);
+            primaryStage.setScene(scene);
+            primaryStage.initModality(Modality.WINDOW_MODAL);
+            primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void offerBankButtonPressed() {
         updateHarbors();
-
-        // create hashMap for move: positive val are given, negative val are taken
-        HashMap<String, Integer> tmp = new HashMap<>();
-        for (String res : RESOURCES) {
-            tmp.put(res, 0);
-        }
 
         /*
          * check for mixed resources
@@ -332,9 +346,7 @@ public class TradingSubController implements Controller {
                             alert("Trade was not successful. You don't have a building on a 3:1 harbor!");
                         }
                     }
-                    case 4 -> {
-                        trade(giveRes, 4);
-                    }
+                    case 4 -> trade(giveRes, 4);
                     default -> {
                     }
                 }
