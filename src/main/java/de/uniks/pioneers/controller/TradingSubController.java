@@ -350,6 +350,9 @@ public class TradingSubController implements Controller {
         this.receiveMoonLabel.setText("0");
         this.receiveNeptunLabel.setText("0");
         this.receiveVenusLabel.setText("0");
+
+        // reset all buttons to initial settings
+        resetButtons();
     }
 
     // Additional methods
@@ -451,6 +454,30 @@ public class TradingSubController implements Controller {
     private void makeButtonVisible(Button button, boolean visible) {
         button.setVisible(visible);
         button.disableProperty().set(!visible);
+    }
+
+    private void resetButtons() {
+        makeButtonVisible(this.giveCactusMinusButton, false);
+        makeButtonVisible(this.giveMarsMinusButton, false);
+        makeButtonVisible(this.giveMoonMinusButton, false);
+        makeButtonVisible(this.giveNeptunMinusButton, false);
+        makeButtonVisible(this.giveVenusMinusButton, false);
+        makeButtonVisible(this.receiveCactusMinusButton, false);
+        makeButtonVisible(this.receiveMarsMinusButton, false);
+        makeButtonVisible(this.receiveMoonMinusButton, false);
+        makeButtonVisible(this.receiveNeptunMinusButton, false);
+        makeButtonVisible(this.receiveVenusMinusButton, false);
+
+        makeButtonVisible(this.giveCactusPlusButton, true);
+        makeButtonVisible(this.giveMarsPlusButton, true);
+        makeButtonVisible(this.giveMoonPlusButton, true);
+        makeButtonVisible(this.giveNeptunPlusButton, true);
+        makeButtonVisible(this.giveVenusPlusButton, true);
+        makeButtonVisible(this.receiveCactusPlusButton, true);
+        makeButtonVisible(this.receiveMarsPlusButton, true);
+        makeButtonVisible(this.receiveMoonPlusButton, true);
+        makeButtonVisible(this.receiveNeptunPlusButton, true);
+        makeButtonVisible(this.receiveVenusPlusButton, true);
     }
 
     // check amount of resource to give or to receive
