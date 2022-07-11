@@ -54,12 +54,9 @@ public class MemberListSubcontroller implements Controller {
 			return null;
 		}
 
-
 		// set username and avatar
 		if (this.member != null) {
 			if (!member.spectator()) {
-				//makes Label invisible to make GameLobby look more like the mockups
-				this.idReady.setVisible(false);
 				if (member.color() != null) {
 					this.idUsername.setText(user.name());
 					this.idUsername.setTextFill(Color.web(member.color()));
@@ -72,12 +69,8 @@ public class MemberListSubcontroller implements Controller {
 				}
 				// set ready
 				if (this.member.ready()) {
-					this.idReady.setText("-ready-");
-					this.idReady.setTextFill(Color.DARKGREEN);
-					this.circleId.setFill(Color.web("#00D100"));
+					this.circleId.setFill(Color.GREEN);
 				} else {
-					this.idReady.setText("-not ready-");
-					this.idReady.setTextFill(Color.FIREBRICK);
 					this.circleId.setFill(Color.RED);
 				}
 			} else {
