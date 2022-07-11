@@ -1,10 +1,15 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.model.Building;
+import de.uniks.pioneers.model.Harbor;
 import de.uniks.pioneers.model.Player;
+import de.uniks.pioneers.model.Point3D;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.websocket.EventListener;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,14 +18,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
-import static de.uniks.pioneers.Constants.RESOURCES;
+import static de.uniks.pioneers.Constants.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class TradingSubController implements Controller {
@@ -92,34 +99,37 @@ public class TradingSubController implements Controller {
     private final GameStorage gameStorage;
     private final PioneersService pioneersService;
     private final IDStorage idStorage;
+    private final EventListener eventListener;
     private Player player;
 
     // hashMaps for resources
     private final HashMap<String, Integer> giveResources = new HashMap<>();
     private final HashMap<String, Integer> receiveResources = new HashMap<>();
+    private final HashMap<Point3D, Building> playersBuildingsZero = new HashMap<>();
+    private final HashMap<Point3D, Building> playersBuildingsSix = new HashMap<>();
+    private final HashMap<String, Boolean> harborHashCheck = new HashMap<>();
+    private final List<Harbor> harbors = new ArrayList<>();
+    private final List<Building> buildings = new ArrayList<>();
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     public TradingSubController(GameStorage gameStorage,
                                 PioneersService pioneersService,
-                                IDStorage idStorage) {
+                                IDStorage idStorage,
+                                EventListener eventListener) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
         this.idStorage = idStorage;
+        this.eventListener = eventListener;
     }
 
     @Override
     public void init() {
         // init hashMaps
-        this.giveResources.put("lumber", 0);
-        this.giveResources.put("brick", 0);
-        this.giveResources.put("ore", 0);
-        this.giveResources.put("wool", 0);
-        this.giveResources.put("grain", 0);
-        this.receiveResources.put("lumber", 0);
-        this.receiveResources.put("brick", 0);
-        this.receiveResources.put("ore", 0);
-        this.receiveResources.put("wool", 0);
-        this.receiveResources.put("grain", 0);
+        for (String res : RESOURCES) {
+            this.giveResources.put(res, 0);
+            this.receiveResources.put(res, 0);
+        }
 
         pioneersService
                 .findAllPlayers(this.gameStorage.getId())
@@ -131,11 +141,31 @@ public class TradingSubController implements Controller {
                         }
                     }
                 });
+
+        // get all harbors and init harborHashCheck
+        pioneersService
+                .findAllTiles(gameStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(tiles -> {
+                    for (Harbor harbor : tiles.harbors()) {
+                        this.harbors.add(harbor);
+                        harborHashCheck.put(harbor.type(), false);
+                    }
+                });
+
+        disposable.add(eventListener
+                .listen("games." + gameStorage.getId() + ".buildings.*.*", Building.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(buildingEvent -> {
+                    if (buildingEvent.event().endsWith(CREATED)) {
+                        buildings.add(buildingEvent.data());
+                    }
+                }));
     }
 
     @Override
     public void destroy() {
-
+        disposable.dispose();
     }
 
     @Override
@@ -150,16 +180,16 @@ public class TradingSubController implements Controller {
             return null;
         }
 
-        makeButtonInvisible(giveCactusMinusButton);
-        makeButtonInvisible(giveMarsMinusButton);
-        makeButtonInvisible(giveMoonMinusButton);
-        makeButtonInvisible(giveNeptunMinusButton);
-        makeButtonInvisible(giveVenusMinusButton);
-        makeButtonInvisible(receiveCactusMinusButton);
-        makeButtonInvisible(receiveMarsMinusButton);
-        makeButtonInvisible(receiveMoonMinusButton);
-        makeButtonInvisible(receiveNeptunMinusButton);
-        makeButtonInvisible(receiveVenusMinusButton);
+        makeButtonVisible(giveCactusMinusButton, false);
+        makeButtonVisible(giveMarsMinusButton, false);
+        makeButtonVisible(giveMoonMinusButton, false);
+        makeButtonVisible(giveNeptunMinusButton, false);
+        makeButtonVisible(giveVenusMinusButton, false);
+        makeButtonVisible(receiveCactusMinusButton, false);
+        makeButtonVisible(receiveMarsMinusButton, false);
+        makeButtonVisible(receiveMoonMinusButton, false);
+        makeButtonVisible(receiveNeptunMinusButton, false);
+        makeButtonVisible(receiveVenusMinusButton, false);
 
         return parent;
     }
@@ -254,7 +284,121 @@ public class TradingSubController implements Controller {
         plusAction(event, "grain", receiveVenusLabel, false, receiveVenusMinusButton);
     }
 
+    private Stage primaryStage;
+
+    public void offerPlayerButtonPressed() {
+    }
+
+    public void offerBankButtonPressed() {
+        updateHarbors();
+
+        /*
+         * check for mixed resources
+         * increase count for every label greater 0
+         * when counter is greater than 1, more than one resource were selected
+         * */
+        int checkGiveRes = 0;
+        int checkReceiveRes = 0;
+
+        for (String res : RESOURCES) {
+            if (this.giveResources.get(res) > 0) {
+                checkGiveRes++;
+            }
+            if (this.receiveResources.get(res) > 0) {
+                checkReceiveRes++;
+            }
+        }
+
+        if (checkGiveRes > 1 || checkReceiveRes > 1) {
+            alert("You can only select one type of resource when trading with the bank");
+        } else {
+            // different conditions for 4:1, 3:1 and 2:1 trades
+            for (String giveRes : RESOURCES) {
+                switch (this.giveResources.get(giveRes)) {
+                    case 2 -> {
+                        if (harborHashCheck.get(giveRes)) {
+                            trade(giveRes, 2);
+                        } else {
+                            alert("Trade was not successful. You don't have a building on a matching 2:1 harbor!");
+                        }
+                    }
+                    case 3 -> {
+                        if (harborHashCheck.get(null)) {
+                            trade(giveRes, 3);
+                        } else {
+                            alert("Trade was not successful. You don't have a building on a 3:1 harbor!");
+                        }
+                    }
+                    case 4 -> trade(giveRes, 4);
+                    default -> {
+                    }
+                }
+            }
+        }
+
+        // clear hashes
+        this.giveResources.replaceAll((k, v) -> v = 0);
+        this.receiveResources.replaceAll((k, v) -> v = 0);
+
+        this.giveCactusLabel.setText("0");
+        this.giveMarsLabel.setText("0");
+        this.giveMoonLabel.setText("0");
+        this.giveNeptunLabel.setText("0");
+        this.giveVenusLabel.setText("0");
+        this.receiveCactusLabel.setText("0");
+        this.receiveMarsLabel.setText("0");
+        this.receiveMoonLabel.setText("0");
+        this.receiveNeptunLabel.setText("0");
+        this.receiveVenusLabel.setText("0");
+
+        // reset all buttons to initial settings
+        resetButtons();
+    }
+
     // Additional methods
+
+    public void alert(String text) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, text);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        alert.showAndWait();
+    }
+
+    /*
+     * trade a given resource
+     * check, if a receiving resource was selected and make move
+     * */
+    private void trade(String giveRes, int amount) {
+        // initialize temporary hashMap for move
+        HashMap<String, Integer> tmp = new HashMap<>();
+        for (String res : RESOURCES) {
+            tmp.put(res, 0);
+        }
+
+        for (String receiveRes : RESOURCES) {
+            if (this.receiveResources.get(receiveRes) == 1) {
+                // put the chosen values in hashMap
+                tmp.put(giveRes, -amount);
+                tmp.put(receiveRes, 1);
+
+                // trade move
+                this.pioneersService
+                        .tradeBank(this.gameStorage.getId(), tmp)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe(result -> pioneersService
+                                .findAllPlayers(this.gameStorage.getId())
+                                .observeOn(FX_SCHEDULER)
+                                .subscribe(c -> {
+                                    for (Player player : c) {
+                                        if (player.userId().equals(idStorage.getID())) {
+                                            this.player = player;
+                                        }
+                                    }
+                                }));
+            }
+        }
+    }
 
     /*
      * decrease the label
@@ -272,10 +416,10 @@ public class TradingSubController implements Controller {
             }
         }
         if (label.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
+            makeButtonVisible((Button) event.getSource(), false);
         }
         if (plusButton.disableProperty().get()) {
-            makeButtonVisible(plusButton);
+            makeButtonVisible(plusButton, true);
         }
     }
 
@@ -283,7 +427,6 @@ public class TradingSubController implements Controller {
      *  increase the label
      *  check amount of resources, so it can't get greater and disable the plus button if so
      * */
-
     private void plusAction(ActionEvent event, String resource, Label label, boolean give, Button minusButton) {
         if (give) {
             // player not null prevents exceptions, when the button is pressed and the player hasn't any resources
@@ -300,105 +443,118 @@ public class TradingSubController implements Controller {
             }
         }
 
-        if (minusButton.disableProperty().get()) {
-            makeButtonVisible(minusButton);
+        if (minusButton.disableProperty().get() && Integer.parseInt(label.getText()) > 0) {
+            makeButtonVisible(minusButton, true);
         }
         if (!checkAmount(label, resource, give)) {
-            makeButtonInvisible((Button) event.getSource());
+            makeButtonVisible((Button) event.getSource(), false);
         }
     }
 
-    private void makeButtonVisible(Button button) {
-        button.setVisible(true);
-        button.disableProperty().set(false);
+    private void makeButtonVisible(Button button, boolean visible) {
+        button.setVisible(visible);
+        button.disableProperty().set(!visible);
     }
 
-    private void makeButtonInvisible(Button button) {
-        button.disableProperty().set(true);
-        button.setVisible(false);
+    private void resetButtons() {
+        makeButtonVisible(this.giveCactusMinusButton, false);
+        makeButtonVisible(this.giveMarsMinusButton, false);
+        makeButtonVisible(this.giveMoonMinusButton, false);
+        makeButtonVisible(this.giveNeptunMinusButton, false);
+        makeButtonVisible(this.giveVenusMinusButton, false);
+        makeButtonVisible(this.receiveCactusMinusButton, false);
+        makeButtonVisible(this.receiveMarsMinusButton, false);
+        makeButtonVisible(this.receiveMoonMinusButton, false);
+        makeButtonVisible(this.receiveNeptunMinusButton, false);
+        makeButtonVisible(this.receiveVenusMinusButton, false);
+
+        makeButtonVisible(this.giveCactusPlusButton, true);
+        makeButtonVisible(this.giveMarsPlusButton, true);
+        makeButtonVisible(this.giveMoonPlusButton, true);
+        makeButtonVisible(this.giveNeptunPlusButton, true);
+        makeButtonVisible(this.giveVenusPlusButton, true);
+        makeButtonVisible(this.receiveCactusPlusButton, true);
+        makeButtonVisible(this.receiveMarsPlusButton, true);
+        makeButtonVisible(this.receiveMoonPlusButton, true);
+        makeButtonVisible(this.receiveNeptunPlusButton, true);
+        makeButtonVisible(this.receiveVenusPlusButton, true);
     }
 
+    // check amount of resource to give or to receive
     private boolean checkAmount(Label label, String resource, boolean give) {
         if (give) {
-            return Integer.parseInt(label.getText()) < player.resources().get(resource);
+            if (player.resources().get(resource) != null) {
+                return Integer.parseInt(label.getText()) < player.resources().get(resource);
+            }
         }
         return Integer.parseInt(label.getText()) < 1;
     }
 
-    public void offerPlayerButtonPressed() {
-    }
-
-    public void offerBankButtonPressed() {
-        // create hashMap for move: positive val are given, negative val are taken
-        HashMap<String, Integer> tmp = new HashMap<>();
-        tmp.put("grain", 0);
-        tmp.put("brick", 0);
-        tmp.put("ore", 0);
-        tmp.put("lumber", 0);
-        tmp.put("wool", 0);
-
-        // check for mixed resources
-        int checkGiveRes = 0;
-        int checkReceiveRes = 0;
-
-        for (String res : RESOURCES) {
-            if (this.giveResources.get(res) > 0) {
-                checkGiveRes++;
-            }
-            if (this.receiveResources.get(res) > 0) {
-                checkReceiveRes++;
-            }
-        }
-
-        if (checkGiveRes > 1 || checkReceiveRes > 1) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You can only select one type of resource when trading with the bank");
-            DialogPane dialogPane = alert.getDialogPane();
-            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-            alert.showAndWait();
-        } else {
-            // 4:1 trade with bank
-            // check for every resource available, if amount to give is 4 and to receive is 1
-            for (String giveRes : RESOURCES) {
-                if (this.giveResources.get(giveRes) == 4) {
-                    for (String receiveRes : RESOURCES) {
-                        if (this.receiveResources.get(receiveRes) == 1) {
-                            // put the chosen values
-                            tmp.put(giveRes, -4);
-                            tmp.put(receiveRes, 1);
-
-                            // trade move
-                            this.pioneersService.tradeBank(this.gameStorage.getId(), tmp)
-                                    .observeOn(FX_SCHEDULER)
-                                    .subscribe(result -> pioneersService
-                                            .findAllPlayers(this.gameStorage.getId())
-                                            .observeOn(FX_SCHEDULER)
-                                            .subscribe(c -> {
-                                                for (Player player : c) {
-                                                    if (player.userId().equals(idStorage.getID())) {
-                                                        this.player = player;
-                                                    }
-                                                }
-                                            }));
-                        }
-                    }
+    private void updateHarbors() {
+        // get or update all building with sides 0 and 6
+        for (Building building : buildings) {
+            if (building.owner().equals(idStorage.getID()) &&
+                    !playersBuildingsZero.containsValue(building) &&
+                    !playersBuildingsSix.containsValue(building)) {
+                if (building.side().intValue() == 0) {
+                    playersBuildingsZero.put(new Point3D(building.x(), building.y(), building.z()), building);
+                }
+                if (building.side().intValue() == 6) {
+                    playersBuildingsSix.put(new Point3D(building.x(), building.y(), building.z()), building);
                 }
             }
         }
 
-        this.giveResources.replaceAll((k, v) -> v = 0);
-        this.receiveResources.replaceAll((k, v) -> v = 0);
+        /*
+         * update all harbors
+         * check for a building on a harbors position
+         * set boolean of that harbor to true
+         * reposition coordinates of harbor to the coordinates of building
+         * every side needs different repositioning of the coordinates
+         * */
+        for (Harbor harbor : harbors) {
+            switch (harbor.side().intValue()) {
+                case 1 -> {
+                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
+                }
+                case 3 -> {
+                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x().intValue() + 1, harbor.y(), harbor.z().intValue() - 1), harbor.type());
+                }
+                case 5 -> {
+                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y().intValue() - 1, harbor.z().intValue() + 1), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                }
+                case 7 -> {
+                    checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                }
+                case 9 -> {
+                    checkHarborPosZero(new Point3D(harbor.x().intValue() - 1, harbor.y(), harbor.z().intValue() + 1), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
+                }
+                case 11 -> {
+                    checkHarborPosZero(new Point3D(harbor.x(), harbor.y(), harbor.z()), harbor.type());
+                    checkHarborPosSix(new Point3D(harbor.x(), harbor.y().intValue() + 1, harbor.z().intValue() - 1), harbor.type());
+                }
+                default -> {
+                }
+            }
+        }
+    }
 
-        this.giveCactusLabel.setText("0");
-        this.giveMarsLabel.setText("0");
-        this.giveMoonLabel.setText("0");
-        this.giveNeptunLabel.setText("0");
-        this.giveVenusLabel.setText("0");
-        this.receiveCactusLabel.setText("0");
-        this.receiveMarsLabel.setText("0");
-        this.receiveMoonLabel.setText("0");
-        this.receiveNeptunLabel.setText("0");
-        this.receiveVenusLabel.setText("0");
+    // do the coordinates match on position 0 or 6
+    private void checkHarborPosZero(Point3D coordinates, String type) {
+        if (playersBuildingsZero.containsKey(coordinates)) {
+            harborHashCheck.put(type, true);
+        }
+    }
+
+    private void checkHarborPosSix(Point3D coordinates, String type) {
+        if (playersBuildingsSix.containsKey(coordinates)) {
+            harborHashCheck.put(type, true);
+        }
     }
 
     public void setPlayer(Player player) {
