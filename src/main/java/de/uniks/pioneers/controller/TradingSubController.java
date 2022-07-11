@@ -18,6 +18,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -179,16 +180,16 @@ public class TradingSubController implements Controller {
             return null;
         }
 
-        makeButtonInvisible(giveCactusMinusButton);
-        makeButtonInvisible(giveMarsMinusButton);
-        makeButtonInvisible(giveMoonMinusButton);
-        makeButtonInvisible(giveNeptunMinusButton);
-        makeButtonInvisible(giveVenusMinusButton);
-        makeButtonInvisible(receiveCactusMinusButton);
-        makeButtonInvisible(receiveMarsMinusButton);
-        makeButtonInvisible(receiveMoonMinusButton);
-        makeButtonInvisible(receiveNeptunMinusButton);
-        makeButtonInvisible(receiveVenusMinusButton);
+        makeButtonVisible(giveCactusMinusButton, false);
+        makeButtonVisible(giveMarsMinusButton, false);
+        makeButtonVisible(giveMoonMinusButton, false);
+        makeButtonVisible(giveNeptunMinusButton, false);
+        makeButtonVisible(giveVenusMinusButton, false);
+        makeButtonVisible(receiveCactusMinusButton, false);
+        makeButtonVisible(receiveMarsMinusButton, false);
+        makeButtonVisible(receiveMoonMinusButton, false);
+        makeButtonVisible(receiveNeptunMinusButton, false);
+        makeButtonVisible(receiveVenusMinusButton, false);
 
         return parent;
     }
@@ -283,17 +284,13 @@ public class TradingSubController implements Controller {
         plusAction(event, "grain", receiveVenusLabel, false, receiveVenusMinusButton);
     }
 
+    private Stage primaryStage;
+
     public void offerPlayerButtonPressed() {
     }
 
     public void offerBankButtonPressed() {
         updateHarbors();
-
-        // create hashMap for move: positive val are given, negative val are taken
-        HashMap<String, Integer> tmp = new HashMap<>();
-        for (String res : RESOURCES) {
-            tmp.put(res, 0);
-        }
 
         /*
          * check for mixed resources
@@ -313,11 +310,7 @@ public class TradingSubController implements Controller {
         }
 
         if (checkGiveRes > 1 || checkReceiveRes > 1) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You can only select one type of resource when trading with the bank");
-            DialogPane dialogPane = alert.getDialogPane();
-            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-            alert.showAndWait();
+            alert("You can only select one type of resource when trading with the bank");
         } else {
             // different conditions for 4:1, 3:1 and 2:1 trades
             for (String giveRes : RESOURCES) {
@@ -325,18 +318,19 @@ public class TradingSubController implements Controller {
                     case 2 -> {
                         if (harborHashCheck.get(giveRes)) {
                             trade(giveRes, 2);
+                        } else {
+                            alert("Trade was not successful. You don't have a building on a matching 2:1 harbor!");
                         }
                     }
                     case 3 -> {
                         if (harborHashCheck.get(null)) {
                             trade(giveRes, 3);
+                        } else {
+                            alert("Trade was not successful. You don't have a building on a 3:1 harbor!");
                         }
                     }
-                    case 4 -> {
-                        trade(giveRes, 4);
-                    }
+                    case 4 -> trade(giveRes, 4);
                     default -> {
-
                     }
                 }
             }
@@ -356,9 +350,20 @@ public class TradingSubController implements Controller {
         this.receiveMoonLabel.setText("0");
         this.receiveNeptunLabel.setText("0");
         this.receiveVenusLabel.setText("0");
+
+        // reset all buttons to initial settings
+        resetButtons();
     }
 
     // Additional methods
+
+    public void alert(String text) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, text);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        alert.showAndWait();
+    }
 
     /*
      * trade a given resource
@@ -411,10 +416,10 @@ public class TradingSubController implements Controller {
             }
         }
         if (label.getText().equals("0")) {
-            makeButtonInvisible((Button) event.getSource());
+            makeButtonVisible((Button) event.getSource(), false);
         }
         if (plusButton.disableProperty().get()) {
-            makeButtonVisible(plusButton);
+            makeButtonVisible(plusButton, true);
         }
     }
 
@@ -439,21 +444,40 @@ public class TradingSubController implements Controller {
         }
 
         if (minusButton.disableProperty().get() && Integer.parseInt(label.getText()) > 0) {
-            makeButtonVisible(minusButton);
+            makeButtonVisible(minusButton, true);
         }
         if (!checkAmount(label, resource, give)) {
-            makeButtonInvisible((Button) event.getSource());
+            makeButtonVisible((Button) event.getSource(), false);
         }
     }
 
-    private void makeButtonVisible(Button button) {
-        button.setVisible(true);
-        button.disableProperty().set(false);
+    private void makeButtonVisible(Button button, boolean visible) {
+        button.setVisible(visible);
+        button.disableProperty().set(!visible);
     }
 
-    private void makeButtonInvisible(Button button) {
-        button.disableProperty().set(true);
-        button.setVisible(false);
+    private void resetButtons() {
+        makeButtonVisible(this.giveCactusMinusButton, false);
+        makeButtonVisible(this.giveMarsMinusButton, false);
+        makeButtonVisible(this.giveMoonMinusButton, false);
+        makeButtonVisible(this.giveNeptunMinusButton, false);
+        makeButtonVisible(this.giveVenusMinusButton, false);
+        makeButtonVisible(this.receiveCactusMinusButton, false);
+        makeButtonVisible(this.receiveMarsMinusButton, false);
+        makeButtonVisible(this.receiveMoonMinusButton, false);
+        makeButtonVisible(this.receiveNeptunMinusButton, false);
+        makeButtonVisible(this.receiveVenusMinusButton, false);
+
+        makeButtonVisible(this.giveCactusPlusButton, true);
+        makeButtonVisible(this.giveMarsPlusButton, true);
+        makeButtonVisible(this.giveMoonPlusButton, true);
+        makeButtonVisible(this.giveNeptunPlusButton, true);
+        makeButtonVisible(this.giveVenusPlusButton, true);
+        makeButtonVisible(this.receiveCactusPlusButton, true);
+        makeButtonVisible(this.receiveMarsPlusButton, true);
+        makeButtonVisible(this.receiveMoonPlusButton, true);
+        makeButtonVisible(this.receiveNeptunPlusButton, true);
+        makeButtonVisible(this.receiveVenusPlusButton, true);
     }
 
     // check amount of resource to give or to receive
