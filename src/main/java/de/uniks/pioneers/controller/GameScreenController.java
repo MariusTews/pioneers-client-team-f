@@ -389,10 +389,7 @@ public class GameScreenController implements Controller {
         if (playerEvent.event().endsWith(UPDATED)) {
 
             for (Player p : playerOwnView) {
-                //System.out.println(p.userId());
-                //System.out.println(player.userId());
                 if (p.userId().equals(player.userId())) {
-                    //System.out.println("hallo");
                     playerOwnView.set(playerOwnView.indexOf(p), player);
                 }
             }
@@ -460,7 +457,7 @@ public class GameScreenController implements Controller {
         }
 
         for (List<String> s : userNumberPoints.values()) {
-            if (s.contains(this.gameStorage.getVictoryPoints())) {
+            if (s.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                         , gameStorage, idStorage, gameService, app, lobbyController);
                 winnerController.render();
