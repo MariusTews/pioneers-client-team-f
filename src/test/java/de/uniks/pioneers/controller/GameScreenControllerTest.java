@@ -73,7 +73,7 @@ class GameScreenControllerTest extends ApplicationTest {
 		remain.put("settlement", 3);
 		remain.put("city", 3);
 		remain.put("road", 3);
-		Player player = new Player("01", "02", "#9932cc", true, 4, null, remain, 2, 2, null);
+		Player player = new Player("01", "02", "#00ffff", true, 4, null, remain, 2, 2, null);
 		gameScreenController.getGameFieldSubController().getPlayers().add(player);
 		gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 7, "02", "road");
 		gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "city");
