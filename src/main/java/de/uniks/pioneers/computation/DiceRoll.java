@@ -11,7 +11,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DiceRoll {
 
 	public List<Image> getDiceImages(int diceSum) {
-		System.out.println(diceSum);
 		List<Image> dices = new ArrayList<>();
 
 		int firstDice;
