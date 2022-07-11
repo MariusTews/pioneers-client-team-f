@@ -155,22 +155,22 @@ public class LobbyViewTest extends ApplicationTest {
 		Label label3 = (Label) hBox3.getChildren().get(0);
 		Button join = (Button) hBox3.getChildren().get(1);
 
-		Assertions.assertThat(label3.getText()).isEqualTo("testGame (2/6)");
+		Assertions.assertThat(label3.getText()).isEqualTo("testGame");
 		Assertions.assertThat(join.getText()).isEqualTo("join");
 
 		// Assert that the third game of the list has no "join" button, because max. members are reached
 		HBox hBox4 = (HBox) vBox2.getChildren().get(1);
-		Assertions.assertThat(hBox4.getChildren().size()).isEqualTo(1);
+		Assertions.assertThat(hBox4.getChildren().size()).isEqualTo(2);
 
 		Label label4 = (Label) hBox4.getChildren().get(0);
-		Assertions.assertThat(label4.getText()).isEqualTo("testGame (" + MAX_MEMBERS + "/6)");
+		Assertions.assertThat(label4.getText()).isEqualTo("testGame");
 
 		// Assert that the second game of the list has no "join" button, because started = true
 		HBox hBox5 = (HBox) vBox2.getChildren().get(2);
 		Assertions.assertThat(hBox5.getChildren().size()).isEqualTo(1);
 
 		Label label5 = (Label) hBox5.getChildren().get(0);
-		Assertions.assertThat(label5.getText()).isEqualTo("testGame (2/6)");
+		Assertions.assertThat(label5.getText()).isEqualTo("testGame");
 
 		// Assert that the text messages are displayed correctly
 		clickOn(chat);

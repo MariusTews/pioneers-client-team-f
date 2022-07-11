@@ -330,7 +330,6 @@ public class GameScreenController implements Controller {
             e.consume();
         });
 
-
         return parent;
     }
 
@@ -433,6 +432,7 @@ public class GameScreenController implements Controller {
         for (User u: allUser) {
             if(u._id().equals(userId)){
                 playerLongestRoadLabel.setText(u.name());
+                break;
             }
         }
     }
