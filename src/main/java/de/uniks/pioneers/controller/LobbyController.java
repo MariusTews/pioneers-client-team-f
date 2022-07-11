@@ -35,6 +35,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.GLOBAL;
+import static de.uniks.pioneers.Constants.GLOBAL;
 import static de.uniks.pioneers.Constants.gameComparator;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -201,17 +203,13 @@ public class LobbyController implements Controller {
     //call this method every 30 minutes to refresh refreshToken and ActiveToken
     public void beepForAHour() {
         String refreshToken = this.refreshTokenStorage.getRefreshToken();
-        final Runnable beeper = new Runnable() {
-            public void run() {
-                authService.refreshToken(refreshToken).
+        final Runnable beeper = () ->authService.refreshToken(refreshToken).
                         observeOn(FX_SCHEDULER).subscribe();
-            }
-        };
+
         final ScheduledFuture<?> beeperHandle =
                 scheduler.scheduleAtFixedRate(beeper, 10, 30*60, SECONDS);
-        scheduler.schedule(new Runnable() {
-            public void run() { beeperHandle.cancel(true); }
-        }, 60 * 60, SECONDS);
+        scheduler.schedule(() ->beeperHandle.cancel(true)
+        , 60 * 60, SECONDS);
     }
 
 
@@ -271,9 +269,7 @@ public class LobbyController implements Controller {
     private void actionOnclose() {
         userService.statusUpdate(idStorage.getID(), "offline")
                 .observeOn(FX_SCHEDULER)
-                .subscribe(er -> {
-                    System.exit(0);
-                });
+                .subscribe(er -> System.exit(0));
     }
 
 
@@ -573,8 +569,8 @@ public class LobbyController implements Controller {
     }
 
     private void loadGames(List<Game> games) {
-        List<Game> accessible = games.stream().filter(game -> (!game.started())).toList();
-        List<Game> notAccessible = games.stream().filter(game -> (game.started())).toList();
+        List<Game> accessible = games.stream().filter(game ->!(game.started())).toList();
+        List<Game> notAccessible = games.stream().filter(Game::started).toList();
 
         this.games.addAll(accessible);
         this.games.addAll(notAccessible);

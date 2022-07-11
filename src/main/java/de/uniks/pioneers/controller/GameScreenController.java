@@ -174,7 +174,6 @@ public class GameScreenController implements Controller {
                             .findOneState(gameStorage.getId())
                             .observeOn(FX_SCHEDULER)
                             .subscribe(r -> {
-                                System.out.println(r);
                                 if(!r.expectedMoves().isEmpty()) {
                                     if (r.expectedMoves().get(0).action().equals("founding-roll")) {
                                         foundingDiceRoll();
@@ -334,6 +333,7 @@ public class GameScreenController implements Controller {
     }
 
     private void actionOnCloseScreen() {
+
         if(playerOwnView.size() + opponents.size() == 1) {
             gameService
                     .deleteGame(gameStorage.getId())
@@ -391,8 +391,12 @@ public class GameScreenController implements Controller {
         Player player = playerEvent.data();
 
         if (playerEvent.event().endsWith(UPDATED)) {
+
             for (Player p : playerOwnView) {
+                //System.out.println(p.userId());
+                //System.out.println(player.userId());
                 if (p.userId().equals(player.userId())) {
+                    //System.out.println("hallo");
                     playerOwnView.set(playerOwnView.indexOf(p), player);
                 }
             }

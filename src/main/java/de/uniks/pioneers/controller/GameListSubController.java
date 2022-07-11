@@ -52,10 +52,10 @@ public class GameListSubController implements Controller {
         }
 
         if (game != null) {
-            this.gameNameLabel.setText(this.game.name() );//+ " (" + game.members() + "/" + MAX_MEMBERS + ")");
+            this.gameNameLabel.setText(this.game.name() );
             this.id = game._id();
 
-            if (game.started()) { //|| (int) game.members() == MAX_MEMBERS) {
+            if (game.started()) {
                 HBox box = (HBox) this.joinButton.getParent();
                 box.getChildren().removeIf(node -> node.equals(joinButton));
             }
@@ -66,9 +66,7 @@ public class GameListSubController implements Controller {
     }
 
     public void joinButtonPressed() {
-        //if ((int) game.members() < MAX_MEMBERS) {
             this.lobbyController.joinGame(this.game);
-        //}
     }
 
     public String getId() {

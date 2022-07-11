@@ -243,9 +243,7 @@ public class GameLobbyController implements Controller {
 				gameService
 						.findOneGame(gameStorage.getId())
 						.observeOn(FX_SCHEDULER)
-						.subscribe(result -> {
-							actionOnCloseScreen(result);
-						});
+						.subscribe(this::actionOnCloseScreen);
 				e.consume();
 		});
 
@@ -326,9 +324,7 @@ public class GameLobbyController implements Controller {
 
 		userService.statusUpdate(this.idStorage.getID(), "offline").
 				observeOn(FX_SCHEDULER)
-				.subscribe(e -> {
-					System.exit(0);
-				});
+				.subscribe(e -> System.exit(0));
 	}
 
 	public void leave() {
