@@ -3,7 +3,7 @@
 #gameView {
     -fx-background-image: url("../assets/ingame_background.png");
     -fx-background-repeat: stretch;
-    -fx-background-size: 1600 900;
+    -fx-background-size: 1700 1000;
 }
 
 /* player's views with resource icons */
@@ -11,7 +11,7 @@
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
-    -fx-background-size: 420 300;
+    -fx-background-size: 380 270;
 }
 
 #userView .text {
