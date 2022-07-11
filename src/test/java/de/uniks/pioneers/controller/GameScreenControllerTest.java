@@ -36,6 +36,8 @@ class GameScreenControllerTest extends ApplicationTest {
 	@Mock
 	MemberService memberService;
 	@Mock
+	GameService gameService;
+	@Mock
 	EventListener eventListener;
 
     @Mock
@@ -51,6 +53,7 @@ class GameScreenControllerTest extends ApplicationTest {
 
 	@ExtendWith(MockitoExtension.class)
 	public void start(Stage stage) {
+		when(gameService.findOneGame(any())).thenReturn(Observable.empty());
 
 		when(userService.findAllUsers()).thenReturn(Observable.empty());
 		when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
