@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static de.uniks.pioneers.Constants.RENAME_FOUNDING_SET2;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,7 +67,7 @@ class GameScreenControllerTest extends ApplicationTest {
 
 		App app = new App(gameScreenController);
 		app.start(stage);
-		gameScreenController.nextMoveLabel.setText("founding-settlement-2");
+		gameScreenController.nextMoveLabel.setText(RENAME_FOUNDING_SET2);
 		gameScreenController.getGameFieldSubController().loadMap(map);
 		HashMap<String, Integer> remain = new HashMap<>();
 		remain.put("settlement", 3);
