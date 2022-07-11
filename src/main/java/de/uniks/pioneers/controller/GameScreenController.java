@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.computation.DiceRoll;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
@@ -788,75 +789,19 @@ public class GameScreenController implements Controller {
         this.diceTwo.toFront();
         this.diceTwo.setVisible(true);
 
-        Image image1 = null;
-        Image image2 = null;
+        DiceRoll diceRoll = new DiceRoll();
+        List<Image> dices = diceRoll.getDiceImages(diceNumber);
+        Image image1 = dices.get(0);
+        Image image2 = dices.get(1);
 
-        switch (diceNumber) {
-            // according to swagger roll is between 1 and 12
-            case 1 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-                this.diceTwo.setVisible(false);
-            }
-            case 2 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 3 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border2.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 4 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border3.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 5 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border4.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 6 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border5.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 7 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 8 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border2.png")).toString());
-            }
-
-            case 9 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border3.png")).toString());
-            }
-
-            case 10 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border4.png")).toString());
-            }
-
-            case 11 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border5.png")).toString());
-            }
-
-            case 12 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-            }
-        }
         if (image1 != null) {
             this.diceOne.setImage(image1);
         }
         if (image2 != null) {
             this.diceTwo.setImage(image2);
+        }
+        else {
+            this.diceTwo.setVisible(false);
         }
     }
 }
