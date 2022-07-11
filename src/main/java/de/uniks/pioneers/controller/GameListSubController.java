@@ -12,8 +12,6 @@ import javafx.scene.layout.HBox;
 import javax.inject.Inject;
 import java.io.IOException;
 
-import static de.uniks.pioneers.Constants.MAX_MEMBERS;
-
 public class GameListSubController implements Controller {
     private String id;
     @FXML
