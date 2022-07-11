@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
-import static de.uniks.pioneers.Constants.RESOURCES;
+import static de.uniks.pioneers.Constants.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class UserSubView implements Controller {
@@ -30,9 +29,9 @@ public class UserSubView implements Controller {
     private final UserService userService;
     private final GameFieldSubController gameFieldSubController;
     private final Player player;
-    private final int vicPoints ;
+    private final int vicPoints;
 
-    public Label name ;
+    public Label name;
     public Label victoryPoints;
     public Label item1;
     public Label item2;
@@ -47,14 +46,13 @@ public class UserSubView implements Controller {
     public Pane cityPane;
 
     @Inject
-    public UserSubView(IDStorage idStorage, UserService userService, Player player,int victoryPoints, GameFieldSubController gameFieldSubController) {
+    public UserSubView(IDStorage idStorage, UserService userService, Player player, int victoryPoints, GameFieldSubController gameFieldSubController) {
         this.idStorage = idStorage;
         this.userService = userService;
         this.player = player;
         this.gameFieldSubController = gameFieldSubController;
         this.vicPoints = victoryPoints;
     }
-
 
     @Override
     public void init() {
@@ -160,9 +158,13 @@ public class UserSubView implements Controller {
             e.printStackTrace();
             return null;
         }
+        // Disable buttons, because resource are not available yet and rename buttons
         this.road.disableProperty().set(true);
+        this.road.setText(RENAME_ROAD);
         this.sett.disableProperty().set(true);
+        this.sett.setText(RENAME_SETTLEMENT);
         this.city.disableProperty().set(true);
+        this.city.setText(RENAME_CITY);
 
         Tooltip.install(this.roadPane, new Tooltip("1 Earth cactus, \n1 Mars bar "));
         Tooltip.install(this.settlementPane, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptun crystals, \n1 Venus grain "));

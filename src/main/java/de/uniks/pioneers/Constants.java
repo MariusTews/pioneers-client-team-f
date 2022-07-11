@@ -63,8 +63,12 @@ public class Constants {
 
     // Game
     public static final int MAX_MEMBERS = 6;
-    public static final String SETTLEMENT = "settlement";
-    public static final String CITY = "city";
+    public static final String RENAME_SETTLEMENT = "UFO";
+    public static final String RENAME_CITY = "Station";
+    public static final String RENAME_ROAD = "Tube";
+    public static final String RENAME_FOUNDING_SET1 = "Place 1st UFO";
+    public static final String RENAME_FOUNDING_SET2 = "Place 2nd UFO";
+    public static final String RENAME_FOUNDING_ROAD = "Place Tube";
     public static final int AMOUNT_SETTLEMENTS_CITIES = 13;
     public static final String VENUS_GRAIN = "grain";
     public static final String MARS_BAR = "brick";
