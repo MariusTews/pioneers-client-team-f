@@ -102,7 +102,7 @@ public class WinnerController implements Controller {
         for (Map.Entry<String, List<String>> entry : userNumberPoints.entrySet()) {
             String key = entry.getKey();
             List<String> value = entry.getValue();
-            if(value.contains("10")){
+            if(value.contains(String.valueOf(this.gameStorage.getVictoryPoints()))){
                 winnerName.setText(key);
                 winnerName.setTextFill(Color.web(value.get(0)));
 

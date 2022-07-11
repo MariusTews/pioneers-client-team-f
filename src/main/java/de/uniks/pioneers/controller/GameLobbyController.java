@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameLobbyController implements Controller {
@@ -236,6 +237,16 @@ public class GameLobbyController implements Controller {
 		this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
 				userService, messageService, memberIDStorage, memberService);
 		messageViewSubController.init();
+
+		//action when the screen is closed
+		this.app.getStage().setOnCloseRequest(e -> {
+				gameService
+						.findOneGame(gameStorage.getId())
+						.observeOn(FX_SCHEDULER)
+						.subscribe(this::actionOnCloseScreen);
+				e.consume();
+		});
+
 	}
 
 	@Override
@@ -247,6 +258,7 @@ public class GameLobbyController implements Controller {
 		}
 		disposable.dispose();
 	}
+
 
 	@Override
 	public Parent render() {
@@ -294,6 +306,27 @@ public class GameLobbyController implements Controller {
 		return parent;
 	}
 
+	//This makes sure the user is offline
+	// and is not  part of the game anymore.
+	private void actionOnCloseScreen(Game result) {
+		if ((int) result.members() == 1 || result.owner().equals(idStorage.getID())) {
+			gameService
+					.deleteGame(gameStorage.getId())
+					.observeOn(FX_SCHEDULER)
+					.subscribe(e -> {
+					});
+		} else {
+			memberService
+					.leave(gameStorage.getId(), idStorage.getID())
+					.observeOn(FX_SCHEDULER)
+					.subscribe();
+		}
+
+		userService.statusUpdate(this.idStorage.getID(), "offline").
+				observeOn(FX_SCHEDULER)
+				.subscribe(e -> System.exit(0));
+	}
+
 	public void leave() {
 		gameService
 				.findOneGame(gameStorage.getId())
@@ -335,11 +368,11 @@ public class GameLobbyController implements Controller {
 				.doOnError(error -> {
 					if ("HTTP 403 ".equals(error.getMessage())) {
 						Alert alert = new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!");
-                        // Set alert stylesheet
-                        DialogPane dialogPane = alert.getDialogPane();
-                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                        alert.showAndWait();
+						// Set alert stylesheet
+						DialogPane dialogPane = alert.getDialogPane();
+						dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+								.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+						alert.showAndWait();
 					}
 				})
 				.subscribe(onSuccess -> {

@@ -102,6 +102,14 @@
     -fx-background-size: 150 70;
 }
 
+#gameScreenCountdown{
+    -fx-background-size: 150 70;
+    -fx-border-width: 4;
+    -fx-background-color: #F2F3F5;
+    -fx-border-color: #0096FF;
+
+}
+
 #remainingTime {
     -fx-font-size: 34;
     -fx-text-fill: dimgrey;

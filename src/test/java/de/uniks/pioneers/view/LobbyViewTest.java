@@ -1,10 +1,10 @@
 package de.uniks.pioneers.view;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.controller.LobbyController;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -57,6 +57,9 @@ public class LobbyViewTest extends ApplicationTest {
 	@Spy
 	IDStorage idStorage;
 
+	@Spy
+	App app;
+
 	@InjectMocks
 	LobbyController lobbyController;
 
@@ -75,7 +78,7 @@ public class LobbyViewTest extends ApplicationTest {
 		when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
 		when(messageService.getAllMessages("global", "627cf3c93496bc00158f3859")).thenReturn(Observable.just(List.of(new Message("1", "1", "5", "1", "Test Message"), new Message("1", "1", "5", "4", "Test Message2"), new Message("1", "1", "5", "1", "Test Message3"))));
 		when(messageService.getAllMessages("groups", "627cf3c93496bc00158f3859")).thenReturn(Observable.just(List.of(new Message("1", "1", "5", "1", "Test Message"), new Message("1", "1", "5", "4", "Test Message2"), new Message("1", "1", "5", "1", "Test Message3"))));
-
+		when(app.getStage()).thenReturn(new Stage());
 
 		final App app = new App(null);
 		app.start(stage);
@@ -152,22 +155,22 @@ public class LobbyViewTest extends ApplicationTest {
 		Label label3 = (Label) hBox3.getChildren().get(0);
 		Button join = (Button) hBox3.getChildren().get(1);
 
-		Assertions.assertThat(label3.getText()).isEqualTo("testGame (2/6)");
+		Assertions.assertThat(label3.getText()).isEqualTo("testGame");
 		Assertions.assertThat(join.getText()).isEqualTo("join");
 
 		// Assert that the third game of the list has no "join" button, because max. members are reached
 		HBox hBox4 = (HBox) vBox2.getChildren().get(1);
-		Assertions.assertThat(hBox4.getChildren().size()).isEqualTo(1);
+		Assertions.assertThat(hBox4.getChildren().size()).isEqualTo(2);
 
 		Label label4 = (Label) hBox4.getChildren().get(0);
-		Assertions.assertThat(label4.getText()).isEqualTo("testGame (" + MAX_MEMBERS + "/6)");
+		Assertions.assertThat(label4.getText()).isEqualTo("testGame");
 
 		// Assert that the second game of the list has no "join" button, because started = true
 		HBox hBox5 = (HBox) vBox2.getChildren().get(2);
 		Assertions.assertThat(hBox5.getChildren().size()).isEqualTo(1);
 
 		Label label5 = (Label) hBox5.getChildren().get(0);
-		Assertions.assertThat(label5.getText()).isEqualTo("testGame (2/6)");
+		Assertions.assertThat(label5.getText()).isEqualTo("testGame");
 
 		// Assert that the text messages are displayed correctly
 		clickOn(chat);
