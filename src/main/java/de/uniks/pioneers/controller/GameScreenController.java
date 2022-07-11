@@ -86,7 +86,7 @@ public class GameScreenController implements Controller {
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
 
-	private String lastBuildingPosition;
+    private String lastBuildingPosition;
 
     private final PioneersService pioneersService;
     private final EventListener eventListener;
