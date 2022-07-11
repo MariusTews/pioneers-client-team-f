@@ -290,20 +290,6 @@ public class TradingSubController implements Controller {
     private Stage primaryStage;
 
     public void offerPlayerButtonPressed() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/Offer.fxml"));
-        loader.setControllerFactory(c -> this);
-        Parent parent;
-        try {
-            parent = loader.load();
-            this.primaryStage = new Stage();
-            primaryStage.initStyle(StageStyle.TRANSPARENT);
-            Scene scene = new Scene(parent, 200, 200);
-            primaryStage.setScene(scene);
-            primaryStage.initModality(Modality.WINDOW_MODAL);
-            primaryStage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void offerBankButtonPressed() {
