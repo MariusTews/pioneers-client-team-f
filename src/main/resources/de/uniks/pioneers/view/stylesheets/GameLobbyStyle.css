@@ -13,12 +13,6 @@
     -fx-border-radius: 30;
 }
 
-
-
-.combo-box:hover {
-    -fx-background-color: darkgrey;
-}
-
 .combo-box {
     -fx-background-image: url("../assets/grey_blue_textfield.png");
     -fx-background-size: 190 25;
