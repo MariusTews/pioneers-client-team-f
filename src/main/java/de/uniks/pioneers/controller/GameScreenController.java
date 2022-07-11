@@ -287,9 +287,9 @@ public class GameScreenController implements Controller {
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
         currentPlayerLabel.textProperty().addListener((observable, oldValue, newValue) -> startTime());
 
-        //add listener on nextMoveLabel to reset the timer if founding-settlement-2
+        //add listener on nextMoveLabel to reset the timer if founding-settlement-2 (Placing-UFO-2)
         nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.equals("founding-settlement-2")) {
+            if (newValue.equals(RENAME_FOUNDING_SET2)) {
                 startTime();
             }
         });
@@ -488,7 +488,8 @@ public class GameScreenController implements Controller {
                 switch (currentMove) {
                 case "founding-settlement-1" -> nextMoveLabel.setText(RENAME_FOUNDING_SET1);
                 case "founding-settlement-2" -> nextMoveLabel.setText(RENAME_FOUNDING_SET2);
-                case "founding-road-1", "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD);
+                case "founding-road-1" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD1);
+                case "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD2);
                 default -> nextMoveLabel.setText(currentMove);
             }
                 // change the currentPlayerLabel to the current player
@@ -659,7 +660,7 @@ public class GameScreenController implements Controller {
             if (seconds[0] <= 0) {
                 timeline.stop();
                 //current Move is founding-settlement
-                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-settlement")) {
+                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
                     //get all valid settlementPosition in dependence of map
                     List<String> validPositions = getAllValidPositions();
                     //get all invalid settlementPositions
