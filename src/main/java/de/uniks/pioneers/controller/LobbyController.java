@@ -573,8 +573,8 @@ public class LobbyController implements Controller {
     }
 
     private void loadGames(List<Game> games) {
-        List<Game> accessible = games.stream().filter(game -> (!game.started() && (int) game.members() < MAX_MEMBERS)).toList();
-        List<Game> notAccessible = games.stream().filter(game -> (game.started() || game.members().equals(MAX_MEMBERS))).toList();
+        List<Game> accessible = games.stream().filter(game -> (!game.started())).toList();
+        List<Game> notAccessible = games.stream().filter(game -> (game.started())).toList();
 
         this.games.addAll(accessible);
         this.games.addAll(notAccessible);

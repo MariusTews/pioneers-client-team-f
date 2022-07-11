@@ -334,12 +334,23 @@ public class GameScreenController implements Controller {
     }
 
     private void actionOnCloseScreen() {
-        pioneersService.updatePlayer(this.gameStorage.getId(),this.idStorage.getID(),false).
-                observeOn(FX_SCHEDULER).subscribe();
-        userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
-                .subscribe( s-> {
-                    System.exit(0);
-                });
+        if(playerOwnView.size() + opponents.size() == 1) {
+            gameService
+                    .deleteGame(gameStorage.getId())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+            userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
+                    .subscribe(s -> {
+                        System.exit(0);
+                    });
+        } else {
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false).
+                    observeOn(FX_SCHEDULER).subscribe();
+            userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
+                    .subscribe(s -> {
+                        System.exit(0);
+                    });
+        }
     }
 
     private Node renderSpectator(Member member) {

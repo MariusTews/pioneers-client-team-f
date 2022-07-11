@@ -367,36 +367,24 @@ public class GameLobbyController implements Controller {
 	}
 
 	public void startGame() {
-		//this makes sure the game can only be started
-		//with allowed maximum numbers
-		if(members.size() > 6){
-			Alert alert = new Alert(Alert.AlertType.INFORMATION, "Maximum allowed players is "+ MAX_MEMBERS);
-			// Set alert stylesheet
-			DialogPane dialogPane = alert.getDialogPane();
-			dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-					.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-			alert.showAndWait();
+		gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints())
+				.observeOn(FX_SCHEDULER)
+				.doOnError(error -> {
+					if ("HTTP 403 ".equals(error.getMessage())) {
+						Alert alert = new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!");
+						// Set alert stylesheet
+						DialogPane dialogPane = alert.getDialogPane();
+						dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+								.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+						alert.showAndWait();
+					}
+				})
+				.subscribe(onSuccess -> {
+					final GameScreenController controller = gameScreenController.get();
+					this.app.show(controller);
 
-		}else {
-			gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints())
-					.observeOn(FX_SCHEDULER)
-					.doOnError(error -> {
-						if ("HTTP 403 ".equals(error.getMessage())) {
-							Alert alert = new Alert(Alert.AlertType.INFORMATION, "only the owner can start the game!");
-							// Set alert stylesheet
-							DialogPane dialogPane = alert.getDialogPane();
-							dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-									.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-							alert.showAndWait();
-						}
-					})
-					.subscribe(onSuccess -> {
-						final GameScreenController controller = gameScreenController.get();
-						this.app.show(controller);
-
-					}, onError -> {
-					});
-		}
+				}, onError -> {
+				});
 	}
 
 	private void giveYourselfColor() {
