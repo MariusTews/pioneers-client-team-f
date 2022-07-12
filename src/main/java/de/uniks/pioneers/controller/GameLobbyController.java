@@ -144,7 +144,21 @@ public class GameLobbyController implements Controller {
 										}
 									}
 								}
-
+								if(this.members.size() > 1) {
+									for (Member member : members) {
+										if (member.userId().equals(this.idStorage.getID())
+												&& member.gameId().equals(this.gameStorage.getId())) {
+											memberService.statusUpdate(member.gameId(), member.userId(), true, "#000000", true)
+													.observeOn(FX_SCHEDULER).subscribe(e -> {
+														//makes ready button invisible
+														this.idReadyButton.setText("Not Ready");
+														this.idReadyButton.setDisable(true);
+														this.colorPicker.setDisable(true);
+													});
+											break;
+										}
+									}
+								}
 							});
 				});
 
@@ -155,12 +169,12 @@ public class GameLobbyController implements Controller {
 				.subscribe(event -> {
 					final Member member = event.data();
 					if (event.event().endsWith(CREATED)) {
-
 						if (!members.contains(member)) {
 							members.add(member);
 							userService.findOne(member.userId())
 									.observeOn(FX_SCHEDULER)
 									.subscribe(this.playerList::add);
+
 						}
 
 					} else if (event.event().endsWith(DELETED)) {
@@ -174,6 +188,7 @@ public class GameLobbyController implements Controller {
 						}
 
 					} else if (event.event().endsWith(UPDATED)) {
+
 						for (Member updatedMember : this.members) {
 							if (updatedMember.userId().equals(member.userId()) && member.spectator()) {
 								spectatorMember.add(member);
@@ -185,7 +200,9 @@ public class GameLobbyController implements Controller {
 								break;
 							}
 						}
+						System.out.println(this.spectatorMember.size());
 						for (Member upSpectatorMember : this.spectatorMember) {
+
 							if (upSpectatorMember.userId().equals(member.userId()) && !member.spectator()) {
 								spectatorMember.remove(upSpectatorMember);
 								members.add(member);
@@ -214,6 +231,7 @@ public class GameLobbyController implements Controller {
 								giveYourselfColor();
 							}
 						}
+
 
 						this.idUserList.getChildren().clear();
 						this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
@@ -286,6 +304,7 @@ public class GameLobbyController implements Controller {
 					this.settingsLabel.setText("Settings: Map Size = " + mapRadius + "  Required VP = " + victoryPoints);
 					this.idTitleLabel.setText("Welcome to " + this.game.name());
 				});
+
 
 		// load game members
 
@@ -440,11 +459,17 @@ public class GameLobbyController implements Controller {
 
 	//render spectators
 	private Node renderSpectatorMember(Member member) {
+		boolean ch = false;
+		System.out.println(playerList);
 		for (User user : playerList) {
 			if (user._id().equals(member.userId()) && member.spectator()) {
+				ch = true;
 				this.memberListSpectatorSubcontroller = new MemberListSubcontroller(member, user);
 				break;
 			}
+		}
+		if(!ch){
+			this.memberListSpectatorSubcontroller = new MemberListSubcontroller(null,null);
 		}
 		return memberListSpectatorSubcontroller.render();
 	}
