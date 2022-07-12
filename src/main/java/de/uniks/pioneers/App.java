@@ -91,8 +91,8 @@ public class App extends Application {
         controller.init();
         stage.getScene().setRoot(controller.render());
         if (controller.getClass().equals(GameScreenController.class)) {
-            stage.setWidth(1615);
-            stage.setHeight(937);
+            stage.setWidth(1610);
+            stage.setHeight(950);
         }else if(controller.getClass().equals(LobbyController.class)){
             stage.setWidth(900);
             stage.setHeight(600);

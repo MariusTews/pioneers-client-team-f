@@ -288,9 +288,9 @@ public class GameScreenController implements Controller {
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
         currentPlayerLabel.textProperty().addListener((observable, oldValue, newValue) -> startTime());
 
-        //add listener on nextMoveLabel to reset the timer if founding-settlement-2
+        //add listener on nextMoveLabel to reset the timer if founding-settlement-2 (Placing-UFO-2)
         nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.equals("founding-settlement-2")) {
+            if (newValue.equals(RENAME_FOUNDING_SET2)) {
                 startTime();
             }
         });
@@ -380,7 +380,7 @@ public class GameScreenController implements Controller {
         // Calculate the victory points, when the change listener of players recognizes changes
         // Update opponent by removing and rendering opponent with new victory points again
         // 13 is the total number of cities and settlements a player is able to set in the game
-        return AMOUNT_SETTLEMENTS_CITIES - (player.remainingBuildings().get(SETTLEMENT) + player.remainingBuildings().get(CITY) * 2);
+        return AMOUNT_SETTLEMENTS_CITIES - (player.remainingBuildings().get("settlement") + player.remainingBuildings().get("city") * 2);
     }
 
     private void handlePlayerEvent(Event<Player> playerEvent) {
@@ -481,12 +481,18 @@ public class GameScreenController implements Controller {
         State state = stateEvent.data();
 
         if (stateEvent.event().endsWith(UPDATED)) {
-            // change the nextMoveLabel to the current move
+            // change the nextMoveLabel to the current move and adapt to the renamed buildings
             // checks the if the expected move is empty or not
             // in some cases it is required
             if (!state.expectedMoves().isEmpty()) {
                 String currentMove = state.expectedMoves().get(0).action();
-                nextMoveLabel.setText(currentMove);
+                switch (currentMove) {
+                case "founding-settlement-1" -> nextMoveLabel.setText(RENAME_FOUNDING_SET1);
+                case "founding-settlement-2" -> nextMoveLabel.setText(RENAME_FOUNDING_SET2);
+                case "founding-road-1" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD1);
+                case "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD2);
+                default -> nextMoveLabel.setText(currentMove);
+            }
                 // change the currentPlayerLabel to the current player
                 User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
                 currentPlayerLabel.setText(currentPlayer.name());
@@ -655,7 +661,7 @@ public class GameScreenController implements Controller {
             if (seconds[0] <= 0) {
                 timeline.stop();
                 //current Move is founding-settlement
-                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-settlement")) {
+                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
                     //get all valid settlementPosition in dependence of map
                     List<String> validPositions = getAllValidPositions();
                     //get all invalid settlementPositions
