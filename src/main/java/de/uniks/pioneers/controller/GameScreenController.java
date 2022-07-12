@@ -114,7 +114,6 @@ public class GameScreenController implements Controller {
     private final Timeline timelineGameCountDown = new Timeline();
     private boolean runDiscardOnce = true;
     private Point3D currentRobPlace;
-    private int maxVictoryPoints = 10;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -207,18 +206,11 @@ public class GameScreenController implements Controller {
                             });
                 });
 
-        // get the amount of maximum victory points for user and opponent sub views
-        gameService.findOneGame(this.gameStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(result ->
-                        this.maxVictoryPoints = result.settings().victoryPoints());
-
         // Listen to the State to handle the event
         disposable.add(eventListener
                 .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleStateEvents));
-
 
         // Listen to the Moves to handle the event
         disposable.add(eventListener
@@ -371,7 +363,8 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController, maxVictoryPoints);
+        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController,
+                this.gameStorage.getVictoryPoints());
         userSubView.init();
         this.tradingSubController.setPlayer(player);
         return userSubView.render();
@@ -588,7 +581,7 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                maxVictoryPoints);
+                this.gameStorage.getVictoryPoints());
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }
