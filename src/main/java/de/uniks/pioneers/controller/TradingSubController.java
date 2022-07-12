@@ -1,15 +1,15 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.model.Building;
-import de.uniks.pioneers.model.Harbor;
-import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.Point3D;
-import de.uniks.pioneers.service.GameStorage;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.dto.Event;
+import de.uniks.pioneers.model.*;
+import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.websocket.EventListener;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -111,16 +111,29 @@ public class TradingSubController implements Controller {
     private final List<Harbor> harbors = new ArrayList<>();
     private final List<Building> buildings = new ArrayList<>();
     private final CompositeDisposable disposable = new CompositeDisposable();
+    private final HashMap<String, User> userHash = new HashMap<>();
+    private final UserService userService;
+    private State state;
+
+    @FXML
+    public Label offer;
+
+    MemberService memberService;
+    private final List<Member> gameMemberList = new ArrayList<>();
 
     @Inject
     public TradingSubController(GameStorage gameStorage,
                                 PioneersService pioneersService,
                                 IDStorage idStorage,
-                                EventListener eventListener) {
+                                EventListener eventListener,
+                                UserService userService,
+                                MemberService memberService) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
         this.idStorage = idStorage;
         this.eventListener = eventListener;
+        this.userService = userService;
+        this.memberService = memberService;
     }
 
     @Override
@@ -130,6 +143,11 @@ public class TradingSubController implements Controller {
             this.giveResources.put(res, 0);
             this.receiveResources.put(res, 0);
         }
+
+        memberService
+                .getAllGameMembers(gameStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this.gameMemberList::addAll);
 
         pioneersService
                 .findAllPlayers(this.gameStorage.getId())
@@ -161,11 +179,43 @@ public class TradingSubController implements Controller {
                         buildings.add(buildingEvent.data());
                     }
                 }));
+
+
+
+        /*userService
+                        .findAllUsers()
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe(result -> {
+                            for (User user : result) {
+                                this.userHash.put(user._id(), user);
+                            }
+                            disposable.add(eventListener
+                                    .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(c -> {
+                                        if (c.event().endsWith(CREATED)) {
+                                            this.state = c.data();
+                                            System.out.println("State got init.");
+                                        }
+                                    }));
+                        });*/
+        /*disposable.add(eventListener
+                .listen("games." + gameStorage.getId() + ".moves.*.created", Move.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this::handleOfferPlayerEvent));*/
     }
+
+    /*private void handleOfferPlayerEvent(Event<Move> moveEvent) {
+        System.out.println("Move: " + moveEvent.data().action());
+        System.out.println("Partner: " + moveEvent.data().partner());
+        System.out.println();
+
+        if ()
+    }*/
 
     @Override
     public void destroy() {
-        disposable.dispose();
+        disposable.clear();
     }
 
     @Override
@@ -284,9 +334,49 @@ public class TradingSubController implements Controller {
         plusAction(event, "grain", receiveVenusLabel, false, receiveVenusMinusButton);
     }
 
-    private Stage primaryStage;
-
     public void offerPlayerButtonPressed() {
+
+        //TODO: set current move to offer Observable list
+        HashMap<String, Integer> tmp = new HashMap<>();
+        for (String res : RESOURCES) {
+            tmp.put(res, 0);
+        }
+
+        for (String res : RESOURCES) {
+            if (this.giveResources.get(res) > 0) {
+                tmp.put(res, (-1) * this.giveResources.get(res));
+            }
+            if (this.receiveResources.get(res) > 0) {
+                tmp.put(res, this.receiveResources.get(res));
+            }
+        }
+
+        memberService
+                .getAllGameMembers(gameStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(members -> {
+                    //for (Member member : members) {
+                       // if (!member.userId().equals(idStorage.getID())) {
+                            pioneersService
+                                    .tradePlayer(gameStorage.getId(), "build", null, tmp)
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(c -> {
+                                        System.out.println("Offer send success -> " + c.partner());
+                                    });
+                       // }
+                   // }
+                });
+
+        /*for (Member member : gameMemberList) {
+            if (!member.userId().equals(idStorage.getID())) {
+                pioneersService
+                        .tradePlayer(gameStorage.getId(), "build", member.userId(), tmp)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe(c -> {
+                            System.out.println("Offer send success -> " + c.partner());
+                        });
+            }
+        }*/
     }
 
     public void offerBankButtonPressed() {
@@ -317,19 +407,19 @@ public class TradingSubController implements Controller {
                 switch (this.giveResources.get(giveRes)) {
                     case 2 -> {
                         if (harborHashCheck.get(giveRes)) {
-                            trade(giveRes, 2);
+                            tradeWithBank(giveRes, 2);
                         } else {
                             alert("Trade was not successful. You don't have a building on a matching 2:1 harbor!");
                         }
                     }
                     case 3 -> {
                         if (harborHashCheck.get(null)) {
-                            trade(giveRes, 3);
+                            tradeWithBank(giveRes, 3);
                         } else {
                             alert("Trade was not successful. You don't have a building on a 3:1 harbor!");
                         }
                     }
-                    case 4 -> trade(giveRes, 4);
+                    case 4 -> tradeWithBank(giveRes, 4);
                     default -> {
                     }
                 }
@@ -369,7 +459,7 @@ public class TradingSubController implements Controller {
      * trade a given resource
      * check, if a receiving resource was selected and make move
      * */
-    private void trade(String giveRes, int amount) {
+    private void tradeWithBank(String giveRes, int amount) {
         // initialize temporary hashMap for move
         HashMap<String, Integer> tmp = new HashMap<>();
         for (String res : RESOURCES) {
@@ -386,16 +476,17 @@ public class TradingSubController implements Controller {
                 this.pioneersService
                         .tradeBank(this.gameStorage.getId(), tmp)
                         .observeOn(FX_SCHEDULER)
-                        .subscribe(result -> pioneersService
-                                .findAllPlayers(this.gameStorage.getId())
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe(c -> {
-                                    for (Player player : c) {
-                                        if (player.userId().equals(idStorage.getID())) {
-                                            this.player = player;
-                                        }
-                                    }
-                                }));
+                        .subscribe(result ->
+                                pioneersService
+                                        .findAllPlayers(this.gameStorage.getId())
+                                        .observeOn(FX_SCHEDULER)
+                                        .subscribe(c -> {
+                                            for (Player player : c) {
+                                                if (player.userId().equals(idStorage.getID())) {
+                                                    this.player = player;
+                                                }
+                                            }
+                                        }));
             }
         }
     }
@@ -437,10 +528,8 @@ public class TradingSubController implements Controller {
                 }
             }
         } else {
-            if (checkAmount(label, resource, false)) {
-                this.receiveResources.put(resource, this.receiveResources.get(resource) + 1);
-                label.setText(String.valueOf(this.receiveResources.get(resource)));
-            }
+            this.receiveResources.put(resource, this.receiveResources.get(resource) + 1);
+            label.setText(String.valueOf(this.receiveResources.get(resource)));
         }
 
         if (minusButton.disableProperty().get() && Integer.parseInt(label.getText()) > 0) {
@@ -487,7 +576,7 @@ public class TradingSubController implements Controller {
                 return Integer.parseInt(label.getText()) < player.resources().get(resource);
             }
         }
-        return Integer.parseInt(label.getText()) < 1;
+        return true;
     }
 
     private void updateHarbors() {

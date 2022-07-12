@@ -86,7 +86,7 @@ public class GameScreenController implements Controller {
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
 
-	private String lastBuildingPosition;
+    private String lastBuildingPosition;
 
     private final PioneersService pioneersService;
     private final EventListener eventListener;
@@ -110,6 +110,8 @@ public class GameScreenController implements Controller {
     private final Timeline timeline = new Timeline();
     private boolean runDiscardOnce = true;
     private Point3D currentRobPlace;
+
+    TradeAcceptSubcontroller tradeAcceptSubcontroller;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -228,6 +230,9 @@ public class GameScreenController implements Controller {
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
+
+        tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
+        tradeAcceptSubcontroller.init();
     }
 
     @Override
@@ -285,7 +290,7 @@ public class GameScreenController implements Controller {
          * hand over own player to trading sub view
          * */
 
-        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener);
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener, userService, memberService);
         tradingSubController.init();
         this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
@@ -320,6 +325,21 @@ public class GameScreenController implements Controller {
         if (move.action().equals("roll") || move.action().equals("founding-roll")) {
             displayDice(move.roll());
         }
+
+        //trading move
+        if (move.action().equals("build") && move.partner() == null && !move.userId().equals(idStorage.getID())) {
+            TradeOfferSubcontroller tradeOfferSubcontroller = new TradeOfferSubcontroller(move, pioneersService, gameStorage);
+            tradeOfferSubcontroller.init();
+            tradeOfferSubcontroller.render();
+        }
+
+        if (move.action().equals("offer") && !move.userId().equals(idStorage.getID())) {
+            tradeAcceptSubcontroller.addUser(userHash.get(move.userId()));
+            tradeAcceptSubcontroller.setMove(move);
+            tradeAcceptSubcontroller.render();
+        }
+
+        //System.out.println("Move: " + move.action());
     }
 
     private int calculateVP(Player player) {
