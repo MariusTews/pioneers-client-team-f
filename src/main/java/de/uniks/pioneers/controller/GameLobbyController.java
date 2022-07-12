@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameLobbyController implements Controller {
@@ -144,7 +143,10 @@ public class GameLobbyController implements Controller {
 										}
 									}
 								}
-								if(this.members.size() > 1) {
+								//pushes all the users to spectator
+								//if the player number is greater than 6
+								//this allows unlimited number of spectator.
+								if(this.members.size() > MAX_MEMBERS-1) {
 									for (Member member : members) {
 										if (member.userId().equals(this.idStorage.getID())
 												&& member.gameId().equals(this.gameStorage.getId())) {
@@ -202,7 +204,6 @@ public class GameLobbyController implements Controller {
 						}
 						System.out.println(this.spectatorMember.size());
 						for (Member upSpectatorMember : this.spectatorMember) {
-
 							if (upSpectatorMember.userId().equals(member.userId()) && !member.spectator()) {
 								spectatorMember.remove(upSpectatorMember);
 								members.add(member);
