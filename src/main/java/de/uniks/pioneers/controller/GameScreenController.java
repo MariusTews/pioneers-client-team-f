@@ -170,27 +170,22 @@ public class GameScreenController implements Controller {
                                             m.userId().equals(this.idStorage.getID())) {
                                         //get access to it
 
-                    // Check if expected move is founding-roll after joining the game
-                    pioneersService
-                            .findOneState(gameStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(r -> {
-                                if(!r.expectedMoves().isEmpty()) {
-                                    if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                        foundingDiceRoll();
-                                    }
-                                }});
+                                        // Check if expected move is founding-roll after joining the game
+                                        pioneersService
+                                                .findOneState(gameStorage.getId())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe(r -> {
+                                                    if (!r.expectedMoves().isEmpty()) {
+                                                        if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                                            foundingDiceRoll();
+                                                        }
+                                                    }
+                                                });
                                         break;
                                     }
                                 }
                                 this.members.setAll(c);
                             });
-
-                    // Listen to the State to handle the event
-                    disposable.add(eventListener
-                            .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(this::handleStateEvents));
 
                     pioneersService
                             .findAllPlayers(this.gameStorage.getId())
@@ -210,6 +205,13 @@ public class GameScreenController implements Controller {
                                 }
                             });
                 });
+
+        // Listen to the State to handle the event
+        disposable.add(eventListener
+                .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this::handleStateEvents));
+
         // Listen to the Moves to handle the event
         disposable.add(eventListener
                 .listen("games." + this.gameStorage.getId() + ".moves.*." + "created", Move.class)
@@ -335,7 +337,7 @@ public class GameScreenController implements Controller {
 
     private void actionOnCloseScreen() {
 
-        if(playerOwnView.size() + opponents.size() == 1) {
+        if (playerOwnView.size() + opponents.size() == 1) {
             gameService
                     .deleteGame(gameStorage.getId())
                     .observeOn(FX_SCHEDULER)
@@ -361,7 +363,8 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
+        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController,
+                this.gameStorage.getVictoryPoints());
         userSubView.init();
         this.tradingSubController.setPlayer(player);
         return userSubView.render();
@@ -374,13 +377,6 @@ public class GameScreenController implements Controller {
         if (move.action().equals("roll") || move.action().equals("founding-roll")) {
             displayDice(move.roll());
         }
-    }
-
-    private int calculateVP(Player player) {
-        // Calculate the victory points, when the change listener of players recognizes changes
-        // Update opponent by removing and rendering opponent with new victory points again
-        // 13 is the total number of cities and settlements a player is able to set in the game
-        return AMOUNT_SETTLEMENTS_CITIES - (player.remainingBuildings().get("settlement") + player.remainingBuildings().get("city") * 2);
     }
 
     private void handlePlayerEvent(Event<Player> playerEvent) {
@@ -402,7 +398,7 @@ public class GameScreenController implements Controller {
                 }
             }
             //sets name of the longest road
-            updateLongestRoad(playerOwnView,opponents);
+            updateLongestRoad(playerOwnView, opponents);
             //sets the winner
             winnerScreen(playerOwnView, opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
@@ -420,8 +416,8 @@ public class GameScreenController implements Controller {
     private void updateLongestRoad(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
         String userId = "";
         int longestRoad = 0;
-        for (Player p:playerOwnView) {
-            if(p.longestRoad() != null) {
+        for (Player p : playerOwnView) {
+            if (p.longestRoad() != null) {
                 if (((int) p.longestRoad()) > longestRoad) {
                     userId = p.userId();
                     longestRoad = (int) p.longestRoad();
@@ -429,8 +425,8 @@ public class GameScreenController implements Controller {
             }
         }
 
-        for (Player p :opponents) {
-            if(p.longestRoad() != null) {
+        for (Player p : opponents) {
+            if (p.longestRoad() != null) {
                 if (((int) p.longestRoad()) > longestRoad) {
                     userId = p.userId();
                     longestRoad = (int) p.longestRoad();
@@ -438,8 +434,8 @@ public class GameScreenController implements Controller {
             }
         }
 
-        for (User u: allUser) {
-            if(u._id().equals(userId)){
+        for (User u : allUser) {
+            if (u._id().equals(userId)) {
                 playerLongestRoadLabel.setText(u.name());
                 break;
             }
@@ -591,7 +587,7 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                this.calculateVP(player));
+                this.gameStorage.getVictoryPoints());
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }

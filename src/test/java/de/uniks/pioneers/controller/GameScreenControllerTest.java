@@ -52,7 +52,6 @@ class GameScreenControllerTest extends ApplicationTest {
 
 	@ExtendWith(MockitoExtension.class)
 	public void start(Stage stage) {
-
 		when(userService.findAllUsers()).thenReturn(Observable.empty());
 		when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
 		when(gameStorage.getId()).thenReturn("02");
