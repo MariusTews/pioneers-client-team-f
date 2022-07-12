@@ -26,38 +26,33 @@
             </padding></HBox>
     </ScrollPane>
     <Pane layoutX="500.0" layoutY="736.6666870117188" prefHeight="150.0" prefWidth="600.0">
-        <VBox id="longestRoadContainer" alignment="CENTER" layoutX="-40.0" layoutY="25.0" prefHeight="100.0"
-              prefWidth="200.0" spacing="10.0">
+        <VBox id="longestRoadContainer" alignment="CENTER" layoutX="-40.0" layoutY="25.0" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
             <Label alignment="CENTER" prefHeight="20.0" prefWidth="180.0" text="Longest Road">
                 <font>
-                    <Font name="System Bold" size="14.0"/>
+                    <Font name="System Bold" size="14.0" />
                 </font>
             </Label>
-            <Label fx:id="playerLongestRoadLabel" alignment="CENTER" prefWidth="180.0" text="playerName"/>
+            <Label fx:id="playerLongestRoadLabel" alignment="CENTER" prefWidth="180.0" text="playerName" />
         </VBox>
         <Pane id="roll" layoutX="200.0" layoutY="25.0" onMouseClicked="#diceRoll" prefWidth="210.0">
-            <ImageView fx:id="diceOne" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true"/>
-            <ImageView fx:id="diceTwo" fitHeight="100.0" fitWidth="100.0" layoutX="110.0" pickOnBounds="true"
-                       preserveRatio="true"/>
+            <ImageView fx:id="diceOne" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="diceTwo" fitHeight="100.0" fitWidth="100.0" layoutX="110.0" pickOnBounds="true" preserveRatio="true" />
         </Pane>
-        <VBox id="zoomContainer" alignment="CENTER" layoutX="450.0" layoutY="25.0" prefHeight="100.0" prefWidth="120.0"
-              spacing="10.0">
+        <VBox id="zoomContainer" alignment="CENTER" layoutX="450.0" layoutY="25.0" prefHeight="100.0" prefWidth="120.0" spacing="10.0">
             <Label alignment="CENTER" prefWidth="120.0" text="Zoom">
                 <font>
-                    <Font name="System Bold" size="24.0"/>
+                    <Font name="System Bold" size="24.0" />
                 </font>
             </Label>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="120.0" spacing="10.0">
-                <Button fx:id="zoomOut" mnemonicParsing="false" onAction="#zoomOut" prefHeight="50.0"
-                        prefWidth="50.0" style="-fx-background-color: WHITE; -fx-text-fill: BLACK;" text="-">
+                <Button fx:id="zoomOut" mnemonicParsing="false" onAction="#zoomOut" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: WHITE; -fx-text-fill: BLACK;" text="-">
                     <font>
-                        <Font name="System Bold" size="24.0"/>
+                        <Font name="System Bold" size="24.0" />
                     </font>
                 </Button>
-                <Button fx:id="zoomIn" mnemonicParsing="false" onAction="#zoomIn" prefHeight="50.0"
-                        prefWidth="50.0" style="-fx-background-color: WHITE; -fx-text-fill: BLACK;" text="+">
+                <Button fx:id="zoomIn" mnemonicParsing="false" onAction="#zoomIn" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: WHITE; -fx-text-fill: BLACK;" text="+">
                     <font>
-                        <Font name="System Bold" size="24.0"/>
+                        <Font name="System Bold" size="24.0" />
                     </font>
                 </Button>
             </HBox>
@@ -69,19 +64,17 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Pane id="tradeSubView" fx:id="tradingPane" layoutX="240.0" layoutY="82.0" prefHeight="212.0" prefWidth="250.0" />
+      <Pane id="tradeSubView" fx:id="tradingPane" layoutX="230.0" layoutY="83.0" prefHeight="212.0" prefWidth="250.0" />
         <Pane id="currentMove" layoutX="230.0" layoutY="420.0" prefHeight="60.0" prefWidth="250.0">
             <Label alignment="CENTER" contentDisplay="TOP" prefHeight="30.0" prefWidth="250.0" text="NEXT MOVE">
          </Label>
-            <Label fx:id="nextMoveLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0" prefHeight="30.0"
-                   prefWidth="250.0">
+            <Label fx:id="nextMoveLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0" prefHeight="30.0" prefWidth="250.0">
          </Label>
         </Pane>
         <Pane id="currentPlayer" layoutX="230.0" layoutY="360.0" prefHeight="60.0" prefWidth="250.0">
             <Label alignment="CENTER" contentDisplay="TOP" prefHeight="30.0" prefWidth="250.0" text="CURRENT PLAYER">
          </Label>
-            <Label fx:id="currentPlayerLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0"
-                   prefHeight="30.0" prefWidth="250.0">
+            <Label fx:id="currentPlayerLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0" prefHeight="30.0" prefWidth="250.0">
          </Label>
         </Pane>
       <Pane fx:id="chatPane" layoutX="50.0" layoutY="574.0" prefHeight="320.0" prefWidth="450.0" />
@@ -92,5 +85,10 @@
              <Label id="remainingTime" fx:id="timerLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0" prefHeight="40.0" prefWidth="150.0">
                 </Label>
          </Pane>
+      <Pane layoutX="62.0" layoutY="549.0" prefHeight="50.0" prefWidth="120.0">
+         <children>
+            <Label fx:id="gameScreenCountdown" alignment="CENTER" layoutX="6.0" layoutY="6.0" prefHeight="40.0" prefWidth="112.0" text="Countdown" />
+         </children>
+      </Pane>
     </Pane>
 </Pane>

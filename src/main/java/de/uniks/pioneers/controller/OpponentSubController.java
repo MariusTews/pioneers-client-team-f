@@ -19,6 +19,7 @@ import java.io.IOException;
 
 public class OpponentSubController implements Controller {
 
+    private final int maxVictoryPoints;
     @FXML
     public VBox singleOpponentView;
     @FXML
@@ -44,19 +45,17 @@ public class OpponentSubController implements Controller {
 
     private final Player opponent;
     private final User opponentAsUser;
-    private final int victoryPoints;
     private String userId;
     private Parent parent;
 
     @Inject
-    public OpponentSubController(Player player, User user, int victoryPoints) {
+    public OpponentSubController(Player player, User user, int maxVictoryPoints) {
         // Opponent as player needed for victory points and color
         this.opponent = player;
 
         // Opponents as user needed for username and avatar
         this.opponentAsUser = user;
-
-        this.victoryPoints = victoryPoints;
+        this.maxVictoryPoints = maxVictoryPoints;
     }
 
     @Override
@@ -94,7 +93,7 @@ public class OpponentSubController implements Controller {
                 this.avatarImageView.setImage(new Image(this.opponentAsUser.avatar()));
             }
             // Set the current victory points and total amount of resources
-            this.victoryPointsLabel.setText("VP: " + victoryPoints + "/10");
+            this.victoryPointsLabel.setText("VP: " + this.opponent.victoryPoints() + "/" + maxVictoryPoints);
             this.totalResourcesLabel.setText("Total resources: " + opponent.resources().get("unknown"));
         }
 

@@ -44,6 +44,9 @@ public class GameLobbyViewTest extends ApplicationTest {
 	@Spy
 	GameStorage gameStorage;
 
+	@Mock
+	App app;
+
 	@InjectMocks
 	GameLobbyController gameLobbyController;
 
@@ -66,6 +69,7 @@ public class GameLobbyViewTest extends ApplicationTest {
 		when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
 		when(gameService.findOneGame(any())).thenReturn(Observable.just(g));
 		when(messageService.getAllMessages(any(), any())).thenReturn(Observable.just(x1, x2).buffer(2));
+		when(app.getStage()).thenReturn(new Stage());
 
 		App app = new App(gameLobbyController);
 		app.start(stage);

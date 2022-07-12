@@ -49,6 +49,12 @@ class LobbyControllerTest extends ApplicationTest {
     @Spy
 	GameStorage gameStorage;
 
+     @Spy
+     RefreshTokenStorage refreshTokenStorage;
+
+     @Spy
+     App app;
+
     @InjectMocks
     LobbyController lobbyController;
 
@@ -59,10 +65,11 @@ class LobbyControllerTest extends ApplicationTest {
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(gameService.findAllGames()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
-
+        when(refreshTokenStorage.getRefreshToken()).thenReturn("21");
+        when(app.getStage()).thenReturn(new Stage());
 
         // start application
-        final App app = new App(lobbyController);
+        app = new App(lobbyController);
         app.start(stage);
     }
 

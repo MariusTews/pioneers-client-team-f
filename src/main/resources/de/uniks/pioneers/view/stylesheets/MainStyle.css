@@ -1,19 +1,19 @@
 /* import font */
 @font-face {
-    src: url("../fonts/kenvector_future.ttf");
+    src: url("../fonts/A-Space_Black_Demo.otf");
 }
 
 /************** general settings for all elements of the specific types **************/
 
 /* all backgrounds default to grey gradient and all inputs have the same font */
 .root {
-    -fx-font-family: "KenVector Future Regular";
+    -fx-font-family: "A-Space Black Demo";
     -fx-background-color: linear-gradient(to bottom, #666666, #F5F5F5);
 }
 
 /* all texts shall have one font */
 .text {
-    -fx-font-family: "KenVector Future Regular";
+    -fx-font-family: "A-Space Black Demo";
 }
 
 /* default focus for all buttons and textfields */

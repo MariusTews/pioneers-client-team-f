@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static de.uniks.pioneers.Constants.RENAME_FOUNDING_SET2;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,7 +39,10 @@ class GameScreenControllerTest extends ApplicationTest {
 	@Mock
 	EventListener eventListener;
 
-	@Spy
+    @Mock
+    App app;
+
+    @Spy
 	GameStorage gameStorage;
 	@Spy
 	IDStorage idStorage;
@@ -48,7 +52,6 @@ class GameScreenControllerTest extends ApplicationTest {
 
 	@ExtendWith(MockitoExtension.class)
 	public void start(Stage stage) {
-
 		when(userService.findAllUsers()).thenReturn(Observable.empty());
 		when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
 		when(gameStorage.getId()).thenReturn("02");
@@ -59,16 +62,17 @@ class GameScreenControllerTest extends ApplicationTest {
 		when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
 		Map map = new Map("02", createMap(), createHarbors());
 		when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
+		when(app.getStage()).thenReturn(new Stage());
 
 		App app = new App(gameScreenController);
 		app.start(stage);
-		gameScreenController.nextMoveLabel.setText("founding-settlement-2");
+		gameScreenController.nextMoveLabel.setText(RENAME_FOUNDING_SET2);
 		gameScreenController.getGameFieldSubController().loadMap(map);
 		HashMap<String, Integer> remain = new HashMap<>();
 		remain.put("settlement", 3);
 		remain.put("city", 3);
 		remain.put("road", 3);
-		Player player = new Player("01", "02", "#9932cc", true, 4, null, remain, 2, 2, null);
+		Player player = new Player("01", "02", "#00ffff", true, 4, null, remain, 2, 2, null);
 		gameScreenController.getGameFieldSubController().getPlayers().add(player);
 		gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 7, "02", "road");
 		gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "city");
@@ -160,11 +164,11 @@ class GameScreenControllerTest extends ApplicationTest {
 		verify(pioneersService).move("02", "build", null, null, null, null, null, null, null);
 	}
 
-	@Test
-	void loadValidPositions() {
-		List<String> pos = gameScreenController.getAllValidPositions();
-		Assertions.assertEquals(pos.size(), 54);
-	}
+    @Test
+    void loadValidPositions() {
+        List<String> pos = gameScreenController.getAllValidPositions();
+        Assertions.assertEquals(pos.size(), 54);
+    }
 
 	@Test
 	void possibleRoadPlacements() {

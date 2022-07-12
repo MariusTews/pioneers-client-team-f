@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.computation.DiceRoll;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
@@ -85,6 +86,7 @@ public class GameScreenController implements Controller {
     private final App app;
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
+    public Label gameScreenCountdown;
 
     private String lastBuildingPosition;
 
@@ -108,6 +110,8 @@ public class GameScreenController implements Controller {
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
     private final Timeline timeline = new Timeline();
+
+    private final Timeline timelineGameCountDown = new Timeline();
     private boolean runDiscardOnce = true;
     private Point3D currentRobPlace;
 
@@ -173,8 +177,10 @@ public class GameScreenController implements Controller {
                                                 .findOneState(gameStorage.getId())
                                                 .observeOn(FX_SCHEDULER)
                                                 .subscribe(r -> {
-                                                    if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                                        foundingDiceRoll();
+                                                    if (!r.expectedMoves().isEmpty()) {
+                                                        if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                                            foundingDiceRoll();
+                                                        }
                                                     }
                                                 });
                                         break;
@@ -182,12 +188,6 @@ public class GameScreenController implements Controller {
                                 }
                                 this.members.setAll(c);
                             });
-
-                    // Listen to the State to handle the event
-                    disposable.add(eventListener
-                            .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(this::handleStateEvents));
 
                     pioneersService
                             .findAllPlayers(this.gameStorage.getId())
@@ -207,6 +207,13 @@ public class GameScreenController implements Controller {
                                 }
                             });
                 });
+
+        // Listen to the State to handle the event
+        disposable.add(eventListener
+                .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this::handleStateEvents));
+
         // Listen to the Moves to handle the event
         disposable.add(eventListener
                 .listen("games." + this.gameStorage.getId() + ".moves.*." + "created", Move.class)
@@ -231,6 +238,31 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
+        //count up
+        countUp();
+
+    }
+
+    private void countUp() {
+        final Integer[] startTime = {0};
+        final Integer[] seconds = {startTime[0]};
+
+        timelineGameCountDown.setCycleCount(Timeline.INDEFINITE);
+
+        //gets called every second to reduce the timer by one second
+        KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
+            seconds[0]++;
+            if (seconds[0] % 60 > 9) {
+                gameScreenCountdown.setText("" + (seconds[0] / 60) + ":" + seconds[0] % 60);
+            } else {
+                gameScreenCountdown.setText("" + (seconds[0] / 60) + ":0" + seconds[0] % 60);
+            }
+        });
+
+        timelineGameCountDown.getKeyFrames().setAll(frame);
+        // start timer
+        timelineGameCountDown.playFromStart();
+
         tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
         tradeAcceptSubcontroller.init();
     }
@@ -245,6 +277,7 @@ public class GameScreenController implements Controller {
 
         this.opponentSubCons.forEach(OpponentSubController::destroy);
         this.opponentSubCons.clear();
+
     }
 
     @Override
@@ -262,9 +295,9 @@ public class GameScreenController implements Controller {
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
         currentPlayerLabel.textProperty().addListener((observable, oldValue, newValue) -> startTime());
 
-        //add listener on nextMoveLabel to reset the timer if founding-settlement-2
+        //add listener on nextMoveLabel to reset the timer if founding-settlement-2 (Placing-UFO-2)
         nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.equals("founding-settlement-2")) {
+            if (newValue.equals(RENAME_FOUNDING_SET2)) {
                 startTime();
             }
         });
@@ -298,7 +331,30 @@ public class GameScreenController implements Controller {
         this.spectatorMember.addListener((ListChangeListener<? super Member>) c ->
                 this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
 
+        //Action is performed when the platform is close
+        this.app.getStage().setOnCloseRequest(e -> {
+            actionOnCloseScreen();
+            e.consume();
+        });
+
         return parent;
+    }
+
+    private void actionOnCloseScreen() {
+
+        if (playerOwnView.size() + opponents.size() == 1) {
+            gameService
+                    .deleteGame(gameStorage.getId())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+            userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
+                    .subscribe(s -> System.exit(0));
+        } else {
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false).
+                    observeOn(FX_SCHEDULER).subscribe();
+            userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
+                    .subscribe(s -> System.exit(0));
+        }
     }
 
     private Node renderSpectator(Member member) {
@@ -312,7 +368,8 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
+        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController,
+                this.gameStorage.getVictoryPoints());
         userSubView.init();
         this.tradingSubController.setPlayer(player);
         return userSubView.render();
@@ -342,18 +399,12 @@ public class GameScreenController implements Controller {
         //System.out.println("Move: " + move.action());
     }
 
-    private int calculateVP(Player player) {
-        // Calculate the victory points, when the change listener of players recognizes changes
-        // Update opponent by removing and rendering opponent with new victory points again
-        // 13 is the total number of cities and settlements a player is able to set in the game
-        return AMOUNT_SETTLEMENTS_CITIES - (player.remainingBuildings().get(SETTLEMENT) + player.remainingBuildings().get(CITY) * 2);
-    }
-
     private void handlePlayerEvent(Event<Player> playerEvent) {
         // Handle event on player and refresh list of players
         Player player = playerEvent.data();
 
         if (playerEvent.event().endsWith(UPDATED)) {
+
             for (Player p : playerOwnView) {
                 if (p.userId().equals(player.userId())) {
                     playerOwnView.set(playerOwnView.indexOf(p), player);
@@ -366,6 +417,9 @@ public class GameScreenController implements Controller {
                     opponents.set(opponents.indexOf(p), player);
                 }
             }
+            //sets name of the longest road
+            updateLongestRoad(playerOwnView, opponents);
+            //sets the winner
             winnerScreen(playerOwnView, opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
             if (!player.userId().equals(idStorage.getID())) {
@@ -375,6 +429,36 @@ public class GameScreenController implements Controller {
         } else if (playerEvent.event().endsWith(DELETED)) {
             this.opponents.remove(player);
             this.removeOpponent(player);
+        }
+    }
+
+    //Sets the name of the user who has longestRoad
+    private void updateLongestRoad(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
+        String userId = "";
+        int longestRoad = 0;
+        for (Player p : playerOwnView) {
+            if (p.longestRoad() != null) {
+                if (((int) p.longestRoad()) > longestRoad) {
+                    userId = p.userId();
+                    longestRoad = (int) p.longestRoad();
+                }
+            }
+        }
+
+        for (Player p : opponents) {
+            if (p.longestRoad() != null) {
+                if (((int) p.longestRoad()) > longestRoad) {
+                    userId = p.userId();
+                    longestRoad = (int) p.longestRoad();
+                }
+            }
+        }
+
+        for (User u : allUser) {
+            if (u._id().equals(userId)) {
+                playerLongestRoadLabel.setText(u.name());
+                break;
+            }
         }
     }
 
@@ -390,7 +474,7 @@ public class GameScreenController implements Controller {
         }
 
         for (List<String> s : userNumberPoints.values()) {
-            if (s.contains("10")) {
+            if (s.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                         , gameStorage, idStorage, gameService, app, lobbyController);
                 winnerController.render();
@@ -413,47 +497,58 @@ public class GameScreenController implements Controller {
         State state = stateEvent.data();
 
         if (stateEvent.event().endsWith(UPDATED)) {
-            // change the nextMoveLabel to the current move
-            String currentMove = state.expectedMoves().get(0).action();
-            nextMoveLabel.setText(currentMove);
-            // change the currentPlayerLabel to the current player
-            User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
-            currentPlayerLabel.setText(currentPlayer.name());
+            // change the nextMoveLabel to the current move and adapt to the renamed buildings
+            // checks the if the expected move is empty or not
+            // in some cases it is required
+            if (!state.expectedMoves().isEmpty()) {
+                String currentMove = state.expectedMoves().get(0).action();
+                switch (currentMove) {
+                case "founding-settlement-1" -> nextMoveLabel.setText(RENAME_FOUNDING_SET1);
+                case "founding-settlement-2" -> nextMoveLabel.setText(RENAME_FOUNDING_SET2);
+                case "founding-road-1" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD1);
+                case "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD2);
+                default -> nextMoveLabel.setText(currentMove);
+            }
+                // change the currentPlayerLabel to the current player
+                User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
+                currentPlayerLabel.setText(currentPlayer.name());
 
-            // open screen for discarding resources if its current player's screen + state is drop
-            // enters more than one time this method: runDiscardOnce variable or find another solution
-            if ((currentMove.equals(DROP_ACTION)) && currentPlayer._id().equals(idStorage.getID()) && runDiscardOnce) {
-                // initialize and render the discard resources view -> open new window (new stage)
-                // get the current player and open the window for dropping resources
-                runDiscardOnce = false;
-                for (Player p : this.playerOwnView) {
-                    if (p.userId().equals(currentPlayer._id())) {
-                        DiscardResourcesController discard = new DiscardResourcesController(p, this.gameStorage.getId(),
-                                this.pioneersService, currentPlayerLabel.getScene().getWindow());
-                        discard.render();
-                        // Deleting the controller is not needed, because the garbage collector should delete the controller
-                        // after closing the window
+                // open screen for discarding resources if its current player's screen + state is drop
+                // enters more than one time this method: runDiscardOnce variable or find another solution
+                if ((currentMove.equals(DROP_ACTION)) && currentPlayer._id().equals(idStorage.getID()) && runDiscardOnce) {
+                    // initialize and render the discard resources view -> open new window (new stage)
+                    // get the current player and open the window for dropping resources
+                    runDiscardOnce = false;
+                    for (Player p : this.playerOwnView) {
+                        if (p.userId().equals(currentPlayer._id())) {
+                            DiscardResourcesController discard = new DiscardResourcesController(p, this.gameStorage.getId(),
+                                    this.pioneersService, currentPlayerLabel.getScene().getWindow());
+                            discard.render();
+                            // Deleting the controller is not needed, because the garbage collector should delete the controller
+                            // after closing the window
+                        }
                     }
                 }
-            }
 
-            // set runDiscardOnce on true again, when another action appears
-            if (!currentMove.equals(DROP_ACTION)) {
-                runDiscardOnce = true;
-            }
 
-            // change the cursor when action is "rob" instead of alert (or notification),
-            //  remove the image from cursor, when leaving the game or when placing robber
-            if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID())) {
-                Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/robber.png")).toString());
-                currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
-            } else {
-                currentPlayerLabel.getScene().setCursor(Cursor.DEFAULT);
-            }
+                // set runDiscardOnce on true again, when another action appears
+                if (!currentMove.equals(DROP_ACTION)) {
+                    runDiscardOnce = true;
+                }
 
-            if (state.robber() != null && !state.robber().equals(currentRobPlace)) {
-                // update the view and place the robber on new tile
-                this.updateRobView(state.robber());
+                // change the cursor when action is "rob" instead of alert (or notification),
+                //  remove the image from cursor, when leaving the game or when placing robber
+                if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID())) {
+                    Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/robber.png")).toString());
+                    currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
+                } else {
+                    currentPlayerLabel.getScene().setCursor(Cursor.DEFAULT);
+                }
+
+                if (state.robber() != null && !state.robber().equals(currentRobPlace)) {
+                    // update the view and place the robber on new tile
+                    this.updateRobView(state.robber());
+                }
             }
         }
     }
@@ -512,7 +607,7 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                this.calculateVP(player));
+                this.gameStorage.getVictoryPoints());
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }
@@ -582,7 +677,7 @@ public class GameScreenController implements Controller {
             if (seconds[0] <= 0) {
                 timeline.stop();
                 //current Move is founding-settlement
-                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-settlement")) {
+                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
                     //get all valid settlementPosition in dependence of map
                     List<String> validPositions = getAllValidPositions();
                     //get all invalid settlementPositions
@@ -808,75 +903,19 @@ public class GameScreenController implements Controller {
         this.diceTwo.toFront();
         this.diceTwo.setVisible(true);
 
-        Image image1 = null;
-        Image image2 = null;
+        DiceRoll diceRoll = new DiceRoll();
+        List<Image> dices = diceRoll.getDiceImages(diceNumber);
+        Image image1 = dices.get(0);
+        Image image2 = dices.get(1);
 
-        switch (diceNumber) {
-            // according to swagger roll is between 1 and 12
-            case 1 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-                this.diceTwo.setVisible(false);
-            }
-            case 2 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 3 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border2.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 4 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border3.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 5 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border4.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 6 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border5.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 7 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 8 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border2.png")).toString());
-            }
-
-            case 9 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border3.png")).toString());
-            }
-
-            case 10 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border4.png")).toString());
-            }
-
-            case 11 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border5.png")).toString());
-            }
-
-            case 12 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-            }
-        }
         if (image1 != null) {
             this.diceOne.setImage(image1);
         }
         if (image2 != null) {
             this.diceTwo.setImage(image2);
+        }
+        else {
+            this.diceTwo.setVisible(false);
         }
     }
 }
