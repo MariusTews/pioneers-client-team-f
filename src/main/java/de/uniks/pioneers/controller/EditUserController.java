@@ -125,13 +125,13 @@ public class EditUserController implements Controller {
         updateAvatar();
 
         if (newUserNameTextField.getText().equals("") && passwordField.getText().equals("")) {
-            updateUser(idStorage.getID(), null, null, null, avatar);
+            updateUser(idStorage.getID(), null, null, null);
         } else if (passwordField.getText().equals("")) {
-            updateUser(idStorage.getID(), newUserNameTextField.getText(), null, null, avatar);
+            updateUser(idStorage.getID(), newUserNameTextField.getText(), null, null);
         } else if (newUserNameTextField.getText().equals("")) {
-            updateUser(idStorage.getID(), null, passwordField.getText(), repeatPasswordFiled.getText(), avatar);
+            updateUser(idStorage.getID(), null, passwordField.getText(), repeatPasswordFiled.getText());
         } else {
-            updateUser(idStorage.getID(), newUserNameTextField.getText(), passwordField.getText(), repeatPasswordFiled.getText(), avatar);
+            updateUser(idStorage.getID(), newUserNameTextField.getText(), passwordField.getText(), repeatPasswordFiled.getText());
         }
     }
 
@@ -142,17 +142,17 @@ public class EditUserController implements Controller {
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         alert.setTitle("Deleting Account");
-        alert.setContentText("Are you sure you want to delete " + username + "?" );
+        alert.setContentText("Are you sure you want to delete " + username + "?");
         alert.getButtonTypes().set(0, ButtonType.YES);
         alert.getButtonTypes().set(1, ButtonType.NO);
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.YES){
+        if (result.isPresent() && result.get() == ButtonType.YES) {
             userService.delete(idStorage.getID())
                     .observeOn(FX_SCHEDULER)
-                    .subscribe(suc -> app.show(loginController.get()), error->{});
+                    .subscribe(suc -> app.show(loginController.get()), error -> {
+                    });
         }
     }
-
 
 
     public String encodeFileToBase64Binary(File file) {
@@ -172,7 +172,6 @@ public class EditUserController implements Controller {
     }
 
 
-
     public void updateAvatar() {
         if (pictureFile == null) {
             user.subscribe(u -> avatar = u.avatar());
@@ -183,14 +182,15 @@ public class EditUserController implements Controller {
     }
 
 
-    public void updateUser(String id, String name, String password, String repeatPassword, String avatar) {
+    public void updateUser(String id, String name, String password, String repeatPassword) {
         if (avatar != null) {
             if (avatar.length() > 16384) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "the chosen image is to big! \nplease choose a picture which is smaller than 10kb");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "the chosen image is to big! \nplease choose a picture which is \nsmaller than 10kb");
                 // Change style of alert
                 DialogPane dialogPane = alert.getDialogPane();
                 dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
                 alert.showAndWait();
+                this.deletePicture();
                 return;
             }
         }
@@ -214,7 +214,7 @@ public class EditUserController implements Controller {
         }
         userService.userUpdate(id, name, avatar, friends, "online", password)
                 .observeOn(FX_SCHEDULER)
-                .doOnError(error ->{
+                .doOnError(error -> {
                     if ("HTTP 409 ".equals(error.getMessage())) {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION, "username is already taken!");
                         // Change style of alert
@@ -231,15 +231,16 @@ public class EditUserController implements Controller {
                     }
                 })
 
-                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {});
+                .subscribe(onSuccess -> app.show(lobbyController.get()), onError -> {
+                });
     }
 
     public void editPicture() {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText("what you want to do \nwith your picture?");
-        alert.getButtonTypes().set(0,new ButtonType("change"));
-        alert.getButtonTypes().set(1,new ButtonType("delete"));
+        alert.getButtonTypes().set(0, new ButtonType("change"));
+        alert.getButtonTypes().set(1, new ButtonType("delete"));
         // Change style of alert
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
@@ -247,7 +248,7 @@ public class EditUserController implements Controller {
         window.setOnCloseRequest(e -> alert.close());
 
         Optional<ButtonType> result = alert.showAndWait();
-        result.ifPresent(res-> {
+        result.ifPresent(res -> {
             if (res.getText().equals("change")) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.getExtensionFilters().addAll();
@@ -257,11 +258,15 @@ public class EditUserController implements Controller {
                     userPicture.setImage(new Image(selectedFile.toURI().toString()));
                 }
             } else if (res.getText().equals("delete")) {
-                this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
-                avatar = "data:image/png;base64,";
+                this.deletePicture();
             }
         });
 
     }
-}
 
+    private void deletePicture() {
+        this.userPicture.setImage(new Image(String.valueOf(Main.class.getResource("defaultPicture.png"))));
+        this.avatar = "data:image/png;base64,";
+        this.pictureFile = null;
+    }
+}
