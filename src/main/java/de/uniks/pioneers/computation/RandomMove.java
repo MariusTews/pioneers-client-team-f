@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class RandomMove {
 
     private final GameStorage gameStorage;
@@ -21,9 +24,7 @@ public class RandomMove {
         this.pioneersService = pioneersService;
     }
 
-    public HashMap<String, Integer> calculateSettlement() {
-        HashMap<String, Integer> result = new HashMap<>();
-
+    public void calculateSettlement(String expectedMove) {
         //get all valid settlementPosition in dependence of map
         List<String> validPositions = getAllValidPositions();
         //get all invalid settlementPositions
@@ -55,21 +56,18 @@ public class RandomMove {
         int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
         int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
 
-        result.put("x", x);
-        result.put("y", y);
-        result.put("z", z);
-        result.put("side", side);
-        result.put("xRoad", xRoad);
-        result.put("yRoad", yRoad);
-        result.put("zRoad", zRoad);
-        result.put("sideRoad", sideRoad);
-
-        return result;
+        //place chosen settlement and road
+        pioneersService.move(gameStorage.getId(), expectedMove,
+                        x, y, z, side,
+                        "settlement", null, null)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(result -> pioneersService.move(gameStorage.getId(), expectedMove, xRoad, yRoad, zRoad,
+                                sideRoad, "road", null, null)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe());
     }
 
-    public HashMap<String, Integer> calculateRoad(String lastBuildingPosition) {
-        HashMap<String, Integer> result = new HashMap<>();
-
+    public void calculateRoad(String lastBuildingPosition, String expectedMove) {
         // String to int from lastBuildingPlaced to calculate possible roadPlacements
         int x = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("x") + 1, lastBuildingPosition.indexOf("y")));
         int y = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("y") + 1, lastBuildingPosition.indexOf("z")));
@@ -88,12 +86,11 @@ public class RandomMove {
         int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
         int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
 
-        result.put("xRoad", xRoad);
-        result.put("yRoad", yRoad);
-        result.put("zRoad", zRoad);
-        result.put("sideRoad", sideRoad);
-
-        return result;
+        //place chosen and road
+        pioneersService.move(gameStorage.getId(), expectedMove, xRoad, yRoad, zRoad,
+                        sideRoad, "road", null, null)
+                .observeOn(FX_SCHEDULER)
+                .subscribe();
     }
 
     public List<String> getAllInvalidSettlementCoordinates() {
