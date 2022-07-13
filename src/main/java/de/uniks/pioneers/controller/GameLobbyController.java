@@ -213,7 +213,7 @@ public class GameLobbyController implements Controller {
 								break;
 							}
 						}
-						System.out.println(this.spectatorMember.size());
+
 						for (Member upSpectatorMember : this.spectatorMember) {
 							if (upSpectatorMember.userId().equals(member.userId()) && !member.spectator()) {
 								spectatorMember.remove(upSpectatorMember);
@@ -245,12 +245,7 @@ public class GameLobbyController implements Controller {
                         }
 
 						//deactivate checkbox if maximum member has been reached
-						if(members.size() == MAX_MEMBERS){
-							checkBoxId.disableProperty().set(true);
-						}else {
-							checkBoxId.disableProperty().set(false);
-						}
-
+						checkBoxId.disableProperty().set(members.size() == MAX_MEMBERS);
 
 						this.idUserList.getChildren().clear();
 						this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
