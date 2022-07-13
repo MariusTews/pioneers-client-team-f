@@ -1,11 +1,14 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.dto.Event;
+import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.Subject;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -58,6 +61,8 @@ class LobbyControllerTest extends ApplicationTest {
     @InjectMocks
     LobbyController lobbyController;
 
+    private Subject<Event<Member>> memberSubject;
+
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
         // empty init
@@ -87,5 +92,10 @@ class LobbyControllerTest extends ApplicationTest {
 
         verify(userService).statusUpdate("4", "offline");
         verify(authService).logout();
+    }
+
+    @Test
+    void lobbyEventListenerTest(){
+
     }
 }
