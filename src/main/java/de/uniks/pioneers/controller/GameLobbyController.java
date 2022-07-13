@@ -146,7 +146,7 @@ public class GameLobbyController implements Controller {
 								//pushes all the users to spectator
 								//if the player number is greater than 6
 								//this allows unlimited number of spectator.
-								if(this.members.size() > MAX_MEMBERS-1) {
+								if(this.members.size() > MAX_MEMBERS) {
 									for (Member member : members) {
 										if (member.userId().equals(this.idStorage.getID())
 												&& member.gameId().equals(this.gameStorage.getId())) {
@@ -188,6 +188,16 @@ public class GameLobbyController implements Controller {
 						if (member.userId().equals(idStorage.getID())) {
 							app.show(lobbyController.get());
 						}
+						this.idUserList.getChildren().clear();
+						this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+						this.spectatorViewId.getChildren().clear();
+						this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
+
+						//make sure if members are less than max number, checkbox is visible
+						if(members.size() < MAX_MEMBERS){
+							checkBoxId.disableProperty().set(false);
+						}
+
 
 					} else if (event.event().endsWith(UPDATED)) {
 
@@ -231,6 +241,13 @@ public class GameLobbyController implements Controller {
 							if(readyMembers == members.size() + spectatorMember.size()){
 								giveYourselfColor();
 							}
+						}
+
+						//deactivate checkbox if maximum member has been reached
+						if(members.size() == MAX_MEMBERS){
+							checkBoxId.disableProperty().set(true);
+						}else {
+							checkBoxId.disableProperty().set(false);
 						}
 
 
@@ -461,7 +478,6 @@ public class GameLobbyController implements Controller {
 	//render spectators
 	private Node renderSpectatorMember(Member member) {
 		boolean ch = false;
-		System.out.println(playerList);
 		for (User user : playerList) {
 			if (user._id().equals(member.userId()) && member.spectator()) {
 				ch = true;
