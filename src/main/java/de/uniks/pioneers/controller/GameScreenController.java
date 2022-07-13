@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.computation.DiceRoll;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
@@ -169,27 +170,22 @@ public class GameScreenController implements Controller {
                                             m.userId().equals(this.idStorage.getID())) {
                                         //get access to it
 
-                    // Check if expected move is founding-roll after joining the game
-                    pioneersService
-                            .findOneState(gameStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(r -> {
-                                if(!r.expectedMoves().isEmpty()) {
-                                    if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                        foundingDiceRoll();
-                                    }
-                                }});
+                                        // Check if expected move is founding-roll after joining the game
+                                        pioneersService
+                                                .findOneState(gameStorage.getId())
+                                                .observeOn(FX_SCHEDULER)
+                                                .subscribe(r -> {
+                                                    if (!r.expectedMoves().isEmpty()) {
+                                                        if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                                            foundingDiceRoll();
+                                                        }
+                                                    }
+                                                });
                                         break;
                                     }
                                 }
                                 this.members.setAll(c);
                             });
-
-                    // Listen to the State to handle the event
-                    disposable.add(eventListener
-                            .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(this::handleStateEvents));
 
                     pioneersService
                             .findAllPlayers(this.gameStorage.getId())
@@ -209,6 +205,13 @@ public class GameScreenController implements Controller {
                                 }
                             });
                 });
+
+        // Listen to the State to handle the event
+        disposable.add(eventListener
+                .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
+                .observeOn(FX_SCHEDULER)
+                .subscribe(this::handleStateEvents));
+
         // Listen to the Moves to handle the event
         disposable.add(eventListener
                 .listen("games." + this.gameStorage.getId() + ".moves.*." + "created", Move.class)
@@ -287,9 +290,9 @@ public class GameScreenController implements Controller {
         //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
         currentPlayerLabel.textProperty().addListener((observable, oldValue, newValue) -> startTime());
 
-        //add listener on nextMoveLabel to reset the timer if founding-settlement-2
+        //add listener on nextMoveLabel to reset the timer if founding-settlement-2 (Placing-UFO-2)
         nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.equals("founding-settlement-2")) {
+            if (newValue.equals(RENAME_FOUNDING_SET2)) {
                 startTime();
             }
         });
@@ -334,7 +337,7 @@ public class GameScreenController implements Controller {
 
     private void actionOnCloseScreen() {
 
-        if(playerOwnView.size() + opponents.size() == 1) {
+        if (playerOwnView.size() + opponents.size() == 1) {
             gameService
                     .deleteGame(gameStorage.getId())
                     .observeOn(FX_SCHEDULER)
@@ -360,7 +363,8 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, userService, player, this.calculateVP(player), gameFieldSubController);
+        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController,
+                this.gameStorage.getVictoryPoints());
         userSubView.init();
         this.tradingSubController.setPlayer(player);
         return userSubView.render();
@@ -373,13 +377,6 @@ public class GameScreenController implements Controller {
         if (move.action().equals("roll") || move.action().equals("founding-roll")) {
             displayDice(move.roll());
         }
-    }
-
-    private int calculateVP(Player player) {
-        // Calculate the victory points, when the change listener of players recognizes changes
-        // Update opponent by removing and rendering opponent with new victory points again
-        // 13 is the total number of cities and settlements a player is able to set in the game
-        return AMOUNT_SETTLEMENTS_CITIES - (player.remainingBuildings().get(SETTLEMENT) + player.remainingBuildings().get(CITY) * 2);
     }
 
     private void handlePlayerEvent(Event<Player> playerEvent) {
@@ -401,7 +398,7 @@ public class GameScreenController implements Controller {
                 }
             }
             //sets name of the longest road
-            updateLongestRoad(playerOwnView,opponents);
+            updateLongestRoad(playerOwnView, opponents);
             //sets the winner
             winnerScreen(playerOwnView, opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
@@ -419,8 +416,8 @@ public class GameScreenController implements Controller {
     private void updateLongestRoad(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
         String userId = "";
         int longestRoad = 0;
-        for (Player p:playerOwnView) {
-            if(p.longestRoad() != null) {
+        for (Player p : playerOwnView) {
+            if (p.longestRoad() != null) {
                 if (((int) p.longestRoad()) > longestRoad) {
                     userId = p.userId();
                     longestRoad = (int) p.longestRoad();
@@ -428,8 +425,8 @@ public class GameScreenController implements Controller {
             }
         }
 
-        for (Player p :opponents) {
-            if(p.longestRoad() != null) {
+        for (Player p : opponents) {
+            if (p.longestRoad() != null) {
                 if (((int) p.longestRoad()) > longestRoad) {
                     userId = p.userId();
                     longestRoad = (int) p.longestRoad();
@@ -437,8 +434,8 @@ public class GameScreenController implements Controller {
             }
         }
 
-        for (User u: allUser) {
-            if(u._id().equals(userId)){
+        for (User u : allUser) {
+            if (u._id().equals(userId)) {
                 playerLongestRoadLabel.setText(u.name());
                 break;
             }
@@ -480,12 +477,18 @@ public class GameScreenController implements Controller {
         State state = stateEvent.data();
 
         if (stateEvent.event().endsWith(UPDATED)) {
-            // change the nextMoveLabel to the current move
+            // change the nextMoveLabel to the current move and adapt to the renamed buildings
             // checks the if the expected move is empty or not
             // in some cases it is required
             if (!state.expectedMoves().isEmpty()) {
                 String currentMove = state.expectedMoves().get(0).action();
-                nextMoveLabel.setText(currentMove);
+                switch (currentMove) {
+                case "founding-settlement-1" -> nextMoveLabel.setText(RENAME_FOUNDING_SET1);
+                case "founding-settlement-2" -> nextMoveLabel.setText(RENAME_FOUNDING_SET2);
+                case "founding-road-1" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD1);
+                case "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD2);
+                default -> nextMoveLabel.setText(currentMove);
+            }
                 // change the currentPlayerLabel to the current player
                 User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
                 currentPlayerLabel.setText(currentPlayer.name());
@@ -584,7 +587,7 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                this.calculateVP(player));
+                this.gameStorage.getVictoryPoints());
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }
@@ -654,7 +657,7 @@ public class GameScreenController implements Controller {
             if (seconds[0] <= 0) {
                 timeline.stop();
                 //current Move is founding-settlement
-                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-settlement")) {
+                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
                     //get all valid settlementPosition in dependence of map
                     List<String> validPositions = getAllValidPositions();
                     //get all invalid settlementPositions
@@ -880,75 +883,19 @@ public class GameScreenController implements Controller {
         this.diceTwo.toFront();
         this.diceTwo.setVisible(true);
 
-        Image image1 = null;
-        Image image2 = null;
+        DiceRoll diceRoll = new DiceRoll();
+        List<Image> dices = diceRoll.getDiceImages(diceNumber);
+        Image image1 = dices.get(0);
+        Image image2 = dices.get(1);
 
-        switch (diceNumber) {
-            // according to swagger roll is between 1 and 12
-            case 1 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-                this.diceTwo.setVisible(false);
-            }
-            case 2 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 3 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border2.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 4 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border3.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 5 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border4.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 6 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border5.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 7 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border1.png")).toString());
-            }
-
-            case 8 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border2.png")).toString());
-            }
-
-            case 9 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border3.png")).toString());
-            }
-
-            case 10 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border4.png")).toString());
-            }
-
-            case 11 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border5.png")).toString());
-            }
-
-            case 12 -> {
-                image1 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-                image2 = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/dieWhite_border6.png")).toString());
-            }
-        }
         if (image1 != null) {
             this.diceOne.setImage(image1);
         }
         if (image2 != null) {
             this.diceTwo.setImage(image2);
+        }
+        else {
+            this.diceTwo.setVisible(false);
         }
     }
 }

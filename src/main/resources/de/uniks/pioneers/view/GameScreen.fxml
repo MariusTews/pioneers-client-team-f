@@ -64,7 +64,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Pane id="tradeSubView" fx:id="tradingPane" layoutX="240.0" layoutY="82.0" prefHeight="212.0" prefWidth="250.0" />
+      <Pane id="tradeSubView" fx:id="tradingPane" layoutX="230.0" layoutY="83.0" prefHeight="212.0" prefWidth="250.0" />
         <Pane id="currentMove" layoutX="230.0" layoutY="420.0" prefHeight="60.0" prefWidth="250.0">
             <Label alignment="CENTER" contentDisplay="TOP" prefHeight="30.0" prefWidth="250.0" text="NEXT MOVE">
          </Label>
