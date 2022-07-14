@@ -107,8 +107,6 @@ class LobbyControllerTest extends ApplicationTest {
 
         when(app.getStage()).thenReturn(new Stage());
 
-
-
         when(eventListener.listen("users.*.*",User.class)).thenReturn(userSubject);
         when(eventListener.listen("games.*.*",Game.class)).thenReturn(gameSubject);
         when(eventListener.listen("group.*.*",Group.class)).thenReturn(groupSubject);
