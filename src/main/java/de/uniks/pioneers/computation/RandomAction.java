@@ -2,6 +2,7 @@ package de.uniks.pioneers.computation;
 
 import de.uniks.pioneers.model.Building;
 import de.uniks.pioneers.model.Map;
+import de.uniks.pioneers.model.Point3D;
 import de.uniks.pioneers.model.Tile;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.PioneersService;
@@ -10,16 +11,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class RandomMove {
+public class RandomAction {
 
     private final GameStorage gameStorage;
     private final PioneersService pioneersService;
 
-    public RandomMove(GameStorage gameStorage,
-                      PioneersService pioneersService) {
+    public RandomAction(GameStorage gameStorage,
+                        PioneersService pioneersService) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
     }
@@ -216,4 +217,82 @@ public class RandomMove {
         return validPositions;
     }
 
+    public void randomRobPlace(String playerID) {
+        this.pioneersService.findOneState(gameStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(move -> {
+                    // safe current robber position
+                    Point3D robberPos = move.robber();
+
+                    // If no buildings are available, set rob on default
+                    Point3D defaultPos = new Point3D(0, 0, 0);
+
+                    this.pioneersService.findAllBuildings(gameStorage.getId())
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe(buildings -> {
+                                // Filter all buildings on the map, get the first building and set on tile
+                                for (Building building : buildings) {
+                                    if (!(building.type().equals(ROAD) || building.owner().equals(playerID))) {
+                                        // only for shorter comparison
+                                        Point3D newRobPos = new Point3D(building.x(), building.y(), building.z());
+                                        if (!newRobPos.equals(robberPos)) {
+                                            pioneersService.move(gameStorage.getId(), ROB_ACTION, building.x(),
+                                                            building.y(), building.z(), null, null,
+                                                            building.owner(), null)
+                                                    .observeOn(FX_SCHEDULER)
+                                                    .subscribe();
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                // when only buildings from the current user are available and the robber is not already
+                                // on the default tile, set on default
+                                if (robberPos == null || !robberPos.equals(defaultPos)) {
+                                    pioneersService.move(gameStorage.getId(), ROB_ACTION, 0, 0, 0, null, null,
+                                                    null, null)
+                                            .observeOn(FX_SCHEDULER)
+                                            .subscribe();
+                                    return;
+                                }
+                                Building anyBuilding = buildings.get(0);
+                                // if default is current robber's position -> other position
+                                pioneersService.move(gameStorage.getId(), ROB_ACTION, anyBuilding.x(), anyBuilding.y(),
+                                                anyBuilding.z(), null, null, null, null)
+                                        .observeOn(FX_SCHEDULER)
+                                        .subscribe();
+                            });
+                });
+    }
+
+    public void randomDiscard(HashMap<String, Integer> playerRes) {
+        // check how much has to be dropped
+        int total = 0;
+        for (int amount : playerRes.values()) {
+            total += amount;
+        }
+        total = total / 2;
+        // iterate through all resources and choose till the total amount is reached
+        HashMap<String, Integer> discardMap = new HashMap<>();
+        int currentAmount = 0;
+        for (String resource : playerRes.keySet()) {
+            for (int i = 1; i < playerRes.get(resource) + 1; i++) {
+                // count the amount of "chosen" resources and stop if enough resources are selected
+                currentAmount += 1;
+                if (currentAmount == total) {
+                    discardMap.put(resource, i * (-1));
+                    pioneersService.move(gameStorage.getId(), DROP_ACTION, null, null, null, null, null, null, discardMap)
+                            .observeOn(FX_SCHEDULER)
+                            .subscribe();
+                    return;
+                }
+            }
+            // put all the specific resource to the discardMap
+            discardMap.put(resource, playerRes.get(resource) * (-1));
+        }
+
+        pioneersService.move(gameStorage.getId(), DROP_ACTION, null, null, null, null, null, null, discardMap)
+                .observeOn(FX_SCHEDULER)
+                .subscribe();
+    }
 }
