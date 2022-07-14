@@ -107,7 +107,6 @@ public class TradingSubController implements Controller {
     // lists
     private final List<Harbor> harbors = new ArrayList<>();
     private final List<Building> buildings = new ArrayList<>();
-    private final List<Player> players = new ArrayList<>();
 
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -116,22 +115,17 @@ public class TradingSubController implements Controller {
     private int checkGiveRes = 0;
     private int checkReceiveRes = 0;
 
-    MemberService memberService;
-    private final List<Member> gameMemberList = new ArrayList<>();
-
     @Inject
     public TradingSubController(GameStorage gameStorage,
                                 PioneersService pioneersService,
                                 IDStorage idStorage,
                                 EventListener eventListener,
-                                UserService userService,
-                                MemberService memberService) {
+                                UserService userService) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
         this.idStorage = idStorage;
         this.eventListener = eventListener;
         this.userService = userService;
-        this.memberService = memberService;
     }
 
     @Override
@@ -142,11 +136,6 @@ public class TradingSubController implements Controller {
             this.receiveResources.put(res, 0);
         }
 
-        /*memberService
-                .getAllGameMembers(gameStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(this.gameMemberList::addAll);*/
-
         pioneersService
                 .findAllPlayers(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
@@ -155,7 +144,6 @@ public class TradingSubController implements Controller {
                         if (player.userId().equals(idStorage.getID())) {
                             this.player = player;
                         }
-                        this.players.add(player);
                     }
                 });
 
@@ -335,8 +323,6 @@ public class TradingSubController implements Controller {
                     .observeOn(FX_SCHEDULER)
                     .subscribe();
         }
-
-
         resetButtonsAndLabels();
     }
 

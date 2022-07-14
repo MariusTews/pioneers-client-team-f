@@ -31,7 +31,6 @@ import java.util.Objects;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class TradeAcceptSubcontroller implements Controller {
-    //public ChoiceBox tradePlayers;
     @FXML
     public Button tradeButton;
     @FXML
@@ -50,18 +49,15 @@ public class TradeAcceptSubcontroller implements Controller {
     private final UserService userService;
     PioneersService pioneersService;
     private final GameStorage gameStorage;
-    private final IDStorage idStorage;
 
     private Move move;
 
     public TradeAcceptSubcontroller(UserService userService,
                                     PioneersService pioneersService,
-                                    GameStorage gameStorage,
-                                    IDStorage idStorage) {
+                                    GameStorage gameStorage) {
         this.userService = userService;
         this.pioneersService = pioneersService;
         this.gameStorage = gameStorage;
-        this.idStorage = idStorage;
     }
 
     @Override
@@ -121,6 +117,7 @@ public class TradeAcceptSubcontroller implements Controller {
     }
 
     public void tradeButton(ActionEvent event) {
+        // check if partner was selected
         if (tradePartner == null) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Please choose a player to trade with");
             DialogPane dialogPane = alert.getDialogPane();
@@ -131,10 +128,7 @@ public class TradeAcceptSubcontroller implements Controller {
             pioneersService
                     .tradePlayer(gameStorage.getId(), "accept", tradePartner._id(), null)
                     .observeOn(FX_SCHEDULER)
-                    .subscribe(x -> {
-                            },
-                            onError -> {
-                            });
+                    .subscribe();
             primaryStage.close();
         }
     }
@@ -143,8 +137,7 @@ public class TradeAcceptSubcontroller implements Controller {
         pioneersService
                 .tradePlayer(gameStorage.getId(), "accept", null, move.resources())
                 .observeOn(FX_SCHEDULER)
-                .subscribe(x -> {},
-                        onError -> {});
+                .subscribe();
         primaryStage.close();
     }
 
@@ -154,9 +147,5 @@ public class TradeAcceptSubcontroller implements Controller {
 
     public void setMove(Move move) {
         this.move = move;
-    }
-
-    public Stage getPrimaryStage() {
-        return this.primaryStage;
     }
 }

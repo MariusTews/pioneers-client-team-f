@@ -239,7 +239,7 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage, idStorage);
+        tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
         tradeAcceptSubcontroller.init();
 
         //count up
@@ -323,7 +323,7 @@ public class GameScreenController implements Controller {
          * hand over own player to trading sub view
          * */
 
-        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener, userService, memberService);
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener, userService);
         tradingSubController.init();
         this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
@@ -408,7 +408,6 @@ public class GameScreenController implements Controller {
             }
             // wait until everybody made an offer
             tradeAcceptSubcontroller.setMove(move);
-
 
             if (acceptRenderFlag) {
                 tradeAcceptSubcontroller.render();

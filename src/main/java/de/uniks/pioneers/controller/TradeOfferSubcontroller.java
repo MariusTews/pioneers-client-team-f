@@ -56,6 +56,7 @@ public class TradeOfferSubcontroller implements Controller {
 
     @Override
     public void init() {
+        // for dynamic loading of the icons
         images.put("lumber", "view/assets/earth_cactus.png");
         images.put("brick", "view/assets/mars_bar.png");
         images.put("ore", "view/assets/moon_rock.png");
@@ -103,12 +104,7 @@ public class TradeOfferSubcontroller implements Controller {
                             }
                         }
                     }
-
-                    if (check == 0) {
-                        this.acceptOfferButton.disableProperty().set(false);
-                    } else {
-                        this.acceptOfferButton.disableProperty().set(true);
-                    }
+                    this.acceptOfferButton.disableProperty().set(check != 0);
                 });
 
         this.acceptOfferButton.disableProperty().set(false);
@@ -151,7 +147,6 @@ public class TradeOfferSubcontroller implements Controller {
             tmp.put(res, 0);
         }
 
-
         for (String res : move.resources().keySet()) {
             if (move.resources().get(res) != 0) {
                 tmp.put(res, (-1) * move.resources().get(res));
@@ -161,9 +156,7 @@ public class TradeOfferSubcontroller implements Controller {
         pioneersService
                 .tradePlayer(gameStorage.getId(), "offer", null, tmp)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(c -> {
-                    System.out.println("Move successful accept " + c.userId());
-                });
+                .subscribe();
 
         primaryStage.close();
     }
