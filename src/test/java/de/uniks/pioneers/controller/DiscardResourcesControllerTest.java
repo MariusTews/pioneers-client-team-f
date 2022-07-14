@@ -45,32 +45,33 @@ class DiscardResourcesControllerTest extends ApplicationTest {
         discardResourcesController.render();
     }
 
+    // Check if the buttons are disabled correctly
     @Test
     void adjustResourcesTest() {
         // Resource 1 - earth cactus UI elements
-        Label amountEarthCactus = lookup("#amountEarthCactus").query();
-        Button incResource1Btn = lookup("#incResource1Btn").query();
-        Button decResource1Btn = lookup("#decResource1Btn").query();
+        Label amountEarthCactus = lookup("#" + EARTH_CACTUS).query();
+        Button incResource1Btn = lookup("#increment_" + EARTH_CACTUS).query();
+        Button decResource1Btn = lookup("#decrement_" + EARTH_CACTUS).query();
 
         // Resource 2 - mars bar UI elements
-        Label amountMarsBar = lookup("#amountMarsBar").query();
-        Button incResource2Btn = lookup("#incResource2Btn").query();
-        Button decResource2Btn = lookup("#decResource2Btn").query();
+        Label amountMarsBar = lookup("#" + MARS_BAR).query();
+        Button incResource2Btn = lookup("#increment_" + MARS_BAR).query();
+        Button decResource2Btn = lookup("#decrement_" + MARS_BAR).query();
 
         // Resource 3 - moon rock UI elements
-        Label amountMoonRock = lookup("#amountMoonRock").query();
-        Button incResource3Btn = lookup("#incResource3Btn").query();
-        Button decResource3Btn = lookup("#decResource3Btn").query();
+        Label amountMoonRock = lookup("#" + MOON_ROCK).query();
+        Button incResource3Btn = lookup("#increment_" + MOON_ROCK).query();
+        Button decResource3Btn = lookup("#decrement_" + MOON_ROCK).query();
 
         // Resource 4 - neptune crystal UI elements
-        Label amountNeptuneCrystal = lookup("#amountNeptuneCrystal").query();
-        Button incResource4Btn = lookup("#incResource4Btn").query();
-        Button decResource4Btn = lookup("#decResource4Btn").query();
+        Label amountNeptuneCrystal = lookup("#" + NEPTUNE_CRYSTAL).query();
+        Button incResource4Btn = lookup("#increment_" + NEPTUNE_CRYSTAL).query();
+        Button decResource4Btn = lookup("#decrement_" + NEPTUNE_CRYSTAL).query();
 
         // Resource 5 - venus grain UI elements
-        Label amountVenusGrain = lookup("#amountVenusGrain").query();
-        Button incResource5Btn = lookup("#incResource5Btn").query();
-        Button decResource5Btn = lookup("#decResource5Btn").query();
+        Label amountVenusGrain = lookup("#" + VENUS_GRAIN).query();
+        Button incResource5Btn = lookup("#increment_grain").query();
+        Button decResource5Btn = lookup("#decrement_grain").query();
 
         Button discardButton = lookup("#discardButton").query();
 
@@ -104,12 +105,13 @@ class DiscardResourcesControllerTest extends ApplicationTest {
         Assertions.assertTrue(decResource5Btn.isDisabled());
     }
 
+    // Check for every resource if the discard button computes the right amount
     @Test
     void adjustResource1Test() {
         // Resource 1 - earth cactus UI elements
-        Label amountEarthCactus = lookup("#amountEarthCactus").query();
-        Button incResource1Btn = lookup("#incResource1Btn").query();
-        Button decResource1Btn = lookup("#decResource1Btn").query();
+        Label amountEarthCactus = lookup("#" + EARTH_CACTUS).query();
+        Button incResource1Btn = lookup("#increment_" + EARTH_CACTUS).query();
+        Button decResource1Btn = lookup("#decrement_" + EARTH_CACTUS).query();
 
         Button discardButton = lookup("#discardButton").query();
 
@@ -132,9 +134,9 @@ class DiscardResourcesControllerTest extends ApplicationTest {
     @Test
     void adjustResource2Test() {
         // Resource 2 - mars bar UI elements
-        Label amountMarsBar = lookup("#amountMarsBar").query();
-        Button incResource2Btn = lookup("#incResource2Btn").query();
-        Button decResource2Btn = lookup("#decResource2Btn").query();
+        Label amountMarsBar = lookup("#" + MARS_BAR).query();
+        Button incResource2Btn = lookup("#increment_" + MARS_BAR).query();
+        Button decResource2Btn = lookup("#decrement_" + MARS_BAR).query();
 
         Button discardButton = lookup("#discardButton").query();
 
@@ -161,9 +163,9 @@ class DiscardResourcesControllerTest extends ApplicationTest {
     @Test
     void adjustResource3Test() {
         // Resource 3 - moon rock UI elements
-        Label amountMoonRock = lookup("#amountMoonRock").query();
-        Button incResource3Btn = lookup("#incResource3Btn").query();
-        Button decResource3Btn = lookup("#decResource3Btn").query();
+        Label amountMoonRock = lookup("#" + MOON_ROCK).query();
+        Button incResource3Btn = lookup("#increment_" + MOON_ROCK).query();
+        Button decResource3Btn = lookup("#decrement_" + MOON_ROCK).query();
 
         Button discardButton = lookup("#discardButton").query();
 
@@ -188,9 +190,9 @@ class DiscardResourcesControllerTest extends ApplicationTest {
     @Test
     void adjustResource4Test() {
         // Resource 4 - neptune crystal UI elements
-        Label amountNeptuneCrystal = lookup("#amountNeptuneCrystal").query();
-        Button incResource4Btn = lookup("#incResource4Btn").query();
-        Button decResource4Btn = lookup("#decResource4Btn").query();
+        Label amountNeptuneCrystal = lookup("#" + NEPTUNE_CRYSTAL).query();
+        Button incResource4Btn = lookup("#increment_" + NEPTUNE_CRYSTAL).query();
+        Button decResource4Btn = lookup("#decrement_" + NEPTUNE_CRYSTAL).query();
 
         Button discardButton = lookup("#discardButton").query();
 
@@ -218,9 +220,9 @@ class DiscardResourcesControllerTest extends ApplicationTest {
     @Test
     void adjustResource5Test() {
         // Resource 5 - venus grain UI elements
-        Label amountVenusGrain = lookup("#amountVenusGrain").query();
-        Button incResource5Btn = lookup("#incResource5Btn").query();
-        Button decResource5Btn = lookup("#decResource5Btn").query();
+        Label amountVenusGrain = lookup("#" + VENUS_GRAIN).query();
+        Button incResource5Btn = lookup("#increment_" + VENUS_GRAIN).query();
+        Button decResource5Btn = lookup("#decrement_" + VENUS_GRAIN).query();
 
         Button discardButton = lookup("#discardButton").query();
 
@@ -252,8 +254,8 @@ class DiscardResourcesControllerTest extends ApplicationTest {
                 .thenReturn(Observable.just(new Move("4", "10", "01", "00", DROP_ACTION,
                         7, null, null, this.resources, null)));
 
-        Button incResource4Btn = lookup("#incResource4Btn").query();
-        Button incResource1Btn = lookup("#incResource1Btn").query();
+        Button incResource4Btn = lookup("#increment_" + NEPTUNE_CRYSTAL).query();
+        Button incResource1Btn = lookup("#increment_" + EARTH_CACTUS).query();
         Button discardButton = lookup("#discardButton").query();
 
         clickOn(incResource1Btn);

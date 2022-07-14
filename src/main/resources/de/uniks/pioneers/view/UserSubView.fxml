@@ -30,7 +30,7 @@
          <Insets left="80.0" right="60.0" />
       </VBox.margin>
    </Label>
-   <HBox alignment="CENTER" prefHeight="26.0" prefWidth="301.0" spacing="30.0">
+   <HBox alignment="CENTER" prefHeight="26.0" prefWidth="301.0" spacing="35.0">
       <ImageView id="cactus" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
       <ImageView id="mars" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
@@ -42,18 +42,18 @@
       </ImageView>
    </HBox>
    <HBox alignment="CENTER" prefHeight="32.0" prefWidth="310.0" spacing="30.0">
-      <Label fx:id="item1" prefHeight="20.0" prefWidth="20.0" text="it1">
+      <Label fx:id="item1" prefHeight="20.0" prefWidth="25.0" text="it1">
          <HBox.margin>
             <Insets left="5.0" />
          </HBox.margin>
       </Label>
-      <Label fx:id="item2" prefHeight="20.0" prefWidth="20.0" text="it2">
+      <Label fx:id="item2" prefHeight="20.0" prefWidth="25.0" text="it2">
       </Label>
-      <Label fx:id="item3" prefHeight="20.0" prefWidth="20.0" text="it3">
+      <Label fx:id="item3" prefHeight="20.0" prefWidth="25.0" text="it3">
       </Label>
-      <Label fx:id="item4" prefHeight="20.0" prefWidth="20.0" text="it4">
+      <Label fx:id="item4" prefHeight="20.0" prefWidth="25.0" text="it4">
       </Label>
-      <Label fx:id="item5" prefHeight="20.0" prefWidth="20.0" text="it5">
+      <Label fx:id="item5" prefHeight="20.0" prefWidth="25.0" text="it5">
       </Label>
    </HBox>
    <Label prefHeight="24.0" prefWidth="139.0" text="Build:">
