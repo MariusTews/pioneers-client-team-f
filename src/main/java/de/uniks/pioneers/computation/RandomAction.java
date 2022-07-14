@@ -217,7 +217,7 @@ public class RandomAction {
         return validPositions;
     }
 
-    public void randomRobPlace(String playerID) {
+    public void automaticRob(String playerID) {
         this.pioneersService.findOneState(gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(move -> {
@@ -265,7 +265,7 @@ public class RandomAction {
                 });
     }
 
-    public void randomDiscard(HashMap<String, Integer> playerRes) {
+    public void automaticDrop(HashMap<String, Integer> playerRes) {
         // check how much has to be dropped
         int total = 0;
         for (int amount : playerRes.values()) {

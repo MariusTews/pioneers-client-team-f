@@ -643,12 +643,12 @@ public class GameScreenController implements Controller {
             diceRoll();
             finishTurn();
         } else if (nextMoveLabel.getText().equals(ROB_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            this.calculateMove.randomRobPlace(this.idStorage.getID());
+            this.calculateMove.automaticRob(this.idStorage.getID());
             mapPane.getScene().setCursor(Cursor.DEFAULT);
         } else if (nextMoveLabel.getText().equals(DROP_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
             // get the current stage for closing the discard window
             discard.getPrimaryStage().close();
-            this.calculateMove.randomDiscard(playerOwnView.get(0).resources());
+            this.calculateMove.automaticDrop(playerOwnView.get(0).resources());
         } else {
             finishTurn();
         }
