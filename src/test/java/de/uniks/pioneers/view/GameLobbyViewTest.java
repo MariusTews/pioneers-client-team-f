@@ -58,8 +58,8 @@ public class GameLobbyViewTest extends ApplicationTest {
 		User u1 = new User("1234", "12345", "u1", "a", "on", null, new ArrayList<>());
 		User u2 = new User("1234", "12345", "u2", "b", "on", null, new ArrayList<>());
 
-		Message x1 = new Message("0", "0", "me1", "u1", "test1");
-		Message x2 = new Message("1", "1", "me2", "u2", "test2");
+		Message x1 = new Message("2022-07-14T22:29:30.318Z", "0", "me1", "u1", "test1");
+		Message x2 = new Message("2022-07-14T22:29:32.318Z", "1", "me2", "u2", "test2");
 
 		Game g = new Game("0", "0", "g1", "g", "u1", 2, true, new GameSettings(2, 10));
 
