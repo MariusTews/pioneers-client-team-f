@@ -94,7 +94,6 @@ public class TradingSubController implements Controller {
     private final PioneersService pioneersService;
     private final IDStorage idStorage;
     private final EventListener eventListener;
-    private final UserService userService;
     private Player player;
 
     // hashMaps for resources
@@ -119,13 +118,11 @@ public class TradingSubController implements Controller {
     public TradingSubController(GameStorage gameStorage,
                                 PioneersService pioneersService,
                                 IDStorage idStorage,
-                                EventListener eventListener,
-                                UserService userService) {
+                                EventListener eventListener) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
         this.idStorage = idStorage;
         this.eventListener = eventListener;
-        this.userService = userService;
     }
 
     @Override
