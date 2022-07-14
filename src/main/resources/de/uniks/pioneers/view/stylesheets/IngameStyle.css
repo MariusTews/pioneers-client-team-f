@@ -102,6 +102,19 @@
     -fx-background-size: 150 70;
 }
 
+#gameTimer {
+    -fx-background-image: url("../assets/grey_blue_textfield.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 100 30;
+    -fx-background-radius: 10;
+}
+
+.label.timer {
+    -fx-text-fill: dimgrey;
+    -fx-font-size: 24;
+}
+
 #gameScreenCountdown{
     -fx-background-size: 150 70;
     -fx-border-width: 4;

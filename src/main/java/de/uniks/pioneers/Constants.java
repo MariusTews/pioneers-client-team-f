@@ -70,7 +70,6 @@ public class Constants {
     public static final String RENAME_FOUNDING_SET2 = "Place-UFO-2";
     public static final String RENAME_FOUNDING_ROAD1 = "Place-Tube-1";
     public static final String RENAME_FOUNDING_ROAD2 = "Place-Tube-2";
-    public static final int AMOUNT_SETTLEMENTS_CITIES = 13;
     public static final String VENUS_GRAIN = "grain";
     public static final String MARS_BAR = "brick";
     public static final String MOON_ROCK = "ore";
