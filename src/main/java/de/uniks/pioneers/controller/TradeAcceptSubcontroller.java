@@ -85,7 +85,7 @@ public class TradeAcceptSubcontroller implements Controller {
         try {
             root = loader.load();
             this.primaryStage = new Stage();
-            Scene scene = new Scene(root, 200, 250);
+            Scene scene = new Scene(root, 200, 200);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Accept");
             primaryStage.show();

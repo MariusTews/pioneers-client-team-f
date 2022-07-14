@@ -7,9 +7,9 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="182.0" prefWidth="261.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.TradeAcceptSubcontroller">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="182.0" prefWidth="204.0" stylesheets="@stylesheets/TradeSubView.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.TradeAcceptSubcontroller">
    <children>
-      <Label prefHeight="51.0" prefWidth="87.0" text="Trade accepted" />
+      <Label alignment="CENTER" prefHeight="24.0" prefWidth="173.0" text="Trade accepted" />
       <VBox fx:id="tradeUsers" prefHeight="113.0" prefWidth="261.0" />
       <HBox alignment="CENTER" prefHeight="66.0" prefWidth="261.0">
          <children>
