@@ -3,7 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.DiceRoll;
-import de.uniks.pioneers.computation.RandomMove;
+import de.uniks.pioneers.computation.RandomAction;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
@@ -110,8 +110,9 @@ public class GameScreenController implements Controller {
     private final HashMap<String, User> userHash = new HashMap<>();
     private boolean runDiscardOnce = true;
     private Point3D currentRobPlace;
-    private RandomMove calculateMove;
+    private RandomAction calculateMove;
     private TimerController moveTimer;
+    private DiscardResourcesController discard;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -234,7 +235,7 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        this.calculateMove = new RandomMove(this.gameStorage, this.pioneersService);
+        this.calculateMove = new RandomAction(this.gameStorage, this.pioneersService);
 
     }
 
@@ -487,7 +488,7 @@ public class GameScreenController implements Controller {
                     runDiscardOnce = false;
                     for (Player p : this.playerOwnView) {
                         if (p.userId().equals(currentPlayer._id())) {
-                            DiscardResourcesController discard = new DiscardResourcesController(p, this.gameStorage.getId(),
+                            discard = new DiscardResourcesController(p, this.gameStorage.getId(),
                                     this.pioneersService, currentPlayerLabel.getScene().getWindow());
                             discard.render();
                             // Deleting the controller is not needed, because the garbage collector should delete the controller
@@ -623,7 +624,6 @@ public class GameScreenController implements Controller {
     }
 
     public void handleExpiredTime() {
-
         //current Move is founding-settlement
         if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
             //get foundingPhase (1 or 2)
@@ -642,6 +642,13 @@ public class GameScreenController implements Controller {
             // player needs to roll and skips his turn if the timer reached 0 seconds
             diceRoll();
             finishTurn();
+        } else if (nextMoveLabel.getText().equals(ROB_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
+            this.calculateMove.randomRobPlace(this.idStorage.getID());
+            mapPane.getScene().setCursor(Cursor.DEFAULT);
+        } else if (nextMoveLabel.getText().equals(DROP_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
+            // get the current stage for closing the discard window
+            discard.getPrimaryStage().close();
+            this.calculateMove.randomDiscard(playerOwnView.get(0).resources());
         } else {
             finishTurn();
         }
@@ -650,7 +657,6 @@ public class GameScreenController implements Controller {
     public GameFieldSubController getGameFieldSubController() {
         return gameFieldSubController;
     }
-
 
     public void zoomIn() {
         this.gameFieldSubController.zoomIn();
@@ -680,4 +686,3 @@ public class GameScreenController implements Controller {
         }
     }
 }
-
