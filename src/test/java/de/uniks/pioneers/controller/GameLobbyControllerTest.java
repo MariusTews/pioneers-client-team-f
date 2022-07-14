@@ -75,14 +75,11 @@ class GameLobbyControllerTest extends ApplicationTest {
         when(messageService.getAllMessages(any(),any())).thenReturn(Observable.just(messages));
 
 
-        //when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         when(userService.findAllUsers()).thenReturn(Observable.just(userList));
-        //when(userService.findOne(any())).thenReturn(Observable.just(new User("0", "1", "8", "Alice", "online", null, null)));
-        //when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
                 "id", "name", "owner", 2, false,new GameSettings(2,10))));
         when(gameStorage.getId()).thenReturn("id");
-        //this is for newstage
+        //this is for new stage
         when(app.getStage()).thenReturn(new Stage());
 
         when(eventListener.listen("games.id.*.*",Message.class)).thenReturn(messageSubject);
