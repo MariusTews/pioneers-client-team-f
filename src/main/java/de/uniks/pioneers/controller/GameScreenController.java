@@ -524,7 +524,6 @@ public class GameScreenController implements Controller {
                 case "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD2);
                 default -> nextMoveLabel.setText(currentMove);
             }
-            //TODO: remove
                 // change the currentPlayerLabel to the current player
                 User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
                 currentPlayerLabel.setText(currentPlayer.name());
