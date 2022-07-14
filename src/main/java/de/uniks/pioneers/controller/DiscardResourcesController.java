@@ -251,4 +251,9 @@ public class DiscardResourcesController implements Controller {
                         }
                 );
     }
+
+    public Stage getPrimaryStage() {
+        return this.primaryStage;
+    }
+
 }

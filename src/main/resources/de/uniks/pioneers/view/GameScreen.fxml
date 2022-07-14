@@ -82,13 +82,8 @@
          <Pane id="timer" layoutX="330.0" layoutY="480.0" prefHeight="70.0" prefWidth="150.0">
              <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="150.0" text="Remaining time">
                 </Label>
-             <Label id="remainingTime" fx:id="timerLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0" prefHeight="40.0" prefWidth="150.0">
-                </Label>
+         <VBox fx:id="remainingTimeView" layoutY="30.0" prefHeight="30.0" prefWidth="150.0" />
          </Pane>
-      <Pane layoutX="62.0" layoutY="549.0" prefHeight="50.0" prefWidth="120.0">
-         <children>
-            <Label fx:id="gameScreenCountdown" alignment="CENTER" layoutX="6.0" layoutY="6.0" prefHeight="40.0" prefWidth="112.0" text="Countdown" />
-         </children>
-      </Pane>
+      <VBox id="gameTimer" fx:id="gameTimeView" layoutX="62.0" layoutY="549.0" prefHeight="30.0" prefWidth="150.0" />
     </Pane>
 </Pane>

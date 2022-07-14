@@ -3,13 +3,12 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.DiceRoll;
+import de.uniks.pioneers.computation.RandomAction;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -23,7 +22,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -70,11 +68,13 @@ public class GameScreenController implements Controller {
     @FXML
     public Label currentPlayerLabel;
     @FXML
-    public Label timerLabel;
-    @FXML
     public Label playerLongestRoadLabel;
     @FXML
     public Button leave;
+    @FXML
+    public VBox remainingTimeView;
+    @FXML
+    public VBox gameTimeView;
     @FXML
     //spectator pane
     public Pane spectatorPaneId;
@@ -86,7 +86,6 @@ public class GameScreenController implements Controller {
     private final App app;
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
-    public Label gameScreenCountdown;
 
     private String lastBuildingPosition;
 
@@ -110,11 +109,11 @@ public class GameScreenController implements Controller {
 
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
     private final HashMap<String, User> userHash = new HashMap<>();
-    private final Timeline timeline = new Timeline();
-
-    private final Timeline timelineGameCountDown = new Timeline();
     private boolean runDiscardOnce = true;
     private Point3D currentRobPlace;
+    private RandomAction calculateMove;
+    private TimerController moveTimer;
+    private DiscardResourcesController discard;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -237,30 +236,8 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
-        //count up
-        countUp();
+        this.calculateMove = new RandomAction(this.gameStorage, this.pioneersService);
 
-    }
-
-    private void countUp() {
-        final Integer[] startTime = {0};
-        final Integer[] seconds = {startTime[0]};
-
-        timelineGameCountDown.setCycleCount(Timeline.INDEFINITE);
-
-        //gets called every second to reduce the timer by one second
-        KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
-            seconds[0]++;
-            if (seconds[0] % 60 > 9) {
-                gameScreenCountdown.setText("" + (seconds[0] / 60) + ":" + seconds[0] % 60);
-            } else {
-                gameScreenCountdown.setText("" + (seconds[0] / 60) + ":0" + seconds[0] % 60);
-            }
-        });
-
-        timelineGameCountDown.getKeyFrames().setAll(frame);
-        // start timer
-        timelineGameCountDown.playFromStart();
     }
 
     @Override
@@ -288,13 +265,23 @@ public class GameScreenController implements Controller {
             return null;
         }
 
-        //add listener on currentPlayerLabel to reset the timer if a currentPlayer changes
-        currentPlayerLabel.textProperty().addListener((observable, oldValue, newValue) -> startTime());
+        // load and start game timer
+        TimerController gameTimer = new TimerController(this);
+        gameTimer.countUp();
+        gameTimeView.getChildren().setAll(gameTimer.render());
+
+        // load timer for remaining time
+        this.moveTimer = new TimerController(this);
+        this.remainingTimeView.getChildren().setAll(this.moveTimer.render());
+
+        // add listener on nextMoveLabel to reset the timer if the next action is expected, else the automatic
+        // move stops after founding phase with the "roll" move where the curren player does not change
+        nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> this.moveTimer.startTime());
 
         //add listener on nextMoveLabel to reset the timer if founding-settlement-2 (Placing-UFO-2)
         nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.equals(RENAME_FOUNDING_SET2)) {
-                startTime();
+                this.moveTimer.startTime();
             }
         });
 
@@ -516,7 +503,7 @@ public class GameScreenController implements Controller {
                     runDiscardOnce = false;
                     for (Player p : this.playerOwnView) {
                         if (p.userId().equals(currentPlayer._id())) {
-                            DiscardResourcesController discard = new DiscardResourcesController(p, this.gameStorage.getId(),
+                            discard = new DiscardResourcesController(p, this.gameStorage.getId(),
                                     this.pioneersService, currentPlayerLabel.getScene().getWindow());
                             discard.render();
                             // Deleting the controller is not needed, because the garbage collector should delete the controller
@@ -524,7 +511,6 @@ public class GameScreenController implements Controller {
                         }
                     }
                 }
-
 
                 // set runDiscardOnce on true again, when another action appears
                 if (!currentMove.equals(DROP_ACTION)) {
@@ -658,238 +644,40 @@ public class GameScreenController implements Controller {
                 });
     }
 
-    private void startTime() {
+    public void handleExpiredTime() {
+        //current Move is founding-settlement
+        if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
+            //get foundingPhase (1 or 2)
+            String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
+            // place random settlement
+            this.calculateMove.calculateSettlement("founding-settlement-" + foundingPhase);
 
-        // starting time
-        final Integer[] startTime = {180};
-        final Integer[] seconds = {startTime[0]};
+            //current Move is founding-road
+        } else if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-Tube-")) {
+            //get foundingPhase (1 or 2)
+            String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
-        timeline.setCycleCount(Timeline.INDEFINITE);
-
-        //gets called every second to reduce the timer by one second
-        KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
-            seconds[0]--;
-            if (seconds[0] % 60 > 9) {
-                timerLabel.setText("" + (seconds[0] / 60) + ":" + seconds[0] % 60);
-            } else {
-                timerLabel.setText("" + (seconds[0] / 60) + ":0" + seconds[0] % 60);
-            }
-
-            if (seconds[0] <= 0) {
-                timeline.stop();
-                //current Move is founding-settlement
-                if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
-                    //get all valid settlementPosition in dependence of map
-                    List<String> validPositions = getAllValidPositions();
-                    //get all invalid settlementPositions
-                    List<String> allInvalidSettlementCoordinates = getAllInvalidSettlementCoordinates();
-
-                    //remove invalid settlementPositions from validPositions
-                    for (String string : allInvalidSettlementCoordinates) {
-                        validPositions.remove(string);
-                    }
-
-                    int randomNumSettlement = (int) (Math.random() * (validPositions.size()));
-                    //select one settlementPosition from all valid settlementPositions
-                    String selectedSettlementPosition = validPositions.get(randomNumSettlement);
-                    // String to int for next method call
-                    int x = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("x") + 1, selectedSettlementPosition.indexOf("y")));
-                    int y = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("y") + 1, selectedSettlementPosition.indexOf("z")));
-                    int z = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("z") + 1, selectedSettlementPosition.indexOf("_")));
-                    int side = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("_") + 1));
-
-                    //get every possible roadPosition in dependence of chosen settlementPosition
-                    List<String> possibleRoadPlacements = getPossibleRoadPlacements(x, y, z, side);
-
-                    int randomNumRoad = (int) (Math.random() * possibleRoadPlacements.size());
-                    //select one roadPosition from all valid roadPositions
-                    String selectedRoadPosition = possibleRoadPlacements.get(randomNumRoad);
-                    // String to int for move call
-                    int xRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("x") + 1, selectedRoadPosition.indexOf("y")));
-                    int yRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("y") + 1, selectedRoadPosition.indexOf("z")));
-                    int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
-                    int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
-                    //get foundingPhase (1 or 2)
-                    String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
-
-                    //place chosen settlement and road
-                    pioneersService.move(gameStorage.getId(), "founding-settlement-" + foundingPhase, x, y, z, side, "settlement", null, null)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(result -> pioneersService.move(gameStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road", null, null)
-                                    .observeOn(FX_SCHEDULER)
-                                    .subscribe());
-
-                    //current Move is founding-road
-                } else if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("founding-road")) {
-                    // String to int from lastBuildingPlaced to calculate possible roadPlacements
-                    int x = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("x") + 1, lastBuildingPosition.indexOf("y")));
-                    int y = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("y") + 1, lastBuildingPosition.indexOf("z")));
-                    int z = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("z") + 1, lastBuildingPosition.indexOf("_")));
-                    int side = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("_") + 1));
-
-                    //get every possible roadPosition
-                    List<String> possibleRoadPlacements = getPossibleRoadPlacements(x, y, z, side);
-
-                    int randomNumRoad = (int) (Math.random() * possibleRoadPlacements.size());
-                    //select one possibleRoad
-                    String selectedRoadPosition = possibleRoadPlacements.get(randomNumRoad);
-                    // String to int for move call
-                    int xRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("x") + 1, selectedRoadPosition.indexOf("y")));
-                    int yRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("y") + 1, selectedRoadPosition.indexOf("z")));
-                    int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
-                    int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
-
-                    //get foundingPhase (1 or 2)
-                    String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
-
-                    //place chosen and road
-                    pioneersService.move(gameStorage.getId(), "founding-road-" + foundingPhase, xRoad, yRoad, zRoad, sideRoad, "road", null, null)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe();
-
-
-                } else if (nextMoveLabel.getText().equals("roll")) {
-                    // player needs to roll and skips his turn if the timer reached 0 seconds
-                    diceRoll();
-                    finishTurn();
-                } else {
-                    finishTurn();
-                }
-            }
-        });
-
-        timeline.getKeyFrames().setAll(frame);
-        // start timer
-        timeline.playFromStart();
-    }
-
-    public List<String> getAllValidPositions() {
-        //get current map
-        Map map = pioneersService.findAllTiles(gameStorage.getId()).blockingFirst();
-        List<String> allTileCoordinates = new ArrayList<>();
-        List<String> allWaterTileCoordinates = new ArrayList<>();
-
-        int gameFieldSize = this.gameStorage.getSize();
-
-        for (Tile tile : map.tiles()) {
-            allTileCoordinates.add("x" + tile.x().toString() + "y" + tile.y() + "z" + tile.z());
+            // calculate and place random road
+            this.calculateMove.calculateRoad(this.lastBuildingPosition, "founding-road-" + foundingPhase);
+        } else if (nextMoveLabel.getText().equals("roll")) {
+            // player needs to roll and skips his turn if the timer reached 0 seconds
+            diceRoll();
+            finishTurn();
+        } else if (nextMoveLabel.getText().equals(ROB_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
+            this.calculateMove.automaticRob(this.idStorage.getID());
+            mapPane.getScene().setCursor(Cursor.DEFAULT);
+        } else if (nextMoveLabel.getText().equals(DROP_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
+            // get the current stage for closing the discard window
+            discard.getPrimaryStage().close();
+            this.calculateMove.automaticDrop(playerOwnView.get(0).resources());
+        } else {
+            finishTurn();
         }
-        //top right fixed waterTile it always appears in any map size
-        allWaterTileCoordinates.add("x" + (gameFieldSize + 1) + "y" + 0 + "z" + ((gameFieldSize + 1) * (-1)));
-        for (int i = 1; i <= gameFieldSize; i++) {
-            //top right waterTile side
-            allWaterTileCoordinates.add("x" + (gameFieldSize + 1) + "y" + (-i) + "z" + ((gameFieldSize + 1) * (-1) + i));
-            //top waterTile side
-            allWaterTileCoordinates.add("x" + (gameFieldSize + 1 - i) + "y" + i + "z" + ((gameFieldSize + 1) * (-1)));
-        }
-        //top left fixed waterTile it always appears in any map size
-        allWaterTileCoordinates.add("x" + 0 + "y" + (gameFieldSize + 1) + "z" + ((gameFieldSize + 1) * (-1)));
-        for (int i = 1; i <= gameFieldSize; i++) {
-            //top left water side
-            allWaterTileCoordinates.add("x" + (-i) + "y" + (gameFieldSize + 1) + "z" + ((gameFieldSize + 1) * (-1) + i));
-        }
-        //far left fixed waterTile it always appears in any map size
-        allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + (gameFieldSize + 1) + "z" + 0);
-        for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom left waterTile side
-            allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + (gameFieldSize + 1 - i) + "z" + i);
-        }
-        //bottom left fixed waterTile it always appears in any map size
-        allWaterTileCoordinates.add("x" + ((gameFieldSize + 1) * (-1)) + "y" + 0 + "z" + (gameFieldSize + 1));
-        for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom waterTile side
-            allWaterTileCoordinates.add("x" + ((gameFieldSize + 1 - i) * (-1)) + "y" + (-i) + "z" + (gameFieldSize + 1));
-        }
-        //bottom right fixed waterTile it always appears in any map size
-        allWaterTileCoordinates.add("x" + 0 + "y" + ((gameFieldSize + 1) * (-1)) + "z" + (gameFieldSize + 1));
-        for (int i = 1; i <= gameFieldSize; i++) {
-            //bottom right waterTile side
-            allWaterTileCoordinates.add("x" + i + "y" + ((gameFieldSize + 1) * (-1)) + "z" + (gameFieldSize + 1 - i));
-        }
-
-        List<String> validPositions = new ArrayList<>();
-        for (String string : allTileCoordinates) {
-            validPositions.add(string + "_0");
-            validPositions.add(string + "_6");
-        }
-
-        for (String string : allWaterTileCoordinates) {
-            int z = Integer.parseInt(string.substring(string.indexOf("z") + 1));
-            if (z < 0) {
-                validPositions.add(string + "_6");
-            } else if (z > 0) {
-                validPositions.add(string + "_0");
-            }
-        }
-        return validPositions;
-    }
-
-    public List<String> getAllInvalidSettlementCoordinates() {
-        List<Building> allBuildings = pioneersService.findAllBuildings(gameStorage.getId()).blockingFirst();
-        List<String> allInvalidSettlementCoordinates = new ArrayList<>();
-        for (Building building : allBuildings) {
-            if (building.side().intValue() == 0) {
-                //building itself
-                allInvalidSettlementCoordinates.add("x" + building.x().toString() + "y" + building.y() + "z" + building.z() + "_" + building.side());
-                //building place down left from current building
-                allInvalidSettlementCoordinates.add("x" + building.x() + "y" + (building.y().intValue() + 1) + "z" + (building.z().intValue() - 1) + "_" + "6");
-                //building place down right from current building
-                allInvalidSettlementCoordinates.add("x" + (building.x().intValue() + 1) + "y" + building.y() + "z" + (building.z().intValue() - 1) + "_" + "6");
-                //building place on top of current building
-                allInvalidSettlementCoordinates.add("x" + (building.x().intValue() + 1) + "y" + (building.y().intValue() + 1) + "z" + (building.z().intValue() - 2) + "_" + "6");
-            } else if (building.side().intValue() == 6) {
-                //building itself
-                allInvalidSettlementCoordinates.add("x" + building.x().toString() + "y" + building.y() + "z" + building.z() + "_" + building.side());
-                //building place top left from current building
-                allInvalidSettlementCoordinates.add("x" + (building.x().intValue() - 1) + "y" + building.y() + "z" + (building.z().intValue() + 1) + "_" + "0");
-                //building place top left from current building
-                allInvalidSettlementCoordinates.add("x" + building.x() + "y" + (building.y().intValue() - 1) + "z" + (building.z().intValue() + 1) + "_" + "0");
-                //building place bottom of current building
-                allInvalidSettlementCoordinates.add("x" + (building.x().intValue() - 1) + "y" + (building.y().intValue() - 1) + "z" + (building.z().intValue() + 2) + "_" + "0");
-            }
-        }
-        return allInvalidSettlementCoordinates;
-    }
-
-    public List<String> getPossibleRoadPlacements(int x, int y, int z, int side) {
-        List<String> possibleRoadPlacements = new ArrayList<>();
-
-        //TODOs: get size from server in V3
-        int gameFieldSize = 2;
-        if (side == 0) {
-            //road bottom left
-            if (x != ((gameFieldSize + 1) * (-1))) {
-                possibleRoadPlacements.add("x" + x + "y" + y + "z" + z + "_" + 11);
-            }
-            //road bottom right
-            if (y != ((gameFieldSize + 1) * (-1))) {
-                possibleRoadPlacements.add("x" + (x + 1) + "y" + y + "z" + (z - 1) + "_" + 7);
-            }
-            //road on top
-            if (z != gameFieldSize * (-1)) {
-                possibleRoadPlacements.add("x" + x + "y" + (y + 1) + "z" + (z - 1) + "_" + 3);
-            }
-        } else if (side == 6) {
-            //road top left
-            if (y != gameFieldSize + 1) {
-                possibleRoadPlacements.add("x" + x + "y" + y + "z" + z + "_" + 7);
-            }
-            //road top right
-            if (x != gameFieldSize + 1) {
-                possibleRoadPlacements.add("x" + x + "y" + (y - 1) + "z" + (z + 1) + "_" + 11);
-            }
-            //road bottom
-            if (z != gameFieldSize) {
-                possibleRoadPlacements.add("x" + (x - 1) + "y" + y + "z" + (z + 1) + "_" + 3);
-            }
-        }
-        return possibleRoadPlacements;
     }
 
     public GameFieldSubController getGameFieldSubController() {
         return gameFieldSubController;
     }
-
 
     public void zoomIn() {
         this.gameFieldSubController.zoomIn();
@@ -919,4 +707,3 @@ public class GameScreenController implements Controller {
         }
     }
 }
-
