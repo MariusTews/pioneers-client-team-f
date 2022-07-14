@@ -13,7 +13,8 @@ import java.io.IOException;
 
 public class TimerController implements Controller {
     private final GameScreenController gameScreenController;
-    Timeline timeline = new Timeline();
+    private Timeline timeline = new Timeline();
+
     public TimerController(GameScreenController gameScreenController) {
         this.gameScreenController = gameScreenController;
     }
