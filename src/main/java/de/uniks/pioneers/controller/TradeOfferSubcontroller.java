@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.service.GameStorage;
+import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,18 +37,21 @@ public class TradeOfferSubcontroller implements Controller {
     public Button declineOfferButton;
 
     private Stage primaryStage;
-    HashMap<String, Integer> resources;
-    HashMap<String, String> images = new HashMap<>();
-    PioneersService pioneersService;
-    GameStorage gameStorage;
-    Move move;
+    private HashMap<String, Integer> resources;
+    private final HashMap<String, String> images = new HashMap<>();
+    private final PioneersService pioneersService;
+    private final GameStorage gameStorage;
+    private final IDStorage idStorage;
+    private final Move move;
 
     public TradeOfferSubcontroller(Move move,
                                    PioneersService pioneersService,
-                                   GameStorage gameStorage) {
+                                   GameStorage gameStorage,
+                                   IDStorage idStorage) {
         this.move = move;
         this.pioneersService = pioneersService;
         this.gameStorage = gameStorage;
+        this.idStorage = idStorage;
     }
 
     @Override
@@ -83,6 +87,31 @@ public class TradeOfferSubcontroller implements Controller {
             return null;
         }
 
+        // check, if player has the resources to trade and enable or disable the accept button
+        pioneersService
+                .findOnePlayer(gameStorage.getId(), idStorage.getID())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(player -> {
+                    int check = 0;
+                    for (String res : move.resources().keySet()) {
+                        if (move.resources().get(res) > 0) {
+                            check++;
+                            if (player.resources().get(res) != null) {
+                                if (player.resources().get(res) >= move.resources().get(res)) {
+                                    check--;
+                                }
+                            }
+                        }
+                    }
+
+                    if (check == 0) {
+                        this.acceptOfferButton.disableProperty().set(false);
+                    } else {
+                        this.acceptOfferButton.disableProperty().set(true);
+                    }
+                });
+
+        this.acceptOfferButton.disableProperty().set(false);
 
         // icons with quantity for offer
         for (String res : RESOURCES) {

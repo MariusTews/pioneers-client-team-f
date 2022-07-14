@@ -104,9 +104,10 @@ public class TradingSubController implements Controller {
     private final HashMap<Point3D, Building> playersBuildingsSix = new HashMap<>();
     private final HashMap<String, Boolean> harborHashCheck = new HashMap<>();
 
-    // lists for harbors and buildings
+    // lists
     private final List<Harbor> harbors = new ArrayList<>();
     private final List<Building> buildings = new ArrayList<>();
+    private final List<Player> players = new ArrayList<>();
 
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -149,11 +150,12 @@ public class TradingSubController implements Controller {
         pioneersService
                 .findAllPlayers(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
-                .subscribe(c -> {
-                    for (Player player : c) {
+                .subscribe(players -> {
+                    for (Player player : players) {
                         if (player.userId().equals(idStorage.getID())) {
                             this.player = player;
                         }
+                        this.players.add(player);
                     }
                 });
 
@@ -300,11 +302,11 @@ public class TradingSubController implements Controller {
     }
 
     /*
-    * initialize tmp hashMap for resources to give and to receive
-    * check quantity and equality of resources
-    * put right values into the tmp hashMap
-    * make initial trade call
-    * */
+     * initialize tmp hashMap for resources to give and to receive
+     * check quantity and equality of resources
+     * put right values into the tmp hashMap
+     * make initial trade call
+     * */
     public void offerPlayerButtonPressed() {
         HashMap<String, Integer> tmp = new HashMap<>();
         for (String res : RESOURCES) {
@@ -333,6 +335,7 @@ public class TradingSubController implements Controller {
                     .observeOn(FX_SCHEDULER)
                     .subscribe();
         }
+
 
         resetButtonsAndLabels();
     }

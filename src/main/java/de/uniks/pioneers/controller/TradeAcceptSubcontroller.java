@@ -13,9 +13,12 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
@@ -23,6 +26,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
@@ -94,59 +98,53 @@ public class TradeAcceptSubcontroller implements Controller {
             return null;
         }
 
-        /*tradingUsers.addListener((ListChangeListener<? super User>) c -> {
-            tradeUsers.getChildren().addAll(c.getList().stream().map(this::renderUser).toList());
-        });*/
+        tradeUsers.getChildren().add(renderUser(tradingUsers.get(0)));
 
+        tradingUsers.addListener((ListChangeListener<? super User>) c -> {
+            tradeUsers.getChildren().addAll(c.getList().stream().map(this::renderUser).toList());
+        });
+
+        return root;
+    }
+
+    private Node renderUser(User user) {
         Label label = new Label(tradingUsers.get(0).name());
         label.setOnMouseClicked(event -> {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
                 if (event.getClickCount() == 1) {
                     label.setStyle("-fx-background-color: grey");
                     tradePartner = userHash.get(label.getText());
-                    System.out.println("Mouse clicked");
-                    System.out.println("Partner: " + tradePartner.name());
-                    System.out.println("Partner-ID: " + tradePartner._id());
                 }
             }
         });
-
-        tradeUsers.getChildren().add(label);
-
-        return root;
+        return label;
     }
 
     public void tradeButton(ActionEvent event) {
-        System.out.println("Clicked -> " + idStorage.getID());
-        pioneersService
-                .tradePlayer(gameStorage.getId(), "accept", tradePartner._id(), null)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(x -> {
-                    System.out.println("Trade accepted success");
-                    System.out.println(x.partner());
-                }, onError -> {
-                    System.out.println("Error");
-                    onError.printStackTrace();
-                });
-
-
-        pioneersService
-                .findOneState(gameStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(state -> {
-                    System.out.println("State: " + state.expectedMoves().toString());
-                });
-
-        primaryStage.close();
+        if (tradePartner == null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Please choose a player to trade with");
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+            alert.showAndWait();
+        } else {
+            pioneersService
+                    .tradePlayer(gameStorage.getId(), "accept", tradePartner._id(), null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(x -> {
+                            },
+                            onError -> {
+                            });
+            primaryStage.close();
+        }
     }
 
     public void declineTrade(ActionEvent event) {
         pioneersService
                 .tradePlayer(gameStorage.getId(), "accept", null, move.resources())
                 .observeOn(FX_SCHEDULER)
-                .subscribe(c -> {
-                    System.out.println("Trade declined success");
-                });
+                .subscribe(x -> {},
+                        onError -> {});
         primaryStage.close();
     }
 
@@ -156,5 +154,9 @@ public class TradeAcceptSubcontroller implements Controller {
 
     public void setMove(Move move) {
         this.move = move;
+    }
+
+    public Stage getPrimaryStage() {
+        return this.primaryStage;
     }
 }

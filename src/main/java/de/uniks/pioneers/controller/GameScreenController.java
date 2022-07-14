@@ -103,6 +103,7 @@ public class GameScreenController implements Controller {
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private TradingSubController tradingSubController;
+    private TradeAcceptSubcontroller tradeAcceptSubcontroller;
 
     private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -114,8 +115,8 @@ public class GameScreenController implements Controller {
     private final Timeline timelineGameCountDown = new Timeline();
     private boolean runDiscardOnce = true;
     private Point3D currentRobPlace;
+    private boolean acceptRenderFlag = false;
 
-    TradeAcceptSubcontroller tradeAcceptSubcontroller;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -238,9 +239,11 @@ public class GameScreenController implements Controller {
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
 
+        tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage, idStorage);
+        tradeAcceptSubcontroller.init();
+
         //count up
         countUp();
-
     }
 
     private void countUp() {
@@ -262,9 +265,6 @@ public class GameScreenController implements Controller {
         timelineGameCountDown.getKeyFrames().setAll(frame);
         // start timer
         timelineGameCountDown.playFromStart();
-
-        tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage, idStorage);
-        tradeAcceptSubcontroller.init();
     }
 
     @Override
@@ -384,34 +384,38 @@ public class GameScreenController implements Controller {
         }
 
         //initiate a trade and show to other players besides yourself
-        if (move.action().equals("build") && move.partner() == null && !move.userId().equals(idStorage.getID())) {
-            TradeOfferSubcontroller tradeOfferSubcontroller = new TradeOfferSubcontroller(move, pioneersService, gameStorage);
+        if (move.action().equals("build") &&
+                move.partner() == null &&
+                !move.userId().equals(idStorage.getID()) &&
+                move.resources() != null) {
+            TradeOfferSubcontroller tradeOfferSubcontroller = new TradeOfferSubcontroller(move, pioneersService, gameStorage, idStorage);
             tradeOfferSubcontroller.init();
             tradeOfferSubcontroller.render();
         }
 
-        if (move.action().equals("offer") && !move.userId().equals(idStorage.getID())) {
-            tradeAcceptSubcontroller.addUser(userHash.get(move.userId()));
-            tradeAcceptSubcontroller.setMove(move);
-            tradeAcceptSubcontroller.render();
+        // set flag to true, so accept window only renders once
+        if (move.action().equals("build") &&
+                move.partner() == null &&
+                move.userId().equals(idStorage.getID()) &&
+                move.resources() != null) {
+            acceptRenderFlag = true;
         }
 
-        System.out.println("ID: " + idStorage.getID());
+        //wait until everybody made an offer, then show accept dialog
+        if (move.action().equals("offer") && !move.userId().equals(idStorage.getID())) {
+            if (move.resources() != null) {
+                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()));
+            }
+            // wait until everybody made an offer
+            tradeAcceptSubcontroller.setMove(move);
 
-        pioneersService
-                .findAllPlayers(gameStorage.getId())
-                .observeOn(FX_SCHEDULER)
-                .subscribe(players -> {
-                    for (Player player : players) {
-                        if (player.previousTradeOffer() != null) {
-                            System.out.println("Player: " + player.userId() + " = " + userHash.get(player.userId()).name());
-                            System.out.println("Trade offer: " + player.previousTradeOffer().toString());
-                        }
-                    }
-                });
 
-        System.out.println(move);
-        //System.out.println("Move: " + move.action());
+            if (acceptRenderFlag) {
+                tradeAcceptSubcontroller.render();
+                acceptRenderFlag = false;
+            }
+        }
+
     }
 
     private void handlePlayerEvent(Event<Player> playerEvent) {
@@ -518,12 +522,12 @@ public class GameScreenController implements Controller {
             if (!state.expectedMoves().isEmpty()) {
                 String currentMove = state.expectedMoves().get(0).action();
                 switch (currentMove) {
-                case "founding-settlement-1" -> nextMoveLabel.setText(RENAME_FOUNDING_SET1);
-                case "founding-settlement-2" -> nextMoveLabel.setText(RENAME_FOUNDING_SET2);
-                case "founding-road-1" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD1);
-                case "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD2);
-                default -> nextMoveLabel.setText(currentMove);
-            }
+                    case "founding-settlement-1" -> nextMoveLabel.setText(RENAME_FOUNDING_SET1);
+                    case "founding-settlement-2" -> nextMoveLabel.setText(RENAME_FOUNDING_SET2);
+                    case "founding-road-1" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD1);
+                    case "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD2);
+                    default -> nextMoveLabel.setText(currentMove);
+                }
                 // change the currentPlayerLabel to the current player
                 User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
                 currentPlayerLabel.setText(currentPlayer.name());
@@ -928,8 +932,7 @@ public class GameScreenController implements Controller {
         }
         if (image2 != null) {
             this.diceTwo.setImage(image2);
-        }
-        else {
+        } else {
             this.diceTwo.setVisible(false);
         }
     }
