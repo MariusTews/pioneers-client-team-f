@@ -97,6 +97,7 @@ public class GameScreenController implements Controller {
     private final GameService gameService;
     private final MessageService messageService;
     private final MemberService memberService;
+    private final SoundService soundService = new SoundService();
 
 
     private GameFieldSubController gameFieldSubController;
@@ -375,6 +376,20 @@ public class GameScreenController implements Controller {
             for (Player p : playerOwnView) {
                 if (p.userId().equals(player.userId())) {
                     playerOwnView.set(playerOwnView.indexOf(p), player);
+                    // check if the user dropped or received resources and play the according sound
+                    int amountResources = 0;
+                    for (int resource : p.resources().values()) {
+                        amountResources += resource;
+                    }
+                    int amountNewResources = 0;
+                    for (int resource : player.resources().values()) {
+                        amountNewResources += resource;
+                    }
+                    if (amountNewResources > amountResources) {
+                        this.soundService.playSound("receive");
+                    } else if (amountNewResources < amountResources) {
+                        this.soundService.playSound("drop");
+                    }
                 }
             }
 
@@ -534,6 +549,9 @@ public class GameScreenController implements Controller {
         robImageView.setImage(new Image(Objects.requireNonNull(Main.class
                 .getResource("view/assets/robber.png")).toString()));
 
+        // Play robber sound
+        this.soundService.playSound(ROB_ACTION);
+
         currentRobPlace = newCoordinates;
     }
 
@@ -550,6 +568,9 @@ public class GameScreenController implements Controller {
         if (buildingEvent.event().endsWith(UPDATED)) {
             lastBuildingPosition = position;
         }
+
+        // Play sound for buildings
+        this.soundService.playSound("building");
     }
 
     private void removeOpponent(Player player) {
