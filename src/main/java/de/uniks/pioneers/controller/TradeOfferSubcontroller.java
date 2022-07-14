@@ -23,7 +23,7 @@ import java.util.HashMap;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
 
-public class TradeOfferSubcontroller implements Controller{
+public class TradeOfferSubcontroller implements Controller {
     @FXML
     public VBox offerContainer;
     @FXML
@@ -117,8 +117,20 @@ public class TradeOfferSubcontroller implements Controller{
     }
 
     public void acceptOffer(ActionEvent event) {
+        HashMap<String, Integer> tmp = new HashMap<>();
+        for (String res : RESOURCES) {
+            tmp.put(res, 0);
+        }
+
+
+        for (String res : move.resources().keySet()) {
+            if (move.resources().get(res) != 0) {
+                tmp.put(res, (-1) * move.resources().get(res));
+            }
+        }
+
         pioneersService
-                .tradePlayer(gameStorage.getId(), "offer", null, move.resources())
+                .tradePlayer(gameStorage.getId(), "offer", null, tmp)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(c -> {
                     System.out.println("Move successful accept " + c.userId());
@@ -128,6 +140,10 @@ public class TradeOfferSubcontroller implements Controller{
     }
 
     public void declineOffer(ActionEvent event) {
+        pioneersService
+                .tradePlayer(gameStorage.getId(), "offer", null, null)
+                .observeOn(FX_SCHEDULER)
+                .subscribe();
         primaryStage.close();
     }
 }

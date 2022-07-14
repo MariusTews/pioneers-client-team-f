@@ -263,7 +263,7 @@ public class GameScreenController implements Controller {
         // start timer
         timelineGameCountDown.playFromStart();
 
-        tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
+        tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage, idStorage);
         tradeAcceptSubcontroller.init();
     }
 
@@ -383,7 +383,7 @@ public class GameScreenController implements Controller {
             displayDice(move.roll());
         }
 
-        //trading move
+        //initiate a trade and show to other players besides yourself
         if (move.action().equals("build") && move.partner() == null && !move.userId().equals(idStorage.getID())) {
             TradeOfferSubcontroller tradeOfferSubcontroller = new TradeOfferSubcontroller(move, pioneersService, gameStorage);
             tradeOfferSubcontroller.init();
@@ -396,6 +396,21 @@ public class GameScreenController implements Controller {
             tradeAcceptSubcontroller.render();
         }
 
+        System.out.println("ID: " + idStorage.getID());
+
+        pioneersService
+                .findAllPlayers(gameStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(players -> {
+                    for (Player player : players) {
+                        if (player.previousTradeOffer() != null) {
+                            System.out.println("Player: " + player.userId() + " = " + userHash.get(player.userId()).name());
+                            System.out.println("Trade offer: " + player.previousTradeOffer().toString());
+                        }
+                    }
+                });
+
+        System.out.println(move);
         //System.out.println("Move: " + move.action());
     }
 
@@ -509,6 +524,7 @@ public class GameScreenController implements Controller {
                 case "founding-road-2" -> nextMoveLabel.setText(RENAME_FOUNDING_ROAD2);
                 default -> nextMoveLabel.setText(currentMove);
             }
+            //TODO: remove
                 // change the currentPlayerLabel to the current player
                 User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
                 currentPlayerLabel.setText(currentPlayer.name());
