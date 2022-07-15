@@ -60,40 +60,21 @@ class GameLobbyControllerTest extends ApplicationTest {
     @InjectMocks
     GameLobbyController gameLobbyController;
 
-    private Subject<Event<Member>> memberSubject;
-    private Subject<Event<Message>> messageSubject;
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
-        memberSubject = PublishSubject.create();
-        messageSubject = PublishSubject.create();
-        List<Member> members = new ArrayList<>();
-        members.add(new Member("0","1","id","7",true,"ffa500",false));
-        when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(members));
-        List<User> userList = new ArrayList<>();
-        userList.add(new User("0","1", "7", "Bob", "online",null, null));
-
-        List<Message> messages = new ArrayList<>();
-        messages.add(new Message("0","1", "id", "7", "first message"));
-        when(messageService.getAllMessages(any(),any())).thenReturn(Observable.just(messages));
-
-
-        when(userService.findAllUsers()).thenReturn(Observable.just(userList));
+        when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
+        when(userService.findAllUsers()).thenReturn(Observable.empty());
+        when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
                 "id", "name", "owner", 2, false,new GameSettings(2,10))));
         when(gameStorage.getId()).thenReturn("id");
-        //this is for new stage
         when(app.getStage()).thenReturn(new Stage());
-
-
-
-        when(eventListener.listen("games.id.*.*",Message.class)).thenReturn(messageSubject);
-        when(eventListener.listen("games.id.members.*.*",Member.class)).thenReturn(memberSubject);
-        when(eventListener.listen("games.id.messages.*.*",Message.class)).thenReturn(messageSubject);
 
         // start application
         App app = new App(gameLobbyController);
         app.start(stage);
+
     }
 
 
@@ -122,21 +103,6 @@ class GameLobbyControllerTest extends ApplicationTest {
 
         verify(gameService).deleteGame("id");
     }
-
-    @Test()
-    void eventListenerTest(){
-        messageSubject.onNext(new Event<>(".created",new Message("0","1","14","7","test")));
-        messageSubject.onNext(new Event<>(".created",new Message("0","1","14","7","test 123")));
-
-        waitForFxEvents();
-
-        memberSubject.onNext(new Event<>(".created",new Member("0","7","01","8",false,null,false)));
-        memberSubject.onNext(new Event<>(".updated",new Member("0","7","01","8",true,"#ff0000",false)));
-        waitForFxEvents();
-
-    }
-
-
 
 
 }
