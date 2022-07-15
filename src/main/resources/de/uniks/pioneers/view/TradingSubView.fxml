@@ -283,12 +283,12 @@
          </HBox>
       </VBox>
    </HBox>
-   <Button id="offer" fx:id="offerPlayerButton" mnemonicParsing="false" onAction="#offerPlayerButtonPressed"
+   <Button id="offerPlayer" fx:id="offerPlayerButton" mnemonicParsing="false" onAction="#offerPlayerButtonPressed"
            prefHeight="25.0" prefWidth="210.0" text="Offer player">
       <VBox.margin>
          <Insets bottom="5.0"/>
       </VBox.margin>
    </Button>
-   <Button id="offer" fx:id="offerBankButton" mnemonicParsing="false" onAction="#offerBankButtonPressed"
+   <Button id="offerBank" fx:id="offerBankButton" mnemonicParsing="false" onAction="#offerBankButtonPressed"
            prefHeight="25.0" prefWidth="210.0" text="Offer bank"/>
 </VBox>
