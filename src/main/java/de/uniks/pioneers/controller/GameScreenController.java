@@ -103,6 +103,7 @@ public class GameScreenController implements Controller {
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private TradingSubController tradingSubController;
+    private TradeAcceptSubcontroller tradeAcceptSubcontroller;
 
     private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -114,6 +115,7 @@ public class GameScreenController implements Controller {
     private RandomAction calculateMove;
     private TimerController moveTimer;
     private DiscardResourcesController discard;
+    private boolean acceptRenderFlag = false;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -237,6 +239,9 @@ public class GameScreenController implements Controller {
         messageViewSubController.init();
 
         this.calculateMove = new RandomAction(this.gameStorage, this.pioneersService);
+
+        this.tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
+        this.tradeAcceptSubcontroller.init();
 
     }
 
@@ -364,6 +369,38 @@ public class GameScreenController implements Controller {
         //if the move is a roll display new dice value
         if (move.action().equals("roll") || move.action().equals("founding-roll")) {
             displayDice(move.roll());
+        }
+
+        //initiate a trade and show to other players besides yourself
+        if (move.action().equals("build") &&
+                move.partner() == null &&
+                !move.userId().equals(idStorage.getID()) &&
+                move.resources() != null) {
+            TradeOfferSubcontroller tradeOfferSubcontroller = new TradeOfferSubcontroller(move, pioneersService, gameStorage, idStorage);
+            tradeOfferSubcontroller.init();
+            tradeOfferSubcontroller.render();
+        }
+
+        // set flag to true, so accept window only renders once
+        if (move.action().equals("build") &&
+                move.partner() == null &&
+                move.userId().equals(idStorage.getID()) &&
+                move.resources() != null) {
+            acceptRenderFlag = true;
+        }
+
+        //wait until everybody made an offer, then show accept dialog
+        if (move.action().equals("offer") && !move.userId().equals(idStorage.getID())) {
+            if (move.resources() != null) {
+                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()));
+            }
+            // wait until everybody made an offer
+            tradeAcceptSubcontroller.setMove(move);
+
+            if (acceptRenderFlag) {
+                tradeAcceptSubcontroller.render();
+                acceptRenderFlag = false;
+            }
         }
     }
 

@@ -240,8 +240,6 @@ public class LobbyController implements Controller {
             rejoinButton.disableProperty().set(true);
         }
 
-
-
         this.users.addListener((ListChangeListener<? super User>) c -> ((VBox) this.userScrollPane.getContent())
                 .getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList()));
 
