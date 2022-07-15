@@ -71,7 +71,7 @@ dependencies {
 
 javafx {
     version = '17'
-    modules = ['javafx.controls', 'javafx.graphics', 'javafx.fxml']
+    modules = ['javafx.controls', 'javafx.graphics', 'javafx.fxml', 'javafx.media']
 }
 
 jacoco {
@@ -79,6 +79,7 @@ jacoco {
 }
 
 jacocoTestReport {
+    //noinspection GrDeprecatedAPIUsage
     reports.xml.enabled = true
 }
 

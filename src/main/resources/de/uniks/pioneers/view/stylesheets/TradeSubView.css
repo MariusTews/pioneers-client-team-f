@@ -1,0 +1,33 @@
+.root {
+    -fx-font-family: "A-Space Black Demo";
+    -fx-font-size: 14;
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 205 355;
+}
+
+.button:focused {
+    -fx-effect: dropshadow(gaussian, grey, 30, 0, 0, 0);
+}
+
+.button.discard {
+    -fx-background-image: url("../assets/green_button.png");
+    -fx-background-size: 175 38;
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-text-fill: darkblue;
+}
+
+.label.amount {
+    -fx-background-image: url("../assets/yellow_border.png");
+    -fx-background-position: center;
+    -fx-background-size: 30 30;
+    -fx-text-fill: darkblue;
+}
+
+.button.amount {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 18;
+}

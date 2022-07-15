@@ -38,6 +38,8 @@ import static de.uniks.pioneers.computation.CalculateMap.createId;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameScreenController implements Controller {
 
+    private List<CircleSubController> circleSubControllers = new ArrayList<>();
+
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
 
     private final ObservableList<Player> playerOwnView = FXCollections.observableArrayList();
@@ -97,11 +99,13 @@ public class GameScreenController implements Controller {
     private final GameService gameService;
     private final MessageService messageService;
     private final MemberService memberService;
+    private final SoundService soundService = new SoundService();
 
 
     private GameFieldSubController gameFieldSubController;
     private MessageViewSubController messageViewSubController;
     private TradingSubController tradingSubController;
+    private TradeAcceptSubcontroller tradeAcceptSubcontroller;
 
     private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -113,6 +117,7 @@ public class GameScreenController implements Controller {
     private RandomAction calculateMove;
     private TimerController moveTimer;
     private DiscardResourcesController discard;
+    private boolean acceptRenderFlag = false;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -236,6 +241,9 @@ public class GameScreenController implements Controller {
         messageViewSubController.init();
 
         this.calculateMove = new RandomAction(this.gameStorage, this.pioneersService);
+
+        this.tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
+        this.tradeAcceptSubcontroller.init();
 
     }
 
@@ -364,6 +372,38 @@ public class GameScreenController implements Controller {
         if (move.action().equals("roll") || move.action().equals("founding-roll")) {
             displayDice(move.roll());
         }
+
+        //initiate a trade and show to other players besides yourself
+        if (move.action().equals("build") &&
+                move.partner() == null &&
+                !move.userId().equals(idStorage.getID()) &&
+                move.resources() != null) {
+            TradeOfferSubcontroller tradeOfferSubcontroller = new TradeOfferSubcontroller(move, pioneersService, gameStorage, idStorage);
+            tradeOfferSubcontroller.init();
+            tradeOfferSubcontroller.render();
+        }
+
+        // set flag to true, so accept window only renders once
+        if (move.action().equals("build") &&
+                move.partner() == null &&
+                move.userId().equals(idStorage.getID()) &&
+                move.resources() != null) {
+            acceptRenderFlag = true;
+        }
+
+        //wait until everybody made an offer, then show accept dialog
+        if (move.action().equals("offer") && !move.userId().equals(idStorage.getID())) {
+            if (move.resources() != null) {
+                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()));
+            }
+            // wait until everybody made an offer
+            tradeAcceptSubcontroller.setMove(move);
+
+            if (acceptRenderFlag) {
+                tradeAcceptSubcontroller.render();
+                acceptRenderFlag = false;
+            }
+        }
     }
 
     private void handlePlayerEvent(Event<Player> playerEvent) {
@@ -375,6 +415,20 @@ public class GameScreenController implements Controller {
             for (Player p : playerOwnView) {
                 if (p.userId().equals(player.userId())) {
                     playerOwnView.set(playerOwnView.indexOf(p), player);
+                    // check if the user dropped or received resources and play the according sound
+                    int amountResources = 0;
+                    for (int resource : p.resources().values()) {
+                        amountResources += resource;
+                    }
+                    int amountNewResources = 0;
+                    for (int resource : player.resources().values()) {
+                        amountNewResources += resource;
+                    }
+                    if (amountNewResources > amountResources) {
+                        this.soundService.playSound("receive");
+                    } else if (amountNewResources < amountResources) {
+                        this.soundService.playSound("drop");
+                    }
                 }
             }
 
@@ -462,6 +516,14 @@ public class GameScreenController implements Controller {
 
     private void handleStateEvents(Event<State> stateEvent) {
         State state = stateEvent.data();
+        if (!state.expectedMoves().isEmpty()) {
+            if(circleSubControllers.isEmpty()) {
+                this.circleSubControllers = this.getGameFieldSubController().getCirclesSubCons();
+            }
+            for (CircleSubController subController: this.circleSubControllers) {
+                subController.setNextMove(state.expectedMoves().get(0));
+            }
+        }
 
         if (stateEvent.event().endsWith(UPDATED)) {
             // change the nextMoveLabel to the current move and adapt to the renamed buildings
@@ -534,6 +596,9 @@ public class GameScreenController implements Controller {
         robImageView.setImage(new Image(Objects.requireNonNull(Main.class
                 .getResource("view/assets/robber.png")).toString()));
 
+        // Play robber sound
+        this.soundService.playSound(ROB_ACTION);
+
         currentRobPlace = newCoordinates;
     }
 
@@ -550,6 +615,9 @@ public class GameScreenController implements Controller {
         if (buildingEvent.event().endsWith(UPDATED)) {
             lastBuildingPosition = position;
         }
+
+        // Play sound for buildings
+        this.soundService.playSound("building");
     }
 
     private void removeOpponent(Player player) {
@@ -649,6 +717,16 @@ public class GameScreenController implements Controller {
             // get the current stage for closing the discard window
             discard.getPrimaryStage().close();
             this.calculateMove.automaticDrop(playerOwnView.get(0).resources());
+        } else if(nextMoveLabel.getText().equals("offer") && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
+            pioneersService
+                    .tradePlayer(gameStorage.getId(), "offer", null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+        } else if (nextMoveLabel.getText().equals("accept") && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
+            pioneersService
+                    .tradePlayer(gameStorage.getId(), "accept", null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
         } else {
             finishTurn();
         }

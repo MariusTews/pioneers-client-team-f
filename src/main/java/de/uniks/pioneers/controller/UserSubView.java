@@ -42,7 +42,7 @@ public class UserSubView implements Controller {
     public Pane settlementPane;
     public Pane roadPane;
     public Pane cityPane;
-    public int maxVictoryPoints;
+    public final int maxVictoryPoints;
 
     @Inject
     public UserSubView(IDStorage idStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
@@ -167,7 +167,7 @@ public class UserSubView implements Controller {
         this.city.setText(RENAME_CITY);
 
         Tooltip.install(this.roadPane, new Tooltip("1 Earth cactus, \n1 Mars bar "));
-        Tooltip.install(this.settlementPane, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptun crystals, \n1 Venus grain "));
+        Tooltip.install(this.settlementPane, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
         Tooltip.install(this.cityPane, new Tooltip("3 Moon rock, \n2 Venus grain "));
         return parent;
     }

@@ -8,6 +8,7 @@ import retrofit2.http.*;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public interface GamesApiService {
 
     @GET("games")
@@ -23,6 +24,7 @@ public interface GamesApiService {
     Observable<Game> patch(@Path("id") String id,
                            @Body UpdateGameDto dto);
 
+    @SuppressWarnings("SameReturnValue")
     @DELETE("games/{id}")
     Observable<Game> delete(@Path("id") String id);
 }

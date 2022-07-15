@@ -37,9 +37,6 @@ public class GameFieldSubController implements Controller {
     private final List<Node> roads = new ArrayList<>();
     private final List<Node> roadCircles = new ArrayList<>();
     private final List<Node> buildingCircles = new ArrayList<>();
-    private final List<Node> labels = new ArrayList<>();
-    private final List<Node> harbourImages = new ArrayList<>();
-    private final List<Node> robberImages = new ArrayList<>();
     private final List<Node> hexagons = new ArrayList<>();
 
     private final IDStorage idStorage;
@@ -116,13 +113,7 @@ public class GameFieldSubController implements Controller {
                 roadCircles.add(node);
             } else if (node.getId().endsWith("_0") || node.getId().endsWith("_6")) {
                 buildingCircles.add(node);
-            } else if (node.getId().endsWith("_label")) {
-                labels.add(node);
-            } else if (node.getId().endsWith("_HarbourImage")) {
-                harbourImages.add(node);
-            } else if (node.getId().endsWith("_RobberImage")) {
-                robberImages.add(node);
-            } else {
+            } else if (!node.getId().endsWith("_label") && !node.getId().endsWith("_HarbourImage") && !node.getId().endsWith("_RobberImage")) {
                 hexagons.add(node);
             }
         }
@@ -147,6 +138,8 @@ public class GameFieldSubController implements Controller {
 
                 if (tile.numberToken() == 7) {
                     label.toBack();
+                } else if (tile.numberToken() == 6 || tile.numberToken() == 8) {
+                    label.setTextFill(Color.RED);
                 }
             }
         }
@@ -163,7 +156,7 @@ public class GameFieldSubController implements Controller {
                 if (road.getId().contains(node.getId())) {
                     CircleSubController circleSubController = new CircleSubController(
                             (Circle) node, (Polygon) road, pioneersService, gameStorage,
-                            idStorage, eventListener, buildingCircles, this);
+                            idStorage, buildingCircles, this);
                     circleSubController.init();
                     this.circleSubControllers.add(circleSubController);
                 }
@@ -171,7 +164,7 @@ public class GameFieldSubController implements Controller {
             if (node.getId().endsWith("_0") || node.getId().endsWith("_6")) {
                 CircleSubController circleSubController = new CircleSubController(
                         (Circle) node, null, pioneersService, gameStorage,
-                        idStorage, eventListener, buildingCircles, this);
+                        idStorage, buildingCircles, this);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
             }
@@ -326,5 +319,9 @@ public class GameFieldSubController implements Controller {
             this.parent.setScaleX(this.parent.getScaleX() - 0.1);
             this.parent.setScaleY(this.parent.getScaleY() - 0.1);
         }
+    }
+
+    public List<CircleSubController> getCirclesSubCons() {
+        return this.circleSubControllers;
     }
 }

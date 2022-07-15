@@ -13,7 +13,7 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
+@SuppressWarnings({"ResultOfMethodCallIgnored", "ClassCanBeRecord"})
 public class RandomAction {
 
     private final GameStorage gameStorage;
@@ -40,40 +40,25 @@ public class RandomAction {
         //select one settlementPosition from all valid settlementPositions
         String selectedSettlementPosition = validPositions.get(randomNumSettlement);
         // String to int for next method call
-        int x = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("x") + 1, selectedSettlementPosition.indexOf("y")));
-        int y = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("y") + 1, selectedSettlementPosition.indexOf("z")));
-        int z = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("z") + 1, selectedSettlementPosition.indexOf("_")));
-        int side = Integer.parseInt(selectedSettlementPosition.substring(selectedSettlementPosition.indexOf("_") + 1));
-
-        //get every possible roadPosition in dependence of chosen settlementPosition
-        List<String> possibleRoadPlacements = getPossibleRoadPlacements(x, y, z, side);
-
-        int randomNumRoad = (int) (Math.random() * possibleRoadPlacements.size());
-        //select one roadPosition from all valid roadPositions
-        String selectedRoadPosition = possibleRoadPlacements.get(randomNumRoad);
-        // String to int for move call
-        int xRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("x") + 1, selectedRoadPosition.indexOf("y")));
-        int yRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("y") + 1, selectedRoadPosition.indexOf("z")));
-        int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
-        int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
+        int x = parseX(selectedSettlementPosition);
+        int y = parseY(selectedSettlementPosition);
+        int z = parseZ(selectedSettlementPosition);
+        int side = parseSide(selectedSettlementPosition);
 
         //place chosen settlement and road
         pioneersService.move(gameStorage.getId(), expectedMove,
                         x, y, z, side,
                         "settlement", null, null)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result -> pioneersService.move(gameStorage.getId(), expectedMove, xRoad, yRoad, zRoad,
-                                sideRoad, "road", null, null)
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe());
+                .subscribe(result -> calculateRoad(selectedSettlementPosition,expectedMove));
     }
 
     public void calculateRoad(String lastBuildingPosition, String expectedMove) {
         // String to int from lastBuildingPlaced to calculate possible roadPlacements
-        int x = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("x") + 1, lastBuildingPosition.indexOf("y")));
-        int y = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("y") + 1, lastBuildingPosition.indexOf("z")));
-        int z = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("z") + 1, lastBuildingPosition.indexOf("_")));
-        int side = Integer.parseInt(lastBuildingPosition.substring(lastBuildingPosition.indexOf("_") + 1));
+        int x = parseX(lastBuildingPosition);
+        int y = parseY(lastBuildingPosition);
+        int z = parseZ(lastBuildingPosition);
+        int side = parseSide(lastBuildingPosition);
 
         //get every possible roadPosition
         List<String> possibleRoadPlacements = getPossibleRoadPlacements(x, y, z, side);
@@ -82,10 +67,10 @@ public class RandomAction {
         //select one possibleRoad
         String selectedRoadPosition = possibleRoadPlacements.get(randomNumRoad);
         // String to int for move call
-        int xRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("x") + 1, selectedRoadPosition.indexOf("y")));
-        int yRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("y") + 1, selectedRoadPosition.indexOf("z")));
-        int zRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("z") + 1, selectedRoadPosition.indexOf("_")));
-        int sideRoad = Integer.parseInt(selectedRoadPosition.substring(selectedRoadPosition.indexOf("_") + 1));
+        int xRoad = parseX(selectedRoadPosition);
+        int yRoad = parseY(selectedRoadPosition);
+        int zRoad = parseZ(selectedRoadPosition);
+        int sideRoad = parseSide(selectedRoadPosition);
 
         //place chosen and road
         pioneersService.move(gameStorage.getId(), expectedMove, xRoad, yRoad, zRoad,
@@ -294,5 +279,19 @@ public class RandomAction {
         pioneersService.move(gameStorage.getId(), DROP_ACTION, null, null, null, null, null, null, discardMap)
                 .observeOn(FX_SCHEDULER)
                 .subscribe();
+    }
+
+    private int parseX (String parse) {
+        return Integer.parseInt(parse.substring(parse.indexOf("x") + 1, parse.indexOf("y")));
+    }
+    private int parseY (String parse) {
+       return Integer.parseInt(parse.substring(parse.indexOf("y") + 1, parse.indexOf("z")));
+    }
+    private int parseZ (String parse) {
+        return Integer.parseInt(parse.substring(parse.indexOf("z") + 1, parse.indexOf("_")));
+    }
+
+    private int parseSide (String parse) {
+        return Integer.parseInt(parse.substring(parse.indexOf("_") + 1));
     }
 }

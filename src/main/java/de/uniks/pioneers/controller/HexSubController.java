@@ -33,7 +33,7 @@ public class HexSubController implements Controller {
     private final PioneersService pioneersService;
     private final UserService userService;
     private final Set<String> owners = new HashSet<>();
-    HashMap<String, String> userHash = new HashMap<>();
+    final HashMap<String, String> userHash = new HashMap<>();
 
     @Inject
     public HexSubController(Polygon view, Tile tile, String gameID, String playerID, PioneersService pioneersService,
