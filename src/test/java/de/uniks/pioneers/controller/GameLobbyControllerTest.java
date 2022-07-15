@@ -24,6 +24,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
 @ExtendWith(MockitoExtension.class)
 class GameLobbyControllerTest extends ApplicationTest {
@@ -114,6 +115,19 @@ class GameLobbyControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
 
         verify(gameService).deleteGame("id");
+    }
+
+    @Test
+    void eventListenerTest(){
+        messageSubject.onNext(new Event<>(".created",new Message("2022-11-30T18:35:24.00Z","1","14","7","test")));
+        messageSubject.onNext(new Event<>(".created",new Message("2022-11-30T18:35:24.00Z","1","14","7","test 123")));
+
+        waitForFxEvents();
+
+
+        memberSubject.onNext(new Event<>(".created",new Member("02022-11-30T19:35:24.00Z","7","01","8",false,null,false)));
+        memberSubject.onNext(new Event<>(".updated",new Member("2022-11-30T19:35:24.00Z","7","01","8",true,"#ff0000",false)));
+        waitForFxEvents();
     }
 
 }
