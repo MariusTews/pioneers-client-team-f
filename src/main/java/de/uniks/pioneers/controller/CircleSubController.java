@@ -2,11 +2,9 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.ExpectedMove;
-import de.uniks.pioneers.model.State;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
-import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -34,7 +32,6 @@ public class CircleSubController implements Controller {
     private final PioneersService pioneersService;
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
-    private final EventListener eventListener;
     private final List<Node> buildingCircles;
     private final GameFieldSubController gameFieldSubController;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -48,14 +45,13 @@ public class CircleSubController implements Controller {
 
     @Inject
     public CircleSubController(Circle view, Polygon road, PioneersService pioneersService,
-                               GameStorage gameStorage, IDStorage idStorage, EventListener eventListener,
+                               GameStorage gameStorage, IDStorage idStorage,
                                List<Node> buildingCircles, GameFieldSubController gameFieldSubController) {
         this.view = view;
         this.road = road;
         this.pioneersService = pioneersService;
         this.gameStorage = gameStorage;
         this.idStorage = idStorage;
-        this.eventListener = eventListener;
         this.buildingCircles = buildingCircles;
         this.gameFieldSubController = gameFieldSubController;
     }
@@ -81,17 +77,6 @@ public class CircleSubController implements Controller {
 
         this.nextMove = new ExpectedMove("", Collections.singletonList(idStorage.getID()));
 
-        disposable.add(eventListener
-                .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    State state = event.data();
-                    //state needs to be checked
-                    //so index out of bound exception doesn't get thrown
-                    if (!state.expectedMoves().isEmpty()) {
-                        this.nextMove = state.expectedMoves().get(0);
-                    }
-                }));
     }
 
 
@@ -258,5 +243,9 @@ public class CircleSubController implements Controller {
 
     public int getZ() {
         return this.z;
+    }
+
+    public void setNextMove(ExpectedMove expectedMove) {
+        this.nextMove = expectedMove;
     }
 }

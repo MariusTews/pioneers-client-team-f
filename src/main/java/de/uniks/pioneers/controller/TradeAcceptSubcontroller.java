@@ -4,13 +4,11 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameStorage;
-import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -30,6 +28,7 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class TradeAcceptSubcontroller implements Controller {
     @FXML
     public Button tradeButton;
@@ -47,7 +46,7 @@ public class TradeAcceptSubcontroller implements Controller {
     private final HashMap<String, User> userHash = new HashMap<>();
 
     private final UserService userService;
-    PioneersService pioneersService;
+    final PioneersService pioneersService;
     private final GameStorage gameStorage;
 
     private Move move;
@@ -94,16 +93,14 @@ public class TradeAcceptSubcontroller implements Controller {
             return null;
         }
 
-        tradeUsers.getChildren().add(renderUser(tradingUsers.get(0)));
+        tradeUsers.getChildren().add(renderUser());
 
-        tradingUsers.addListener((ListChangeListener<? super User>) c -> {
-            tradeUsers.getChildren().addAll(c.getList().stream().map(this::renderUser).toList());
-        });
+        tradingUsers.addListener((ListChangeListener<? super User>) c -> tradeUsers.getChildren().addAll(c.getList().stream().map(user -> renderUser()).toList()));
 
         return root;
     }
 
-    private Node renderUser(User user) {
+    private Node renderUser() {
         Label label = new Label(tradingUsers.get(0).name());
         label.setOnMouseClicked(event -> {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
@@ -116,7 +113,7 @@ public class TradeAcceptSubcontroller implements Controller {
         return label;
     }
 
-    public void tradeButton(ActionEvent event) {
+    public void tradeButton() {
         // check if partner was selected
         if (tradePartner == null) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Please choose a player to trade with");
@@ -133,7 +130,7 @@ public class TradeAcceptSubcontroller implements Controller {
         }
     }
 
-    public void declineTrade(ActionEvent event) {
+    public void declineTrade() {
         pioneersService
                 .tradePlayer(gameStorage.getId(), "accept", null, move.resources())
                 .observeOn(FX_SCHEDULER)

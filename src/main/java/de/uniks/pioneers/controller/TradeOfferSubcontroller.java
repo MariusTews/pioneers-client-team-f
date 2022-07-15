@@ -5,7 +5,6 @@ import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,6 +23,7 @@ import java.util.HashMap;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 import static de.uniks.pioneers.Constants.RESOURCES;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class TradeOfferSubcontroller implements Controller {
     @FXML
     public VBox offerContainer;
@@ -141,7 +141,7 @@ public class TradeOfferSubcontroller implements Controller {
         tradeIconsContainer.getChildren().add(box);
     }
 
-    public void acceptOffer(ActionEvent event) {
+    public void acceptOffer() {
         HashMap<String, Integer> tmp = new HashMap<>();
         for (String res : RESOURCES) {
             tmp.put(res, 0);
@@ -161,7 +161,7 @@ public class TradeOfferSubcontroller implements Controller {
         primaryStage.close();
     }
 
-    public void declineOffer(ActionEvent event) {
+    public void declineOffer() {
         pioneersService
                 .tradePlayer(gameStorage.getId(), "offer", null, null)
                 .observeOn(FX_SCHEDULER)
