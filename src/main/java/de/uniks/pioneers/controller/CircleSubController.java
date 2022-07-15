@@ -202,9 +202,9 @@ public class CircleSubController implements Controller {
             // check if the given color from the server is available in the application
             for (Color colorAvailable : COLORARRAY) {
                 if (colorAvailable.equals(Color.web(color))) {
-                    Image settlement = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/settlement_" + color + ".png")).toExternalForm());
-                    ImagePattern settlementPattern = new ImagePattern(settlement);
-                    this.view.setFill(settlementPattern);
+                    Image city = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/city_" + color + ".png")).toExternalForm());
+                    ImagePattern cityPattern = new ImagePattern(city);
+                    this.view.setFill(cityPattern);
                     return;
                 }
             }
