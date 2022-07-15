@@ -1,20 +1,22 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
-import de.uniks.pioneers.websocket.EventListener;
-import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
@@ -23,8 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,9 +60,6 @@ class LobbyControllerTest extends ApplicationTest {
     @SuppressWarnings("unused")
     @Spy
 	GameStorage gameStorage;
-
-     @Spy
-     RefreshTokenStorage refreshTokenStorage;
 
      @Spy
      App app;
@@ -139,26 +137,75 @@ class LobbyControllerTest extends ApplicationTest {
                 new ArrayList<>())));
         userSubject.onNext(new Event<>(".updated",new User("0","1","id","Tom","offline",null,
                 new ArrayList<>())));
+        userSubject.onComplete();
         waitForFxEvents();
 
         gameSubject.onNext(new Event<>(".created", new Game("0","1","2", "ert","2",0,false,
                 new GameSettings(2,10))));
         gameSubject.onNext(new Event<>(".updated", new Game("0","1","2", "ert","2",0,true,
                 new GameSettings(2,10))));
+        gameSubject.onComplete();
         waitForFxEvents();
+
 
         //members for Group
         List<String> memberForGroup = new ArrayList<>();
         groupSubject.onNext(new Event<>(".created",new Group("1","2","id","ert",memberForGroup)));
         memberForGroup.add("Tom");
         groupSubject.onNext(new Event<>(".updated",new Group("1","2","id","ert",memberForGroup)));
+        gameSubject.onComplete();
         waitForFxEvents();
 
         messageSubject.onNext(new Event<>(".created", new Message("1","2",
                 "627cf3c93496bc00158f3859","tom","Hello!!")));
         messageSubject.onNext(new Event<>(".updated", new Message("1","2",
                 "627cf3c93496bc00158f3859","tom","no!!")));
+        messageSubject.onComplete();
         waitForFxEvents();
+
+
+    }
+
+    @Test
+    void createGameTest(){
+        when(gameStorage.getId()).thenReturn("id");
+        when(idStorage.getID()).thenReturn("3");
+        List<Member> memberList =  new ArrayList<>();
+        memberList.add(new Member("0","2","id","3",true,"#00012f",false));
+        when(memberService.getAllGameMembers("id")).thenReturn(Observable.just(memberList));
+
+        lobbyController.createGameButtonPressed();
+
+    }
+
+    @Test
+    void joinGameTest(){
+        when(gameStorage.getId()).thenReturn("id");
+        when(idStorage.getID()).thenReturn("3");
+        List<Member> memberList =  new ArrayList<>();
+        memberList.add(new Member("0","2","id","3",true,"#00012f",false));
+        when(memberService.getAllGameMembers("id")).thenReturn(Observable.just(memberList));
+        //when(memberService.join("id","00000")).thenReturn(Observable.empty());
+        Game game = new Game("0","1","2", "ert","2",0,true,
+                new GameSettings(2,10));
+        lobbyController.joinGame(game);
+
+        verify(memberService).getAllGameMembers("id");
+
+    }
+
+    @Test
+    void joinGameNullTest(){
+        when(gameStorage.getId()).thenReturn(null);
+        Game game = new Game("0","1","2", "ert","2",0,true,
+                new GameSettings(2,10));
+
+        Platform.runLater(new Runnable(){
+            @Override
+            public void run() {
+                lobbyController.joinGame(game);
+            }
+        });
 
     }
 }

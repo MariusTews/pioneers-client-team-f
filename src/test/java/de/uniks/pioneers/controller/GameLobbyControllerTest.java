@@ -6,8 +6,11 @@ import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -65,13 +68,13 @@ class GameLobbyControllerTest extends ApplicationTest {
         memberSubject = PublishSubject.create();
         messageSubject = PublishSubject.create();
         List<Member> members = new ArrayList<>();
-        members.add(new Member("0","1","87","7",true,"ffa500",false));
+        members.add(new Member("0","1","id","7",true,"ffa500",false));
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(members));
         List<User> userList = new ArrayList<>();
         userList.add(new User("0","1", "7", "Bob", "online",null, null));
 
         List<Message> messages = new ArrayList<>();
-        messages.add(new Message("0","1", "78", "7", "first message"));
+        messages.add(new Message("0","1", "id", "7", "first message"));
         when(messageService.getAllMessages(any(),any())).thenReturn(Observable.just(messages));
 
 
@@ -82,10 +85,11 @@ class GameLobbyControllerTest extends ApplicationTest {
         //this is for new stage
         when(app.getStage()).thenReturn(new Stage());
 
+
+
         when(eventListener.listen("games.id.*.*",Message.class)).thenReturn(messageSubject);
         when(eventListener.listen("games.id.members.*.*",Member.class)).thenReturn(memberSubject);
         when(eventListener.listen("games.id.messages.*.*",Message.class)).thenReturn(messageSubject);
-
 
         // start application
         App app = new App(gameLobbyController);
@@ -120,7 +124,7 @@ class GameLobbyControllerTest extends ApplicationTest {
     }
 
     @Test()
-    void setEventListener(){
+    void eventListenerTest(){
         messageSubject.onNext(new Event<>(".created",new Message("0","1","14","7","test")));
         messageSubject.onNext(new Event<>(".created",new Message("0","1","14","7","test 123")));
 
@@ -129,5 +133,10 @@ class GameLobbyControllerTest extends ApplicationTest {
         memberSubject.onNext(new Event<>(".created",new Member("0","7","01","8",false,null,false)));
         memberSubject.onNext(new Event<>(".updated",new Member("0","7","01","8",true,"#ff0000",false)));
         waitForFxEvents();
+
     }
+
+
+
+
 }
