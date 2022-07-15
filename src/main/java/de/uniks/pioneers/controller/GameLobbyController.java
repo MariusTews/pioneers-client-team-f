@@ -571,13 +571,11 @@ public class GameLobbyController implements Controller {
 
 	private void changeView() {
 		Timeline timeline = new Timeline();
-		final Integer[] countdown = {5};
-		//final int[] n = {4};
+		final Integer[] countdown = {4};
 		timeline.setCycleCount(10);
 
 		//gets called every second to reduce the timer by one second
 		KeyFrame frame = new KeyFrame(Duration.seconds(1), ev -> {
-			countdown[0]--;
 
 			if(countdown[0] >= 2){
 				idStartGameButton.setText(String.valueOf(countdown[0]-1));
@@ -592,6 +590,7 @@ public class GameLobbyController implements Controller {
 				final GameScreenController controller = gameScreenController.get();
 				this.app.show(controller);
 			}
+			countdown[0]--;
 		});
 
 		timeline.getKeyFrames().setAll(frame);
