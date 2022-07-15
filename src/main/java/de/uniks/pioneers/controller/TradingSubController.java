@@ -1,13 +1,8 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.model.Building;
-import de.uniks.pioneers.model.Harbor;
-import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.Point3D;
-import de.uniks.pioneers.service.GameStorage;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
+import de.uniks.pioneers.model.*;
+import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.event.ActionEvent;
@@ -107,9 +102,17 @@ public class TradingSubController implements Controller {
     private final HashMap<Point3D, Building> playersBuildingsZero = new HashMap<>();
     private final HashMap<Point3D, Building> playersBuildingsSix = new HashMap<>();
     private final HashMap<String, Boolean> harborHashCheck = new HashMap<>();
+
+    // lists
     private final List<Harbor> harbors = new ArrayList<>();
     private final List<Building> buildings = new ArrayList<>();
+
     private final CompositeDisposable disposable = new CompositeDisposable();
+
+    // check variables for chosen resources
+    private boolean sameType = false;
+    private int checkGiveRes = 0;
+    private int checkReceiveRes = 0;
 
     @Inject
     public TradingSubController(GameStorage gameStorage,
@@ -133,8 +136,8 @@ public class TradingSubController implements Controller {
         pioneersService
                 .findAllPlayers(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
-                .subscribe(c -> {
-                    for (Player player : c) {
+                .subscribe(players -> {
+                    for (Player player : players) {
                         if (player.userId().equals(idStorage.getID())) {
                             this.player = player;
                         }
@@ -164,7 +167,7 @@ public class TradingSubController implements Controller {
 
     @Override
     public void destroy() {
-        disposable.dispose();
+        disposable.clear();
     }
 
     @Override
@@ -283,78 +286,87 @@ public class TradingSubController implements Controller {
         plusAction(event, "grain", receiveVenusLabel, false, receiveVenusMinusButton);
     }
 
+    /*
+     * initialize tmp hashMap for resources to give and to receive
+     * check quantity and equality of resources
+     * put right values into the tmp hashMap
+     * make initial trade call
+     * */
     public void offerPlayerButtonPressed() {
+        HashMap<String, Integer> tmp = new HashMap<>();
+        for (String res : RESOURCES) {
+            tmp.put(res, 0);
+        }
+
+        // check chosen amount of resources, so no 2:0 or other trade can be made
+        checkResources();
+
+        if (this.sameType) {
+            alert("You cannot trade the same type of resource!");
+        } else if (this.checkGiveRes == 0 || this.checkReceiveRes == 0) {
+            alert("Amount to give or to receive is 0!");
+        } else {
+            for (String res : RESOURCES) {
+                if (this.giveResources.get(res) > 0) {
+                    tmp.put(res, (-1) * this.giveResources.get(res));
+                }
+                if (this.receiveResources.get(res) > 0) {
+                    tmp.put(res, this.receiveResources.get(res));
+                }
+            }
+
+            pioneersService
+                    .tradePlayer(gameStorage.getId(), "build", null, tmp)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+        }
+        resetButtonsAndLabels();
     }
 
     public void offerBankButtonPressed() {
         updateHarbors();
+        checkResources();
 
-        /*
-         * check for mixed resources
-         * increase count for every label greater 0
-         * when counter is greater than 1, more than one resource were selected
-         * */
-        int checkGiveRes = 0;
-        int checkReceiveRes = 0;
-
-        for (String res : RESOURCES) {
-            if (this.giveResources.get(res) > 0) {
-                checkGiveRes++;
-            }
-            if (this.receiveResources.get(res) > 0) {
-                checkReceiveRes++;
-            }
-        }
-
-        if (checkGiveRes > 1 || checkReceiveRes > 1) {
-            alert("You can only select one type of resource when trading with the bank");
+        if (this.sameType) {
+            alert("You cannot trade the same type of resource!");
         } else {
-            // different conditions for 4:1, 3:1 and 2:1 trades
-            for (String giveRes : RESOURCES) {
-                switch (this.giveResources.get(giveRes)) {
-                    case 2 -> {
-                        if (harborHashCheck.get(giveRes)) {
-                            trade(giveRes, 2);
-                        } else {
-                            alert("Trade was not successful. You don't have a building on a matching 2:1 harbor!");
+            if (this.checkGiveRes > 1 || this.checkReceiveRes > 1) {
+                alert("You can only select one type of resource when trading with the bank");
+            } else if (this.checkGiveRes == 0 || this.checkReceiveRes == 0) {
+                alert("Amount to give or to receive is 0!");
+            } else {
+                // different conditions for 4:1, 3:1 and 2:1 trades
+                for (String giveRes : RESOURCES) {
+                    switch (this.giveResources.get(giveRes)) {
+                        case 2 -> {
+                            if (harborHashCheck.get(giveRes)) {
+                                tradeWithBank(giveRes, 2);
+                            } else {
+                                alert("Trade was not successful. You don't have a building on a matching 2:1 harbor!");
+                            }
                         }
-                    }
-                    case 3 -> {
-                        if (harborHashCheck.get(null)) {
-                            trade(giveRes, 3);
-                        } else {
-                            alert("Trade was not successful. You don't have a building on a 3:1 harbor!");
+                        case 3 -> {
+                            if (harborHashCheck.get(null)) {
+                                tradeWithBank(giveRes, 3);
+                            } else {
+                                alert("Trade was not successful. You don't have a building on a 3:1 harbor!");
+                            }
                         }
-                    }
-                    case 4 -> trade(giveRes, 4);
-                    default -> {
+                        case 4 -> tradeWithBank(giveRes, 4);
+                        default -> {
+                        }
                     }
                 }
             }
         }
 
-        // clear hashes
-        this.giveResources.replaceAll((k, v) -> v = 0);
-        this.receiveResources.replaceAll((k, v) -> v = 0);
-
-        this.giveCactusLabel.setText("0");
-        this.giveMarsLabel.setText("0");
-        this.giveMoonLabel.setText("0");
-        this.giveNeptunLabel.setText("0");
-        this.giveVenusLabel.setText("0");
-        this.receiveCactusLabel.setText("0");
-        this.receiveMarsLabel.setText("0");
-        this.receiveMoonLabel.setText("0");
-        this.receiveNeptunLabel.setText("0");
-        this.receiveVenusLabel.setText("0");
-
         // reset all buttons to initial settings
-        resetButtons();
+        resetButtonsAndLabels();
     }
 
     // Additional methods
 
-    public void alert(String text) {
+    private void alert(String text) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, text);
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
@@ -363,10 +375,29 @@ public class TradingSubController implements Controller {
     }
 
     /*
+     * check for mixed resources
+     * increase count for every label greater 0
+     * when counter is greater than 1, more than one resource were selected
+     * */
+    private void checkResources() {
+        for (String res : RESOURCES) {
+            if (this.giveResources.get(res) > 0 && this.receiveResources.get(res) > 0) {
+                sameType = true;
+            }
+            if (this.giveResources.get(res) > 0) {
+                checkGiveRes++;
+            }
+            if (this.receiveResources.get(res) > 0) {
+                checkReceiveRes++;
+            }
+        }
+    }
+
+    /*
      * trade a given resource
      * check, if a receiving resource was selected and make move
      * */
-    private void trade(String giveRes, int amount) {
+    private void tradeWithBank(String giveRes, int amount) {
         // initialize temporary hashMap for move
         HashMap<String, Integer> tmp = new HashMap<>();
         for (String res : RESOURCES) {
@@ -383,16 +414,17 @@ public class TradingSubController implements Controller {
                 this.pioneersService
                         .tradeBank(this.gameStorage.getId(), tmp)
                         .observeOn(FX_SCHEDULER)
-                        .subscribe(result -> pioneersService
-                                .findAllPlayers(this.gameStorage.getId())
-                                .observeOn(FX_SCHEDULER)
-                                .subscribe(c -> {
-                                    for (Player player : c) {
-                                        if (player.userId().equals(idStorage.getID())) {
-                                            this.player = player;
-                                        }
-                                    }
-                                }));
+                        .subscribe(result ->
+                                pioneersService
+                                        .findAllPlayers(this.gameStorage.getId())
+                                        .observeOn(FX_SCHEDULER)
+                                        .subscribe(c -> {
+                                            for (Player player : c) {
+                                                if (player.userId().equals(idStorage.getID())) {
+                                                    this.player = player;
+                                                }
+                                            }
+                                        }));
             }
         }
     }
@@ -434,10 +466,8 @@ public class TradingSubController implements Controller {
                 }
             }
         } else {
-            if (checkAmount(label, resource, false)) {
-                this.receiveResources.put(resource, this.receiveResources.get(resource) + 1);
-                label.setText(String.valueOf(this.receiveResources.get(resource)));
-            }
+            this.receiveResources.put(resource, this.receiveResources.get(resource) + 1);
+            label.setText(String.valueOf(this.receiveResources.get(resource)));
         }
 
         if (minusButton.disableProperty().get() && Integer.parseInt(label.getText()) > 0) {
@@ -453,7 +483,24 @@ public class TradingSubController implements Controller {
         button.disableProperty().set(!visible);
     }
 
-    private void resetButtons() {
+    private void resetButtonsAndLabels() {
+        // clear hashes
+        this.giveResources.replaceAll((k, v) -> v = 0);
+        this.receiveResources.replaceAll((k, v) -> v = 0);
+
+        // set labels to zero
+        this.giveCactusLabel.setText("0");
+        this.giveMarsLabel.setText("0");
+        this.giveMoonLabel.setText("0");
+        this.giveNeptunLabel.setText("0");
+        this.giveVenusLabel.setText("0");
+        this.receiveCactusLabel.setText("0");
+        this.receiveMarsLabel.setText("0");
+        this.receiveMoonLabel.setText("0");
+        this.receiveNeptunLabel.setText("0");
+        this.receiveVenusLabel.setText("0");
+
+        // reset buttons
         makeButtonVisible(this.giveCactusMinusButton, false);
         makeButtonVisible(this.giveMarsMinusButton, false);
         makeButtonVisible(this.giveMoonMinusButton, false);
@@ -475,6 +522,11 @@ public class TradingSubController implements Controller {
         makeButtonVisible(this.receiveMoonPlusButton, true);
         makeButtonVisible(this.receiveNeptunPlusButton, true);
         makeButtonVisible(this.receiveVenusPlusButton, true);
+
+        // reset check variables
+        this.sameType = false;
+        this.checkGiveRes = 0;
+        this.checkReceiveRes = 0;
     }
 
     // check amount of resource to give or to receive
@@ -484,7 +536,7 @@ public class TradingSubController implements Controller {
                 return Integer.parseInt(label.getText()) < player.resources().get(resource);
             }
         }
-        return Integer.parseInt(label.getText()) < 1;
+        return true;
     }
 
     private void updateHarbors() {
