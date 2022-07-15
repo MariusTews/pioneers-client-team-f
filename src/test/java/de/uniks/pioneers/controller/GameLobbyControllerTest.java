@@ -3,14 +3,11 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
-import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -27,7 +24,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
 @ExtendWith(MockitoExtension.class)
 class GameLobbyControllerTest extends ApplicationTest {
@@ -59,16 +55,32 @@ class GameLobbyControllerTest extends ApplicationTest {
 
     @InjectMocks
     GameLobbyController gameLobbyController;
-
+    private Subject<Event<Member>> memberSubject;
+    private Subject<Event<Message>> messageSubject;
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
-        when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
-        when(userService.findAllUsers()).thenReturn(Observable.empty());
-        when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
-        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
+        memberSubject = PublishSubject.create();
+        messageSubject = PublishSubject.create();
+        List<Member> members = new ArrayList<>();
+        members.add(new Member("2022-11-30T18:35:24.00Z","1:00","87","7",true,"ffa500",false));
+        when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(members));
+        List<User> userList = new ArrayList<>();
+        userList.add(new User("2022-11-30T18:35:24.00Z","1:00","7","Bob","online",null,null));
+
+        List<Message> messages = new ArrayList<>();
+        messages.add(new Message("2022-11-30T18:35:24.00Z","1:00","78","7","first message"));
+        when(messageService.getAllMessages(any(),any())).thenReturn(Observable.just(messages));
+
+        when(userService.findAllUsers()).thenReturn(Observable.just(userList));
+        //when(userService.findOne(any())).thenReturn(Observable.just(new User("2022-11-30T18:35:24.00Z","1:00","8","Alice","online",null,null)));
+        when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("2022-11-30T18:35:24.00Z", "00:30",
                 "id", "name", "owner", 2, false,new GameSettings(2,10))));
         when(gameStorage.getId()).thenReturn("id");
+
+        when(eventListener.listen("games.id.*.*",Message.class)).thenReturn(messageSubject);
+        when(eventListener.listen("games.id.members.*.*",Member.class)).thenReturn(memberSubject);
+        when(eventListener.listen("games.id.messages.*.*",Message.class)).thenReturn(messageSubject);
         when(app.getStage()).thenReturn(new Stage());
 
         // start application
@@ -103,6 +115,5 @@ class GameLobbyControllerTest extends ApplicationTest {
 
         verify(gameService).deleteGame("id");
     }
-
 
 }

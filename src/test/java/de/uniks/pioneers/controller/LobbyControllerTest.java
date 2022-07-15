@@ -80,6 +80,9 @@ class LobbyControllerTest extends ApplicationTest {
         gameSubject = PublishSubject.create();
         messageSubject = PublishSubject.create();
         groupSubject = PublishSubject.create();
+        userSubject.subscribe( e -> {
+            System.out.println("hallo");
+        });
 
         List<Member> memberList =  new ArrayList<>();
         memberList.add(new Member("0","2","id","3",true,"#00012f",false));
@@ -109,6 +112,7 @@ class LobbyControllerTest extends ApplicationTest {
         when(eventListener.listen("games.*.*",Game.class)).thenReturn(gameSubject);
         when(eventListener.listen("group.*.*",Group.class)).thenReturn(groupSubject);
         when(eventListener.listen("global.627cf3c93496bc00158f3859.messages.*.*",Message.class)).thenReturn(messageSubject);
+
 
         // start application
         app = new App(lobbyController);
