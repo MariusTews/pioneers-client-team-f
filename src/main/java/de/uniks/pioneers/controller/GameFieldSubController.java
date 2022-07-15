@@ -147,6 +147,8 @@ public class GameFieldSubController implements Controller {
 
                 if (tile.numberToken() == 7) {
                     label.toBack();
+                } else if (tile.numberToken() == 6 || tile.numberToken() == 8) {
+                    label.setTextFill(Color.RED);
                 }
             }
         }
