@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
@@ -25,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
 @ExtendWith(MockitoExtension.class)
@@ -133,18 +133,16 @@ class LobbyControllerTest extends ApplicationTest {
 
     @Test
     void lobbyEventListenerTest(){
-        userSubject.onNext(new Event<>(".created",new User("0","1","id","Tom","online",null,
+        userSubject.onNext(new Event<>(".created",new User("0","1","627cf3c93496bc00158f3859","Tom","online",null,
                 new ArrayList<>())));
-        userSubject.onNext(new Event<>(".updated",new User("0","1","id","Tom","offline",null,
+        userSubject.onNext(new Event<>(".updated",new User("0","1","627cf3c93496bc00158f3859","Tom","offline",null,
                 new ArrayList<>())));
-        userSubject.onComplete();
         waitForFxEvents();
 
         gameSubject.onNext(new Event<>(".created", new Game("0","1","2", "ert","2",0,false,
                 new GameSettings(2,10))));
         gameSubject.onNext(new Event<>(".updated", new Game("0","1","2", "ert","2",0,true,
                 new GameSettings(2,10))));
-        gameSubject.onComplete();
         waitForFxEvents();
 
 
@@ -153,14 +151,12 @@ class LobbyControllerTest extends ApplicationTest {
         groupSubject.onNext(new Event<>(".created",new Group("1","2","id","ert",memberForGroup)));
         memberForGroup.add("Tom");
         groupSubject.onNext(new Event<>(".updated",new Group("1","2","id","ert",memberForGroup)));
-        gameSubject.onComplete();
         waitForFxEvents();
 
         messageSubject.onNext(new Event<>(".created", new Message("1","2",
                 "627cf3c93496bc00158f3859","tom","Hello!!")));
         messageSubject.onNext(new Event<>(".updated", new Message("1","2",
                 "627cf3c93496bc00158f3859","tom","no!!")));
-        messageSubject.onComplete();
         waitForFxEvents();
 
 
