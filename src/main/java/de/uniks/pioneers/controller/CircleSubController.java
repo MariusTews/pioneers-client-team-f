@@ -87,7 +87,7 @@ public class CircleSubController implements Controller {
                 .subscribe(event -> {
                     State state = event.data();
                     //state needs to be checked
-                    //so index out of bound exception doesnt get thrown
+                    //so index out of bound exception doesn't get thrown
                     if (!state.expectedMoves().isEmpty()) {
                         this.nextMove = state.expectedMoves().get(0);
                     }

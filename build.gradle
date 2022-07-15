@@ -79,6 +79,7 @@ jacoco {
 }
 
 jacocoTestReport {
+    //noinspection GrDeprecatedAPIUsage
     reports.xml.enabled = true
 }
 

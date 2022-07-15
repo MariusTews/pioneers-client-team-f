@@ -18,7 +18,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -283,8 +282,6 @@ public class TradingSubController implements Controller {
     public void receiveVenusPlusButtonPressed(ActionEvent event) {
         plusAction(event, "grain", receiveVenusLabel, false, receiveVenusMinusButton);
     }
-
-    private Stage primaryStage;
 
     public void offerPlayerButtonPressed() {
     }

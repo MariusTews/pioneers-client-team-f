@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.core.Observable;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
+@SuppressWarnings({"SameReturnValue", "unused"})
 public interface AuthApiService {
 
     @POST("auth/login")

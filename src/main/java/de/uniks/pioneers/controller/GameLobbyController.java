@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameLobbyController implements Controller {
@@ -428,7 +427,7 @@ public class GameLobbyController implements Controller {
         for (Member member : members) {
             if ((member.color() == null || member.color().equals("#000000"))
                     && member.userId().equals(this.idStorage.getID()) && !member.spectator()) {
-                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), member.spectator())
+                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), false)
                         .subscribe();
                 allColors.remove(0);
             }

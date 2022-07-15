@@ -101,7 +101,7 @@ public class OpponentSubController implements Controller {
         Tooltip.install(earthCactusImage, new Tooltip("Earth cactus"));
         Tooltip.install(marsBarImage, new Tooltip("Mars bar"));
         Tooltip.install(moonRockImage, new Tooltip("Moon rock"));
-        Tooltip.install(neptunCrystalsImage, new Tooltip("Neptun crystals"));
+        Tooltip.install(neptunCrystalsImage, new Tooltip("Neptune crystals"));
         Tooltip.install(venusGrainImage, new Tooltip("Venus grain"));
 
         this.parent = parent;

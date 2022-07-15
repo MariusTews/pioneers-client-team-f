@@ -37,9 +37,6 @@ public class GameFieldSubController implements Controller {
     private final List<Node> roads = new ArrayList<>();
     private final List<Node> roadCircles = new ArrayList<>();
     private final List<Node> buildingCircles = new ArrayList<>();
-    private final List<Node> labels = new ArrayList<>();
-    private final List<Node> harbourImages = new ArrayList<>();
-    private final List<Node> robberImages = new ArrayList<>();
     private final List<Node> hexagons = new ArrayList<>();
 
     private final IDStorage idStorage;
@@ -116,13 +113,7 @@ public class GameFieldSubController implements Controller {
                 roadCircles.add(node);
             } else if (node.getId().endsWith("_0") || node.getId().endsWith("_6")) {
                 buildingCircles.add(node);
-            } else if (node.getId().endsWith("_label")) {
-                labels.add(node);
-            } else if (node.getId().endsWith("_HarbourImage")) {
-                harbourImages.add(node);
-            } else if (node.getId().endsWith("_RobberImage")) {
-                robberImages.add(node);
-            } else {
+            } else if (!node.getId().endsWith("_label") && !node.getId().endsWith("_HarbourImage") && !node.getId().endsWith("_RobberImage")) {
                 hexagons.add(node);
             }
         }

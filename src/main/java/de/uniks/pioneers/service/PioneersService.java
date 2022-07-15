@@ -14,6 +14,7 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class PioneersService {
 
     private final PioneersApiService pioneersApiService;
@@ -69,15 +70,15 @@ public class PioneersService {
 		return this.pioneersApiService.updatePlayer(gameId, userId, new UpdatePlayerDto(active));
 	}
 
+    // methode added for later use
+    @SuppressWarnings("unused")
     public Observable<List<Move>> findAllMoves(String gameId) {
         return this.pioneersApiService.findAllMoves(gameId);
     }
 
+    // methode added for later use
+    @SuppressWarnings("unused")
     public Observable<Move> findOneMove(String gameId, String moveId) {
         return this.pioneersApiService.findOneMove(gameId, moveId);
     }
-
-	public Observable<Move> rob(String gameId, String oppId) {
-		return pioneersApiService.create(gameId, new CreateMoveDto("rob", new RobDto(1, 1, 1, oppId), null, null, null));
-	}
 }

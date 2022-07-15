@@ -82,7 +82,7 @@ class EditUserControllerTest extends ApplicationTest {
         String avatar = editUserController.encodeFileToBase64Binary(file);
         when(userService.userUpdate(any(),any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("1234","12345","01","Alice","offline",avatar,new ArrayList<>())));
         write("\t\t\t\t\t\t");
-        //check if all textfields are empty
+        //check if all text-fields are empty
         type(KeyCode.SPACE);
         write("\t\t\t1234567\t\t\t\t");
         type(KeyCode.SPACE);
