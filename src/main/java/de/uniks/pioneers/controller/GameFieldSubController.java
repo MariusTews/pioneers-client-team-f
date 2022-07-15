@@ -156,7 +156,7 @@ public class GameFieldSubController implements Controller {
                 if (road.getId().contains(node.getId())) {
                     CircleSubController circleSubController = new CircleSubController(
                             (Circle) node, (Polygon) road, pioneersService, gameStorage,
-                            idStorage, eventListener, buildingCircles, this);
+                            idStorage, buildingCircles, this);
                     circleSubController.init();
                     this.circleSubControllers.add(circleSubController);
                 }
@@ -164,7 +164,7 @@ public class GameFieldSubController implements Controller {
             if (node.getId().endsWith("_0") || node.getId().endsWith("_6")) {
                 CircleSubController circleSubController = new CircleSubController(
                         (Circle) node, null, pioneersService, gameStorage,
-                        idStorage, eventListener, buildingCircles, this);
+                        idStorage, buildingCircles, this);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
             }

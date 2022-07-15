@@ -1,6 +1,5 @@
 package de.uniks.pioneers.controller;
 
-import com.sun.javafx.binding.SelectBinding;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.GameStorage;
