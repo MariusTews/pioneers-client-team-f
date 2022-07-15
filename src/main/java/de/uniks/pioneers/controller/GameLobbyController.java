@@ -9,6 +9,8 @@ import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -19,6 +21,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -28,7 +31,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameLobbyController implements Controller {
@@ -260,8 +262,7 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     if (event.event().endsWith("state" + CREATED)) {
-                        final GameScreenController controller = gameScreenController.get();
-                        this.app.show(controller);
+                        changeView();
                     }
                 }));
 
@@ -403,13 +404,10 @@ public class GameLobbyController implements Controller {
 						alert.showAndWait();
                     }
                 })
-                .subscribe(onSuccess -> {
-                    final GameScreenController controller = gameScreenController.get();
-                    this.app.show(controller);
+                .subscribe();
+	}
 
-                }, onError -> {
-                });
-    }
+
 
     private void giveYourselfColor() {
         ColorController controller = new ColorController();
@@ -428,7 +426,7 @@ public class GameLobbyController implements Controller {
         for (Member member : members) {
             if ((member.color() == null || member.color().equals("#000000"))
                     && member.userId().equals(this.idStorage.getID()) && !member.spectator()) {
-                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), member.spectator())
+                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), false)
                         .subscribe();
                 allColors.remove(0);
             }
@@ -570,4 +568,33 @@ public class GameLobbyController implements Controller {
                     .subscribe();
         }
     }
+
+	private void changeView() {
+		Timeline timeline = new Timeline();
+		final Integer[] countdown = {4};
+		timeline.setCycleCount(10);
+
+		//gets called every second to reduce the timer by one second
+		KeyFrame frame = new KeyFrame(Duration.seconds(1), ev -> {
+
+			if(countdown[0] >= 2){
+				idStartGameButton.setText(String.valueOf(countdown[0]-1));
+
+			}
+			if(countdown[0] < 2){
+				idStartGameButton.setText("GO");
+
+			}
+			if (countdown[0] == 0){
+				timeline.stop();
+				final GameScreenController controller = gameScreenController.get();
+				this.app.show(controller);
+			}
+			countdown[0]--;
+		});
+
+		timeline.getKeyFrames().setAll(frame);
+		// start timer
+		timeline.playFromStart();
+	}
 }

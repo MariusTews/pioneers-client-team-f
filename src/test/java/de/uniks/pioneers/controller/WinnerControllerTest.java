@@ -31,8 +31,10 @@ public class WinnerControllerTest extends ApplicationTest {
     @Mock
     GameService gameService;
 
+    @Spy
     Provider<LobbyController> lobbyController;
 
+    @Spy
     App app;
 
     List<String> pointsAndValues;

@@ -8,6 +8,7 @@ import retrofit2.http.*;
 
 import java.util.List;
 
+@SuppressWarnings({"SameReturnValue", "unused"})
 public interface MessageApiService {
 
     @GET("{namespace}/{parent}/messages")

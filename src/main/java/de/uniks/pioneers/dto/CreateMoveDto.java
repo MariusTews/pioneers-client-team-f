@@ -2,6 +2,7 @@ package de.uniks.pioneers.dto;
 
 import java.util.HashMap;
 
+@SuppressWarnings("unused")
 public record CreateMoveDto(
         String action,
 		RobDto rob,

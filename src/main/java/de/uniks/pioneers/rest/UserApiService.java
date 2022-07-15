@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.core.Observable;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public interface UserApiService {
     @GET("users")
     Observable<List<User>> findAllUsers();
