@@ -9,6 +9,8 @@ import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -19,6 +21,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -259,8 +262,7 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     if (event.event().endsWith("state" + CREATED)) {
-                        final GameScreenController controller = gameScreenController.get();
-                        this.app.show(controller);
+                        changeView();
                     }
                 }));
 
@@ -402,13 +404,10 @@ public class GameLobbyController implements Controller {
 						alert.showAndWait();
                     }
                 })
-                .subscribe(onSuccess -> {
-                    final GameScreenController controller = gameScreenController.get();
-                    this.app.show(controller);
+                .subscribe();
+	}
 
-                }, onError -> {
-                });
-    }
+
 
     private void giveYourselfColor() {
         ColorController controller = new ColorController();
@@ -569,4 +568,34 @@ public class GameLobbyController implements Controller {
                     .subscribe();
         }
     }
+
+	private void changeView() {
+		Timeline timeline = new Timeline();
+		final Integer[] countdown = {5};
+		//final int[] n = {4};
+		timeline.setCycleCount(10);
+
+		//gets called every second to reduce the timer by one second
+		KeyFrame frame = new KeyFrame(Duration.seconds(1), ev -> {
+			countdown[0]--;
+
+			if(countdown[0] >= 2){
+				idStartGameButton.setText(String.valueOf(countdown[0]-1));
+
+			}
+			if(countdown[0] < 2){
+				idStartGameButton.setText("GO");
+
+			}
+			if (countdown[0] == 0){
+				timeline.stop();
+				final GameScreenController controller = gameScreenController.get();
+				this.app.show(controller);
+			}
+		});
+
+		timeline.getKeyFrames().setAll(frame);
+		// start timer
+		timeline.playFromStart();
+	}
 }
