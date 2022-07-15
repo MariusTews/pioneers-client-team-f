@@ -717,6 +717,16 @@ public class GameScreenController implements Controller {
             // get the current stage for closing the discard window
             discard.getPrimaryStage().close();
             this.calculateMove.automaticDrop(playerOwnView.get(0).resources());
+        } else if(nextMoveLabel.getText().equals("offer") && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
+            pioneersService
+                    .tradePlayer(gameStorage.getId(), "offer", null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+        } else if (nextMoveLabel.getText().equals("accept") && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
+            pioneersService
+                    .tradePlayer(gameStorage.getId(), "accept", null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
         } else {
             finishTurn();
         }
