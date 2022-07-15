@@ -4,6 +4,7 @@ import de.uniks.pioneers.dto.RobDto;
 
 import java.util.HashMap;
 
+@SuppressWarnings("unused")
 public record Move(
 		String createdAt,
         String _id,

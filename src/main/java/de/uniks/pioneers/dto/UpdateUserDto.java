@@ -2,6 +2,7 @@ package de.uniks.pioneers.dto;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public record UpdateUserDto(
 		String name,
 		String status,

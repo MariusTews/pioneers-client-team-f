@@ -36,7 +36,8 @@ public class ColorControllerTest extends ApplicationTest {
         List<Label> listLabel = new ArrayList<>();
         listLabel.add(a1);
         when(colorcontroller.getColor()).thenReturn((listLabel));
-        colorcontroller.getColor();
+        List<Label> color = colorcontroller.getColor();
+        Assertions.assertEquals(color.size(),1);
 
         verify(colorcontroller).getColor();
 
