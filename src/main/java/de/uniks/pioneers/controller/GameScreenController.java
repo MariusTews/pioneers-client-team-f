@@ -38,6 +38,8 @@ import static de.uniks.pioneers.computation.CalculateMap.createId;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameScreenController implements Controller {
 
+    private List<CircleSubController> circleSubControllers = new ArrayList<>();
+
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
 
     private final ObservableList<Player> playerOwnView = FXCollections.observableArrayList();
@@ -514,6 +516,14 @@ public class GameScreenController implements Controller {
 
     private void handleStateEvents(Event<State> stateEvent) {
         State state = stateEvent.data();
+        if (!state.expectedMoves().isEmpty()) {
+            if(circleSubControllers.isEmpty()) {
+                this.circleSubControllers = this.getGameFieldSubController().getCirclesSubCons();
+            }
+            for (CircleSubController subController: this.circleSubControllers) {
+                subController.setNextMove(state.expectedMoves().get(0));
+            }
+        }
 
         if (stateEvent.event().endsWith(UPDATED)) {
             // change the nextMoveLabel to the current move and adapt to the renamed buildings

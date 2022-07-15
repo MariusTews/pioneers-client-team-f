@@ -81,17 +81,6 @@ public class CircleSubController implements Controller {
 
         this.nextMove = new ExpectedMove("", Collections.singletonList(idStorage.getID()));
 
-        disposable.add(eventListener
-                .listen("games." + this.gameStorage.getId() + ".state.*", State.class)
-                .observeOn(FX_SCHEDULER)
-                .subscribe(event -> {
-                    State state = event.data();
-                    //state needs to be checked
-                    //so index out of bound exception doesnt get thrown
-                    if (!state.expectedMoves().isEmpty()) {
-                        this.nextMove = state.expectedMoves().get(0);
-                    }
-                }));
     }
 
 
@@ -258,5 +247,9 @@ public class CircleSubController implements Controller {
 
     public int getZ() {
         return this.z;
+    }
+
+    public void setNextMove(ExpectedMove expectedMove) {
+        this.nextMove = expectedMove;
     }
 }

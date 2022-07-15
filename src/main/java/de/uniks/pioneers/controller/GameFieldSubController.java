@@ -329,4 +329,8 @@ public class GameFieldSubController implements Controller {
             this.parent.setScaleY(this.parent.getScaleY() - 0.1);
         }
     }
+
+    public List<CircleSubController> getCirclesSubCons() {
+        return this.circleSubControllers;
+    }
 }
