@@ -1,6 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.Main;
 import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
@@ -20,8 +21,10 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -67,6 +70,9 @@ class LobbyControllerTest extends ApplicationTest {
     @InjectMocks
     LobbyController lobbyController;
 
+    @InjectMocks
+    EditUserController editUserController;
+
     private Subject<Event<Game>> gameSubject;
     private Subject<Event<Message>> messageSubject;
 
@@ -76,13 +82,15 @@ class LobbyControllerTest extends ApplicationTest {
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
+        File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
+
+        String avatar = editUserController.encodeFileToBase64Binary(file);
+        System.out.println(avatar);
+
         userSubject = PublishSubject.create();
         gameSubject = PublishSubject.create();
         messageSubject = PublishSubject.create();
         groupSubject = PublishSubject.create();
-        userSubject.subscribe( e -> {
-            System.out.println("hallo");
-        });
 
         List<Member> memberList =  new ArrayList<>();
         memberList.add(new Member("0","2","id","3",true,"#00012f",false));
@@ -94,7 +102,7 @@ class LobbyControllerTest extends ApplicationTest {
         when(gameService.findAllGames()).thenReturn(Observable.just(gameList));
 
         List<User> userList = new ArrayList<>();
-        userList.add(new User("0","1", "7", "Bob", "online",null, null));
+        userList.add(new User("0","1", "7", "Bob", "online",avatar, null));
         when(userService.findAllUsers()).thenReturn(Observable.just(userList));
 
         List<Message> messages = new ArrayList<>();
@@ -137,9 +145,12 @@ class LobbyControllerTest extends ApplicationTest {
 
     @Test
     void lobbyEventListenerTest(){
-        userSubject.onNext(new Event<>(".created",new User("0","1","627cf3c93496bc00158f3859","Tom","online",null,
+        File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
+
+        String avatar = editUserController.encodeFileToBase64Binary(file);
+        userSubject.onNext(new Event<>(".created",new User("0","1","8","Tom","online",avatar,
                 new ArrayList<>())));
-        userSubject.onNext(new Event<>(".updated",new User("0","1","627cf3c93496bc00158f3859","Tom","offline",null,
+        userSubject.onNext(new Event<>(".updated",new User("0","1","8","Tom","online",avatar,
                 new ArrayList<>())));
         waitForFxEvents();
 
@@ -158,9 +169,9 @@ class LobbyControllerTest extends ApplicationTest {
         waitForFxEvents();
 
         messageSubject.onNext(new Event<>(".created", new Message("1","2",
-                "627cf3c93496bc00158f3859","tom","Hello!!")));
+                "627cf3c93496bc00158f3859","7","Hello!!")));
         messageSubject.onNext(new Event<>(".updated", new Message("1","2",
-                "627cf3c93496bc00158f3859","tom","no!!")));
+                "627cf3c93496bc00158f3859","7","no!!")));
         waitForFxEvents();
 
 
