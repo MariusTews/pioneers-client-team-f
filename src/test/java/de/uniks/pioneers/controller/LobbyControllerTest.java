@@ -1,7 +1,6 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.Main;
 import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
@@ -21,10 +20,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -82,9 +79,6 @@ class LobbyControllerTest extends ApplicationTest {
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
-        /*File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
-
-        String avatar = editUserController.encodeFileToBase64Binary(file);*/
 
         userSubject = PublishSubject.create();
         gameSubject = PublishSubject.create();
@@ -145,9 +139,6 @@ class LobbyControllerTest extends ApplicationTest {
     @Test
     void lobbyEventListenerTest(){
 
-        /*File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
-
-        String avatar = editUserController.encodeFileToBase64Binary(file);*/
         userSubject.onNext(new Event<>(".created",new User("0","1","8","Tom","online",null,
                 new ArrayList<>())));
         userSubject.onNext(new Event<>(".updated",new User("0","1","8","Tom","online",null,
@@ -211,12 +202,7 @@ class LobbyControllerTest extends ApplicationTest {
         Game game = new Game("0", "1", "2", "ert", "2", 0, true,
                 new GameSettings(2, 10));
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                lobbyController.joinGame(game);
-            }
-        });
+        Platform.runLater(() -> lobbyController.joinGame(game));
 
     }
 
@@ -230,5 +216,6 @@ class LobbyControllerTest extends ApplicationTest {
         userSubject.onComplete();
         gameSubject.onComplete();
         groupSubject.onComplete();
+
     }
 }

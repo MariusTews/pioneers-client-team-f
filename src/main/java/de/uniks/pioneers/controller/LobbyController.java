@@ -629,7 +629,6 @@ public class LobbyController implements Controller {
         ImageView imageView = new ImageView();
         imageView.setFitWidth(20);
         imageView.setFitHeight(20);
-        System.out.println(message.sender());
         if (this.memberHash.get(message.sender()).avatar() != null) {
             imageView.setImage(new Image(this.memberHash.get(message.sender()).avatar()));
         }
