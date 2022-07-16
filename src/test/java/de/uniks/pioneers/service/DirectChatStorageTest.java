@@ -40,4 +40,5 @@ class DirectChatStorageTest {
 
 		Assertions.assertEquals(storage.getUser(),user);
 	}
+
 }

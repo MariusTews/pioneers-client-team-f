@@ -118,5 +118,12 @@ public class GameLobbyViewTest extends ApplicationTest {
 		Assertions.assertEquals(Color.BLUE, label.getTextFill());
 
 		verify(messageService).getAllMessages("games", "g1");
+
+	}
+
+ 	@Override
+	public void stop() throws Exception {
+		super.stop();
+		gameLobbyController =null;
 	}
 }

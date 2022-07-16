@@ -40,7 +40,15 @@ class RulesScreenViewTest extends ApplicationTest {
 
         rulesScreenController.render();
         verify(rulesScreenController,times(1)).render();
+    }
 
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        rulesScreenController = null;
+        lobbyController = null;
+        app = null;
     }
 
 }

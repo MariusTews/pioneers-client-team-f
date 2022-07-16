@@ -189,5 +189,15 @@ class GameScreenControllerTest extends ApplicationTest {
 
         List<String> invalidPos = randomAction.getAllInvalidSettlementCoordinates();
         Assertions.assertEquals(invalidPos.size(), 8);
+
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        gameScreenController = null;
+        randomAction =null;
+        app =null;
     }
 }

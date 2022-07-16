@@ -82,10 +82,9 @@ class LobbyControllerTest extends ApplicationTest {
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
-        File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
+        /*File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
 
-        String avatar = editUserController.encodeFileToBase64Binary(file);
-        System.out.println(avatar);
+        String avatar = editUserController.encodeFileToBase64Binary(file);*/
 
         userSubject = PublishSubject.create();
         gameSubject = PublishSubject.create();
@@ -102,7 +101,7 @@ class LobbyControllerTest extends ApplicationTest {
         when(gameService.findAllGames()).thenReturn(Observable.just(gameList));
 
         List<User> userList = new ArrayList<>();
-        userList.add(new User("0","1", "7", "Bob", "online",avatar, null));
+        userList.add(new User("0","1", "7", "Bob", "online",null, null));
         when(userService.findAllUsers()).thenReturn(Observable.just(userList));
 
         List<Message> messages = new ArrayList<>();
@@ -145,12 +144,13 @@ class LobbyControllerTest extends ApplicationTest {
 
     @Test
     void lobbyEventListenerTest(){
-        File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
 
-        String avatar = editUserController.encodeFileToBase64Binary(file);
-        userSubject.onNext(new Event<>(".created",new User("0","1","8","Tom","online",avatar,
+        /*File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
+
+        String avatar = editUserController.encodeFileToBase64Binary(file);*/
+        userSubject.onNext(new Event<>(".created",new User("0","1","8","Tom","online",null,
                 new ArrayList<>())));
-        userSubject.onNext(new Event<>(".updated",new User("0","1","8","Tom","online",avatar,
+        userSubject.onNext(new Event<>(".updated",new User("0","1","8","Tom","online",null,
                 new ArrayList<>())));
         waitForFxEvents();
 
@@ -206,17 +206,29 @@ class LobbyControllerTest extends ApplicationTest {
     }
 
     @Test
-    void joinGameNullTest(){
+    void joinGameNullTest() {
         when(gameStorage.getId()).thenReturn(null);
-        Game game = new Game("0","1","2", "ert","2",0,true,
-                new GameSettings(2,10));
+        Game game = new Game("0", "1", "2", "ert", "2", 0, true,
+                new GameSettings(2, 10));
 
-        Platform.runLater(new Runnable(){
+        Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 lobbyController.joinGame(game);
             }
         });
 
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        lobbyController =null;
+        editUserController = null;
+        app = null;
+        messageSubject.onComplete();
+        userSubject.onComplete();
+        gameSubject.onComplete();
+        groupSubject.onComplete();
     }
 }

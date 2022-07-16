@@ -69,6 +69,16 @@ public class WinnerControllerTest extends ApplicationTest {
         Assertions.assertThat(loserTitel.getText()).isEqualTo("Loser");
 
         Assertions.assertThat(!userNamePAndV.isEmpty()).isTrue();
+
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        lobbyController = null;
+        userNamePAndV.clear();
+        pointsAndValues = null;
     }
 
 }

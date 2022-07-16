@@ -12,10 +12,11 @@ import org.testfx.framework.junit5.ApplicationTest;
 
 public class LoginViewTest extends ApplicationTest {
 
+    App app;
     @Override
     public void start(Stage stage) {
         // start application
-        App app = new App();
+        app = new App();
         app.start(stage);
     }
 
@@ -40,5 +41,12 @@ public class LoginViewTest extends ApplicationTest {
         clickOn(passwordField);
         write("test");
         Assertions.assertThat(passwordField.getText()).isEqualTo("test");
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        app = null;
     }
 }

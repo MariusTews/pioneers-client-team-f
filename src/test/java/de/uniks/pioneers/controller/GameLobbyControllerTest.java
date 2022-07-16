@@ -127,6 +127,16 @@ class GameLobbyControllerTest extends ApplicationTest {
         memberSubject.onNext(new Event<>(".created",new Member("02022-11-30T19:35:24.00Z","7","01","8",false,null,false)));
         memberSubject.onNext(new Event<>(".updated",new Member("2022-11-30T19:35:24.00Z","7","01","8",true,"#ff0000",false)));
         waitForFxEvents();
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        gameLobbyController=null;
+        app = null;
+        messageSubject.onComplete();
+        memberSubject.onComplete();
     }
 
 }

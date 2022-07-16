@@ -32,5 +32,12 @@ public class UserListSubControllerTest extends ApplicationTest {
 
 		Assertions.assertThat(usernameLabel.getText()).isEqualTo("username");
 		Assertions.assertThat(statusCircle.getFill()).isEqualTo(Color.WHITE);
+
+	}
+
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		userListSubController =null;
 	}
 }

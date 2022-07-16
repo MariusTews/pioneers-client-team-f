@@ -288,7 +288,7 @@ public class GameLobbyController implements Controller {
         if (this.messageViewSubController != null) {
             this.messageViewSubController.destroy();
         }
-        disposable.dispose();
+        disposable.clear();
     }
 
     @Override
