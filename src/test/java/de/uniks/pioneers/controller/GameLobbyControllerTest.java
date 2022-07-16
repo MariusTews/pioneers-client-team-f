@@ -63,6 +63,8 @@ class GameLobbyControllerTest extends ApplicationTest {
     public void start(Stage stage) {
         memberSubject = PublishSubject.create();
         messageSubject = PublishSubject.create();
+
+
         List<Member> members = new ArrayList<>();
         members.add(new Member("2022-11-30T18:35:24.00Z","1:00","87","7",true,"ffa500",false));
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(members));
@@ -119,6 +121,7 @@ class GameLobbyControllerTest extends ApplicationTest {
 
     @Test
     void eventListenerTest(){
+        when(userService.findOne("8")).thenReturn(Observable.just(new User("2022-11-30T18:35:24.00Z","1:00","7","Bob","online",null,null)));
         messageSubject.onNext(new Event<>(".created",new Message("2022-11-30T18:35:24.00Z","1","14","7","test")));
         messageSubject.onNext(new Event<>(".created",new Message("2022-11-30T18:35:24.00Z","1","14","7","test 123")));
 
