@@ -134,5 +134,12 @@ class CreateGameControllerTest extends ApplicationTest {
 		Assertions.assertFalse(minus.isVisible());
 		clickOn(plus);
 		Assertions.assertTrue(minus.isVisible());
+
+	}
+
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		createGameController = null;
 	}
 }

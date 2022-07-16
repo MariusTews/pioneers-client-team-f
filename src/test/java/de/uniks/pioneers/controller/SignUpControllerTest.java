@@ -62,6 +62,13 @@ class SignUpControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
 
         verify(userService).register("Bob", null, "bobbob111");
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        signUpController = null;
     }
 
 }

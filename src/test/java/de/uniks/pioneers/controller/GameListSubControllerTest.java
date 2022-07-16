@@ -30,5 +30,12 @@ public class GameListSubControllerTest extends ApplicationTest {
 		Button joinButton = lookup("#joinButton").query();
 		Assertions.assertThat(gameName.getText()).isEqualTo("gamename");
 		Assertions.assertThat(joinButton.getText()).isEqualTo("join");
+
+	}
+
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		gameListSubController = null;
 	}
 }

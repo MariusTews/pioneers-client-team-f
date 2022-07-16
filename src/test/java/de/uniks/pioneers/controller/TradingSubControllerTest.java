@@ -191,5 +191,13 @@ public class TradingSubControllerTest extends ApplicationTest {
 
         Assertions.assertEquals(receiveMarsLabel.getText(), "0");
         Assertions.assertEquals(giveCactusLabel.getText(), "0");
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        resources.clear();
+        tradingSubController =null;
     }
 }

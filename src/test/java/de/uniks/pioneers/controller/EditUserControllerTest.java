@@ -118,5 +118,13 @@ class EditUserControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
         verify(userService).userUpdate("01","Alice",avatar,new ArrayList<>(),"online","12345678");
         type(KeyCode.SPACE);
+
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        editUserController = null;
     }
 }

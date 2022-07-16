@@ -191,7 +191,7 @@ public class LobbyController implements Controller {
         this.gameSubCons.clear();
         this.directChatStorages.clear();
 
-        disposable.dispose();
+        disposable.clear();
     }
 
     //call this method every 30 minutes to refresh refreshToken and ActiveToken

@@ -269,5 +269,12 @@ class DiscardResourcesControllerTest extends ApplicationTest {
         clickOn(discardButton);
 
         verify(pioneersService).move("01", DROP_ACTION, null, null, null, null, null, null, this.resources);
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        resources.clear();
     }
 }

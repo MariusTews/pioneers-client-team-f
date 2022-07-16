@@ -288,7 +288,7 @@ public class GameLobbyController implements Controller {
         if (this.messageViewSubController != null) {
             this.messageViewSubController.destroy();
         }
-        disposable.dispose();
+        disposable.clear();
     }
 
     @Override
@@ -356,7 +356,9 @@ public class GameLobbyController implements Controller {
 		userService.statusUpdate(this.idStorage.getID(), "offline").
 				observeOn(FX_SCHEDULER)
 				.subscribe(e -> System.exit(0));
-	}public void leave() {
+	}
+
+    public void leave() {
         gameService
                 .findOneGame(gameStorage.getId())
                 .observeOn(FX_SCHEDULER)

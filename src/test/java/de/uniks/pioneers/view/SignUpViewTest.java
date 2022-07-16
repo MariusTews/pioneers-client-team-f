@@ -19,10 +19,12 @@ class SignUpViewTest extends ApplicationTest {
     @InjectMocks
     SignUpController signUpController;
 
+    App app;
+
     @Override
     public void start(Stage stage) {
         // start application
-        App app = new App(signUpController);
+        app = new App(signUpController);
         app.start(stage);
     }
 
@@ -45,5 +47,13 @@ class SignUpViewTest extends ApplicationTest {
         clickOn(repeatPasswordField);
         write("test");
         Assertions.assertThat(repeatPasswordField.getText()).isEqualTo("test");
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        signUpController = null;
+        app = null;
     }
 }

@@ -60,6 +60,7 @@ public class UserSubViewTest extends ApplicationTest {
         final App app = new App(userSubView);
         app.start(stage);
         testParameters();
+
     }
 
 
@@ -89,5 +90,12 @@ public class UserSubViewTest extends ApplicationTest {
         Label item5 = lookup("#item5").query();
         Assertions.assertThat(item5.getText()).isEqualTo("it5");
         */
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        gameFieldSubController = null;
+        hm.clear();
     }
 }

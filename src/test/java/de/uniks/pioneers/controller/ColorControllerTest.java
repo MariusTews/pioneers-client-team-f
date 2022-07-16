@@ -42,6 +42,14 @@ public class ColorControllerTest extends ApplicationTest {
         verify(colorcontroller).getColor();
 
         Assertions.assertEquals(listLabel,colorcontroller.getColor());
+
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        colorcontroller = null;
     }
 
 

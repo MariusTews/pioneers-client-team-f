@@ -196,5 +196,14 @@ public class LobbyViewTest extends ApplicationTest {
 		Assertions.assertThat(firstChatMessage.getText()).isEqualTo("test: Test Message");
 		Assertions.assertThat(secondChatMessage.getText()).isEqualTo("testus: Test Message2");
 		Assertions.assertThat(thirdChatMessage.getText()).isEqualTo("test: Test Message3");
+
+
+	}
+
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		lobbyController = null;
+		app = null;
 	}
 }

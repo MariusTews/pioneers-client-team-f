@@ -206,7 +206,6 @@ public class CircleSubController implements Controller {
         disposable.dispose();
     }
 
-
     @Override
     public Parent render() {
         //this method needs to be pressed because this subController implements controller therefore the method is empty
