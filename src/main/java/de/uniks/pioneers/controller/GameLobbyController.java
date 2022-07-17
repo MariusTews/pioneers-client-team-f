@@ -120,7 +120,6 @@ public class GameLobbyController implements Controller {
 
     @Override
     public void init() {
-
 		// get all game members
 		memberService
 				.getAllGameMembers(this.gameStorage.getId())
@@ -136,35 +135,7 @@ public class GameLobbyController implements Controller {
 					if (ready >= 2) {
 						idStartGameButton.disableProperty().set(false);
 					}
-					this.userService.findAllUsers().
-							observeOn(FX_SCHEDULER)
-							.subscribe(event -> {
-								for (User user : event) {
-									for (Member member : members) {
-										if (user._id().equals(member.userId())) {
-											this.playerList.add(user);
-										}
-									}
-								}
-								//pushes all the users to spectator
-								//if the player number is greater than 6
-								//this allows unlimited number of spectator.
-								if(this.members.size() > MAX_MEMBERS) {
-									for (Member member : members) {
-										if (member.userId().equals(this.idStorage.getID())
-												&& member.gameId().equals(this.gameStorage.getId())) {
-											memberService.statusUpdate(member.gameId(), member.userId(), true, "#000000", true)
-													.observeOn(FX_SCHEDULER).subscribe(e -> {
-														//makes ready button invisible
-														this.idReadyButton.setText("Not Ready");
-														this.idReadyButton.setDisable(true);
-														this.colorPicker.setDisable(true);
-													});
-											break;
-										}
-									}
-								}
-							});
+					this.initPlayerList();
 				});
 
 		// listen to members
@@ -183,76 +154,9 @@ public class GameLobbyController implements Controller {
 						}
 
 					} else if (event.event().endsWith(DELETED)) {
-						if (members.contains(member)) {
-							members.remove(member);
-						} else {
-							spectatorMember.remove(member);
-						}
-						if (member.userId().equals(idStorage.getID())) {
-							app.show(lobbyController.get());
-						}
-						this.idUserList.getChildren().clear();
-						this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-						this.spectatorViewId.getChildren().clear();
-						this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
-
-						//make sure if members are less than max number, checkbox is visible
-						if(members.size() < MAX_MEMBERS){
-							checkBoxId.disableProperty().set(false);
-						}
-
-
+                        this.deleteMember(member);
 					} else if (event.event().endsWith(UPDATED)) {
-
-						for (Member updatedMember : this.members) {
-							if (updatedMember.userId().equals(member.userId()) && member.spectator()) {
-								spectatorMember.add(member);
-								members.remove(updatedMember);
-								this.playersNumberId.setText("Players " + members.size() + "/6");
-								break;
-							} else if (updatedMember.userId().equals(member.userId())) {
-								this.members.set(this.members.indexOf(updatedMember), member);
-								break;
-							}
-						}
-
-						for (Member upSpectatorMember : this.spectatorMember) {
-							if (upSpectatorMember.userId().equals(member.userId()) && !member.spectator()) {
-								spectatorMember.remove(upSpectatorMember);
-								members.add(member);
-								this.playersNumberId.setText("Players " + members.size() + "/6");
-								break;
-							}
-						}
-						int readyMembers = 0;
-						for (Member members : this.members) {
-							if (members.ready()) {
-								readyMembers += 1;
-							}
-						}
-						for (Member member1 : this.spectatorMember) {
-							if (member1.ready()) {
-								readyMembers += 1;
-							}
-						}
-						this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
-								+ spectatorMember.size());// || members.size() == 0);
-
-                        //checks if combobox has been clicked,if not
-                        //then automatically picks color for the user.
-                        if (colorPicker.getSelectionModel().isEmpty()) {
-                            if (readyMembers == members.size() + spectatorMember.size()) {
-                                giveYourselfColor();
-                            }
-                        }
-
-						//deactivate checkbox if maximum member has been reached
-						checkBoxId.disableProperty().set(members.size() == MAX_MEMBERS);
-
-						this.idUserList.getChildren().clear();
-						this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
-						this.spectatorViewId.getChildren().clear();
-						this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
+                        this.updateMember(member);
 					}
 				}));
 
@@ -335,6 +239,109 @@ public class GameLobbyController implements Controller {
         idChatContainer.getChildren().setAll(messageViewSubController.render());
 
         return parent;
+    }
+
+    private void initPlayerList() {
+        this.userService.findAllUsers().
+                observeOn(FX_SCHEDULER)
+                .subscribe(event -> {
+                    for (User user : event) {
+                        for (Member member : members) {
+                            if (user._id().equals(member.userId())) {
+                                this.playerList.add(user);
+                            }
+                        }
+                    }
+                    //pushes all the users to spectator
+                    //if the player number is greater than 6
+                    //this allows unlimited number of spectator.
+                    if(this.members.size() > MAX_MEMBERS) {
+                        for (Member member : members) {
+                            if (member.userId().equals(this.idStorage.getID())
+                                    && member.gameId().equals(this.gameStorage.getId())) {
+                                memberService.statusUpdate(member.gameId(), member.userId(), true, "#000000", true)
+                                        .observeOn(FX_SCHEDULER).subscribe(e -> {
+                                            //makes ready button invisible
+                                            this.idReadyButton.setText("Not Ready");
+                                            this.idReadyButton.setDisable(true);
+                                            this.colorPicker.setDisable(true);
+                                        });
+                                break;
+                            }
+                        }
+                    }
+                });
+    }
+    private void deleteMember(Member member) {
+        if (members.contains(member)) {
+            members.remove(member);
+        } else {
+            spectatorMember.remove(member);
+        }
+        if (member.userId().equals(idStorage.getID())) {
+            app.show(lobbyController.get());
+        }
+        this.idUserList.getChildren().clear();
+        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+        this.spectatorViewId.getChildren().clear();
+        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
+
+        //make sure if members are less than max number, checkbox is visible
+        if(members.size() < MAX_MEMBERS){
+            checkBoxId.disableProperty().set(false);
+        }
+
+    }
+    private void updateMember(Member member) {
+        for (Member updatedMember : this.members) {
+            if (updatedMember.userId().equals(member.userId()) && member.spectator()) {
+                spectatorMember.add(member);
+                members.remove(updatedMember);
+                this.playersNumberId.setText("Players " + members.size() + "/6");
+                break;
+            } else if (updatedMember.userId().equals(member.userId())) {
+                this.members.set(this.members.indexOf(updatedMember), member);
+                break;
+            }
+        }
+
+        for (Member upSpectatorMember : this.spectatorMember) {
+            if (upSpectatorMember.userId().equals(member.userId()) && !member.spectator()) {
+                spectatorMember.remove(upSpectatorMember);
+                members.add(member);
+                this.playersNumberId.setText("Players " + members.size() + "/6");
+                break;
+            }
+        }
+        int readyMembers = 0;
+        for (Member members : this.members) {
+            if (members.ready()) {
+                readyMembers += 1;
+            }
+        }
+        for (Member member1 : this.spectatorMember) {
+            if (member1.ready()) {
+                readyMembers += 1;
+            }
+        }
+        this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
+                + spectatorMember.size());// || members.size() == 0);
+
+        //checks if combobox has been clicked,if not
+        //then automatically picks color for the user.
+        if (colorPicker.getSelectionModel().isEmpty()) {
+            if (readyMembers == members.size() + spectatorMember.size()) {
+                giveYourselfColor();
+            }
+        }
+
+        //deactivate checkbox if maximum member has been reached
+        checkBoxId.disableProperty().set(members.size() == MAX_MEMBERS);
+
+        this.idUserList.getChildren().clear();
+        this.idUserList.getChildren().setAll(members.stream().map(this::renderMember).toList());
+        this.spectatorViewId.getChildren().clear();
+        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectatorMember).toList());
     }
 
     //This makes sure the user is offline
