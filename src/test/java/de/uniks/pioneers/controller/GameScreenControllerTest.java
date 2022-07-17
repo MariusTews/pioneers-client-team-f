@@ -68,7 +68,6 @@ class GameScreenControllerTest extends ApplicationTest {
     Subject<Event<Member>> memberSubject;
 
 
-
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
         stateSubject = PublishSubject.create();
@@ -78,26 +77,26 @@ class GameScreenControllerTest extends ApplicationTest {
         messageSubject = PublishSubject.create();
         memberSubject = PublishSubject.create();
 
-        when(eventListener.listen("games.02.state.*",State.class)).thenReturn(stateSubject);
-        when(eventListener.listen("games.02.moves.*.created",Move.class)).thenReturn(moveSubject);
-        when(eventListener.listen("games.02.players.*.*",Player.class)).thenReturn(playerSubject);
-        when(eventListener.listen("games.02.buildings.*.*",Building.class)).thenReturn(buildingSubject);
-        when(eventListener.listen("games.02.messages.*.*",Message.class)).thenReturn(messageSubject);
-        when(eventListener.listen("games.02.members.*.*",Member.class)).thenReturn(memberSubject);
+        when(eventListener.listen("games.02.state.*", State.class)).thenReturn(stateSubject);
+        when(eventListener.listen("games.02.moves.*.created", Move.class)).thenReturn(moveSubject);
+        when(eventListener.listen("games.02.players.*.*", Player.class)).thenReturn(playerSubject);
+        when(eventListener.listen("games.02.buildings.*.*", Building.class)).thenReturn(buildingSubject);
+        when(eventListener.listen("games.02.messages.*.*", Message.class)).thenReturn(messageSubject);
+        when(eventListener.listen("games.02.members.*.*", Member.class)).thenReturn(memberSubject);
 
         List<User> users = new ArrayList<>();
-        users.add(new User("0","1","01","Bob","online",null,null));
+        users.add(new User("0", "1", "01", "Bob", "online", null, null));
 
         when(userService.findAllUsers()).thenReturn(Observable.just(users));
-        when(messageService.getAllMessages(any(),any())).thenReturn(Observable.just(Collections.singletonList(null)));
+        when(messageService.getAllMessages(any(), any())).thenReturn(Observable.just(Collections.singletonList(null)));
 
         when(gameStorage.getId()).thenReturn("02");
         when(gameStorage.getSize()).thenReturn(2);
         when(idStorage.getID()).thenReturn("01");
 
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
-        List<Player> players =new ArrayList<>();
-        players.add(new Player("02","01","ffff00",true,3,null,null,2,2,null));
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null));
         when(pioneersService.findAllPlayers(any())).thenReturn(Observable.just(players));
         Map map = new Map("02", createMap(), createHarbors());
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
@@ -230,18 +229,17 @@ class GameScreenControllerTest extends ApplicationTest {
     }
 
     @Test
-    void eventListenerTest(){
+    void eventListenerTest() {
 
         ExpectedMove ex = new ExpectedMove("founding-settlement-1", Collections.singletonList("01"));
-        stateSubject.onNext(new Event<>(".updated",new State("0","02", Collections.singletonList(ex),new Point3D(0,0,0))));
+        stateSubject.onNext(new Event<>(".updated", new State("0", "02", Collections.singletonList(ex), new Point3D(0, 0, 0))));
         waitForFxEvents();
-        buildingSubject.onNext(new Event<>(".created",new Building(1,1,-2,"79",6,"Settlement","02","01")));
+        buildingSubject.onNext(new Event<>(".created", new Building(1, 1, -2, "79", 6, "Settlement", "02", "01")));
         waitForFxEvents();
-        moveSubject.onNext(new Event<>(".created",new Move("0","1","02","01","roll",8,null,null,null,null)));
-        moveSubject.onNext(new Event<>(".created",new Move("0","1","02","01","build",8,null,null,null,null)));
-        System.out.println();
+        moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "roll", 8, null, null, null, null)));
+        moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "build", 8, null, null, null, null)));
 
-        playerSubject.onNext(new Event<>(".updated",new Player("02","01","ffff00",true,3,null,null,2,2,null)));
+        playerSubject.onNext(new Event<>(".updated", new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null)));
         waitForFxEvents();
 
     }
