@@ -693,42 +693,44 @@ public class GameScreenController implements Controller {
 
     public void handleExpiredTime() {
         //current Move is founding-settlement
-        if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
-            //get foundingPhase (1 or 2)
-            String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
-            // place random settlement
-            this.calculateMove.calculateSettlement("founding-settlement-" + foundingPhase);
+        if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name())) {
+            if (nextMoveLabel.getText().startsWith("Place-UFO")) {
+                //get foundingPhase (1 or 2)
+                String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
+                // place random settlement
+                this.calculateMove.calculateSettlement("founding-settlement-" + foundingPhase);
 
-            //current Move is founding-road
-        } else if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-Tube-")) {
-            //get foundingPhase (1 or 2)
-            String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
+                //current Move is founding-road
+            } else if (nextMoveLabel.getText().startsWith("Place-Tube-")) {
+                //get foundingPhase (1 or 2)
+                String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
-            // calculate and place random road
-            this.calculateMove.calculateRoad(this.lastBuildingPosition, "founding-road-" + foundingPhase);
-        } else if (nextMoveLabel.getText().equals("roll")) {
-            // player needs to roll and skips his turn if the timer reached 0 seconds
-            diceRoll();
-            finishTurn();
-        } else if (nextMoveLabel.getText().equals(ROB_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            this.calculateMove.automaticRob(this.idStorage.getID());
-            mapPane.getScene().setCursor(Cursor.DEFAULT);
-        } else if (nextMoveLabel.getText().equals(DROP_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            // get the current stage for closing the discard window
-            discard.getPrimaryStage().close();
-            this.calculateMove.automaticDrop(playerOwnView.get(0).resources());
-        } else if(nextMoveLabel.getText().equals("offer") && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            pioneersService
-                    .tradePlayer(gameStorage.getId(), "offer", null, null)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe();
-        } else if (nextMoveLabel.getText().equals("accept") && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            pioneersService
-                    .tradePlayer(gameStorage.getId(), "accept", null, null)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe();
-        } else {
-            finishTurn();
+                // calculate and place random road
+                this.calculateMove.calculateRoad(this.lastBuildingPosition, "founding-road-" + foundingPhase);
+            } else if (nextMoveLabel.getText().equals("roll")) {
+                // player needs to roll and skips his turn if the timer reached 0 seconds
+                diceRoll();
+                finishTurn();
+            } else if (nextMoveLabel.getText().equals(ROB_ACTION)) {
+                this.calculateMove.automaticRob(this.idStorage.getID());
+                mapPane.getScene().setCursor(Cursor.DEFAULT);
+            } else if (nextMoveLabel.getText().equals(DROP_ACTION)) {
+                // get the current stage for closing the discard window
+                discard.getPrimaryStage().close();
+                this.calculateMove.automaticDrop(playerOwnView.get(0).resources());
+            } else if (nextMoveLabel.getText().equals("offer")) {
+                pioneersService
+                        .tradePlayer(gameStorage.getId(), "offer", null, null)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+            } else if (nextMoveLabel.getText().equals("accept")) {
+                pioneersService
+                        .tradePlayer(gameStorage.getId(), "accept", null, null)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+            } else {
+                finishTurn();
+            }
         }
     }
 
