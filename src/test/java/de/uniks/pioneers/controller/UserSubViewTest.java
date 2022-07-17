@@ -26,36 +26,30 @@ public class UserSubViewTest extends ApplicationTest {
 
     @Spy
     IDStorage idStorage;
-
     @Mock
     GameFieldSubController gameFieldSubController;
     @Mock
     UserService userService;
 
-
-    final HashMap<String, Integer> hm = new HashMap<>(){{
-      put("wool", 2);
-      put("grain", 3);
-      put("ore", 2);
-      put("lumber", 2);
-      put("brick", 6);
-    }
-    };
-
-
+    final HashMap<String, Integer> hm = new HashMap<>() {{
+        put("wool", 2);
+        put("grain", 3);
+        put("ore", 2);
+        put("lumber", 2);
+        put("brick", 6);
+    }};
 
     @InjectMocks
-    UserSubView userSubView = new UserSubView(idStorage,userService,new Player("id","2",
-            "#000000", true, 2, hm, new HashMap<>(),2,2,null), gameFieldSubController, 10);
+    UserSubView userSubView = new UserSubView(idStorage, userService, new Player("id", "2",
+            "#000000", true, 2, hm, new HashMap<>(), 2, 2, null), gameFieldSubController, 10);
 
-
-    public void start(Stage stage){
+    public void start(Stage stage) {
         when(idStorage.getID()).thenReturn("2");
         when(userService.findAllUsers()).thenReturn(Observable.just(List.of(
-                new User("1234","12345","2","testus","online",null, new ArrayList<>()))));
+                new User("1234", "12345", "2", "testus", "online", null, new ArrayList<>()))));
 
-        userSubView = new UserSubView(idStorage,userService,new Player("id","2",
-                "#000000", true, 2, hm, new HashMap<>(),2,10,null), gameFieldSubController, 10);
+        userSubView = new UserSubView(idStorage, userService, new Player("id", "2",
+                "#000000", true, 2, hm, new HashMap<>(), 2, 10, null), gameFieldSubController, 10);
 
         final App app = new App(userSubView);
         app.start(stage);
@@ -65,7 +59,7 @@ public class UserSubViewTest extends ApplicationTest {
 
 
     @Test
-    public void testParameters(){
+    public void testParameters() {
 
         //Todo: this test needs to be fixed the old version of this test wasn't testing anything
         /*
@@ -96,6 +90,8 @@ public class UserSubViewTest extends ApplicationTest {
     public void stop() throws Exception {
         super.stop();
         gameFieldSubController = null;
+        userService = null;
+        idStorage = null;
         hm.clear();
     }
 }

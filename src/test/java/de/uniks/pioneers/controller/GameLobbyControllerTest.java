@@ -41,7 +41,6 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Mock
     GameService gameService;
 
-
     @Mock
     EventListener eventListener;
 
@@ -135,8 +134,15 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Override
     public void stop() throws Exception {
         super.stop();
-        gameLobbyController=null;
+        gameLobbyController = null;
         app = null;
+        idStorage = null;
+        gameStorage = null;
+        eventListener = null;
+        memberService = null;
+        userService = null;
+        messageService = null;
+        gameService = null;
         messageSubject.onComplete();
         memberSubject.onComplete();
     }

@@ -224,8 +224,6 @@ class GameScreenControllerTest extends ApplicationTest {
 
         List<String> invalidPos = randomAction.getAllInvalidSettlementCoordinates();
         Assertions.assertEquals(invalidPos.size(), 8);
-
-
     }
 
     @Test
@@ -247,5 +245,18 @@ class GameScreenControllerTest extends ApplicationTest {
         gameScreenController = null;
         randomAction = null;
         app = null;
+        userService = null;
+        pioneersService = null;
+        messageService = null;
+        memberService = null;
+        eventListener = null;
+        gameStorage = null;
+        idStorage = null;
+        stateSubject.onComplete();
+        moveSubject.onComplete();
+        playerSubject.onComplete();
+        buildingSubject.onComplete();
+        messageSubject.onComplete();
+        memberSubject.onComplete();
     }
 }

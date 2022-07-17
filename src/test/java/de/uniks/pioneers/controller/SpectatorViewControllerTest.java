@@ -15,17 +15,16 @@ import java.util.ArrayList;
 @ExtendWith(MockitoExtension.class)
 public class SpectatorViewControllerTest extends ApplicationTest {
 
-
     @ExtendWith(MockitoExtension.class)
-    public void start(Stage stage){
-        User user = new User(null,null,"2","Tia","offline",null,new ArrayList<>());
+    public void start(Stage stage) {
+        User user = new User(null, null, "2", "Tia", "offline", null, new ArrayList<>());
         SpectatorViewController spectatorViewController = new SpectatorViewController(user);
         final App app = new App(spectatorViewController);
         app.start(stage);
     }
 
     @Test
-    public void testParameters(){
+    public void testParameters() {
         Label userNameLabel = lookup("#spectatorNameId").query();
         Assertions.assertThat(userNameLabel.getText()).isEqualTo("Tia");
     }
