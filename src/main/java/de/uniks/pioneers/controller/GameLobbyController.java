@@ -92,6 +92,7 @@ public class GameLobbyController implements Controller {
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private Game game;
+    private boolean started = false;
 
     @Inject
     public GameLobbyController(App app,
@@ -166,7 +167,11 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(event -> {
                     if (event.event().endsWith("state" + CREATED)) {
-                        changeView();
+                        // Flag needed, otherwise the gameScreenController is initialized twice
+                        if (!started) {
+                            started = true;
+                            changeView();
+                        }
                     }
                 }));
 
@@ -174,7 +179,7 @@ public class GameLobbyController implements Controller {
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
                 userService, messageService, memberIDStorage, memberService);
         messageViewSubController.init();
-    //action when the screen is closed
+        //action when the screen is closed
 		this.app.getStage().setOnCloseRequest(e -> {
 				gameService
 						.findOneGame(gameStorage.getId())
@@ -182,7 +187,6 @@ public class GameLobbyController implements Controller {
 						.subscribe(this::actionOnCloseScreen);
 				e.consume();
 		});
-
 	}
 
     @Override
@@ -241,6 +245,7 @@ public class GameLobbyController implements Controller {
         return parent;
     }
 
+    // initPlayerList, deleteMember and updateMember have to be outsourced in a service class in 4th release.
     private void initPlayerList() {
         this.userService.findAllUsers().
                 observeOn(FX_SCHEDULER)
