@@ -79,9 +79,9 @@ class GameScreenControllerTest extends ApplicationTest {
         remain.put("road", 3);
         Player player = new Player("01", "02", "#00ffff", true, 4, null, remain, 2, 2, null);
         gameScreenController.getGameFieldSubController().getPlayers().add(player);
-        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 7, "02", "road");
-        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "city");
-        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "settlement");
+        //gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 7, "02", "road");
+        //gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "city");
+        //gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "settlement");
     }
 
     List<Tile> createMap() {
