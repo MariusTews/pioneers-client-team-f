@@ -253,7 +253,7 @@ public class GameScreenController implements Controller {
             this.messageViewSubController.destroy();
         }
 
-        disposable.dispose();
+        disposable.clear();
 
         this.opponentSubCons.forEach(OpponentSubController::destroy);
         this.opponentSubCons.clear();
