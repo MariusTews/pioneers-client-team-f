@@ -232,10 +232,7 @@ class GameScreenControllerTest extends ApplicationTest {
     void eventListenerTest() {
 
         ExpectedMove ex = new ExpectedMove("founding-settlement-1", Collections.singletonList("01"));
-        stateSubject.onNext(new Event<>(".updated", new State("0", "02", Collections.singletonList(ex), new Point3D(0, 0, 0))));
-        waitForFxEvents();
-        buildingSubject.onNext(new Event<>(".created", new Building(1, 1, -2, "79", 6, "Settlement", "02", "01")));
-        waitForFxEvents();
+        stateSubject.onNext(new Event<>(".updated", new State("0", "02", Collections.singletonList(ex), null)));
         moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "roll", 8, null, null, null, null)));
         moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "build", 8, null, null, null, null)));
 
