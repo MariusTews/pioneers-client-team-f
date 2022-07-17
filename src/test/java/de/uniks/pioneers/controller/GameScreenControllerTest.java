@@ -178,7 +178,7 @@ class GameScreenControllerTest extends ApplicationTest {
     @Test
     void loadValidPositions() {
         List<String> pos = randomAction.getAllValidPositions();
-        Assertions.assertEquals(pos.size(), 28);
+        Assertions.assertEquals(pos.size(), 24);
     }
 
     @Test
