@@ -102,7 +102,7 @@ class GameScreenControllerTest extends ApplicationTest {
         Map map = new Map("02", createMap(), createHarbors());
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
         when(app.getStage()).thenReturn(new Stage());
-        when(userStorage.getUserList()).thenReturn(List.of(new User("1","2","02", "x", "true", null, null)));
+        when(userStorage.getUserList()).thenReturn(users);
 
         App app = new App(gameScreenController);
         app.start(stage);
