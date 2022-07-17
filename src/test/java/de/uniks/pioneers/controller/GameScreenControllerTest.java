@@ -85,7 +85,7 @@ class GameScreenControllerTest extends ApplicationTest {
     List<Tile> createMap() {
         List<Tile> titles = new ArrayList<>();
         titles.add(new Tile(-2, 2, 0, "fields", 5));
-        titles.add(new Tile(-2, 1, 1, "desert", 5));
+        titles.add(new Tile(-2, 1, 1, "desert", 7));
         titles.add(new Tile(-2, 0, 2, "hills", 5));
         titles.add(new Tile(-1, 2, -1, "mountains", 5));
         titles.add(new Tile(-1, 1, 0, "forest", 5));
@@ -94,8 +94,8 @@ class GameScreenControllerTest extends ApplicationTest {
         titles.add(new Tile(0, 2, -2, "fields", 5));
         titles.add(new Tile(0, 1, -1, "fields", 5));
         titles.add(new Tile(0, 0, 0, "fields", 5));
-        titles.add(new Tile(0, -1, 1, "fields", 5));
-        titles.add(new Tile(0, -2, 2, "fields", 5));
+        titles.add(new Tile(0, -1, 1, "fields", 6));
+        titles.add(new Tile(0, -2, 2, "fields", 8));
         titles.add(new Tile(1, 1, -2, "fields", 5));
         titles.add(new Tile(1, 0, -1, "fields", 5));
         titles.add(new Tile(1, -1, 0, "fields", 5));
@@ -110,6 +110,14 @@ class GameScreenControllerTest extends ApplicationTest {
     List<Harbor> createHarbors() {
         List<Harbor> harbors = new ArrayList<>();
         harbors.add(new Harbor(2, 0, -2, null, 1));
+        // create Resource Harbors
+        harbors.add(new Harbor(2, 0, -2, "grain", 3));
+        harbors.add(new Harbor(2, 0, -2, "brick", 5));
+        harbors.add(new Harbor(0, -2, 2, "ore", 7));
+        harbors.add(new Harbor(-2, 0, 2, "lumber", 9));
+        harbors.add(new Harbor(-2, 2, 0, "wool", 11));
+
+
         return harbors;
     }
 
