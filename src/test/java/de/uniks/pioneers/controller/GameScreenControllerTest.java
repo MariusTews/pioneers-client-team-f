@@ -111,12 +111,12 @@ class GameScreenControllerTest extends ApplicationTest {
         List<Harbor> harbors = new ArrayList<>();
         harbors.add(new Harbor(2, 0, -2, null, 1));
         // create Resource Harbors
+
         harbors.add(new Harbor(2, 0, -2, "grain", 3));
-        harbors.add(new Harbor(2, 0, -2, "brick", 5));
+        harbors.add(new Harbor(0, -2, 2, "brick", 5));
         harbors.add(new Harbor(0, -2, 2, "ore", 7));
         harbors.add(new Harbor(-2, 0, 2, "lumber", 9));
         harbors.add(new Harbor(-2, 2, 0, "wool", 11));
-
 
         return harbors;
     }
@@ -199,6 +199,12 @@ class GameScreenControllerTest extends ApplicationTest {
         Assertions.assertEquals(invalidPos.size(), 8);
 
 
+    }
+
+    @Test
+    void zoomMap() {
+        clickOn("#zoomOut");
+        clickOn("#zoomIn");
     }
 
     @Override
