@@ -50,7 +50,8 @@ public class RandomAction {
                         x, y, z, side,
                         "settlement", null, null)
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result -> calculateRoad(selectedSettlementPosition,expectedMove));
+                .subscribe(result -> calculateRoad(selectedSettlementPosition, "founding-road-"
+                        + expectedMove.charAt(expectedMove.length()-1)));
     }
 
     public void calculateRoad(String lastBuildingPosition, String expectedMove) {
