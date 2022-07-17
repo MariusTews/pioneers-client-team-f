@@ -39,6 +39,8 @@ class GameScreenControllerTest extends ApplicationTest {
     MemberService memberService;
     @Mock
     EventListener eventListener;
+    @Mock
+    UserStorage userStorage;
 
     @Mock
     App app;
@@ -60,12 +62,12 @@ class GameScreenControllerTest extends ApplicationTest {
         when(gameStorage.getId()).thenReturn("02");
         when(gameStorage.getSize()).thenReturn(2);
         when(idStorage.getID()).thenReturn("01");
-
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
         Map map = new Map("02", createMap(), createHarbors());
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
         when(app.getStage()).thenReturn(new Stage());
+        when(userStorage.getUserList()).thenReturn(List.of(new User("1","2","02", "x", "true", null, null)));
 
         App app = new App(gameScreenController);
         app.start(stage);
