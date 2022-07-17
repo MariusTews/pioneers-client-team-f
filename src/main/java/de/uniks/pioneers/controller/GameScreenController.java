@@ -38,6 +38,7 @@ import static de.uniks.pioneers.computation.CalculateMap.createId;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameScreenController implements Controller {
 
+    private final UserStorage userStorage;
     private List<CircleSubController> circleSubControllers = new ArrayList<>();
 
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
@@ -51,7 +52,7 @@ public class GameScreenController implements Controller {
     private final Provider<LobbyController> lobbyController;
 
     //all Users
-    private final ArrayList<User> allUser = new ArrayList<>();
+    private final List<User> allUser = new ArrayList<>();
 
     @FXML
     public ScrollPane mapPane;
@@ -130,7 +131,8 @@ public class GameScreenController implements Controller {
                                 UserService userService,
                                 GameService gameService,
                                 MessageService messageService,
-                                MemberService memberService) {
+                                MemberService memberService,
+                                UserStorage userStorage) {
         this.lobbyController = lobbyController;
         this.app = app;
         this.gameStorage = gameStorage;
@@ -142,6 +144,7 @@ public class GameScreenController implements Controller {
         this.messageService = messageService;
         this.memberIDStorage = memberIDStorage;
         this.memberService = memberService;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -149,65 +152,60 @@ public class GameScreenController implements Controller {
         // For later : userHash is needed in MessageViewSubController too,
         // improvement would be to not initialize the hash twice.
         // Get all users for the username and avatar. Save in HashMap to find the user by his/her ID
-        userService
-                .findAllUsers()
+        this.allUser.addAll(this.userStorage.getUserList());
+        for (User user : this.allUser) {
+            this.userHash.put(user._id(), user);
+        }
+
+        //get all the members
+        memberService
+                .getAllGameMembers(gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    this.allUser.addAll(result);
-                    for (User user : result) {
-                        this.userHash.put(user._id(), user);
+                .subscribe(c -> {
+                    for (Member member : c) {
+                        if (member.spectator() && member.gameId().equals(this.gameStorage.getId())) {
+                            this.spectatorMember.add(member);
+                        }
                     }
+                    //Added to prevent 403 error
+                    for (Member m : c) {
+                        if (!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
+                                m.userId().equals(this.idStorage.getID())) {
+                            //get access to it
 
-                    //get all the members
-                    memberService
-                            .getAllGameMembers(gameStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(c -> {
-                                for (Member member : c) {
-                                    if (member.spectator() && member.gameId().equals(this.gameStorage.getId())) {
-                                        this.spectatorMember.add(member);
-                                    }
-                                }
-                                //Added to prevent 403 error
-                                for (Member m : c) {
-                                    if (!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
-                                            m.userId().equals(this.idStorage.getID())) {
-                                        //get access to it
-
-                                        // Check if expected move is founding-roll after joining the game
-                                        pioneersService
-                                                .findOneState(gameStorage.getId())
-                                                .observeOn(FX_SCHEDULER)
-                                                .subscribe(r -> {
-                                                    if (!r.expectedMoves().isEmpty()) {
-                                                        if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                                            foundingDiceRoll();
-                                                        }
-                                                    }
-                                                });
-                                        break;
-                                    }
-                                }
-                                this.members.setAll(c);
-                            });
-
-                    pioneersService
-                            .findAllPlayers(this.gameStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(c -> {
-                                for (Member member : this.members) {
-                                    for (Player player : c) {
-                                        //this checks if the player is opponent or spectator or yourself
-                                        if (!player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId())) {
-                                            opponents.add(player);
-                                        } else if (player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId())) {
-                                            playerOwnView.add(player);
+                            // Check if expected move is founding-roll after joining the game
+                            pioneersService
+                                    .findOneState(gameStorage.getId())
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(r -> {
+                                        if (!r.expectedMoves().isEmpty()) {
+                                            if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                                foundingDiceRoll();
+                                            }
                                         }
-                                    }
-                                }
-                            });
+                                    });
+                            break;
+                        }
+                    }
+                    this.members.setAll(c);
+                });
+
+        pioneersService
+                .findAllPlayers(this.gameStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(c -> {
+                    for (Member member : this.members) {
+                        for (Player player : c) {
+                            //this checks if the player is opponent or spectator or yourself
+                            if (!player.userId().equals(idStorage.getID()) && member.userId()
+                                    .equals(player.userId())) {
+                                opponents.add(player);
+                            } else if (player.userId().equals(idStorage.getID()) && member.userId()
+                                    .equals(player.userId())) {
+                                playerOwnView.add(player);
+                            }
+                        }
+                    }
                 });
 
         // Listen to the State to handle the event
@@ -517,10 +515,10 @@ public class GameScreenController implements Controller {
     private void handleStateEvents(Event<State> stateEvent) {
         State state = stateEvent.data();
         if (!state.expectedMoves().isEmpty()) {
-            if(circleSubControllers.isEmpty()) {
+            if (circleSubControllers.isEmpty()) {
                 this.circleSubControllers = this.getGameFieldSubController().getCirclesSubCons();
             }
-            for (CircleSubController subController: this.circleSubControllers) {
+            for (CircleSubController subController : this.circleSubControllers) {
                 subController.setNextMove(state.expectedMoves().get(0));
             }
         }
@@ -693,42 +691,44 @@ public class GameScreenController implements Controller {
 
     public void handleExpiredTime() {
         //current Move is founding-settlement
-        if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-UFO")) {
-            //get foundingPhase (1 or 2)
-            String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
-            // place random settlement
-            this.calculateMove.calculateSettlement("founding-settlement-" + foundingPhase);
+        if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name())) {
+            if (nextMoveLabel.getText().startsWith("Place-UFO")) {
+                //get foundingPhase (1 or 2)
+                String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
+                // place random settlement
+                this.calculateMove.calculateSettlement("founding-settlement-" + foundingPhase);
 
-            //current Move is founding-road
-        } else if (currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) && nextMoveLabel.getText().startsWith("Place-Tube-")) {
-            //get foundingPhase (1 or 2)
-            String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
+                //current Move is founding-road
+            } else if (nextMoveLabel.getText().startsWith("Place-Tube-")) {
+                //get foundingPhase (1 or 2)
+                String foundingPhase = nextMoveLabel.getText().substring(nextMoveLabel.getText().length() - 1);
 
-            // calculate and place random road
-            this.calculateMove.calculateRoad(this.lastBuildingPosition, "founding-road-" + foundingPhase);
-        } else if (nextMoveLabel.getText().equals("roll")) {
-            // player needs to roll and skips his turn if the timer reached 0 seconds
-            diceRoll();
-            finishTurn();
-        } else if (nextMoveLabel.getText().equals(ROB_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            this.calculateMove.automaticRob(this.idStorage.getID());
-            mapPane.getScene().setCursor(Cursor.DEFAULT);
-        } else if (nextMoveLabel.getText().equals(DROP_ACTION) && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            // get the current stage for closing the discard window
-            discard.getPrimaryStage().close();
-            this.calculateMove.automaticDrop(playerOwnView.get(0).resources());
-        } else if(nextMoveLabel.getText().equals("offer") && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            pioneersService
-                    .tradePlayer(gameStorage.getId(), "offer", null, null)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe();
-        } else if (nextMoveLabel.getText().equals("accept") && currentPlayerLabel.getText().equals(userHash.get(this.idStorage.getID()).name())) {
-            pioneersService
-                    .tradePlayer(gameStorage.getId(), "accept", null, null)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe();
-        } else {
-            finishTurn();
+                // calculate and place random road
+                this.calculateMove.calculateRoad(this.lastBuildingPosition, "founding-road-" + foundingPhase);
+            } else if (nextMoveLabel.getText().equals("roll")) {
+                // player needs to roll and skips his turn if the timer reached 0 seconds
+                diceRoll();
+                finishTurn();
+            } else if (nextMoveLabel.getText().equals(ROB_ACTION)) {
+                this.calculateMove.automaticRob(this.idStorage.getID());
+                mapPane.getScene().setCursor(Cursor.DEFAULT);
+            } else if (nextMoveLabel.getText().equals(DROP_ACTION)) {
+                // get the current stage for closing the discard window
+                discard.getPrimaryStage().close();
+                this.calculateMove.automaticDrop(playerOwnView.get(0).resources());
+            } else if (nextMoveLabel.getText().equals("offer")) {
+                pioneersService
+                        .tradePlayer(gameStorage.getId(), "offer", null, null)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+            } else if (nextMoveLabel.getText().equals("accept")) {
+                pioneersService
+                        .tradePlayer(gameStorage.getId(), "accept", null, null)
+                        .observeOn(FX_SCHEDULER)
+                        .subscribe();
+            } else {
+                finishTurn();
+            }
         }
     }
 
