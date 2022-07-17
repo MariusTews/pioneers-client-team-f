@@ -93,7 +93,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(messageService.getAllMessages(any(), any())).thenReturn(Observable.just(Collections.singletonList(null)));
 
         when(gameStorage.getId()).thenReturn("02");
-        when(gameStorage.getSize()).thenReturn(2);
+        when(gameStorage.getSize()).thenReturn(1);
         when(idStorage.getID()).thenReturn("01");
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         List<Player> players = new ArrayList<>();
@@ -114,39 +114,32 @@ class GameScreenControllerTest extends ApplicationTest {
         remain.put("road", 3);
         Player player = new Player("01", "02", "#00ffff", true, 4, null, remain, 2, 2, null);
         gameScreenController.getGameFieldSubController().getPlayers().add(player);
-        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 7, "02", "road");
-        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "city");
-        gameScreenController.getGameFieldSubController().updateBuildings(1, -1, 0, 6, "02", "settlement");
     }
 
     List<Tile> createMap() {
         List<Tile> titles = new ArrayList<>();
-        titles.add(new Tile(-2, 2, 0, "fields", 5));
-        titles.add(new Tile(-2, 1, 1, "desert", 5));
-        titles.add(new Tile(-2, 0, 2, "hills", 5));
-        titles.add(new Tile(-1, 2, -1, "mountains", 5));
         titles.add(new Tile(-1, 1, 0, "forest", 5));
         titles.add(new Tile(-1, 0, 1, "pasture", 5));
-        titles.add(new Tile(-1, -1, 2, "fields", 5));
-        titles.add(new Tile(0, 2, -2, "fields", 5));
-        titles.add(new Tile(0, 1, -1, "fields", 5));
-        titles.add(new Tile(0, 0, 0, "fields", 5));
-        titles.add(new Tile(0, -1, 1, "fields", 5));
-        titles.add(new Tile(0, -2, 2, "fields", 5));
-        titles.add(new Tile(1, 1, -2, "fields", 5));
-        titles.add(new Tile(1, 0, -1, "fields", 5));
-        titles.add(new Tile(1, -1, 0, "fields", 5));
-        titles.add(new Tile(1, -2, 1, "fields", 5));
-        titles.add(new Tile(2, 0, -2, "fields", 5));
-        titles.add(new Tile(2, -1, -1, "fields", 5));
-        titles.add(new Tile(2, -2, 0, "fields", 5));
+        titles.add(new Tile(0, 1, -1, "desert", 7));
+        titles.add(new Tile(0, 0, 0, "hills", 5));
+        titles.add(new Tile(0, -1, 1, "fields", 6));
+        titles.add(new Tile(1, 0, -1, "fields", 8));
+        titles.add(new Tile(1, -1, 0, "mountain", 5));
 
         return titles;
     }
 
     List<Harbor> createHarbors() {
         List<Harbor> harbors = new ArrayList<>();
-        harbors.add(new Harbor(2, 0, -2, null, 1));
+        harbors.add(new Harbor(1, 0, -1, null, 1));
+        // create Resource Harbors
+
+        harbors.add(new Harbor(1, 0, -1, "grain", 3));
+        harbors.add(new Harbor(0, -1, 1, "brick", 5));
+        harbors.add(new Harbor(0, -1, 1, "ore", 7));
+        harbors.add(new Harbor(-1, 0, 1, "lumber", 9));
+        harbors.add(new Harbor(-1, 1, 0, "wool", 11));
+
         return harbors;
     }
 
@@ -207,7 +200,7 @@ class GameScreenControllerTest extends ApplicationTest {
     @Test
     void loadValidPositions() {
         List<String> pos = randomAction.getAllValidPositions();
-        Assertions.assertEquals(pos.size(), 54);
+        Assertions.assertEquals(pos.size(), 24);
     }
 
     @Test
@@ -239,6 +232,12 @@ class GameScreenControllerTest extends ApplicationTest {
         playerSubject.onNext(new Event<>(".updated", new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null)));
         waitForFxEvents();
 
+    }
+
+    @Test
+    void zoomMap() {
+        clickOn("#zoomOut");
+        clickOn("#zoomIn");
     }
 
     @Override
