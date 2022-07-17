@@ -38,6 +38,7 @@ import static de.uniks.pioneers.computation.CalculateMap.createId;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameScreenController implements Controller {
 
+    private final UserStorage userStorage;
     private List<CircleSubController> circleSubControllers = new ArrayList<>();
 
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
@@ -51,7 +52,7 @@ public class GameScreenController implements Controller {
     private final Provider<LobbyController> lobbyController;
 
     //all Users
-    private final ArrayList<User> allUser = new ArrayList<>();
+    private final List<User> allUser = new ArrayList<>();
 
     @FXML
     public ScrollPane mapPane;
@@ -130,7 +131,8 @@ public class GameScreenController implements Controller {
                                 UserService userService,
                                 GameService gameService,
                                 MessageService messageService,
-                                MemberService memberService) {
+                                MemberService memberService,
+                                UserStorage userStorage) {
         this.lobbyController = lobbyController;
         this.app = app;
         this.gameStorage = gameStorage;
@@ -142,6 +144,7 @@ public class GameScreenController implements Controller {
         this.messageService = messageService;
         this.memberIDStorage = memberIDStorage;
         this.memberService = memberService;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -149,65 +152,60 @@ public class GameScreenController implements Controller {
         // For later : userHash is needed in MessageViewSubController too,
         // improvement would be to not initialize the hash twice.
         // Get all users for the username and avatar. Save in HashMap to find the user by his/her ID
-        userService
-                .findAllUsers()
+        this.allUser.addAll(this.userStorage.getUserList());
+        for (User user : this.allUser) {
+            this.userHash.put(user._id(), user);
+        }
+
+        //get all the members
+        memberService
+                .getAllGameMembers(gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
-                .subscribe(result -> {
-                    this.allUser.addAll(result);
-                    for (User user : result) {
-                        this.userHash.put(user._id(), user);
+                .subscribe(c -> {
+                    for (Member member : c) {
+                        if (member.spectator() && member.gameId().equals(this.gameStorage.getId())) {
+                            this.spectatorMember.add(member);
+                        }
                     }
+                    //Added to prevent 403 error
+                    for (Member m : c) {
+                        if (!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
+                                m.userId().equals(this.idStorage.getID())) {
+                            //get access to it
 
-                    //get all the members
-                    memberService
-                            .getAllGameMembers(gameStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(c -> {
-                                for (Member member : c) {
-                                    if (member.spectator() && member.gameId().equals(this.gameStorage.getId())) {
-                                        this.spectatorMember.add(member);
-                                    }
-                                }
-                                //Added to prevent 403 error
-                                for (Member m : c) {
-                                    if (!m.spectator() && m.gameId().equals(this.gameStorage.getId()) &&
-                                            m.userId().equals(this.idStorage.getID())) {
-                                        //get access to it
-
-                                        // Check if expected move is founding-roll after joining the game
-                                        pioneersService
-                                                .findOneState(gameStorage.getId())
-                                                .observeOn(FX_SCHEDULER)
-                                                .subscribe(r -> {
-                                                    if (!r.expectedMoves().isEmpty()) {
-                                                        if (r.expectedMoves().get(0).action().equals("founding-roll")) {
-                                                            foundingDiceRoll();
-                                                        }
-                                                    }
-                                                });
-                                        break;
-                                    }
-                                }
-                                this.members.setAll(c);
-                            });
-
-                    pioneersService
-                            .findAllPlayers(this.gameStorage.getId())
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe(c -> {
-                                for (Member member : this.members) {
-                                    for (Player player : c) {
-                                        //this checks if the player is opponent or spectator or yourself
-                                        if (!player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId())) {
-                                            opponents.add(player);
-                                        } else if (player.userId().equals(idStorage.getID()) && member.userId()
-                                                .equals(player.userId())) {
-                                            playerOwnView.add(player);
+                            // Check if expected move is founding-roll after joining the game
+                            pioneersService
+                                    .findOneState(gameStorage.getId())
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(r -> {
+                                        if (!r.expectedMoves().isEmpty()) {
+                                            if (r.expectedMoves().get(0).action().equals("founding-roll")) {
+                                                foundingDiceRoll();
+                                            }
                                         }
-                                    }
-                                }
-                            });
+                                    });
+                            break;
+                        }
+                    }
+                    this.members.setAll(c);
+                });
+
+        pioneersService
+                .findAllPlayers(this.gameStorage.getId())
+                .observeOn(FX_SCHEDULER)
+                .subscribe(c -> {
+                    for (Member member : this.members) {
+                        for (Player player : c) {
+                            //this checks if the player is opponent or spectator or yourself
+                            if (!player.userId().equals(idStorage.getID()) && member.userId()
+                                    .equals(player.userId())) {
+                                opponents.add(player);
+                            } else if (player.userId().equals(idStorage.getID()) && member.userId()
+                                    .equals(player.userId())) {
+                                playerOwnView.add(player);
+                            }
+                        }
+                    }
                 });
 
         // Listen to the State to handle the event
@@ -517,10 +515,10 @@ public class GameScreenController implements Controller {
     private void handleStateEvents(Event<State> stateEvent) {
         State state = stateEvent.data();
         if (!state.expectedMoves().isEmpty()) {
-            if(circleSubControllers.isEmpty()) {
+            if (circleSubControllers.isEmpty()) {
                 this.circleSubControllers = this.getGameFieldSubController().getCirclesSubCons();
             }
-            for (CircleSubController subController: this.circleSubControllers) {
+            for (CircleSubController subController : this.circleSubControllers) {
                 subController.setNextMove(state.expectedMoves().get(0));
             }
         }
