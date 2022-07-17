@@ -8,27 +8,55 @@ import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
+import javax.inject.Singleton;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Module
 public class TestModule {
-	@Provides
-	static EventListener eventListener() {
-		return new EventListener(null, null) {
-			@Override
-			public <T> Observable<Event<T>> listen(String pattern, Class<T> type) {
-				return Observable.empty();
-			}
 
-			@Override
-			public void send(Object message) {
-			}
-		};
+	public static final PublishSubject<Event<Member>> memberSubject = PublishSubject.create();
+	public static final PublishSubject<Event<Game>> gameSubject = PublishSubject.create();
+	public static final PublishSubject<Event<User>> userSubject = PublishSubject.create();
+
+	public static final PublishSubject<Event<State>> stateSubject = PublishSubject.create();
+	public static final PublishSubject<Event<Building>> buildingSubject = PublishSubject.create();
+	public static final PublishSubject<Event<Move>> moveSubject = PublishSubject.create();
+	public static final PublishSubject<Event<Player>> playerSubject = PublishSubject.create();
+	public static final PublishSubject<Event<Message>> messageSubject = PublishSubject.create();
+	public static final PublishSubject<Event<Group>> groupSubject = PublishSubject.create();
+
+
+	@Provides
+	@Singleton
+	EventListener eventListener() {
+		EventListener eventListener = mock(EventListener.class);
+
+		when(eventListener.listen("users.*.*", User.class)).thenReturn(userSubject);
+		when(eventListener.listen("games.*.*", Game.class)).thenReturn(gameSubject);
+
+		when(eventListener.listen("games.01.members.*.*", Member.class)).thenReturn(memberSubject);
+		when(eventListener.listen("games.01.*.*", Message.class)).thenReturn(messageSubject);
+		when(eventListener.listen("games.01.messages.*.*", Message.class)).thenReturn(messageSubject);
+
+		when(eventListener.listen("games.01.state.*", State.class)).thenReturn(stateSubject);
+		when(eventListener.listen("games.01.moves.*.created", Move.class)).thenReturn(moveSubject);
+		when(eventListener.listen("games.01.players.*.*", Player.class)).thenReturn(playerSubject);
+		when(eventListener.listen("games.01.buildings.*.*", Building.class)).thenReturn(buildingSubject);
+
+		when(eventListener.listen("group.*.*",Group.class)).thenReturn(groupSubject);
+		when(eventListener.listen("global.627cf3c93496bc00158f3859.messages.*.*",Message.class)).thenReturn(messageSubject);
+
+		return eventListener;
 	}
 
-	@Provides
+		@Provides
 	static UserApiService userApiService() {
 		return new UserApiService() {
 			@Override
@@ -151,7 +179,7 @@ public class TestModule {
 			@Override
 			public Observable<List<Member>> findAll(String gameId) {
 				ArrayList<Member> members = new ArrayList<>();
-				members.add(new Member("0", "0", "01", "10", true, null, false));
+				members.add(new Member("0", "0", "01", "01", true, null, false));
 				members.add(new Member("0", "0", "01", "15", true, null, false));
 				return Observable.just(members);
 			}
@@ -193,7 +221,7 @@ public class TestModule {
 
 			@Override
 			public Observable<Game> findOne(String id) {
-				return Observable.empty();
+				return Observable.just(new Game("0","1","01","TestGame","7",1,false,new GameSettings(1,3)));
 			}
 
 			@Override
@@ -233,14 +261,20 @@ public class TestModule {
 				titles.add(new Tile(2, 0, -2, "fields", 5));
 				titles.add(new Tile(2, -1, -1, "fields", 5));
 				titles.add(new Tile(2, -2, 0, "fields", 5));
-				Map map = new Map("02", titles, null);
+				List<Harbor> harbors = new ArrayList<>();
+				harbors.add( new Harbor(1,0,-1,null,1));
+				Map map = new Map("02", titles,harbors );
 
 				return Observable.just(map);
 			}
 
 			@Override
 			public Observable<List<Player>> findAllPlayers(String gameId) {
-				return Observable.empty();
+				List<Player> players =new ArrayList<>();
+				HashMap<String, Integer> res = new HashMap<>();
+				res.put("lumber",0);
+				players.add(new Player("01","01","#0000ff",true,1,res,null,0,0,null));
+				return Observable.just(players);
 			}
 
 			@Override

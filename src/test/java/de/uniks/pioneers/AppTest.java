@@ -1,9 +1,14 @@
 package de.uniks.pioneers;
 
+import de.uniks.pioneers.dto.Event;
+import de.uniks.pioneers.model.Message;
+import de.uniks.pioneers.model.Player;
+import de.uniks.pioneers.model.State;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.util.WaitForAsyncUtils;
 
 
 public class AppTest extends ApplicationTest {
@@ -53,12 +58,29 @@ public class AppTest extends ApplicationTest {
 
         //test CreateGameScreen
         write("testGame\t");
-        write("12\t\t");
+        write("12\t");
+        type(KeyCode.SPACE);
+        write("\t\t");
+        System.out.println();
+        for(int i =0;i<7;i++){
+            type(KeyCode.SPACE);
+        }
+        System.out.println();
+        write("\t\t");
+
         type(KeyCode.SPACE);
 
         //test gameLobby
-        write("\t\t\t\t\t");
+        WaitForAsyncUtils.waitForFxEvents();
+        System.out.println();
+
+
+        write("\t\t\t\t\t\t");
+        System.out.println();
         type(KeyCode.SPACE);
+        TestModule.messageSubject.onNext(new Event<>("state.created", new Message("2022-11-30T18:35:24.00Z","1","89","01","state.created")));
+        WaitForAsyncUtils.waitForFxEvents();
+        sleep(7000);
 
     }
 }
