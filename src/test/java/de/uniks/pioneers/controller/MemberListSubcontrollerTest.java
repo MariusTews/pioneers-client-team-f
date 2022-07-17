@@ -31,8 +31,6 @@ class MemberListSubcontrollerTest extends ApplicationTest {
         Assertions.assertEquals("ImageView[id=idAvatar, styleClass=image-view]", avatar.toString());
         Assertions.assertEquals("", name.getText());
         Assertions.assertEquals("", ready.getText());
-
-
     }
 
 

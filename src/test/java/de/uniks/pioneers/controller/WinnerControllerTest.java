@@ -39,29 +39,26 @@ public class WinnerControllerTest extends ApplicationTest {
 
     List<String> pointsAndValues;
 
-   final HashMap<String, List<String>> userNamePAndV = new HashMap<>();
-
-
+    final HashMap<String, List<String>> userNamePAndV = new HashMap<>();
 
     @ExtendWith(MockitoExtension.class)
-    public void start(Stage stage){
+    public void start(Stage stage) {
         pointsAndValues = new ArrayList<>();
         pointsAndValues.add("#00000F");
         pointsAndValues.add("10");
-        userNamePAndV.put("Tina",pointsAndValues);
+        userNamePAndV.put("Tina", pointsAndValues);
         pointsAndValues = new ArrayList<>();
         pointsAndValues.add("#0000DF");
         pointsAndValues.add("6");
-        userNamePAndV.put("Syd",pointsAndValues);
+        userNamePAndV.put("Syd", pointsAndValues);
 
-        WinnerController winnerController = new WinnerController(userNamePAndV,null,gameStorage
-                ,idStorage, gameService, app, lobbyController);
+        WinnerController winnerController = new WinnerController(userNamePAndV, null, gameStorage
+                , idStorage, gameService, app, lobbyController);
         winnerController.render();
-
     }
 
     @Test
-    public void testParameters(){
+    public void testParameters() {
         Label winnerTitel = lookup("#winnerTitel").query();
         Assertions.assertThat(winnerTitel.getText()).isEqualTo("Winner");
 
@@ -69,8 +66,6 @@ public class WinnerControllerTest extends ApplicationTest {
         Assertions.assertThat(loserTitel.getText()).isEqualTo("Loser");
 
         Assertions.assertThat(!userNamePAndV.isEmpty()).isTrue();
-
-
     }
 
     @Override
@@ -79,6 +74,10 @@ public class WinnerControllerTest extends ApplicationTest {
         lobbyController = null;
         userNamePAndV.clear();
         pointsAndValues = null;
+        gameStorage = null;
+        idStorage = null;
+        gameService = null;
+        app = null;
     }
 
 }

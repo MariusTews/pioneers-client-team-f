@@ -66,7 +66,7 @@ class EditUserControllerTest extends ApplicationTest {
     }
 
     @Test
-    void deleteUser(){
+    void deleteUser() {
         when(userService.delete(any())).thenReturn(Observable.just(new User("1234","12345","01","Alice","offline",null,new ArrayList<>())));
 
         write("\t\t\t\t");
@@ -118,13 +118,13 @@ class EditUserControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
         verify(userService).userUpdate("01","Alice",avatar,new ArrayList<>(),"online","12345678");
         type(KeyCode.SPACE);
-
-
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
         editUserController = null;
+        idStorage = null;
+        userService = null;
     }
 }

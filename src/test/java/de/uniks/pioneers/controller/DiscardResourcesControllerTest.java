@@ -276,5 +276,6 @@ class DiscardResourcesControllerTest extends ApplicationTest {
     public void stop() throws Exception {
         super.stop();
         resources.clear();
+        pioneersService = null;
     }
 }

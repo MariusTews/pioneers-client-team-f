@@ -41,7 +41,6 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Mock
     GameService gameService;
 
-
     @Mock
     EventListener eventListener;
 
@@ -63,7 +62,6 @@ class GameLobbyControllerTest extends ApplicationTest {
     public void start(Stage stage) {
         memberSubject = PublishSubject.create();
         messageSubject = PublishSubject.create();
-
 
         List<Member> members = new ArrayList<>();
         members.add(new Member("2022-11-30T18:35:24.00Z","1:00","87","7",true,"ffa500",false));
@@ -88,13 +86,10 @@ class GameLobbyControllerTest extends ApplicationTest {
         // start application
         App app = new App(gameLobbyController);
         app.start(stage);
-
     }
-
 
     @Test
     void leave() {
-
         when(idStorage.getID()).thenReturn("4");
         when(memberService.leave("id", "4")).thenReturn(Observable.just(new Member("0:00",
                 "0:30", "id", "4", false, "#000000",false)));
@@ -119,7 +114,7 @@ class GameLobbyControllerTest extends ApplicationTest {
     }
 
     @Test
-    void eventListenerTest(){
+    void eventListenerTest() {
         when(userService.findOne("8")).thenReturn(Observable.just(new User("2022-11-30T18:35:24.00Z","1:00","7","Bob","online",null,null)));
         messageSubject.onNext(new Event<>(".created",new Message("2022-11-30T18:35:24.00Z","1","14","7","test")));
         messageSubject.onNext(new Event<>(".created",new Message("2022-11-30T18:35:24.00Z","1","14","7","test 123")));
@@ -129,14 +124,20 @@ class GameLobbyControllerTest extends ApplicationTest {
         memberSubject.onNext(new Event<>(".created",new Member("02022-11-30T19:35:24.00Z","7","01","8",false,null,false)));
         memberSubject.onNext(new Event<>(".updated",new Member("2022-11-30T19:35:24.00Z","7","01","8",true,"#ff0000",false)));
         waitForFxEvents();
-
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
-        gameLobbyController=null;
+        gameLobbyController = null;
         app = null;
+        idStorage = null;
+        gameStorage = null;
+        eventListener = null;
+        memberService = null;
+        userService = null;
+        messageService = null;
+        gameService = null;
         messageSubject.onComplete();
         memberSubject.onComplete();
     }

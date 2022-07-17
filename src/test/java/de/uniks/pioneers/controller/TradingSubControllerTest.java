@@ -198,6 +198,10 @@ public class TradingSubControllerTest extends ApplicationTest {
     public void stop() throws Exception {
         super.stop();
         resources.clear();
-        tradingSubController =null;
+        tradingSubController = null;
+        pioneersService = null;
+        eventListener = null;
+        gameStorage = null;
+        idStorage = null;
     }
 }

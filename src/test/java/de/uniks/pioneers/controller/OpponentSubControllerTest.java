@@ -57,7 +57,6 @@ public class OpponentSubControllerTest extends ApplicationTest {
         Assertions.assertThat(opponentSubController.getId()).isEqualTo("00");
         Assertions.assertThat(avatarImage.getUrl()).isEqualTo(avatar);
         Assertions.assertThat(vBox).isEqualTo(opponentSubController.getParent());
-
     }
 
     @Override

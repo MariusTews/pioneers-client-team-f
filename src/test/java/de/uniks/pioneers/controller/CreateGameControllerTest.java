@@ -141,5 +141,6 @@ class CreateGameControllerTest extends ApplicationTest {
 	public void stop() throws Exception {
 		super.stop();
 		createGameController = null;
+		gameService = null;
 	}
 }
