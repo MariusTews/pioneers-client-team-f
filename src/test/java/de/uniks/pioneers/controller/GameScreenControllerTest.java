@@ -90,9 +90,9 @@ class GameScreenControllerTest extends ApplicationTest {
         //titles.add(new Tile(-1, 2, -1, "mountains", 5));
         titles.add(new Tile(-1, 1, 0, "forest", 5));
         titles.add(new Tile(-1, 0, 1, "pasture", 5));
-        titles.add(new Tile(-1, -1, 2, "desert", 7));
+        //titles.add(new Tile(-1, -1, 2, "desert", 7));
         //titles.add(new Tile(0, 2, -2, "fields", 5));
-        titles.add(new Tile(0, 1, -1, "fields", 5));
+        titles.add(new Tile(0, 1, -1, "desert", 7));
         titles.add(new Tile(0, 0, 0, "hills", 5));
         titles.add(new Tile(0, -1, 1, "fields", 6));
         //titles.add(new Tile(0, -2, 2, "fields", 8));
