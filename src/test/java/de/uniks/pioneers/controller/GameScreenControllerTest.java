@@ -58,7 +58,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(userService.findAllUsers()).thenReturn(Observable.empty());
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameStorage.getId()).thenReturn("02");
-        when(gameStorage.getSize()).thenReturn(2);
+        when(gameStorage.getSize()).thenReturn(1);
         when(idStorage.getID()).thenReturn("01");
 
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
@@ -84,39 +84,39 @@ class GameScreenControllerTest extends ApplicationTest {
 
     List<Tile> createMap() {
         List<Tile> titles = new ArrayList<>();
-        titles.add(new Tile(-2, 2, 0, "fields", 5));
-        titles.add(new Tile(-2, 1, 1, "desert", 7));
-        titles.add(new Tile(-2, 0, 2, "hills", 5));
-        titles.add(new Tile(-1, 2, -1, "mountains", 5));
+        //titles.add(new Tile(-2, 2, 0, "fields", 5));
+        //titles.add(new Tile(-2, 1, 1, "desert", 7));
+        //titles.add(new Tile(-2, 0, 2, "hills", 5));
+        //titles.add(new Tile(-1, 2, -1, "mountains", 5));
         titles.add(new Tile(-1, 1, 0, "forest", 5));
         titles.add(new Tile(-1, 0, 1, "pasture", 5));
-        titles.add(new Tile(-1, -1, 2, "fields", 5));
-        titles.add(new Tile(0, 2, -2, "fields", 5));
+        titles.add(new Tile(-1, -1, 2, "desert", 7));
+        //titles.add(new Tile(0, 2, -2, "fields", 5));
         titles.add(new Tile(0, 1, -1, "fields", 5));
-        titles.add(new Tile(0, 0, 0, "fields", 5));
+        titles.add(new Tile(0, 0, 0, "hills", 5));
         titles.add(new Tile(0, -1, 1, "fields", 6));
-        titles.add(new Tile(0, -2, 2, "fields", 8));
-        titles.add(new Tile(1, 1, -2, "fields", 5));
-        titles.add(new Tile(1, 0, -1, "fields", 5));
+        //titles.add(new Tile(0, -2, 2, "fields", 8));
+        titles.add(new Tile(1, 1, -2, "mountain", 5));
+        titles.add(new Tile(1, 0, -1, "fields", 8));
         titles.add(new Tile(1, -1, 0, "fields", 5));
-        titles.add(new Tile(1, -2, 1, "fields", 5));
-        titles.add(new Tile(2, 0, -2, "fields", 5));
-        titles.add(new Tile(2, -1, -1, "fields", 5));
-        titles.add(new Tile(2, -2, 0, "fields", 5));
+        //titles.add(new Tile(1, -2, 1, "fields", 5));
+        //titles.add(new Tile(2, 0, -2, "fields", 5));
+        //titles.add(new Tile(2, -1, -1, "fields", 5));
+        //titles.add(new Tile(2, -2, 0, "fields", 5));
 
         return titles;
     }
 
     List<Harbor> createHarbors() {
         List<Harbor> harbors = new ArrayList<>();
-        harbors.add(new Harbor(2, 0, -2, null, 1));
+        harbors.add(new Harbor(1, 0, -1, null, 1));
         // create Resource Harbors
 
-        harbors.add(new Harbor(2, 0, -2, "grain", 3));
-        harbors.add(new Harbor(0, -2, 2, "brick", 5));
-        harbors.add(new Harbor(0, -2, 2, "ore", 7));
-        harbors.add(new Harbor(-2, 0, 2, "lumber", 9));
-        harbors.add(new Harbor(-2, 2, 0, "wool", 11));
+        harbors.add(new Harbor(1, 0, -1, "grain", 3));
+        harbors.add(new Harbor(0, -1, 1, "brick", 5));
+        harbors.add(new Harbor(0, -1, 1, "ore", 7));
+        harbors.add(new Harbor(-1, 0, 1, "lumber", 9));
+        harbors.add(new Harbor(-1, 1, 0, "wool", 11));
 
         return harbors;
     }
@@ -178,7 +178,7 @@ class GameScreenControllerTest extends ApplicationTest {
     @Test
     void loadValidPositions() {
         List<String> pos = randomAction.getAllValidPositions();
-        Assertions.assertEquals(pos.size(), 54);
+        Assertions.assertEquals(pos.size(), 28);
     }
 
     @Test
