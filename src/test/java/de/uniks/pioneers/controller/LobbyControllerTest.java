@@ -49,10 +49,8 @@ class LobbyControllerTest extends ApplicationTest {
     @Mock
     AuthService authService;
 
-
     @Mock
     EventListener eventListener;
-
 
     @Spy
     IDStorage idStorage;
@@ -114,7 +112,6 @@ class LobbyControllerTest extends ApplicationTest {
         when(eventListener.listen("group.*.*",Group.class)).thenReturn(groupSubject);
         when(eventListener.listen("global.627cf3c93496bc00158f3859.messages.*.*",Message.class)).thenReturn(messageSubject);
 
-
         // start application
         app = new App(lobbyController);
         app.start(stage);
@@ -127,7 +124,6 @@ class LobbyControllerTest extends ApplicationTest {
         when(userService.statusUpdate("4", "offline")).thenReturn(Observable.just(new User("1234","12345","id",
                                                     "name", "status", "avatar", new ArrayList<>())));
         when(authService.logout()).thenReturn(Observable.just(new ErrorResponse(123, "error", "message")));
-
 
         write("\t");
         type(KeyCode.SPACE);
@@ -151,7 +147,6 @@ class LobbyControllerTest extends ApplicationTest {
                 new GameSettings(2,10))));
         waitForFxEvents();
 
-
         //members for Group
         List<String> memberForGroup = new ArrayList<>();
         groupSubject.onNext(new Event<>(".created",new Group("1","2","id","ert",memberForGroup)));
@@ -165,11 +160,10 @@ class LobbyControllerTest extends ApplicationTest {
                 "627cf3c93496bc00158f3859","7","no!!")));
         waitForFxEvents();
 
-
     }
 
     @Test
-    void createGameTest(){
+    void createGameTest() {
         when(gameStorage.getId()).thenReturn("id");
         when(idStorage.getID()).thenReturn("3");
         List<Member> memberList =  new ArrayList<>();
@@ -177,11 +171,10 @@ class LobbyControllerTest extends ApplicationTest {
         when(memberService.getAllGameMembers("id")).thenReturn(Observable.just(memberList));
 
         lobbyController.createGameButtonPressed();
-
     }
 
     @Test
-    void joinGameTest(){
+    void joinGameTest() {
         when(gameStorage.getId()).thenReturn("id");
         when(idStorage.getID()).thenReturn("3");
         List<Member> memberList =  new ArrayList<>();
@@ -193,7 +186,6 @@ class LobbyControllerTest extends ApplicationTest {
         lobbyController.joinGame(game);
 
         verify(memberService).getAllGameMembers("id");
-
     }
 
     @Test
@@ -203,19 +195,26 @@ class LobbyControllerTest extends ApplicationTest {
                 new GameSettings(2, 10));
 
         Platform.runLater(() -> lobbyController.joinGame(game));
-
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
-        lobbyController =null;
+        lobbyController = null;
         editUserController = null;
         app = null;
+        userService = null;
+        gameService = null;
+        messageService = null;
+        memberService = null;
+        groupService =  null;
+        authService = null;
+        eventListener = null;
+        idStorage = null;
+        gameStorage = null;
         messageSubject.onComplete();
         userSubject.onComplete();
         gameSubject.onComplete();
         groupSubject.onComplete();
-
     }
 }

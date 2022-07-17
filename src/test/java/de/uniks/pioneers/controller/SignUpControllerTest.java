@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SignUpControllerTest extends ApplicationTest {
 
-
     @Mock
     UserService userService;
 
@@ -62,13 +61,13 @@ class SignUpControllerTest extends ApplicationTest {
         type(KeyCode.SPACE);
 
         verify(userService).register("Bob", null, "bobbob111");
-
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
         signUpController = null;
+        userService = null;
     }
 
 }
