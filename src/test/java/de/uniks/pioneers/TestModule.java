@@ -3,10 +3,10 @@ package de.uniks.pioneers;
 
 import dagger.Module;
 import dagger.Provides;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -50,13 +50,13 @@ public class TestModule {
 		when(eventListener.listen("games.01.players.*.*", Player.class)).thenReturn(playerSubject);
 		when(eventListener.listen("games.01.buildings.*.*", Building.class)).thenReturn(buildingSubject);
 
-		when(eventListener.listen("group.*.*",Group.class)).thenReturn(groupSubject);
-		when(eventListener.listen("global.627cf3c93496bc00158f3859.messages.*.*",Message.class)).thenReturn(messageSubject);
+		when(eventListener.listen("group.*.*", Group.class)).thenReturn(groupSubject);
+		when(eventListener.listen("global.627cf3c93496bc00158f3859.messages.*.*", Message.class)).thenReturn(messageSubject);
 
 		return eventListener;
 	}
 
-		@Provides
+	@Provides
 	static UserApiService userApiService() {
 		return new UserApiService() {
 			@Override
@@ -221,7 +221,7 @@ public class TestModule {
 
 			@Override
 			public Observable<Game> findOne(String id) {
-				return Observable.just(new Game("0","1","01","TestGame","7",1,false,new GameSettings(1,3)));
+				return Observable.just(new Game("0", "1", "01", "TestGame", "7", 1, false, new GameSettings(1, 3)));
 			}
 
 			@Override
@@ -262,18 +262,18 @@ public class TestModule {
 				titles.add(new Tile(2, -1, -1, "fields", 5));
 				titles.add(new Tile(2, -2, 0, "fields", 5));
 				List<Harbor> harbors = new ArrayList<>();
-				harbors.add( new Harbor(1,0,-1,null,1));
-				Map map = new Map("02", titles,harbors );
+				harbors.add(new Harbor(1, 0, -1, null, 1));
+				Map map = new Map("02", titles, harbors);
 
 				return Observable.just(map);
 			}
 
 			@Override
 			public Observable<List<Player>> findAllPlayers(String gameId) {
-				List<Player> players =new ArrayList<>();
+				List<Player> players = new ArrayList<>();
 				HashMap<String, Integer> res = new HashMap<>();
-				res.put("lumber",0);
-				players.add(new Player("01","01","#0000ff",true,1,res,null,0,0,null));
+				res.put("lumber", 0);
+				players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, null));
 				return Observable.just(players);
 			}
 
