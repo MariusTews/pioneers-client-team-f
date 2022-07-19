@@ -2,8 +2,6 @@ package de.uniks.pioneers;
 
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.Message;
-import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.State;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
