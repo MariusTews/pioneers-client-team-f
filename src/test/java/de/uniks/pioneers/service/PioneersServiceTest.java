@@ -58,7 +58,7 @@ public class PioneersServiceTest {
 
 		when(pioneersService.findAllPlayers(any()))
 				.thenReturn(Observable.just(List.of(new Player("2", "12", Color.BLACK.toString(), true,
-						3, resources, remainingBuildings, 2, 2, null))));
+						3, resources, remainingBuildings, 2, 2, null, null))));
 		final List<Player> result = pioneersService.findAllPlayers("2").blockingFirst();
 		Player player = result.get(0);
 
@@ -84,7 +84,7 @@ public class PioneersServiceTest {
 
 		when(pioneersService.findOnePlayer(any(), any()))
 				.thenReturn(Observable.just(new Player("2", "12", Color.BLACK.toString(), true,
-						3, resources, remainingBuildings, 2, 2, null)));
+						3, resources, remainingBuildings, 2, 2, null, null)));
 		final Player player = pioneersService.findOnePlayer("2", "12").blockingFirst();
 
 		assertEquals(player.gameId(), "2");
@@ -154,7 +154,7 @@ public class PioneersServiceTest {
 	public void moveBuild() {
 		when(pioneersApiService.create(any(), any()))
 				.thenReturn(Observable.just(new Move("4", "10", "100", "99", "build",
-						3, "city", null, null, null)));
+						3, "city", null, null, null, null)));
 		final Move result = pioneersService.move("100", "build", 1, 2, 3, 20, "city", null, null).blockingFirst();
 
 		assertEquals(result._id(), "10");
@@ -165,7 +165,7 @@ public class PioneersServiceTest {
 		assertEquals(result.roll(), 3);
 		assertEquals(result.building(), "city");
 
-		verify(pioneersApiService).create("100", new CreateMoveDto("build", null, null, null,
+		verify(pioneersApiService).create("100", new CreateMoveDto("build", null, null, null, null,
 				new CreateBuildingDto(1, 2, 3, 20, "city")));
 	}
 
@@ -173,7 +173,7 @@ public class PioneersServiceTest {
 	public void moveRoll() {
 		when(pioneersApiService.create(any(), any()))
 				.thenReturn(Observable.just(new Move("4", "10", "100", "99", "roll",
-						3, null, null, null, null)));
+						3, null, null, null, null, null)));
 		final Move result = pioneersService.move("100", "roll", null, null, null, null, null, null, null).blockingFirst();
 
 		assertEquals(result._id(), "10");
@@ -184,6 +184,6 @@ public class PioneersServiceTest {
 		assertEquals(result.roll(), 3);
 		assertNull(result.building());
 
-		verify(pioneersApiService).create("100", new CreateMoveDto("roll", null, null, null, null));
+		verify(pioneersApiService).create("100", new CreateMoveDto("roll", null, null, null, null, null));
 	}
 }

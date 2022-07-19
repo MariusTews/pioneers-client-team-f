@@ -61,7 +61,7 @@ public class GameLobbyViewTest extends ApplicationTest {
 		Message x1 = new Message("2022-07-14T22:29:30.318Z", "0", "me1", "u1", "test1");
 		Message x2 = new Message("2022-07-14T22:29:32.318Z", "1", "me2", "u2", "test2");
 
-		Game g = new Game("0", "0", "g1", "g", "u1", 2, true, new GameSettings(2, 10));
+		Game g = new Game("0", "0", "g1", "g", "u1", 2, true, new GameSettings(2, 10, null, false, 0));
 
 		when(gameStorage.getId()).thenReturn("g1");
 		when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(m1, m2).buffer(2));

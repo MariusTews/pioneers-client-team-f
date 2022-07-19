@@ -30,7 +30,7 @@ public class OpponentSubControllerTest extends ApplicationTest {
 
     @InjectMocks
     OpponentSubController opponentSubController = new OpponentSubController(new Player("01", "00",
-            Color.DARKORCHID.toString(), true,6, resources, null,2,2,null),
+            Color.DARKORCHID.toString(), true,6, resources, null,2,2,null, null),
             new User("1234","12345","00", "bob", "online", avatar, null), 4);
 
     @ExtendWith(MockitoExtension.class)

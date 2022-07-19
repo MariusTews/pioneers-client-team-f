@@ -24,9 +24,9 @@ public class GameService {
         this.memberIDStorage = memberIDStorage;
     }
 
-    public Observable<Game> create(String gameName, String password, int mapSize, int victoryPoints) {
+    public Observable<Game> create(String gameName, String password, int mapSize, int victoryPoints, String mapTemplate, boolean roll7, int startingResources) {
         return gamesApiService
-                .create(new CreateGameDto(gameName, false, new GameSettings(mapSize, victoryPoints), password))
+                .create(new CreateGameDto(gameName, false, new GameSettings(mapSize, victoryPoints, mapTemplate, roll7, startingResources), password))
                 .doOnNext(result -> {
                     this.gameStorage.setId(result._id());
 
@@ -42,8 +42,8 @@ public class GameService {
         return this.gamesApiService.findOne(id);
     }
 
-    public Observable<Game> updateGame(String id, String name, String password, String owner, boolean started, int mapSize, int victoryPoints) {
-        return this.gamesApiService.patch(id, new UpdateGameDto(name, owner, started, new GameSettings(mapSize, victoryPoints), password));
+    public Observable<Game> updateGame(String id, String name, String password, String owner, boolean started, int mapSize, int victoryPoints, String mapTemplate, boolean roll7, int startingResources) {
+        return this.gamesApiService.patch(id, new UpdateGameDto(name, owner, started, new GameSettings(mapSize, victoryPoints, mapTemplate, roll7, startingResources), password));
     }
 
     public Observable<Game> deleteGame(String id) {

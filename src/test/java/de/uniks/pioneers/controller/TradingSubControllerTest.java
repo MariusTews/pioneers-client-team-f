@@ -69,7 +69,7 @@ public class TradingSubControllerTest extends ApplicationTest {
 
 
 
-        when(pioneersService.findAllPlayers(any())).thenReturn(Observable.just(new Player("g1", "u1", "b", true, 1, resources, null, 2, 3, null)).buffer(1));
+        when(pioneersService.findAllPlayers(any())).thenReturn(Observable.just(new Player("g1", "u1", "b", true, 1, resources, null, 2, 3, null, null)).buffer(1));
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(new Map("g1", tiles, harbors)));
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameStorage.getId()).thenReturn("g1");
@@ -152,7 +152,7 @@ public class TradingSubControllerTest extends ApplicationTest {
 
     @Test
     public void testOfferBank4to1() {
-        when(pioneersService.tradeBank(any(), any())).thenReturn(Observable.just(new Move("0", "m1", "g1", "u1", "build", 1, null, null, resources, "b1")));
+        when(pioneersService.tradeBank(any(), any())).thenReturn(Observable.just(new Move("0", "m1", "g1", "u1", "build", 1, null, null, resources, "b1", null)));
         Label giveCactusLabel = lookup("#giveCactusLabel").query();
         Label receiveMarsLabel = lookup("#receiveMarsLabel").query();
 
@@ -174,7 +174,7 @@ public class TradingSubControllerTest extends ApplicationTest {
 
     @Test
     public void testOfferPlayer() {
-        when(pioneersService.tradePlayer(any(), any(), any(), any())).thenReturn(Observable.just(new Move("0", "m1", "g1", "u1", "build", 1, null, null, resources, "b1")));
+        when(pioneersService.tradePlayer(any(), any(), any(), any())).thenReturn(Observable.just(new Move("0", "m1", "g1", "u1", "build", 1, null, null, resources, "b1", null)));
         Label giveCactusLabel = lookup("#giveCactusLabel").query();
         Label receiveMarsLabel = lookup("#receiveMarsLabel").query();
 
