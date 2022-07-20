@@ -1,0 +1,14 @@
+/**************** map templates screen specific styles ****************/
+
+.white-title {
+    -fx-text-fill: white;
+    -fx-font-size: 30;
+}
+
+.map-templates-box {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 850 400;
+    -fx-background-color: transparent;
+}

@@ -51,6 +51,7 @@ public class App extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/GameLobbyStyle.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/ChatStyle.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/IngameStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapTemplatesScreenStyle.css")).toString());
 
         setAppIcon(stage);
 

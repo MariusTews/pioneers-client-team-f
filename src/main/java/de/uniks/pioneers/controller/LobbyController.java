@@ -154,7 +154,7 @@ public class LobbyController implements Controller {
     @Override
     public void init() {
 
-        if(this.gameStorage.getId() != null) {
+        if (this.gameStorage.getId() != null) {
             memberService.getAllGameMembers(this.gameStorage.getId())
                     .observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
         }
@@ -164,7 +164,7 @@ public class LobbyController implements Controller {
 
         disposable.add(eventListener.listen("users.*.*", User.class).observeOn(FX_SCHEDULER).subscribe(this::handleUserEvents));
         disposable.add(eventListener.listen("games.*.*", Game.class).observeOn(FX_SCHEDULER).subscribe(this::handleGameEvents));
-		disposable.add(eventListener.listen("group.*.*", Group.class).observeOn(FX_SCHEDULER).subscribe(this::handleGroupEvents));
+        disposable.add(eventListener.listen("group.*.*", Group.class).observeOn(FX_SCHEDULER).subscribe(this::handleGroupEvents));
 
         //listen to messages on lobby on Global channel
         disposable.add(eventListener
@@ -173,13 +173,13 @@ public class LobbyController implements Controller {
                 .subscribe(this::handleAllTabMessages));
 
         //refreshed Token and runs for an hour
-        if(this.gameStorage.getId() == null) {
+        if (this.gameStorage.getId() == null) {
             beepForAHour();
         }
 
         this.app.getStage().setOnCloseRequest(e -> {
-                actionOnclose();
-                e.consume();
+            actionOnclose();
+            e.consume();
         });
     }
 
@@ -197,13 +197,13 @@ public class LobbyController implements Controller {
     //call this method every 30 minutes to refresh refreshToken and ActiveToken
     public void beepForAHour() {
         String refreshToken = this.refreshTokenStorage.getRefreshToken();
-        final Runnable beeper = () ->authService.refreshToken(refreshToken).
-                        observeOn(FX_SCHEDULER).subscribe();
+        final Runnable beeper = () -> authService.refreshToken(refreshToken).
+                observeOn(FX_SCHEDULER).subscribe();
 
         final ScheduledFuture<?> beeperHandle =
-                scheduler.scheduleAtFixedRate(beeper, 10, 30*60, SECONDS);
-        scheduler.schedule(() ->beeperHandle.cancel(true)
-        , 60 * 60, SECONDS);
+                scheduler.scheduleAtFixedRate(beeper, 10, 30 * 60, SECONDS);
+        scheduler.schedule(() -> beeperHandle.cancel(true)
+                , 60 * 60, SECONDS);
     }
 
 
@@ -250,7 +250,6 @@ public class LobbyController implements Controller {
         this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 handleTabSwitching(oldValue, newValue));
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
-
 
 
         return parent;
@@ -457,23 +456,23 @@ public class LobbyController implements Controller {
         }
     }
 
-	// Handle group events, so the users do not end up in different groups when opening the direct chat
-	private void handleGroupEvents(Event<Group> groupEvent) {
-		final Group group = groupEvent.data();
+    // Handle group events, so the users do not end up in different groups when opening the direct chat
+    private void handleGroupEvents(Event<Group> groupEvent) {
+        final Group group = groupEvent.data();
 
-		if (groupEvent.event().endsWith(CREATED)) {
-			this.groups.add(group);
-		} else if (groupEvent.event().endsWith(DELETED)) {
-			this.groups.removeIf(u -> u._id().equals(group._id()));
-		} else if (groupEvent.event().endsWith(UPDATED)) {
-			for (Group updatedGroup : this.groups) {
-				if (updatedGroup._id().equals(group._id())) {
-					this.groups.set(this.groups.indexOf(updatedGroup), group);
-					break;
-				}
-			}
-		}
-	}
+        if (groupEvent.event().endsWith(CREATED)) {
+            this.groups.add(group);
+        } else if (groupEvent.event().endsWith(DELETED)) {
+            this.groups.removeIf(u -> u._id().equals(group._id()));
+        } else if (groupEvent.event().endsWith(UPDATED)) {
+            for (Group updatedGroup : this.groups) {
+                if (updatedGroup._id().equals(group._id())) {
+                    this.groups.set(this.groups.indexOf(updatedGroup), group);
+                    break;
+                }
+            }
+        }
+    }
 
     public void openDirectChat(User user) {
 
@@ -552,7 +551,7 @@ public class LobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.lobby_messages.setAll(col);
-                    for (Message message: lobby_messages) {
+                    for (Message message : lobby_messages) {
                         if (!this.deletedAllMessages.contains(message._id())) {
                             renderSingleMessage(null, allTab, message);
                         }
@@ -561,7 +560,7 @@ public class LobbyController implements Controller {
     }
 
     private void loadGames(List<Game> games) {
-        List<Game> accessible = games.stream().filter(game ->!(game.started())).toList();
+        List<Game> accessible = games.stream().filter(game -> !(game.started())).toList();
         List<Game> notAccessible = games.stream().filter(Game::started).toList();
 
         this.games.addAll(accessible);
@@ -586,8 +585,7 @@ public class LobbyController implements Controller {
                     }
                 }
             });
-        }
-        else {
+        } else {
             this.messageService.getAllMessages(GROUPS, groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
                 this.messages.clear();
                 this.messages.addAll(messages);
@@ -610,7 +608,7 @@ public class LobbyController implements Controller {
         this.directChatStorages.add(directChatStorage);
     }
 
-    private  void handleAllTabMessages(Event<Message> event) {
+    private void handleAllTabMessages(Event<Message> event) {
         final Message message = event.data();
         if (event.event().endsWith(CREATED)) {
             this.lobby_messages.add(message);
@@ -707,7 +705,7 @@ public class LobbyController implements Controller {
 
         menuItem.setOnAction(event -> {
             if (sender.equals(this.idStorage.getID())) {
-                if(groupId != null) {
+                if (groupId != null) {
                     messageService
                             .delete(GROUPS, groupId, messageId)
                             .observeOn(FX_SCHEDULER)
@@ -732,15 +730,15 @@ public class LobbyController implements Controller {
     //reactivate for the possibility of joining the game
     public void onRejoin() {
         boolean changeToPlayer = false;
-        for (Member m: this.members) {
-            if(m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())
-                && m.spectator()){
+        for (Member m : this.members) {
+            if (m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())
+                    && m.spectator()) {
                 this.app.show(gameScreenController.get());
                 changeToPlayer = true;
                 break;
             }
         }
-        if(!changeToPlayer) {
+        if (!changeToPlayer) {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
                     .observeOn(FX_SCHEDULER)
                     .subscribe();

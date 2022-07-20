@@ -1,5 +1,6 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,9 +12,12 @@ import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 
 public class MapTemplatesScreenController implements Controller{
+    private final App app;
+    private final Provider<CreateGameController> createGameController;
     @FXML public ImageView nameArrow;
     @FXML public ImageView createdByArrow;
     @FXML public ImageView votesArrow;
@@ -24,8 +28,9 @@ public class MapTemplatesScreenController implements Controller{
     @FXML public Button selectButton;
 
     @Inject
-    public MapTemplatesScreenController() {
-
+    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController) {
+        this.app = app;
+        this.createGameController = createGameController;
     }
 
     @Override
@@ -52,8 +57,9 @@ public class MapTemplatesScreenController implements Controller{
         return parent;
     }
 
-    public void onBackButtonPressed(ActionEvent actionEvent) {
-
+    public void onBackButtonPressed() {
+        final CreateGameController controller = createGameController.get();
+        this.app.show(controller);
     }
 
     public void onCreateButtonPressed(ActionEvent actionEvent) {

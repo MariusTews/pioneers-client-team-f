@@ -2,7 +2,6 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.MainModule_AuthApiServiceFactory;
 import de.uniks.pioneers.service.GameService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
