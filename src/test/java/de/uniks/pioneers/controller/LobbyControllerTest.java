@@ -89,7 +89,7 @@ class LobbyControllerTest extends ApplicationTest {
 
         List<Game> gameList = new ArrayList<>();
         gameList.add(new Game("0:00", "0:30",
-                "id", "name", "owner", 2, false,new GameSettings(2,10, null,false, 0)));
+                "id", "name", "owner", 2, false,new GameSettings(2,10, null, false, 0)));
         when(gameService.findAllGames()).thenReturn(Observable.just(gameList));
 
         List<User> userList = new ArrayList<>();

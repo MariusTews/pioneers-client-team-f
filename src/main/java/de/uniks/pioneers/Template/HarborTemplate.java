@@ -6,5 +6,4 @@ public record HarborTemplate(
         Number z,
         String type,
         Number side
-) {
-}
+) {}
