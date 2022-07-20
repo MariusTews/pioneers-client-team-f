@@ -216,17 +216,17 @@ public class TestModule {
 
 			@Override
 			public Observable<Game> create(CreateGameDto dto) {
-				return Observable.just(new Game("0", "0", "01", "testGame", "01", 1, false, new GameSettings(2, 10)));
+				return Observable.just(new Game("0", "0", "01", "testGame", "01", 1, false, new GameSettings(2, 10, null, false, 0)));
 			}
 
 			@Override
 			public Observable<Game> findOne(String id) {
-				return Observable.just(new Game("0", "1", "01", "TestGame", "7", 1, false, new GameSettings(1, 3)));
+				return Observable.just(new Game("0", "1", "01", "TestGame", "7", 1, false, new GameSettings(1, 3, null, false, 0)));
 			}
 
 			@Override
 			public Observable<Game> patch(String id, UpdateGameDto dto) {
-				return Observable.just(new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10)));
+				return Observable.just(new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10, null, false, 0)));
 			}
 
 			@Override
@@ -273,7 +273,7 @@ public class TestModule {
 				List<Player> players = new ArrayList<>();
 				HashMap<String, Integer> res = new HashMap<>();
 				res.put("lumber", 0);
-				players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, null));
+				players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, null, null));
 				return Observable.just(players);
 			}
 

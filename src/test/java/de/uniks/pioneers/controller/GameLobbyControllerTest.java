@@ -75,7 +75,7 @@ class GameLobbyControllerTest extends ApplicationTest {
 
         when(userService.findAllUsers()).thenReturn(Observable.just(userList));
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("2022-11-30T18:35:24.00Z", "00:30",
-                "id", "name", "owner", 2, false,new GameSettings(2,10))));
+                "id", "name", "owner", 2, false,new GameSettings(2,10, null, false, 0))));
         when(gameStorage.getId()).thenReturn("id");
 
         when(eventListener.listen("games.id.*.*",Message.class)).thenReturn(messageSubject);
@@ -103,9 +103,9 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Test
     void leaveLastMember() {
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
-                                                    "id", "name", "owner", 1, false,new GameSettings(2,10))));
+                                                    "id", "name", "owner", 1, false,new GameSettings(2,10, null, false, 0))));
         when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30",
-                                                        "id", "name", "owner", 1, false,new GameSettings(2,10))));
+                                                        "id", "name", "owner", 1, false,new GameSettings(2,10, null,false, 0))));
 
         write("\t\t\t\t\t\t");
         type(KeyCode.SPACE);

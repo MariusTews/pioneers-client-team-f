@@ -42,7 +42,7 @@ class CreateGameControllerTest extends ApplicationTest {
 
 	@Test
 	void createGameButtonPressed() {
-		when(gameService.create(anyString(), anyString(), anyInt(), anyInt())).thenReturn(Observable.just(new Game("0:00", "now", "01", "Test game", "Alice", 1, false, new GameSettings(2, 10))));
+		when(gameService.create(anyString(), anyString(), anyInt(), anyInt(), any(), anyBoolean(), anyInt())).thenReturn(Observable.just(new Game("0:00", "now", "01", "Test game", "Alice", 1, false, new GameSettings(2, 10, null, false, 0))));
 
 		write("\t\t\t\t\t\t\t");
 		type(KeyCode.SPACE);
@@ -64,7 +64,7 @@ class CreateGameControllerTest extends ApplicationTest {
 		write("\t\t123\t\t\t\t\t\t");
 		type(KeyCode.SPACE);
 
-		verify(gameService).create("Test game", "123", 2, 10);
+		verify(gameService).create("Test game", "123", 2, 10, null, false, 0);
 	}
 
 	@Test
