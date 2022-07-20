@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.MainModule_AuthApiServiceFactory;
 import de.uniks.pioneers.service.GameService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,54 +20,60 @@ import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 public class CreateGameController implements Controller {
     private final Provider<GameLobbyController> gameLobbyController;
     private final Provider<LobbyController> lobbyController;
+    private final Provider<MapTemplatesScreenController> mapTemplatesScreenController;
     private final GameService gameService;
 
-	private String mapTemplate;
-	private int mapSize;
-	private int victoryPoints;
+    private String mapTemplate;
+    private int mapSize;
+    private int victoryPoints;
 
-	@FXML
+    @FXML
     public TextField gameNameTextField;
-	@FXML
+    @FXML
     public Button backToLobbyButton;
-	@FXML
+    @FXML
     public Button createGameButton;
-	@FXML
+    @FXML
     public PasswordField passwordTextField;
-	@FXML
+    @FXML
     public Button mapSizeMinusButton;
-	@FXML
+    @FXML
     public Button mapSizePlusButton;
-	@FXML
+    @FXML
     public Button victoryPointsMinusButton;
-	@FXML
+    @FXML
     public Button victoryPointsPlusButton;
-	@FXML
+    @FXML
 	public Button mapsButton;
-	@FXML
+    @FXML
     public Label mapSizeLabel;
-	@FXML
+    @FXML
     public Label victoryPointsLabel;
-	@FXML
+    @FXML
     public Label mapTemplateLabel;
 
-	private final App app;
+    private final App app;
 
-	@Inject
+    @Inject
     public CreateGameController(App app,
                                 GameService gameService,
                                 Provider<LobbyController> lobbyController,
-                                Provider<GameLobbyController> gameLobbyController) {
+                                Provider<GameLobbyController> gameLobbyController,
+                                Provider<MapTemplatesScreenController> mapTemplatesScreenController) {
         this.app = app;
+        this.gameService = gameService;
         this.gameLobbyController = gameLobbyController;
         this.lobbyController = lobbyController;
-        this.gameService = gameService;
+        this.mapTemplatesScreenController = mapTemplatesScreenController;
     }
 
     @Override
     public void init() {
         this.mapSize = 2;
         this.victoryPoints = 10;
+        if (mapTemplate == null) {
+            mapTemplate = "Default";
+        }
     }
 
     @Override
@@ -87,8 +94,7 @@ public class CreateGameController implements Controller {
         }
         mapSizeLabel.setText("" + mapSize);
         victoryPointsLabel.setText("" + victoryPoints);
-        //TODO
-		//mapTemplateLabel.setText(mapTemplate);
+        mapTemplateLabel.setText("Map Template: " + mapTemplate);
 
         return parent;
     }
@@ -99,7 +105,8 @@ public class CreateGameController implements Controller {
     }
 
 	public void mapsButtonPressed() {
-		System.out.println("maps button pressed");
+        final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
+        this.app.show(controller);
 	}
 
     public void createGameButtonPressed() {
