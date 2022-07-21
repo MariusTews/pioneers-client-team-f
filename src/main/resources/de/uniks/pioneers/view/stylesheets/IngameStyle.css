@@ -11,7 +11,7 @@
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
-    -fx-background-size: 380 270;
+    -fx-background-size: 420 300;
 }
 
 #userView .text {
@@ -40,7 +40,7 @@
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
-    -fx-background-size: 230 130;
+    -fx-background-size: 230 180;
 }
 
 #cactus {
@@ -71,13 +71,6 @@
 }
 
 /* bottom of the screen: dice roll */
-
-#roll {
-    -fx-background-image: url("../assets/green_panel.png");
-    -fx-background-repeat: stretch;
-    -fx-background-position: center;
-    -fx-background-size: 200 100;
-}
 
 /* right side of the screen: current move and player, finish move via button */
 
@@ -160,13 +153,6 @@
     -fx-background-position: center;
     -fx-background-repeat: stretch;
     -fx-background-size: 180 60;
-}
-
-#longestRoadContainer {
-    -fx-background-image: url("../assets/red_panel.png");
-    -fx-background-position: center;
-    -fx-background-repeat: stretch;
-    -fx-background-size: 200 100;
 }
 
 #zoomContainer {
