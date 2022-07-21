@@ -8,43 +8,27 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox id="opponentView" fx:id="singleOpponentView" alignment="CENTER" prefHeight="180.0" prefWidth="230.0" spacing="10.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.OpponentSubController">
+<VBox id="opponentView" fx:id="singleOpponentView" alignment="CENTER" prefHeight="180.0" prefWidth="230.0" spacing="10.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.OpponentSubController">
    <HBox alignment="CENTER" prefHeight="61.0" prefWidth="216.0" spacing="10.0">
       <ImageView fx:id="avatarImageView" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
       <VBox alignment="CENTER" prefHeight="62.0" prefWidth="160.0" spacing="2.0">
          <Label fx:id="usernameLabel" prefHeight="24.0" prefWidth="140.0" text="Label" />
          <HBox maxHeight="24.0" maxWidth="160.0">
-            <Label fx:id="victoryPointsLabel" prefHeight="24.0" prefWidth="80.0" text="Label"/>
+            <Label fx:id="victoryPointsLabel" prefHeight="24.0" prefWidth="80.0" text="Label" />
             <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@assets/rocket.png"/>
+               <Image url="@assets/rocket.png" />
             </ImageView>
-            <Label fx:id="opponentFleetLabel" alignment="CENTER" prefHeight="24.0" prefWidth="24.0" text=": X"/>
+            <Label fx:id="opponentFleetLabel" alignment="CENTER" prefHeight="24.0" prefWidth="24.0" text=": X" />
          </HBox>
       </VBox>
    </HBox>
    <HBox alignment="CENTER" maxHeight="50.0" maxWidth="230.0" prefHeight="50.0" prefWidth="230.0" spacing="10.0">
-      <Pane prefHeight="50.0" prefWidth="90.0"
-            style="-fx-border-color: WHITE; -fx-border-radius: 5; -fx-border-width: 3;">
-         <ImageView fx:id="opponentLargestFleetIcon" fitHeight="50.0" fitWidth="90.0" pickOnBounds="true"
-                    preserveRatio="true"/>
+      <Pane prefHeight="50.0" prefWidth="90.0" style="-fx-border-color: WHITE; -fx-border-radius: 5; -fx-border-width: 3;">
+         <ImageView fx:id="opponentLargestFleetIcon" fitHeight="50.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" />
       </Pane>
-      <Pane prefHeight="50.0" prefWidth="90.0"
-            style="-fx-border-color: WHITE; -fx-border-radius: 5; -fx-border-width: 3;">
-         <ImageView fx:id="opponentLongestRoadIcon" fitHeight="50.0" fitWidth="90.0" pickOnBounds="true"
-                    preserveRatio="true"/>
+      <Pane prefHeight="50.0" prefWidth="90.0" style="-fx-border-color: WHITE; -fx-border-radius: 5; -fx-border-width: 3;">
+         <ImageView fx:id="opponentLongestRoadIcon" fitHeight="50.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" />
       </Pane>
-   </HBox>
-   <HBox fx:id="resourcesView" alignment="CENTER" prefHeight="14.0" prefWidth="200.0" spacing="15.0">
-      <ImageView id="cactus" fx:id="earthCactusImage" fitHeight="28.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
-      </ImageView>
-      <ImageView id="mars" fx:id="marsBarImage" fitHeight="31.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-      </ImageView>
-      <ImageView id="moon" fx:id="moonRockImage" fitHeight="26.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-      </ImageView>
-      <ImageView id="neptun" fx:id="neptunCrystalsImage" fitHeight="26.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
-      </ImageView>
-      <ImageView id="venus" fx:id="venusGrainImage" fitHeight="30.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
-      </ImageView>
    </HBox>
    <Label fx:id="totalResourcesLabel" maxHeight="24.0" maxWidth="180.0" text="total resources: ">
       <VBox.margin>
