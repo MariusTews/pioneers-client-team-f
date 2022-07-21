@@ -5,9 +5,11 @@ import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.controller.GameScreenController;
 import de.uniks.pioneers.controller.LobbyController;
 import javafx.application.Application;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
@@ -91,8 +93,14 @@ public class App extends Application {
         controller.init();
         stage.getScene().setRoot(controller.render());
         if (controller.getClass().equals(GameScreenController.class)) {
-            stage.setWidth(1610);
-            stage.setHeight(950);
+            Parent parent = controller.render();
+            Scale scale = new Scale();
+            scale.setX(0.8);
+            scale.setY(0.8);
+            parent.getTransforms().add(scale);
+            stage.setWidth(1288);
+            stage.setHeight(760);
+            stage.getScene().setRoot(parent);
         }else if(controller.getClass().equals(LobbyController.class)){
             stage.setWidth(900);
             stage.setHeight(600);
