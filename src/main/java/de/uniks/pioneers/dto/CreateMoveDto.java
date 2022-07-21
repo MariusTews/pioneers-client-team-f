@@ -8,5 +8,6 @@ public record CreateMoveDto(
 		RobDto rob,
 		HashMap<String, Integer> resources,
 		String partner,
+		String developmentCard,
         CreateBuildingDto building
 ) {}

@@ -41,7 +41,7 @@ class DiscardResourcesControllerTest extends ApplicationTest {
         // open new window therefore starting via app is not needed (discard window has another root)
         DiscardResourcesController discardResourcesController = new DiscardResourcesController(new Player("01", "00",
                 Color.DARKORCHID.toString(), true,6, resources, null,2,
-                2,null), "01", pioneersService, null);
+                2,null, null), "01", pioneersService, null);
         discardResourcesController.render();
     }
 
@@ -252,7 +252,7 @@ class DiscardResourcesControllerTest extends ApplicationTest {
 
         when(pioneersService.move(any(), any(), any(), any(), any(),any(), any(), any(), any()))
                 .thenReturn(Observable.just(new Move("4", "10", "01", "00", DROP_ACTION,
-                        7, null, null, this.resources, null)));
+                        7, null, null, this.resources, null, null)));
 
         Button incResource4Btn = lookup("#increment_" + NEPTUNE_CRYSTAL).query();
         Button incResource1Btn = lookup("#increment_" + EARTH_CACTUS).query();

@@ -16,5 +16,6 @@ public record Player(
 		Number longestRoad,
 		// swagger documentation is not clear about the data type required for previousTradeOffer,
 		// therefore a generic list of objects is used that might need to be changed later.
-		List<Object> previousTradeOffer
+		List<Object> previousTradeOffer,
+		List<DevelopmentCard> developmentCards
 ) {}

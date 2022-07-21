@@ -52,22 +52,22 @@ public class PioneersService {
                                  String type, String target, HashMap<String, Integer> resources) {
         if (action.equals(DROP_ACTION) && resources != null) {
             return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null,
-                    resources, null, null));
+                    resources, null, null, null));
         } else if (action.equals(ROB_ACTION)) {
-            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, new RobDto(x, y, z, target), null, null, null));
+            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, new RobDto(x, y, z, target), null, null, null, null));
         } else if (x == null && y == null && z == null && side == null && type == null) {
-            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, null));
+            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, null, null));
         } else {
-            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, new CreateBuildingDto(x, y, z, side, type)));
+            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, null, new CreateBuildingDto(x, y, z, side, type)));
         }
     }
 
     public Observable<Move> tradeBank(String gameId, HashMap<String, Integer> resources) {
-		return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, resources, BANK_ID, null));
+		return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, resources, BANK_ID, null, null));
 	}
 
     public Observable<Move> tradePlayer(String gameId, String action, String partner, HashMap<String, Integer> resources) {
-        return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, resources, partner, null));
+        return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, resources, partner, null, null));
     }
 
 	public Observable<Player> updatePlayer(String gameId, String userId, boolean active) {
