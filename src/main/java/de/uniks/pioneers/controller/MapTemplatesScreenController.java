@@ -2,6 +2,10 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.Template.MapTemplate;
+import de.uniks.pioneers.service.MapsService;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,22 +19,26 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+
 public class MapTemplatesScreenController implements Controller{
     private final App app;
     private final Provider<CreateGameController> createGameController;
+    private final MapsService mapsService;
     @FXML public ImageView nameArrow;
     @FXML public ImageView createdByArrow;
     @FXML public ImageView votesArrow;
     @FXML public Label selectedLabel;
-    @FXML public ListView mapTemplatesListView;
     @FXML public Button backButton;
     @FXML public Button createButton;
     @FXML public Button selectButton;
-
+    @FXML public ListView<Parent> mapTemplatesListView;
+    private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     @Inject
-    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController) {
+    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController, MapsService mapsService) {
         this.app = app;
         this.createGameController = createGameController;
+        this.mapsService = mapsService;
     }
 
     @Override
@@ -43,6 +51,7 @@ public class MapTemplatesScreenController implements Controller{
 
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public Parent render() {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/MapTemplatesScreen.fxml"));
@@ -54,6 +63,21 @@ public class MapTemplatesScreenController implements Controller{
             e.printStackTrace();
             return null;
         }
+
+        mapTemplatesListView.setItems(mapTemplates);
+
+        mapsService
+                .findAllMaps()
+                .observeOn(FX_SCHEDULER)
+                .subscribe(
+                        maps -> {
+                            for (MapTemplate template : maps) {
+                                MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template);
+                                mapTemplates.add(controller.render());
+                            }
+                        }
+                );
+
         return parent;
     }
 
@@ -62,11 +86,11 @@ public class MapTemplatesScreenController implements Controller{
         this.app.show(controller);
     }
 
-    public void onCreateButtonPressed(ActionEvent actionEvent) {
+    public void onCreateButtonPressed() {
 
     }
 
-    public void onSelectButtonPressed(ActionEvent actionEvent) {
+    public void onSelectButtonPressed() {
 
     }
 }
