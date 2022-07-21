@@ -42,9 +42,15 @@ public class OpponentSubController implements Controller {
     public ImageView venusGrainImage;
     @FXML
     public Label totalResourcesLabel;
-
+    @FXML
+    public Label opponentFleetLabel;
+    @FXML
+    public ImageView opponentLargestFleetIcon;
+    @FXML
+    public ImageView opponentLongestRoadIcon;
     private final Player opponent;
     private final User opponentAsUser;
+
     private String userId;
     private Parent parent;
 
