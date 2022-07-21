@@ -251,7 +251,6 @@ public class LobbyController implements Controller {
                 handleTabSwitching(oldValue, newValue));
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
 
-
         return parent;
     }
 
