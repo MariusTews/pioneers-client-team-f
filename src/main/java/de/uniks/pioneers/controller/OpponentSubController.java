@@ -10,7 +10,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -28,8 +27,6 @@ public class OpponentSubController implements Controller {
     public Label usernameLabel;
     @FXML
     public Label victoryPointsLabel;
-    @FXML
-    public HBox resourcesView;
     @FXML
     public ImageView earthCactusImage;
     @FXML
