@@ -14,16 +14,12 @@
     -fx-background-size: 420 300;
 }
 
-#userView .text {
-    -fx-font-size: 18;
-}
-
 .button.move {
     -fx-background-image: url("../assets/grey_button.png");
     -fx-background-size: 200 50;
     -fx-background-repeat: stretch;
     -fx-background-position: center;
-    -fx-font-size: 16;
+    -fx-font-size: 12;
     -fx-text-fill: #666666;
 }
 
@@ -164,7 +160,7 @@
 #zoomButton{
     -fx-background-color: WHITE;
     -fx-text-fill: BLACK;
-    -fx-font: System Bold;
+    -fx-font-weight: Bold;
     -fx-font-size: 18;
 }
 #iconFrame{
