@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplatesScreenController">
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplatesScreenController">
     <Label styleClass="white-title" text="Map Templates">
         <VBox.margin>
           <Insets bottom="20.0" />
@@ -20,7 +20,7 @@
             <Insets />
         </VBox.margin>
         <HBox prefHeight="20.0" prefWidth="600.0">
-            <HBox prefHeight="20.0" prefWidth="580.0">
+            <HBox id="descriptionHBox" prefHeight="20.0" prefWidth="540.0">
                 <HBox.margin>
                     <Insets left="24.0" />
                 </HBox.margin>
@@ -53,6 +53,9 @@
                 <font>
                     <Font size="14.0" />
                 </font>
+            <HBox.margin>
+               <Insets left="20.0" />
+            </HBox.margin>
             </Label>
         </HBox>
         <ListView fx:id="mapTemplatesListView" prefHeight="340.0" prefWidth="800.0" styleClass="map-templates-list-view">

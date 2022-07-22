@@ -13,12 +13,12 @@
       </HBox.margin></Label>
     <Label fx:id="createdByLabel" prefWidth="170.0" style="-fx-text-fill: white" text="CREATED_BY">
         <HBox.margin>
-          <Insets left="32.0" />
+          <Insets left="21.0" />
         </HBox.margin>
     </Label>
     <Label fx:id="votesLabel" alignment="TOP_LEFT" prefWidth="60.0" style="-fx-text-fill: white" text="VOTES">
         <HBox.margin>
-          <Insets left="85.0" />
+          <Insets left="87.0" />
         </HBox.margin>
     </Label>
     <ImageView fx:id="selectedImageView" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -28,7 +28,7 @@
     </ImageView>
     <Button id="showButton" fx:id="showButton" mnemonicParsing="false" text="Show">
         <HBox.margin>
-          <Insets left="12.0" />
+          <Insets left="6.0" />
         </HBox.margin>
     </Button>
     <ImageView fx:id="leftActionImageView" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#onLeftActionImagePressed" pickOnBounds="true" preserveRatio="true">

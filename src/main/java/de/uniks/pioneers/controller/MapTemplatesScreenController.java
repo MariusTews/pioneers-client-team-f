@@ -6,6 +6,7 @@ import de.uniks.pioneers.Template.MapTemplate;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MapsService;
+import de.uniks.pioneers.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
@@ -29,6 +31,7 @@ public class MapTemplatesScreenController implements Controller{
     private final App app;
     private final Provider<CreateGameController> createGameController;
     private final MapsService mapsService;
+    private final UserService userService;
     private final IDStorage idStorage;
     @FXML public ImageView nameArrow;
     @FXML public ImageView createdByArrow;
@@ -40,12 +43,14 @@ public class MapTemplatesScreenController implements Controller{
     @FXML public ListView<Parent> mapTemplatesListView;
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     private final List<MapTemplateSubcontroller> mapTemplateSubCons = new ArrayList<>();
+    private final HashMap<String, String> userNames = new HashMap<>();
 
     @Inject
-    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController, MapsService mapsService, IDStorage idStorage) {
+    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController, MapsService mapsService, UserService userService, IDStorage idStorage) {
         this.app = app;
         this.createGameController = createGameController;
         this.mapsService = mapsService;
+        this.userService = userService;
         this.idStorage = idStorage;
     }
 
@@ -77,6 +82,12 @@ public class MapTemplatesScreenController implements Controller{
 
         mapTemplatesListView.setItems(mapTemplates);
 
+        List<User> users = userService.findAllUsers().blockingFirst();
+
+        for (User user : users) {
+            userNames.put(user._id(), user.name());
+        }
+
         mapsService
                 .findAllMaps()
                 .observeOn(FX_SCHEDULER)
@@ -86,11 +97,14 @@ public class MapTemplatesScreenController implements Controller{
                             List<MapTemplate> otherMaps = new ArrayList<>(maps.stream().filter(mapTemplate -> !(idStorage.getID().equals(mapTemplate.createdBy()))).toList());
                             maps.clear();
                             maps.addAll(ownMaps);
+                            //add empty template to create distance between own and other maps
+                            maps.add(new MapTemplate(null, null, "", null, null, null, null, null, null));
                             maps.addAll(otherMaps);
 
                             for (MapTemplate template : maps) {
                                 boolean ownMap = idStorage.getID().equals(template.createdBy());
-                                MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap);
+                                String userName = userNames.get(template.createdBy());
+                                MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
                                 mapTemplateSubCons.add(controller);
                                 mapTemplates.add(controller.render());
                             }

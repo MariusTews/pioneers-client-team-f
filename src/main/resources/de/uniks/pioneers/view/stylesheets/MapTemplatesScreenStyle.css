@@ -7,8 +7,8 @@
 
 .map-templates-box {
     -fx-background-image: url("../assets/blue_panel.png");
-    -fx-background-position: center;
     -fx-background-repeat: stretch;
+    -fx-background-position: center;
     -fx-background-size: 850 400;
     -fx-background-color: transparent;
 }
@@ -25,4 +25,8 @@
     -fx-background-color: #fcfcfc;
     -fx-text-fill: grey;
     -fx-font-size: 12;
+}
+
+#descriptionHBox {
+    -fx-border-color: transparent transparent white transparent;
 }
