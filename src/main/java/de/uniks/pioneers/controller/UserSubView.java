@@ -43,10 +43,12 @@ public class UserSubView implements Controller {
     public final int maxVictoryPoints;
     @FXML
     public ImageView largestFleetIconDisplay;
+    //Todo: set icon than user has largest fleet
     @FXML
     public Label fleetLabel;
     @FXML
     public ImageView longestRoadIconDisplay;
+    //Todo: set icon than user has longest road
     @FXML
     public Button developmentCardsButton;
 
@@ -191,5 +193,6 @@ public class UserSubView implements Controller {
     }
 
     public void onDevelopmentCards() {
+        //Todo: implement methode
     }
 }

@@ -43,8 +43,10 @@ public class OpponentSubController implements Controller {
     public Label opponentFleetLabel;
     @FXML
     public ImageView opponentLargestFleetIcon;
+    //Todo: set icon than opponent has largest fleet
     @FXML
     public ImageView opponentLongestRoadIcon;
+    //Todo: set icon than opponent has longest road
     private final Player opponent;
     private final User opponentAsUser;
 
