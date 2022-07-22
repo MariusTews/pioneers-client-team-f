@@ -39,6 +39,7 @@ import static de.uniks.pioneers.computation.CalculateMap.createId;
 public class GameScreenController implements Controller {
 
     private final UserStorage userStorage;
+
     private List<CircleSubController> circleSubControllers = new ArrayList<>();
 
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
@@ -85,6 +86,8 @@ public class GameScreenController implements Controller {
     public Pane userViewPane;
     @FXML
     public Pane tradingPane;
+    @FXML
+    public Label devCardsAmountLabel;
 
     private final App app;
     private final GameStorage gameStorage;
@@ -475,7 +478,8 @@ public class GameScreenController implements Controller {
 
         for (User u : allUser) {
             if (u._id().equals(userId)) {
-                playerLongestRoadLabel.setText(u.name());
+                // Todo: longest Road
+                //playerLongestRoadLabel.setText(u.name());
                 break;
             }
         }

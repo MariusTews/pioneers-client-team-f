@@ -10,7 +10,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -29,8 +28,6 @@ public class OpponentSubController implements Controller {
     @FXML
     public Label victoryPointsLabel;
     @FXML
-    public HBox resourcesView;
-    @FXML
     public ImageView earthCactusImage;
     @FXML
     public ImageView marsBarImage;
@@ -42,9 +39,17 @@ public class OpponentSubController implements Controller {
     public ImageView venusGrainImage;
     @FXML
     public Label totalResourcesLabel;
-
+    @FXML
+    public Label opponentFleetLabel;
+    @FXML
+    public ImageView opponentLargestFleetIcon;
+    //Todo: set icon than opponent has largest fleet
+    @FXML
+    public ImageView opponentLongestRoadIcon;
+    //Todo: set icon than opponent has longest road
     private final Player opponent;
     private final User opponentAsUser;
+
     private String userId;
     private Parent parent;
 
