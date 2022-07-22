@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox id="userView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.UserSubView">
+<VBox id="userView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="426.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.UserSubView">
    <padding>
       <Insets left="20.0" top="10.0" />
    </padding>
@@ -41,7 +41,7 @@
       <ImageView id="venus" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
    </HBox>
-   <HBox alignment="CENTER" prefHeight="32.0" prefWidth="310.0" spacing="30.0">
+   <HBox alignment="CENTER" prefHeight="32.0" prefWidth="414.0" spacing="30.0">
       <Label fx:id="item1" prefHeight="20.0" prefWidth="25.0" text="it1">
          <HBox.margin>
             <Insets left="5.0" />
@@ -61,21 +61,26 @@
          <Insets left="100.0" right="80.0" />
       </VBox.margin>
    </Label>
-   <HBox prefHeight="52.0" prefWidth="366.0">
+   <HBox prefHeight="52.0" prefWidth="393.0">
       <Pane fx:id="settlementPane">
          <HBox.margin>
             <Insets right="10.0" />
          </HBox.margin>
-         <Button fx:id="sett" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="120.0" styleClass="move" text="SETT." />
+         <Button fx:id="sett" layoutX="-7.0" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="88.0" styleClass="move" text="SETT." />
       </Pane>
       <Pane fx:id="roadPane">
-         <Button fx:id="road" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="120.0" styleClass="move" text="Road" />
+         <Button fx:id="road" layoutX="-8.0" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="88.0" styleClass="move" text="Road" />
       </Pane>
-      <Pane fx:id="cityPane">
+      <Pane fx:id="cityPane" prefHeight="52.0" prefWidth="124.0">
          <HBox.margin>
             <Insets left="10.0" />
          </HBox.margin>
-         <Button fx:id="city" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="120.0" styleClass="move" text="City" />
+         <Button fx:id="city" layoutX="-2.0" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="120.0" styleClass="move" text="City" />
+      </Pane>
+      <Pane prefHeight="56.0" prefWidth="142.0">
+         <children>
+            <Button fx:id="developmentId" layoutX="-1.0" layoutY="-1.0" mnemonicParsing="false" onAction="#onDev" prefHeight="42.0" prefWidth="134.0" styleClass="move" text="Dev card" />
+         </children>
       </Pane>
       <VBox.margin>
          <Insets />

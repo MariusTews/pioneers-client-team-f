@@ -5,6 +5,7 @@ import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -43,6 +44,7 @@ public class UserSubView implements Controller {
     public Pane roadPane;
     public Pane cityPane;
     public final int maxVictoryPoints;
+    public Button developmentId;
 
     @Inject
     public UserSubView(IDStorage idStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
@@ -164,7 +166,9 @@ public class UserSubView implements Controller {
         this.sett.disableProperty().set(true);
         this.sett.setText(RENAME_SETTLEMENT);
         this.city.disableProperty().set(true);
-        this.city.setText(RENAME_CITY);
+        this.city.setText(RENAME_CITY );
+        this.developmentId.disableProperty().set(false);
+        this.developmentId.setText("Dev card");
 
         Tooltip.install(this.roadPane, new Tooltip("1 Earth cactus, \n1 Mars bar "));
         Tooltip.install(this.settlementPane, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
@@ -184,4 +188,7 @@ public class UserSubView implements Controller {
         gameFieldSubController.build("city");
     }
 
+    public void onDev(ActionEvent event) {
+        //call devlopment Controller
+    }
 }

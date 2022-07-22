@@ -11,7 +11,7 @@
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
-    -fx-background-size: 380 270;
+    -fx-background-size: 426 300;
 }
 
 #userView .text {

@@ -264,7 +264,7 @@ public class GameLobbyController implements Controller {
                     //pushes all the users to spectator
                     //if the player number is greater than 6
                     //this allows unlimited number of spectator.
-                    if (this.members.size() > MAX_MEMBERS) {
+                    if (this.members.size() > 1) {
                         for (Member member : members) {
                             if (member.userId().equals(this.idStorage.getID())
                                     && member.gameId().equals(this.gameStorage.getId())) {
