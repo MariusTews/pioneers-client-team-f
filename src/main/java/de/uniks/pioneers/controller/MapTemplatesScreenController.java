@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Template.MapTemplate;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MapsService;
 import javafx.collections.FXCollections;
@@ -81,8 +82,15 @@ public class MapTemplatesScreenController implements Controller{
                 .observeOn(FX_SCHEDULER)
                 .subscribe(
                         maps -> {
+                            List<MapTemplate> ownMaps = new ArrayList<>(maps.stream().filter(mapTemplate -> idStorage.getID().equals(mapTemplate.createdBy())).toList());
+                            List<MapTemplate> otherMaps = new ArrayList<>(maps.stream().filter(mapTemplate -> !(idStorage.getID().equals(mapTemplate.createdBy()))).toList());
+                            maps.clear();
+                            maps.addAll(ownMaps);
+                            maps.addAll(otherMaps);
+
                             for (MapTemplate template : maps) {
-                                MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, idStorage.getID().equals(template.createdBy()));
+                                boolean ownMap = idStorage.getID().equals(template.createdBy());
+                                MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap);
                                 mapTemplateSubCons.add(controller);
                                 mapTemplates.add(controller.render());
                             }
