@@ -17,27 +17,23 @@
    </Label>
    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="420.0">
       <VBox.margin>
-         <Insets/>
+         <Insets />
       </VBox.margin>
       <VBox alignment="CENTER" prefHeight="100.0" prefWidth="180.0">
-         <Label fx:id="victoryPoints" prefHeight="50.0" prefWidth="150.0" text="Vp: x/x"/>
-         <Pane maxHeight="50.0" maxWidth="150.0" prefHeight="50.0" prefWidth="150.0"
-               style="-fx-border-color: WHITE; -fx-border-width: 3; -fx-border-radius: 5;">
-            <ImageView fx:id="largestFleetIconDisplay" fitHeight="50.0" fitWidth="150.0" pickOnBounds="true"
-                       preserveRatio="true"/>
+         <Label fx:id="victoryPoints" prefHeight="50.0" prefWidth="150.0" text="Vp: x/x" />
+         <Pane id="iconFrame" maxHeight="50.0" maxWidth="150.0" prefHeight="50.0" prefWidth="150.0">
+            <ImageView fx:id="largestFleetIconDisplay" fitHeight="50.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
          </Pane>
       </VBox>
       <VBox prefHeight="100.0" prefWidth="180.0">
          <HBox alignment="CENTER_LEFT" maxHeight="50.0" maxWidth="210.0">
             <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@assets/rocket.png"/>
+               <Image url="@assets/rocket.png" />
             </ImageView>
-            <Label fx:id="fleetLabel" prefHeight="50.0" prefWidth="100.0" text=": X"/>
+            <Label fx:id="fleetLabel" prefHeight="50.0" prefWidth="100.0" text=": X" />
          </HBox>
-         <Pane maxHeight="50.0" maxWidth="150.0"
-               style="-fx-border-color: WHITE; -fx-border-radius: 5; -fx-border-width: 3;">
-            <ImageView fx:id="longestRoadIconDisplay" fitHeight="50.0" fitWidth="150.0" pickOnBounds="true"
-                       preserveRatio="true"/>
+         <Pane id="iconFrame" maxHeight="50.0" maxWidth="150.0">
+            <ImageView fx:id="longestRoadIconDisplay" fitHeight="50.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
          </Pane>
       </VBox>
    </HBox>

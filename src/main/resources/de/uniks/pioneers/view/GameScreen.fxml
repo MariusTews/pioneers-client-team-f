@@ -38,26 +38,15 @@
                 </font>
             </Label>
             <HBox alignment="CENTER" maxHeight="40.0" maxWidth="90.0" prefHeight="25.0" prefWidth="60.0" spacing="10.0">
-                <Button fx:id="zoomOut" mnemonicParsing="false" onAction="#zoomOut" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: WHITE; -fx-text-fill: BLACK;" text="-">
-                    <font>
-                        <Font name="System Bold" size="18.0" />
-                    </font>
-                </Button>
-                <Button fx:id="zoomIn" mnemonicParsing="false" onAction="#zoomIn" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: WHITE; -fx-text-fill: BLACK;" text="+">
-                    <font>
-                        <Font name="System Bold" size="18.0" />
-                    </font>
-                </Button>
+                <Button id="zoomButton" fx:id="zoomOut" mnemonicParsing="false" onAction="#zoomOut" prefHeight="40.0" prefWidth="40.0" text="-" />
+                <Button id="zoomButton" fx:id="zoomIn" mnemonicParsing="false" onAction="#zoomIn" prefHeight="40.0" prefWidth="40.0" text="+" />
             </HBox>
         </VBox>
-        <Pane id="devCardsPane" layoutX="20.0" layoutY="-30.0" prefHeight="120.0" prefWidth="60.0"
-              style="-fx-background-color: ff3333;">
-            <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true"
-                       preserveRatio="true">
-                <Image url="@assets/helmet.png"/>
+        <Pane id="devCardsPane" layoutX="20.0" layoutY="-30.0" prefHeight="120.0" prefWidth="60.0" style="-fx-background-color: ff3333;">
+            <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@assets/helmet.png" />
             </ImageView>
-            <Label fx:id="devCardsAmountLabel" alignment="CENTER" layoutY="60.0" prefHeight="40.0" prefWidth="60.0"
-                   text="X"/>
+            <Label fx:id="devCardsAmountLabel" alignment="CENTER" layoutY="60.0" prefHeight="40.0" prefWidth="60.0" text="X" />
         </Pane>
     </Pane>
     <Pane layoutX="1100.0" prefHeight="900.0" prefWidth="500.0">

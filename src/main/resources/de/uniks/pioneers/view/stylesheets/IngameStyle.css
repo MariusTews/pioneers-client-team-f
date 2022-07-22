@@ -161,3 +161,14 @@
     -fx-background-repeat: stretch;
     -fx-background-size: 120 100;
 }
+#zoomButton{
+    -fx-background-color: WHITE;
+    -fx-text-fill: BLACK;
+    -fx-font: System Bold;
+    -fx-font-size: 18;
+}
+#iconFrame{
+    -fx-border-color: WHITE;
+    -fx-border-radius: 5;
+    -fx-border-width: 3;
+}
