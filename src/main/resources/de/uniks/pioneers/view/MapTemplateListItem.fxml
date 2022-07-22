@@ -6,38 +6,39 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-
-<HBox prefHeight="20.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="de.uniks.pioneers.controller.MapTemplateSubcontroller">
-    <Label fx:id="nameLabel" text="NAME"/>
-    <Label fx:id="createdByLabel" text="CREATED_BY">
+<HBox prefHeight="25.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateSubcontroller">
+    <Label fx:id="nameLabel" prefWidth="170.0" style="-fx-text-fill: white" text="NAME">
+      <HBox.margin>
+         <Insets left="18.0" />
+      </HBox.margin></Label>
+    <Label fx:id="createdByLabel" prefWidth="170.0" style="-fx-text-fill: white" text="CREATED_BY">
         <HBox.margin>
-          <Insets left="140.0"/>
+          <Insets left="32.0" />
         </HBox.margin>
     </Label>
-    <Label fx:id="votesLabel" text="VOTES">
+    <Label fx:id="votesLabel" alignment="TOP_LEFT" prefWidth="60.0" style="-fx-text-fill: white" text="VOTES">
         <HBox.margin>
-          <Insets left="140.0"/>
+          <Insets left="85.0" />
         </HBox.margin>
     </Label>
     <ImageView fx:id="selectedImageView" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
         <HBox.margin>
-          <Insets left="24.0"/>
+          <Insets left="6.0" />
         </HBox.margin>
     </ImageView>
-    <Button fx:id="showButton" mnemonicParsing="false" text="Show">
+    <Button id="showButton" fx:id="showButton" mnemonicParsing="false" text="Show">
         <HBox.margin>
-          <Insets left="120.0"/>
+          <Insets left="12.0" />
         </HBox.margin>
     </Button>
-    <ImageView fx:id="leftActionImageView" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+    <ImageView fx:id="leftActionImageView" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#onLeftActionImagePressed" pickOnBounds="true" preserveRatio="true">
         <HBox.margin>
-          <Insets left="30.0"/>
+          <Insets left="24.0" />
         </HBox.margin>
     </ImageView>
-    <ImageView fx:id="rightActionImageView" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+    <ImageView fx:id="rightActionImageView" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#onRightActionImagePressed" pickOnBounds="true" preserveRatio="true">
         <HBox.margin>
-          <Insets left="20.0"/>
+          <Insets left="12.0" />
         </HBox.margin>
     </ImageView>
 </HBox>

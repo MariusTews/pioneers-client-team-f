@@ -55,7 +55,10 @@
                 </font>
             </Label>
         </HBox>
-        <ListView fx:id="mapTemplatesListView" prefHeight="340.0" prefWidth="600.0" />
+        <ListView fx:id="mapTemplatesListView" prefHeight="340.0" prefWidth="800.0" styleClass="map-templates-list-view">
+         <VBox.margin>
+            <Insets top="12.0" />
+         </VBox.margin></ListView>
       <padding>
          <Insets bottom="20.0" left="50.0" right="50.0" top="20.0" />
       </padding>

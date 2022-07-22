@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Template.MapTemplate;
+import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MapsService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,6 +19,8 @@ import javafx.scene.image.ImageView;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
@@ -25,6 +28,7 @@ public class MapTemplatesScreenController implements Controller{
     private final App app;
     private final Provider<CreateGameController> createGameController;
     private final MapsService mapsService;
+    private final IDStorage idStorage;
     @FXML public ImageView nameArrow;
     @FXML public ImageView createdByArrow;
     @FXML public ImageView votesArrow;
@@ -34,11 +38,14 @@ public class MapTemplatesScreenController implements Controller{
     @FXML public Button selectButton;
     @FXML public ListView<Parent> mapTemplatesListView;
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
+    private final List<MapTemplateSubcontroller> mapTemplateSubCons = new ArrayList<>();
+
     @Inject
-    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController, MapsService mapsService) {
+    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController, MapsService mapsService, IDStorage idStorage) {
         this.app = app;
         this.createGameController = createGameController;
         this.mapsService = mapsService;
+        this.idStorage = idStorage;
     }
 
     @Override
@@ -48,7 +55,10 @@ public class MapTemplatesScreenController implements Controller{
 
     @Override
     public void destroy() {
-
+        for (MapTemplateSubcontroller controller : mapTemplateSubCons) {
+            controller.destroy();
+        }
+        mapTemplateSubCons.clear();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -72,7 +82,8 @@ public class MapTemplatesScreenController implements Controller{
                 .subscribe(
                         maps -> {
                             for (MapTemplate template : maps) {
-                                MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template);
+                                MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, idStorage.getID().equals(template.createdBy()));
+                                mapTemplateSubCons.add(controller);
                                 mapTemplates.add(controller.render());
                             }
                         }

@@ -7,12 +7,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class MapTemplateSubcontroller implements Controller{
     private final MapTemplate template;
+    private final boolean ownMap;
+    private Image leftActionImage;
+    private Image rightActionImage;
     @FXML public Label nameLabel;
     @FXML public Label createdByLabel;
     @FXML public Label votesLabel;
@@ -21,8 +27,9 @@ public class MapTemplateSubcontroller implements Controller{
     @FXML public ImageView leftActionImageView;
     @FXML public ImageView rightActionImageView;
 
-    public MapTemplateSubcontroller(MapTemplate template) {
+    public MapTemplateSubcontroller(MapTemplate template, boolean ownMap) {
         this.template = template;
+        this.ownMap = ownMap;
     }
 
     @Override
@@ -32,7 +39,8 @@ public class MapTemplateSubcontroller implements Controller{
 
     @Override
     public void destroy() {
-
+        leftActionImage = null;
+        rightActionImage = null;
     }
 
     @Override
@@ -51,6 +59,36 @@ public class MapTemplateSubcontroller implements Controller{
         createdByLabel.setText(template.createdBy());
         votesLabel.setText("" + template.votes());
 
+        if (ownMap) {
+            leftActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/editIcon.png")).toString());
+            rightActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/deleteIcon.png")).toString());
+        }
+        else {
+            leftActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/thumbsUpIcon.png")).toString());
+            rightActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/thumbsDownIcon.png")).toString());
+        }
+
+        leftActionImageView.setImage(leftActionImage);
+        rightActionImageView.setImage(rightActionImage);
+
         return parent;
+    }
+
+    public void onLeftActionImagePressed() {
+        if (ownMap) {
+            //edit map
+        }
+        else {
+            //up-vote map
+        }
+    }
+
+    public void onRightActionImagePressed() {
+        if (ownMap) {
+            //delete map
+        }
+        else {
+            //down-vote map
+        }
     }
 }
