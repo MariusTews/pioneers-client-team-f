@@ -1,8 +1,10 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import javafx.event.ActionEvent;
@@ -28,6 +30,8 @@ public class UserSubView implements Controller {
 
     private final ArrayList<User> users = new ArrayList<>();
     private final IDStorage idStorage;
+
+    private final GameStorage gameStorage;
     private final UserService userService;
     private final GameFieldSubController gameFieldSubController;
     private final Player player;
@@ -54,9 +58,10 @@ public class UserSubView implements Controller {
     public Button developmentCardsButton;
 
     @Inject
-    public UserSubView(IDStorage idStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
+    public UserSubView(IDStorage idStorage, GameStorage gameStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
                        int maxVictoryPoints) {
         this.idStorage = idStorage;
+        this.gameStorage = gameStorage;
         this.userService = userService;
         this.player = player;
         this.gameFieldSubController = gameFieldSubController;
@@ -174,8 +179,6 @@ public class UserSubView implements Controller {
         this.sett.setText(RENAME_SETTLEMENT);
         this.city.disableProperty().set(true);
         this.city.setText(RENAME_CITY );
-        this.developmentId.disableProperty().set(false);
-        this.developmentId.setText("Dev card");
 
         Tooltip.install(this.road, new Tooltip("1 Earth cactus, \n1 Mars bar "));
         Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
@@ -196,6 +199,6 @@ public class UserSubView implements Controller {
     }
 
     public void onDev(ActionEvent event) {
-        //call devlopment Controller
+
     }
 }

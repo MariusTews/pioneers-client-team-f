@@ -20,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -359,7 +360,7 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController,
+        UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService, player, gameFieldSubController,
                 this.gameStorage.getVictoryPoints());
         userSubView.init();
         this.tradingSubController.setPlayer(player);
@@ -766,5 +767,11 @@ public class GameScreenController implements Controller {
         } else {
             this.diceTwo.setVisible(false);
         }
+    }
+
+    public void onShowDevCard(MouseEvent mouseEvent) {
+        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(),gameStorage,
+                idStorage, app);
+        developmentCardController.render();
     }
 }
