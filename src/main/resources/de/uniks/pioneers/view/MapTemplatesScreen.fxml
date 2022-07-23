@@ -20,7 +20,7 @@
             <Insets />
         </VBox.margin>
         <HBox prefHeight="20.0" prefWidth="600.0">
-            <HBox id="descriptionHBox" prefHeight="20.0" prefWidth="540.0">
+            <HBox id="descriptionHBox" prefHeight="20.0" prefWidth="520.0">
                 <HBox.margin>
                     <Insets left="24.0" />
                 </HBox.margin>
@@ -32,7 +32,7 @@
                 <ImageView fx:id="nameArrow" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
                 <Label style="-fx-text-fill: white" text="| Created By">
                     <HBox.margin>
-                        <Insets left="120.0" />
+                        <Insets left="140.0" />
                     </HBox.margin>
                     <font>
                         <Font size="14.0" />
@@ -41,7 +41,7 @@
                 <ImageView fx:id="createdByArrow" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
                 <Label style="-fx-text-fill: white" text="| Votes">
                     <HBox.margin>
-                        <Insets left="120.0" />
+                        <Insets left="60.0" />
                     </HBox.margin>
                     <font>
                         <Font size="14.0" />

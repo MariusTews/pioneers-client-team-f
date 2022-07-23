@@ -21,7 +21,6 @@ import org.testfx.util.WaitForAsyncUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,19 +40,19 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
     @InjectMocks
     MapTemplatesScreenController mapTemplatesScreenController;
 
-    User bert;
-    User kuno;
-    MapTemplate bertsMap;
-    MapTemplate kunosMap;
+    User user1;
+    User user2;
+    MapTemplate user1Map;
+    MapTemplate user2Map;
 
     public void start(Stage stage) {
-        bert = new User("", "", "1", "bert", "online", null, null);
-        kuno = new User("", "", "2", "kuno", "online", null, null);
-        bertsMap = new MapTemplate("", "", bert._id(), "berts map", null, bert._id(), 0, List.of(), List.of());
-        kunosMap = new MapTemplate("", "", kuno._id(), "kunos map", null, kuno._id(), 0, List.of(), List.of());
-        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(bert, kuno)));
-        when(idStorage.getID()).thenReturn(bert._id());
-        when(mapsService.findAllMaps()).thenReturn(Observable.just(new ArrayList<>(List.of(bertsMap, kunosMap))));
+        user1 = new User("", "", "1", "bert", "online", null, null);
+        user2 = new User("", "", "2", "kuno", "online", null, null);
+        user1Map = new MapTemplate("", "", user1._id(), "berts map", null, user1._id(), 0, List.of(), List.of());
+        user2Map = new MapTemplate("", "", user2._id(), "kunos map", null, user2._id(), 0, List.of(), List.of());
+        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(user2, user1)));
+        when(idStorage.getID()).thenReturn(user1._id());
+        when(mapsService.findAllMaps()).thenReturn(Observable.just(new ArrayList<>(List.of(user2Map, user1Map))));
 
         // start application
         app = new App(mapTemplatesScreenController);
@@ -64,10 +63,10 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
     void loadAllMaps() {
         WaitForAsyncUtils.waitForFxEvents();
 
-        HBox bertsMapTemplateBox = lookup("#" + bert._id()).query();
-        HBox kunosMapTemplateBox = lookup("#" + kuno._id()).query();
+        HBox user1MapTemplateBox = lookup("#" + user1._id()).query();
+        HBox user2MapTemplateBox = lookup("#" + user2._id()).query();
 
-        Assertions.assertThat(bertsMapTemplateBox.getChildren().size()).isEqualTo(7);
-        Assertions.assertThat(kunosMapTemplateBox.getChildren().size()).isEqualTo(7);
+        Assertions.assertThat(user1MapTemplateBox.getChildren().size()).isEqualTo(7);
+        Assertions.assertThat(user2MapTemplateBox.getChildren().size()).isEqualTo(7);
     }
 }

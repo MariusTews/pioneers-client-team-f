@@ -103,7 +103,7 @@ public class MapTemplatesScreenController implements Controller{
 
                             for (MapTemplate template : maps) {
                                 boolean ownMap = idStorage.getID().equals(template.createdBy());
-                                String userName = userNames.get(template.createdBy());
+                                String userName = userNames.getOrDefault(template.createdBy(), "");
                                 MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
                                 mapTemplateSubCons.add(controller);
                                 mapTemplates.add(controller.render());
