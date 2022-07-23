@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uniks.pioneers.Constants.*;
 import static de.uniks.pioneers.computation.CalculateMap.createId;
@@ -87,6 +88,8 @@ public class GameScreenController implements Controller {
     public Pane userViewPane;
     @FXML
     public Pane tradingPane;
+
+    //total amount of cards currently at the moment
     @FXML
     public Label devCardsAmountLabel;
 
@@ -329,7 +332,33 @@ public class GameScreenController implements Controller {
             e.consume();
         });
 
+
+        //calculate all the owned cards
+        allTheCards();
         return parent;
+    }
+
+    private void allTheCards() {
+        AtomicInteger allTheCards = new AtomicInteger();
+        pioneersService.findOnePlayer(this.gameStorage.getId(),this.idStorage.getID())
+                .observeOn(FX_SCHEDULER).subscribe(e ->{
+                    for (DevelopmentCard card: e.developmentCards()) {
+                        if(card.type().equals(KNIGHT)){
+                            allTheCards.set(allTheCards.get() + 1);
+
+                        }
+                        if(card.type().equals(YEAR_OF_PLENTY)){
+                            allTheCards.set(allTheCards.get()+1);
+                        }
+                        if(card.type().equals(ROAD_BUILDING)){
+                            allTheCards.set(allTheCards.get()+1);
+                        }
+                        if (card.type().equals(MONOPOLY)){
+                            allTheCards.set(allTheCards.get()+1);
+                        }
+                    }
+                    devCardsAmountLabel.setText(String.valueOf(allTheCards.get()));
+                });
     }
 
     private void actionOnCloseScreen() {
@@ -418,6 +447,7 @@ public class GameScreenController implements Controller {
                 if (p.userId().equals(player.userId())) {
                     playerOwnView.set(playerOwnView.indexOf(p), player);
                     // check if the user dropped or received resources and play the according sound
+
                     int amountResources = 0;
                     for (int resource : p.resources().values()) {
                         amountResources += resource;
@@ -431,6 +461,9 @@ public class GameScreenController implements Controller {
                     } else if (amountNewResources < amountResources) {
                         this.soundService.playSound("drop");
                     }
+
+                    //call All calculate method for calculating all the owned cards
+                    allTheCards();
                 }
             }
 
@@ -769,7 +802,7 @@ public class GameScreenController implements Controller {
         }
     }
 
-    public void onShowDevCard(MouseEvent mouseEvent) {
+    public void onShowDevCard() {
         DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(),gameStorage,
                 idStorage, app,pioneersService);
         developmentCardController.init();
