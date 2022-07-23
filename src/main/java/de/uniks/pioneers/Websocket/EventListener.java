@@ -1,4 +1,4 @@
-package de.uniks.pioneers.websocket;
+package de.uniks.pioneers.Websocket;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 public class EventListener {
     private final TokenStorage tokenStorage;
     private final ObjectMapper mapper;
-    private ClientEndpoint endpoint;
+    private de.uniks.pioneers.websocket.ClientEndpoint endpoint;
 
     @Inject
     public EventListener(TokenStorage tokenStorage, ObjectMapper mapper) {
@@ -35,7 +35,7 @@ public class EventListener {
             return;
         }
         try {
-            endpoint = new ClientEndpoint(new URI(WS_AUTHTOKEN_URL + tokenStorage.getToken()));
+            endpoint = new de.uniks.pioneers.websocket.ClientEndpoint(new URI(WS_AUTHTOKEN_URL + tokenStorage.getToken()));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
