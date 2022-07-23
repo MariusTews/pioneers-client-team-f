@@ -81,7 +81,6 @@ public class Constants {
 
     //Card names
     public static final String UNKNOWN = "unknown";
-
     public static final String KNIGHT = "Knight";
 
     public static final String VICTORY_POINT = "victory-point";
