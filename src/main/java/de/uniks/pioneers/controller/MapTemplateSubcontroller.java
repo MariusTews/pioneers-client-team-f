@@ -78,6 +78,8 @@ public class MapTemplateSubcontroller implements Controller{
             ((HBox) parent).getChildren().clear();
         }
 
+        parent.setId(template._id());
+
         return parent;
     }
 

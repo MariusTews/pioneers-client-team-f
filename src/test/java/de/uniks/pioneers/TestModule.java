@@ -3,6 +3,7 @@ package de.uniks.pioneers;
 
 import dagger.Module;
 import dagger.Provides;
+import de.uniks.pioneers.Template.MapTemplate;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
@@ -319,6 +320,16 @@ public class TestModule {
 
 			@Override
 			public Observable<Move> findOneMove(String gameId, String moveId) {
+				return null;
+			}
+		};
+	}
+
+	@Provides
+	static MapsApiService mapsApiService() {
+		return new MapsApiService() {
+			@Override
+			public Observable<List<MapTemplate>> findAllMaps() {
 				return null;
 			}
 		};

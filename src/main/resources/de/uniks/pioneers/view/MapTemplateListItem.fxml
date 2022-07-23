@@ -13,7 +13,7 @@
       </HBox.margin></Label>
     <Label fx:id="createdByLabel" prefWidth="170.0" style="-fx-text-fill: white" text="CREATED_BY">
         <HBox.margin>
-          <Insets left="21.0" />
+          <Insets left="22.0" />
         </HBox.margin>
     </Label>
     <Label fx:id="votesLabel" alignment="TOP_LEFT" prefWidth="60.0" style="-fx-text-fill: white" text="VOTES">
