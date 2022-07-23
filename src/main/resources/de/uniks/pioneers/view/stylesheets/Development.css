@@ -1,0 +1,99 @@
+.button.move {
+    -fx-background-image: url("../assets/grey_button.png");
+    -fx-background-size: 200 50;
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-font-size: 16;
+    -fx-text-fill: #666666;
+}
+
+#mainHboxId {
+    -fx-background-image: url("../assets/yellow_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 625 410;
+}
+
+
+#paneForLumberId {
+    -fx-background-color: transparent;
+}
+
+#currentLumberDevId {
+    -fx-font-family: "A-Space Black Demo";
+    -fx-font-size: 30;
+    -fx-text-fill: #ffffff;
+}
+
+#labelForLumberId {
+    -fx-font-family: "A-Space Black Demo";
+    -fx-font-size: 20;
+    -fx-text-fill: #ffffff;
+}
+
+#vBoxForLumberId {
+    -fx-background-radius: 5.0;
+    -fx-padding: 4;
+    -fx-background-color: #ff3333;
+}
+
+#roadPaneId {
+    -fx-background-color: transparent;
+}
+
+#vBoxRoadId {
+    -fx-background-radius: 5.0;
+    -fx-padding: 4;
+    -fx-background-color: #ff3333;
+}
+
+#labelForRoadId {
+    -fx-font-family: "A-Space Black Demo";
+    -fx-font-size: 30;
+    -fx-text-fill: #ffffff;
+}
+
+#rocketPaneId{
+    -fx-background-color: transparent;
+}
+
+#rocketVboxId {
+    -fx-background-radius: 5.0;
+    -fx-padding: 4;
+    -fx-background-color: #ff3333;
+}
+
+#rocketLabelDevId {
+    -fx-font-family: "A-Space Black Demo";
+    -fx-font-size: 30;
+    -fx-text-fill: #ffffff;
+}
+
+#threeImgPaneId {
+    -fx-background-color: transparent;
+}
+
+#threeImgesHBoxId {
+    -fx-background-color: transparent;
+}
+
+#threeImagesVboxId {
+    -fx-background-radius: 5.0;
+    -fx-padding: 4;
+    -fx-background-color: #ff3333;
+}
+
+#threeImagesDevId {
+    -fx-font-family: "A-Space Black Demo";
+    -fx-font-size: 30;
+    -fx-text-fill: #ffffff;
+}
+
+
+
+
+/* Breite:300 höhe:100*/
+
+
+
+
