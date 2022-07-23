@@ -20,7 +20,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -805,7 +804,6 @@ public class GameScreenController implements Controller {
     public void onShowDevCard() {
         DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(),gameStorage,
                 idStorage, app,pioneersService);
-        developmentCardController.init();
         developmentCardController.render();
     }
 }
