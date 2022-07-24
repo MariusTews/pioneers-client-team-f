@@ -5,9 +5,14 @@ import de.uniks.pioneers.controller.GameLobbyController;
 import de.uniks.pioneers.controller.GameScreenController;
 import de.uniks.pioneers.controller.LobbyController;
 import javafx.application.Application;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
+import javafx.scene.transform.Scale;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
@@ -89,16 +94,46 @@ public class App extends Application {
         cleanup();
         this.controller = controller;
         controller.init();
-        stage.getScene().setRoot(controller.render());
         if (controller.getClass().equals(GameScreenController.class)) {
-            stage.setWidth(1610);
-            stage.setHeight(950);
-        }else if(controller.getClass().equals(LobbyController.class)){
-            stage.setWidth(900);
-            stage.setHeight(600);
-        }else if(controller.getClass().equals(GameLobbyController.class)){
-            stage.setWidth(1010);
-            stage.setHeight(600);
+            Screen screen = Screen.getPrimary();
+            Rectangle2D bounds = screen.getVisualBounds();
+            Scale scale = new Scale();
+            Pane pane = (Pane) controller.render();
+            // wide screen
+            if ((bounds.getHeight() / 950) * 1600 < bounds.getWidth()) {
+                double scaleFactor = bounds.getHeight() / 950;
+                scale.setX(scaleFactor);
+                scale.setY(scaleFactor);
+                Group group = new Group(pane);
+                group.getTransforms().add(scale);
+                stage.getScene().setRoot(group);
+                stage.setWidth(scaleFactor * 1600);
+                stage.setHeight(bounds.getHeight());
+                stage.centerOnScreen();
+
+            }
+            // "higher" screens
+            else {
+                double scaleFactor = bounds.getWidth() / 1600;
+                scale.setX(scaleFactor);
+                scale.setY(scaleFactor);
+                Group group = new Group(pane);
+                group.getTransforms().add(scale);
+                stage.getScene().setRoot(group);
+                stage.setWidth(bounds.getWidth());
+                stage.setHeight(scaleFactor * 950);
+                stage.centerOnScreen();
+            }
+        }
+        else {
+            stage.getScene().setRoot(controller.render());
+            if (controller.getClass().equals(LobbyController.class)) {
+                stage.setWidth(900);
+                stage.setHeight(600);
+            } else if (controller.getClass().equals(GameLobbyController.class)) {
+                stage.setWidth(1010);
+                stage.setHeight(600);
+            }
         }
     }
 
