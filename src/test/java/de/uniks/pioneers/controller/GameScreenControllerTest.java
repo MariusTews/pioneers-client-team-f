@@ -98,6 +98,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(gameStorage.getId()).thenReturn("02");
         when(gameStorage.getSize()).thenReturn(1);
         when(idStorage.getID()).thenReturn("01");
+        when(pioneersService.findOnePlayer(any(),any())).thenReturn(Observable.empty());
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         List<Player> players = new ArrayList<>();
         players.add(new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null, null));
