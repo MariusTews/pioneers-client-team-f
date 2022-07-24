@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 import java.util.Comparator;
+import java.util.HashMap;
 
 public class Constants {
     public static final String VERSION_PREFIX = "/v4";
@@ -36,6 +37,30 @@ public class Constants {
     //Messages
     public static final String GROUPS = "groups";
     public static final String GAMES = "games";
+
+    //Achievements Api Service
+    public static final String ACHIEVEMENTS_URL = "achievements";
+    public static final String USER_ACHIEVEMENTS_URL = "users/{userId}/" + ACHIEVEMENTS_URL;
+
+    public static final String USER_ACHIEVEMENTS_BY_ID_URL = USER_ACHIEVEMENTS_URL + "/{id}";
+
+    //Achievements
+    public static final String FIRST_ROAD = "first-road";
+
+    public static final String ROAD_BUILDER = "road-builder";
+
+    public static final String WIN_GAME = "win-game";
+
+    public static final String CREATE_MAP = "create-map";
+
+    public static final HashMap<String, Integer> ACHIEVEMENT_UNLOCK_VALUES = new HashMap<>();
+
+    static {
+        ACHIEVEMENT_UNLOCK_VALUES.put(FIRST_ROAD, 1);
+        ACHIEVEMENT_UNLOCK_VALUES.put(ROAD_BUILDER, 100);
+        ACHIEVEMENT_UNLOCK_VALUES.put(WIN_GAME, 1);
+        ACHIEVEMENT_UNLOCK_VALUES.put(CREATE_MAP, 1);
+    }
 
     //Sorting
     public static final Comparator<User> userComparator = Comparator.comparing(User::status).reversed().thenComparing(User::name);
@@ -88,5 +113,5 @@ public class Constants {
             Color.YELLOW, Color.ROSYBROWN, Color.OLIVE, Color.MAGENTA, Color.AQUA};
 
     //Array of resources
-    public static final String[] RESOURCES = {"lumber","brick","ore","wool","grain"};
+    public static final String[] RESOURCES = {"lumber", "brick", "ore", "wool", "grain"};
 }
