@@ -26,12 +26,12 @@ public class App extends Application {
 
     private Controller controller;
 
-    public App(){
+    public App() {
         final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
         controller = mainComponent.loginController();
     }
 
-    public App(Controller controller){
+    public App(Controller controller) {
         this.controller = controller;
     }
 
@@ -60,7 +60,7 @@ public class App extends Application {
         setAppIcon(stage);
 
         primaryStage.show();
-        if(controller != null) {
+        if (controller != null) {
             show(controller);
         }
     }
@@ -99,7 +99,7 @@ public class App extends Application {
             Rectangle2D bounds = screen.getVisualBounds();
             Scale scale = new Scale();
             Pane pane = (Pane) controller.render();
-            // wide screen
+            // wide screens
             if ((bounds.getHeight() / 950) * 1600 < bounds.getWidth()) {
                 double scaleFactor = bounds.getHeight() / 950;
                 scale.setX(scaleFactor);
@@ -124,8 +124,7 @@ public class App extends Application {
                 stage.setHeight(scaleFactor * 950);
                 stage.centerOnScreen();
             }
-        }
-        else {
+        } else {
             stage.getScene().setRoot(controller.render());
             if (controller.getClass().equals(LobbyController.class)) {
                 stage.setWidth(900);
@@ -144,7 +143,7 @@ public class App extends Application {
         }
     }
 
-    public Stage getStage(){
+    public Stage getStage() {
         return this.stage;
     }
 }
