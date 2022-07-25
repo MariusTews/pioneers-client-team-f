@@ -122,6 +122,7 @@ public class GameScreenController implements Controller {
     private TimerController moveTimer;
     private DiscardResourcesController discard;
     private boolean acceptRenderFlag = false;
+    private ExpectedMove nextMove;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -335,8 +336,8 @@ public class GameScreenController implements Controller {
     }
 
     private void allTheCards() {
-        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.app.getStage().getScene().getWindow(), gameStorage,
-                idStorage, pioneersService);
+        DevelopmentCardController developmentCardController = new DevelopmentCardController(this,this.app.getStage().getScene().getWindow(), gameStorage,
+                idStorage, pioneersService, nextMove, userHash);
         devCardsAmountLabel.setText(String.valueOf(developmentCardController.getAllTheCards().get()));
 
     }
@@ -505,6 +506,7 @@ public class GameScreenController implements Controller {
             for (CircleSubController subController : this.circleSubControllers) {
                 subController.setNextMove(state.expectedMoves().get(0));
             }
+            this.nextMove = state.expectedMoves().get(0);
         }
 
         if (stateEvent.event().endsWith(UPDATED)) {
@@ -749,8 +751,8 @@ public class GameScreenController implements Controller {
     }
 
     public void onShowDevCard() {
-        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(), gameStorage,
-                idStorage, pioneersService);
+        DevelopmentCardController developmentCardController = new DevelopmentCardController(this,this.currentPlayerLabel.getScene().getWindow(), gameStorage,
+                idStorage, pioneersService, nextMove, userHash);
         developmentCardController.render();
     }
 }

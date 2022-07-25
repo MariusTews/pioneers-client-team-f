@@ -2,13 +2,18 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.DevelopmentCard;
+import de.uniks.pioneers.model.ExpectedMove;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,6 +27,7 @@ import javafx.stage.Window;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,15 +62,20 @@ public class DevelopmentCardController implements Controller {
     private final IDStorage idStorage;
     private final PioneersService pioneersService;
 
+    private GameScreenController gameScreenController;
     private final Window owner;
+    private ExpectedMove nextMove;
+    private HashMap<String, User> userHash;
 
     @Inject
-    public DevelopmentCardController(Window owner, GameStorage gameStorage, IDStorage idStorage
-            , PioneersService pioneersService) {
+    public DevelopmentCardController(GameScreenController gameScreenController, Window owner, GameStorage gameStorage, IDStorage idStorage, PioneersService pioneersService, ExpectedMove nextMove, HashMap<String, User> userHash) {
+        this.gameScreenController = gameScreenController;
         this.owner = owner;
         this.gameStorage = gameStorage;
         this.idStorage = idStorage;
         this.pioneersService = pioneersService;
+        this.nextMove = nextMove;
+        this.userHash = userHash;
     }
 
     @Override
@@ -174,18 +185,64 @@ public class DevelopmentCardController implements Controller {
 
     public void onYearOfPlentyClick(ActionEvent event) {
         //TODO:implement action when year of plenty card is clicked
+        if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
+                !nextMove.action().equals("build") || currentLumberDevId.getText().equals("0")) {
+            showAlert();
+        } else {
+            pioneersService
+                    .playDevCard(gameStorage.getId(), "year-of-plenty")
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+        }
     }
 
     public void onRoadBuildingClick(ActionEvent event) {
         //TODO:implement action when roadBuilding card is played
+        if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
+                !nextMove.action().equals("build") || labelForRoadId.getText().equals("0")) {
+            showAlert();
+        } else {
+            pioneersService
+                    .playDevCard(gameStorage.getId(), "road-building")
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+        }
     }
 
     public void onKnightClick(ActionEvent event) {
         //TODO :implement action Knight card is played
+        if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
+                !nextMove.action().equals("build") || rocketLabelDevId.getText().equals("0")) {
+            showAlert();
+        } else {
+            pioneersService
+                    .playDevCard(gameStorage.getId(), "knight")
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+        }
     }
 
     public void onMonopolyClick(ActionEvent event) {
         //TODO : implement action when Monopoly card is played
+        //if it's not your turn
+        if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
+            !nextMove.action().equals("build") || threeImagesDevId.getText().equals("0")) {
+            showAlert();
+        } else {
+            pioneersService
+                    .playDevCard(gameStorage.getId(), "monopoly")
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+        }
+    }
+
+    public void showAlert() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Playing not possible!");
+        // set style
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        alert.showAndWait();
     }
 }
 
