@@ -30,21 +30,29 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
-public class MapTemplatesScreenController implements Controller{
+public class MapTemplatesScreenController implements Controller {
     private final App app;
     private final Provider<CreateGameController> createGameController;
     private final MapsService mapsService;
     private final UserService userService;
     private final IDStorage idStorage;
     private final EventListener eventListener;
-    @FXML public ImageView nameArrow;
-    @FXML public ImageView createdByArrow;
-    @FXML public ImageView votesArrow;
-    @FXML public Label selectedLabel;
-    @FXML public Button backButton;
-    @FXML public Button createButton;
-    @FXML public Button selectButton;
-    @FXML public ListView<Parent> mapTemplatesListView;
+    @FXML
+    public ImageView nameArrow;
+    @FXML
+    public ImageView createdByArrow;
+    @FXML
+    public ImageView votesArrow;
+    @FXML
+    public Label selectedLabel;
+    @FXML
+    public Button backButton;
+    @FXML
+    public Button createButton;
+    @FXML
+    public Button selectButton;
+    @FXML
+    public ListView<Parent> mapTemplatesListView;
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     private final HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
@@ -135,22 +143,19 @@ public class MapTemplatesScreenController implements Controller{
                     position++;
                 }
                 addMapTemplateItem(template, position);
-            }
-            else {
+            } else {
                 addMapTemplateItem(template, -1);
             }
-        }
-        else if (event.event().endsWith(UPDATED)) {
+        } else if (event.event().endsWith(UPDATED)) {
             MapTemplateSubcontroller controller = mapTemplateSubCons.get(template._id());
             controller.setTemplate(template);
             controller.updateContent();
-        }
-        else if (event.event().endsWith(DELETED)) {
+        } else if (event.event().endsWith(DELETED)) {
             MapTemplateSubcontroller controller = mapTemplateSubCons.get(template._id());
             controller.destroy();
             mapTemplateSubCons.remove(template._id());
             for (Parent mapTemplateItem : mapTemplates) {
-                if (mapTemplateItem.getId().equals(template._id())){
+                if (mapTemplateItem.getId().equals(template._id())) {
                     mapTemplates.remove(mapTemplateItem);
                     break;
                 }
@@ -166,8 +171,7 @@ public class MapTemplatesScreenController implements Controller{
         //if position is -1 then the item should be added at the end of the list
         if (position == -1) {
             mapTemplates.add(controller.render());
-        }
-        else {
+        } else {
             mapTemplates.add(position, controller.render());
         }
     }

@@ -14,19 +14,26 @@ import javafx.scene.layout.HBox;
 import java.io.IOException;
 import java.util.Objects;
 
-public class MapTemplateSubcontroller implements Controller{
+public class MapTemplateSubcontroller implements Controller {
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
     private Image leftActionImage;
     private Image rightActionImage;
-    @FXML public Label nameLabel;
-    @FXML public Label createdByLabel;
-    @FXML public Label votesLabel;
-    @FXML public Button showButton;
-    @FXML public ImageView selectedImageView;
-    @FXML public ImageView leftActionImageView;
-    @FXML public ImageView rightActionImageView;
+    @FXML
+    public Label nameLabel;
+    @FXML
+    public Label createdByLabel;
+    @FXML
+    public Label votesLabel;
+    @FXML
+    public Button showButton;
+    @FXML
+    public ImageView selectedImageView;
+    @FXML
+    public ImageView leftActionImageView;
+    @FXML
+    public ImageView rightActionImageView;
 
     public MapTemplateSubcontroller(MapTemplate template, boolean ownMap, String createdBy) {
         this.template = template;
@@ -62,8 +69,7 @@ public class MapTemplateSubcontroller implements Controller{
         if (ownMap) {
             leftActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/editIcon.png")).toString());
             rightActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/deleteIcon.png")).toString());
-        }
-        else {
+        } else {
             leftActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/thumbsUpIcon.png")).toString());
             rightActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/thumbsDownIcon.png")).toString());
         }
@@ -89,8 +95,7 @@ public class MapTemplateSubcontroller implements Controller{
     public void onLeftActionImagePressed() {
         if (ownMap) {
             //edit map
-        }
-        else {
+        } else {
             //up-vote map
         }
     }
@@ -98,8 +103,7 @@ public class MapTemplateSubcontroller implements Controller{
     public void onRightActionImagePressed() {
         if (ownMap) {
             //delete map
-        }
-        else {
+        } else {
             //down-vote map
         }
     }
