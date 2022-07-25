@@ -22,6 +22,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -335,7 +336,7 @@ public class GameScreenController implements Controller {
     }
 
     private void allTheCards() {
-        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.app.getStage().getScene().getWindow(), gameStorage,
+        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.app.getStage().getOwner(), gameStorage,
                 idStorage, pioneersService);
         devCardsAmountLabel.setText(String.valueOf(developmentCardController.getAllTheCards().get()));
 
