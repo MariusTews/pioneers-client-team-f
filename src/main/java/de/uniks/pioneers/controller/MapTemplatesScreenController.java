@@ -181,4 +181,8 @@ public class MapTemplatesScreenController implements Controller{
     public void onSelectButtonPressed() {
 
     }
+
+    public HashMap<String, MapTemplateSubcontroller> getMapTemplateSubCons() {
+        return mapTemplateSubCons;
+    }
 }

@@ -7,7 +7,7 @@ import de.uniks.pioneers.Template.MapTemplate;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
