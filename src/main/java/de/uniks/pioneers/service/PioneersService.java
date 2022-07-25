@@ -62,6 +62,10 @@ public class PioneersService {
         }
     }
 
+    public Observable<Move> playDevCard(String gameId, String devCard) {
+        return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, null, null, devCard, null));
+    }
+
     public Observable<Move> tradeBank(String gameId, HashMap<String, Integer> resources) {
 		return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, resources, BANK_ID, null, null));
 	}
