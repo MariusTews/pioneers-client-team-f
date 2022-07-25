@@ -36,7 +36,6 @@ public class UserSubViewTest extends ApplicationTest {
     @Mock
     UserService userService;
 
-
     final HashMap<String, Integer> hm = new HashMap<>() {{
       put("wool", 2);
       put("grain", 3);

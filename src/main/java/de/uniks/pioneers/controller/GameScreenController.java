@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uniks.pioneers.Constants.*;
 import static de.uniks.pioneers.computation.CalculateMap.createId;
@@ -72,8 +71,6 @@ public class GameScreenController implements Controller {
     public Label nextMoveLabel;
     @FXML
     public Label currentPlayerLabel;
-    @FXML
-    public Label playerLongestRoadLabel;
     @FXML
     public Button leave;
     @FXML
@@ -338,30 +335,13 @@ public class GameScreenController implements Controller {
     }
 
     private void allTheCards() {
-        AtomicInteger allTheCards = new AtomicInteger();
-        pioneersService.findOnePlayer(this.gameStorage.getId(),this.idStorage.getID())
-                .observeOn(FX_SCHEDULER).subscribe(e ->{
-                    for (DevelopmentCard card: e.developmentCards()) {
-                        if(card.type().equals(KNIGHT)){
-                            allTheCards.set(allTheCards.get() + 1);
+        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.app.getStage().getScene().getWindow(), gameStorage,
+                idStorage, pioneersService);
+        devCardsAmountLabel.setText(String.valueOf(developmentCardController.getAllTheCards().get()));
 
-                        }
-                        if(card.type().equals(YEAR_OF_PLENTY)){
-                            allTheCards.set(allTheCards.get()+1);
-                        }
-                        if(card.type().equals(ROAD_BUILDING)){
-                            allTheCards.set(allTheCards.get()+1);
-                        }
-                        if (card.type().equals(MONOPOLY)){
-                            allTheCards.set(allTheCards.get()+1);
-                        }
-                    }
-                    devCardsAmountLabel.setText(String.valueOf(allTheCards.get()));
-                });
     }
 
     private void actionOnCloseScreen() {
-
         if (playerOwnView.size() + opponents.size() == 1) {
             gameService
                     .deleteGame(gameStorage.getId())
@@ -472,8 +452,6 @@ public class GameScreenController implements Controller {
                     opponents.set(opponents.indexOf(p), player);
                 }
             }
-            //sets name of the longest road
-            updateLongestRoad(playerOwnView, opponents);
             //sets the winner
             winnerScreen(playerOwnView, opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
@@ -484,37 +462,6 @@ public class GameScreenController implements Controller {
         } else if (playerEvent.event().endsWith(DELETED)) {
             this.opponents.remove(player);
             this.removeOpponent(player);
-        }
-    }
-
-    //Sets the name of the user who has longestRoad
-    private void updateLongestRoad(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
-        String userId = "";
-        int longestRoad = 0;
-        for (Player p : playerOwnView) {
-            if (p.longestRoad() != null) {
-                if (((int) p.longestRoad()) > longestRoad) {
-                    userId = p.userId();
-                    longestRoad = (int) p.longestRoad();
-                }
-            }
-        }
-
-        for (Player p : opponents) {
-            if (p.longestRoad() != null) {
-                if (((int) p.longestRoad()) > longestRoad) {
-                    userId = p.userId();
-                    longestRoad = (int) p.longestRoad();
-                }
-            }
-        }
-
-        for (User u : allUser) {
-            if (u._id().equals(userId)) {
-                // Todo: longest Road
-                //playerLongestRoadLabel.setText(u.name());
-                break;
-            }
         }
     }
 
@@ -802,8 +749,8 @@ public class GameScreenController implements Controller {
     }
 
     public void onShowDevCard() {
-        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(),gameStorage,
-                idStorage, app,pioneersService);
+        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(), gameStorage,
+                idStorage, pioneersService);
         developmentCardController.render();
     }
 }

@@ -1,6 +1,5 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.service.GameStorage;
@@ -55,21 +54,16 @@ public class DevelopmentCardController implements Controller {
     private final GameStorage gameStorage;
 
     private final IDStorage idStorage;
-
-    private final App app;
-    private PioneersService pioneersService;
+    private final PioneersService pioneersService;
 
     private final Window owner;
 
-    private String allTheDevelopmentCard;
-
     @Inject
-    public DevelopmentCardController(Window owner, GameStorage gameStorage, IDStorage idStorage,
-                                     App app, PioneersService pioneersService){
+    public DevelopmentCardController(Window owner, GameStorage gameStorage, IDStorage idStorage
+            , PioneersService pioneersService) {
         this.owner = owner;
-        this.gameStorage =gameStorage;
+        this.gameStorage = gameStorage;
         this.idStorage = idStorage;
-        this.app = app;
         this.pioneersService = pioneersService;
     }
 
@@ -94,7 +88,8 @@ public class DevelopmentCardController implements Controller {
             // Set to UNDECORATED or TRANSPARENT (without white background) to remove minimize, maximize and close button of stage
             primaryStage.initStyle(StageStyle.TRANSPARENT);
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/Development.css")).toString());
+            scene.getStylesheets().add(Objects.requireNonNull(
+                    Main.class.getResource("view/stylesheets/DevelopmentCardStyle.css")).toString());
             primaryStage.setScene(scene);
             primaryStage.setTitle("");
             // Specify modality of the new window: interactions are only possible on the second window
@@ -106,7 +101,7 @@ public class DevelopmentCardController implements Controller {
             return null;
         }
 
-        calculateALlOwnedCards();
+        calculateAllOwnedCards();
 
         lumberImageId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/earth_cactus.png"))));
         roadImageId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/roadDev.png"))));
@@ -120,26 +115,26 @@ public class DevelopmentCardController implements Controller {
 
     }
 
-    private void calculateALlOwnedCards() {
+    private void calculateAllOwnedCards() {
         AtomicInteger year_of_plenty = new AtomicInteger();
         AtomicInteger road_building = new AtomicInteger();
         AtomicInteger knight = new AtomicInteger();
         AtomicInteger monopoly = new AtomicInteger();
 
-        pioneersService.findOnePlayer(this.gameStorage.getId(),this.idStorage.getID())
-                .observeOn(FX_SCHEDULER).subscribe(e ->{
-                    for (DevelopmentCard card: e.developmentCards()) {
-                        if(card.type().equals(KNIGHT)){
+        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
+                .observeOn(FX_SCHEDULER).subscribe(e -> {
+                    for (DevelopmentCard card : e.developmentCards()) {
+                        if (card.type().equals(KNIGHT)) {
                             knight.set(knight.get() + 1);
                         }
-                        if(card.type().equals(YEAR_OF_PLENTY)){
-                            year_of_plenty.set(year_of_plenty.get()+1);
+                        if (card.type().equals(YEAR_OF_PLENTY)) {
+                            year_of_plenty.set(year_of_plenty.get() + 1);
                         }
-                        if(card.type().equals(ROAD_BUILDING)){
-                            road_building.set(road_building.get()+1);
+                        if (card.type().equals(ROAD_BUILDING)) {
+                            road_building.set(road_building.get() + 1);
                         }
-                        if (card.type().equals(MONOPOLY)){
-                            monopoly.set(monopoly.get()+1);
+                        if (card.type().equals(MONOPOLY)) {
+                            monopoly.set(monopoly.get() + 1);
                         }
                     }
 
@@ -149,6 +144,28 @@ public class DevelopmentCardController implements Controller {
                     threeImagesDevId.setText(String.valueOf(monopoly.get()));
 
                 });
+    }
+
+    public AtomicInteger getAllTheCards() {
+        AtomicInteger allTheCards = new AtomicInteger();
+        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
+                .observeOn(FX_SCHEDULER).subscribe(e -> {
+                    for (DevelopmentCard card : e.developmentCards()) {
+                        if (card.type().equals(KNIGHT)) {
+                            allTheCards.set(allTheCards.get() + 1);
+                        }
+                        if (card.type().equals(YEAR_OF_PLENTY)) {
+                            allTheCards.set(allTheCards.get() + 1);
+                        }
+                        if (card.type().equals(ROAD_BUILDING)) {
+                            allTheCards.set(allTheCards.get() + 1);
+                        }
+                        if (card.type().equals(MONOPOLY)) {
+                            allTheCards.set(allTheCards.get() + 1);
+                        }
+                    }
+                });
+        return allTheCards;
     }
 
     public void onClickCancel() {

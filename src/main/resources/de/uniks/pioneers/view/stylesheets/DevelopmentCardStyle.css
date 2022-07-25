@@ -1,3 +1,7 @@
+.root {
+    -fx-font-family: "A-Space Black Demo";
+}
+
 .button.move {
     -fx-background-image: url("../assets/grey_button.png");
     -fx-background-size: 200 50;
@@ -53,7 +57,7 @@
     -fx-text-fill: #ffffff;
 }
 
-#rocketPaneId{
+#rocketPaneId {
     -fx-background-color: transparent;
 }
 
@@ -89,10 +93,6 @@
     -fx-text-fill: #ffffff;
 }
 
-
-
-
-/* Breite:300 höhe:100*/
 
 
 

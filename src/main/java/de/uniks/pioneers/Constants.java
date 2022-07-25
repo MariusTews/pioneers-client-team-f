@@ -80,11 +80,7 @@ public class Constants {
     public static final String ROAD = "road";
 
     //Card names
-    public static final String UNKNOWN = "unknown";
     public static final String KNIGHT = "Knight";
-
-    public static final String VICTORY_POINT = "victory-point";
-
     public static final String ROAD_BUILDING = "road-building";
 
     public static final String YEAR_OF_PLENTY = "year-of-plenty";

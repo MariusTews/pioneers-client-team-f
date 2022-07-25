@@ -1,6 +1,5 @@
 package de.uniks.pioneers.controller;
 
-import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
@@ -178,7 +177,7 @@ public class UserSubView implements Controller {
         this.sett.disableProperty().set(true);
         this.sett.setText(RENAME_SETTLEMENT);
         this.city.disableProperty().set(true);
-        this.city.setText(RENAME_CITY );
+        this.city.setText(RENAME_CITY);
 
         Tooltip.install(this.road, new Tooltip("1 Earth cactus, \n1 Mars bar "));
         Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
@@ -199,6 +198,6 @@ public class UserSubView implements Controller {
     }
 
     public void onDev(ActionEvent event) {
-
+        //TODO:action on clicked Dev card
     }
 }
