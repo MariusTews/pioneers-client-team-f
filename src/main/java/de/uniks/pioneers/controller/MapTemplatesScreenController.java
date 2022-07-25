@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
@@ -126,12 +127,14 @@ public class MapTemplatesScreenController implements Controller{
         if (event.event().endsWith(CREATED)) {
             if (idStorage.getID().equals(template.createdBy())) {
                 int position = 0;
-                for (Parent mapTemplateItem : mapTemplates) {
-                    if (mapTemplateItem.getId().equals("")) {
-                        addMapTemplateItem(template, position);
+                for (Parent mapTemplate : mapTemplates) {
+                    //the id "" is only used for the empty line hbox between own and other players' maps
+                    if (mapTemplate.getId().equals("")) {
+                        break;
                     }
                     position++;
                 }
+                addMapTemplateItem(template, position);
             }
             else {
                 addMapTemplateItem(template, -1);
@@ -184,5 +187,9 @@ public class MapTemplatesScreenController implements Controller{
 
     public HashMap<String, MapTemplateSubcontroller> getMapTemplateSubCons() {
         return mapTemplateSubCons;
+    }
+
+    public ObservableList<Parent> getMapTemplates() {
+        return mapTemplates;
     }
 }

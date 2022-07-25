@@ -12,6 +12,8 @@ import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import javafx.collections.ObservableList;
+import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static de.uniks.pioneers.Constants.CREATED;
+import static de.uniks.pioneers.Constants.UPDATED;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,7 +89,7 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
     @Test
     void updateMapTemplateName() {
         String newName = "berts map v2";
-        mapTemplateSubject.onNext(new Event<>(".updated", new MapTemplate(user1Map.createdAt(), user1Map.updatedAt(),
+        mapTemplateSubject.onNext(new Event<>(UPDATED, new MapTemplate(user1Map.createdAt(), user1Map.updatedAt(),
                 user1Map._id(), newName, user1Map.icon(), user1Map.createdBy(), user1Map.votes(), user1Map.tiles(), user1Map.harbors())));
 
         WaitForAsyncUtils.waitForFxEvents();
@@ -94,5 +98,37 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         MapTemplateSubcontroller controller = mapTemplateSubCons.get(user1Map._id());
 
         Assertions.assertThat(controller.nameLabel.getText()).isEqualTo(newName);
+    }
+
+    @Test
+    void addOwnMapTemplate() {
+        MapTemplate user1NewMap = new MapTemplate("", "", "3", "berts new map", null, user1._id(), 0, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(CREATED, user1NewMap));
+
+        WaitForAsyncUtils.waitForFxEvents();
+
+        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubcontroller controller = mapTemplateSubCons.get(user1NewMap._id());
+        Assertions.assertThat(controller).isNotNull();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        //assert that the new map is the second one (index 1) in the list (because it is a map from the current user)
+        Assertions.assertThat(mapTemplates.get(1).getId()).isEqualTo(user1NewMap._id());
+    }
+
+    @Test
+    void addMapTemplate() {
+        MapTemplate user2NewMap = new MapTemplate("", "", "4", "kunos new map", null, user2._id(), 0, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(CREATED, user2NewMap));
+
+        WaitForAsyncUtils.waitForFxEvents();
+
+        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubcontroller controller = mapTemplateSubCons.get(user2NewMap._id());
+        Assertions.assertThat(controller).isNotNull();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        //assert that the new map is the third one in the list, because it is a map from another user (index 3 because the empty line is in between)
+        Assertions.assertThat(mapTemplates.get(3).getId()).isEqualTo(user2NewMap._id());
     }
 }
