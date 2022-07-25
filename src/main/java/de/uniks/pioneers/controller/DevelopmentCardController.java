@@ -23,7 +23,6 @@ import javafx.stage.Window;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -116,35 +115,33 @@ public class DevelopmentCardController implements Controller {
     }
 
     private void calculateAllOwnedCards() {
-        AtomicInteger year_of_plenty = new AtomicInteger();
-        AtomicInteger road_building = new AtomicInteger();
-        AtomicInteger knight = new AtomicInteger();
-        AtomicInteger monopoly = new AtomicInteger();
-
         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
                 .observeOn(FX_SCHEDULER).subscribe(e -> {
+                    int year_of_plenty = 0;
+                    int road_building = 0;
+                    int knight = 0;
+                    int monopoly = 0;
                     for (DevelopmentCard card : e.developmentCards()) {
                         if (card.type().equals(KNIGHT)) {
-                            knight.set(knight.get() + 1);
+                            knight++;
                         }
                         if (card.type().equals(YEAR_OF_PLENTY)) {
-                            year_of_plenty.set(year_of_plenty.get() + 1);
+                            year_of_plenty++;
                         }
                         if (card.type().equals(ROAD_BUILDING)) {
-                            road_building.set(road_building.get() + 1);
+                            road_building++;
                         }
                         if (card.type().equals(MONOPOLY)) {
-                            monopoly.set(monopoly.get() + 1);
+                            monopoly++;
                         }
                     }
-
-                    currentLumberDevId.setText(String.valueOf(year_of_plenty.get()));
-                    labelForRoadId.setText(String.valueOf(road_building.get()));
-                    rocketLabelDevId.setText(String.valueOf(knight.get()));
-                    threeImagesDevId.setText(String.valueOf(monopoly.get()));
-
+                    currentLumberDevId.setText(String.valueOf(year_of_plenty));
+                    labelForRoadId.setText(String.valueOf(road_building));
+                    rocketLabelDevId.setText(String.valueOf(knight));
+                    threeImagesDevId.setText(String.valueOf(monopoly));
                 });
     }
+
     public void onClickCancel() {
         primaryStage.close();
     }

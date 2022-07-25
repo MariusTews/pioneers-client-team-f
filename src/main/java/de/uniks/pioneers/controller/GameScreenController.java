@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uniks.pioneers.Constants.*;
 import static de.uniks.pioneers.computation.CalculateMap.createId;
@@ -336,12 +335,10 @@ public class GameScreenController implements Controller {
     }
 
     private void allTheCards() {
-        AtomicInteger allTheCards = new AtomicInteger();
         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
                 .observeOn(FX_SCHEDULER).subscribe(e -> {
-                    allTheCards.set(e.developmentCards().size());
+                    devCardsAmountLabel.setText(String.valueOf(e.developmentCards().size()));
                 });
-        devCardsAmountLabel.setText(String.valueOf(allTheCards.get()));
     }
 
     private void actionOnCloseScreen() {
