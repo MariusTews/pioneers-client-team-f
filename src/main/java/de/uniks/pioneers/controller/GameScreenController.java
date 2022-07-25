@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uniks.pioneers.Constants.*;
 import static de.uniks.pioneers.computation.CalculateMap.createId;
@@ -328,17 +329,19 @@ public class GameScreenController implements Controller {
             e.consume();
         });
 
-
         //calculate all the owned cards
         allTheCards();
+
         return parent;
     }
 
     private void allTheCards() {
-        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.app.getStage().getOwner(), gameStorage,
-                idStorage, pioneersService);
-        devCardsAmountLabel.setText(String.valueOf(developmentCardController.getAllTheCards().get()));
-
+        AtomicInteger allTheCards = new AtomicInteger();
+        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
+                .observeOn(FX_SCHEDULER).subscribe(e -> {
+                    allTheCards.set(e.developmentCards().size());
+                });
+        devCardsAmountLabel.setText(String.valueOf(allTheCards.get()));
     }
 
     private void actionOnCloseScreen() {
@@ -472,7 +475,6 @@ public class GameScreenController implements Controller {
         //This saves username and their respective points from game in hashmap
         for (User user : this.allUser) {
             save(playerOwnView, userNumberPoints, user);
-
             save(opponents, userNumberPoints, user);
         }
 

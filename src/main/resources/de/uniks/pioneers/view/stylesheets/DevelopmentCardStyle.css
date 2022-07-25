@@ -11,7 +11,7 @@
     -fx-text-fill: #666666;
 }
 
-#mainHboxId {
+#mainHBoxId {
     -fx-background-image: url("../assets/yellow_panel.png");
     -fx-background-position: center;
     -fx-background-repeat: stretch;
@@ -77,7 +77,7 @@
     -fx-background-color: transparent;
 }
 
-#threeImgesHBoxId {
+#threeImagesHBoxId {
     -fx-background-color: transparent;
 }
 
@@ -92,8 +92,3 @@
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
 }
-
-
-
-
-

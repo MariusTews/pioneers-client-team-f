@@ -29,7 +29,7 @@ import static de.uniks.pioneers.Constants.*;
 
 public class DevelopmentCardController implements Controller {
 
-    public HBox mainHboxId;
+    public HBox mainHBoxId;
     public Pane paneForLumberId;
     public VBox vBoxForLumberId;
     public HBox hBoxForLumberId;
@@ -59,8 +59,8 @@ public class DevelopmentCardController implements Controller {
     private final Window owner;
 
     @Inject
-    public DevelopmentCardController(Window owner, GameStorage gameStorage, IDStorage idStorage
-            , PioneersService pioneersService) {
+    public DevelopmentCardController(Window owner, GameStorage gameStorage, IDStorage idStorage,
+                                     PioneersService pioneersService) {
         this.owner = owner;
         this.gameStorage = gameStorage;
         this.idStorage = idStorage;
@@ -145,29 +145,6 @@ public class DevelopmentCardController implements Controller {
 
                 });
     }
-
-    public AtomicInteger getAllTheCards() {
-        AtomicInteger allTheCards = new AtomicInteger();
-        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
-                .observeOn(FX_SCHEDULER).subscribe(e -> {
-                    for (DevelopmentCard card : e.developmentCards()) {
-                        if (card.type().equals(KNIGHT)) {
-                            allTheCards.set(allTheCards.get() + 1);
-                        }
-                        if (card.type().equals(YEAR_OF_PLENTY)) {
-                            allTheCards.set(allTheCards.get() + 1);
-                        }
-                        if (card.type().equals(ROAD_BUILDING)) {
-                            allTheCards.set(allTheCards.get() + 1);
-                        }
-                        if (card.type().equals(MONOPOLY)) {
-                            allTheCards.set(allTheCards.get() + 1);
-                        }
-                    }
-                });
-        return allTheCards;
-    }
-
     public void onClickCancel() {
         primaryStage.close();
     }
