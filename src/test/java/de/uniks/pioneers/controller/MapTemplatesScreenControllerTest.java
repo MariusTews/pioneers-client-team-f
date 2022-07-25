@@ -29,8 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static de.uniks.pioneers.Constants.CREATED;
-import static de.uniks.pioneers.Constants.UPDATED;
+import static de.uniks.pioneers.Constants.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,6 +83,11 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
         Assertions.assertThat(user1MapTemplateBox.getChildren().size()).isEqualTo(7);
         Assertions.assertThat(user2MapTemplateBox.getChildren().size()).isEqualTo(7);
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        Assertions.assertThat(mapTemplates.get(0).getId()).isEqualTo(user1Map._id());
+        //index 1 is the empty line between own and other maps
+        Assertions.assertThat(mapTemplates.get(2).getId()).isEqualTo(user2Map._id());
     }
 
     @Test
@@ -108,7 +112,7 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
-        MapTemplateSubcontroller controller = mapTemplateSubCons.get(user1NewMap._id());
+        MapTemplateSubcontroller controller = mapTemplateSubCons.getOrDefault(user1NewMap._id(), null);
         Assertions.assertThat(controller).isNotNull();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
@@ -124,11 +128,41 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
-        MapTemplateSubcontroller controller = mapTemplateSubCons.get(user2NewMap._id());
+        MapTemplateSubcontroller controller = mapTemplateSubCons.getOrDefault(user2NewMap._id(), null);
         Assertions.assertThat(controller).isNotNull();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
         //assert that the new map is the third one in the list, because it is a map from another user (index 3 because the empty line is in between)
         Assertions.assertThat(mapTemplates.get(3).getId()).isEqualTo(user2NewMap._id());
+    }
+
+    @Test
+    void deleteOwnMapTemplate() {
+        mapTemplateSubject.onNext(new Event<>(DELETED, user1Map));
+
+        WaitForAsyncUtils.waitForFxEvents();
+
+        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubcontroller controller = mapTemplateSubCons.getOrDefault(user1Map._id(), null);
+        Assertions.assertThat(controller).isNull();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        //assert that there are only two list items left (one for the empty line, one for the other map)
+        Assertions.assertThat(mapTemplates.size()).isEqualTo(2);
+    }
+
+    @Test
+    void deleteMapTemplate() {
+        mapTemplateSubject.onNext(new Event<>(DELETED, user2Map));
+
+        WaitForAsyncUtils.waitForFxEvents();
+
+        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubcontroller controller = mapTemplateSubCons.getOrDefault(user2Map._id(), null);
+        Assertions.assertThat(controller).isNull();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        //assert that there are only two list items left (one for the empty line, one for the own map)
+        Assertions.assertThat(mapTemplates.size()).isEqualTo(2);
     }
 }
