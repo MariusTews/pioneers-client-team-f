@@ -330,7 +330,7 @@ public class TestModule {
 		return new MapsApiService() {
 			@Override
 			public Observable<List<MapTemplate>> findAllMaps() {
-				return null;
+				return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
 			}
 		};
 	}
