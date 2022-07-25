@@ -22,7 +22,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -369,7 +368,7 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService, player, gameFieldSubController,
+        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController,
                 this.gameStorage.getVictoryPoints());
         userSubView.init();
         this.tradingSubController.setPlayer(player);

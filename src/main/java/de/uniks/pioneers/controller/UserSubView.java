@@ -3,7 +3,6 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import javafx.event.ActionEvent;
@@ -29,8 +28,6 @@ public class UserSubView implements Controller {
 
     private final ArrayList<User> users = new ArrayList<>();
     private final IDStorage idStorage;
-
-    private final GameStorage gameStorage;
     private final UserService userService;
     private final GameFieldSubController gameFieldSubController;
     private final Player player;
@@ -57,10 +54,9 @@ public class UserSubView implements Controller {
     public Button developmentCardsButton;
 
     @Inject
-    public UserSubView(IDStorage idStorage, GameStorage gameStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
+    public UserSubView(IDStorage idStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
                        int maxVictoryPoints) {
         this.idStorage = idStorage;
-        this.gameStorage = gameStorage;
         this.userService = userService;
         this.player = player;
         this.gameFieldSubController = gameFieldSubController;

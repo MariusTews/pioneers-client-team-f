@@ -3,7 +3,6 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
@@ -28,9 +27,6 @@ public class UserSubViewTest extends ApplicationTest {
     @Spy
     IDStorage idStorage;
 
-    @Spy
-    GameStorage gameStorage;
-
     @Mock
     GameFieldSubController gameFieldSubController;
     @Mock
@@ -45,7 +41,7 @@ public class UserSubViewTest extends ApplicationTest {
     }};
 
     @InjectMocks
-    UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService,new Player("id","2",
+    UserSubView userSubView = new UserSubView(idStorage, userService,new Player("id","2",
             "#000000", true, 2, hm, new HashMap<>(),2,2,null, null), gameFieldSubController, 10);
 
 
@@ -54,7 +50,7 @@ public class UserSubViewTest extends ApplicationTest {
         when(userService.findAllUsers()).thenReturn(Observable.just(List.of(
                 new User("1234","12345","2","testus","online",null, new ArrayList<>()))));
 
-        userSubView = new UserSubView(idStorage, gameStorage, userService,new Player("id","2",
+        userSubView = new UserSubView(idStorage, userService,new Player("id","2",
                 "#000000", true, 2, hm, new HashMap<>(),2,10,null, null), gameFieldSubController, 10);
 
         final App app = new App(userSubView);
