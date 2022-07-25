@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class MapTemplateSubcontroller implements Controller{
-    private final MapTemplate template;
+    private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
     private Image leftActionImage;
@@ -57,9 +57,7 @@ public class MapTemplateSubcontroller implements Controller{
             return null;
         }
 
-        nameLabel.setText(template.name());
-        createdByLabel.setText("| " + createdBy);
-        votesLabel.setText("| " + template.votes());
+        updateContent();
 
         if (ownMap) {
             leftActionImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/editIcon.png")).toString());
@@ -82,6 +80,12 @@ public class MapTemplateSubcontroller implements Controller{
         return parent;
     }
 
+    public void updateContent() {
+        nameLabel.setText(template.name());
+        createdByLabel.setText("| " + createdBy);
+        votesLabel.setText("| " + template.votes());
+    }
+
     public void onLeftActionImagePressed() {
         if (ownMap) {
             //edit map
@@ -98,5 +102,9 @@ public class MapTemplateSubcontroller implements Controller{
         else {
             //down-vote map
         }
+    }
+
+    public void setTemplate(MapTemplate template) {
+        this.template = template;
     }
 }

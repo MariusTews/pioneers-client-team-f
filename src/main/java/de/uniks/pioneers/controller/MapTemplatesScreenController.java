@@ -3,13 +3,15 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.Template.MapTemplate;
+import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MapsService;
 import de.uniks.pioneers.service.UserService;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -25,7 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 public class MapTemplatesScreenController implements Controller{
     private final App app;
@@ -33,6 +35,7 @@ public class MapTemplatesScreenController implements Controller{
     private final MapsService mapsService;
     private final UserService userService;
     private final IDStorage idStorage;
+    private final EventListener eventListener;
     @FXML public ImageView nameArrow;
     @FXML public ImageView createdByArrow;
     @FXML public ImageView votesArrow;
@@ -42,29 +45,37 @@ public class MapTemplatesScreenController implements Controller{
     @FXML public Button selectButton;
     @FXML public ListView<Parent> mapTemplatesListView;
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
-    private final List<MapTemplateSubcontroller> mapTemplateSubCons = new ArrayList<>();
+    private final HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
+    private CompositeDisposable disposable;
 
     @Inject
-    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController, MapsService mapsService, UserService userService, IDStorage idStorage) {
+    public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController,
+                                        MapsService mapsService, UserService userService, IDStorage idStorage,
+                                        EventListener eventListener) {
         this.app = app;
         this.createGameController = createGameController;
         this.mapsService = mapsService;
         this.userService = userService;
         this.idStorage = idStorage;
+        this.eventListener = eventListener;
     }
 
     @Override
     public void init() {
-
+        disposable = new CompositeDisposable();
+        disposable.add(eventListener.listen("maps.*.*", MapTemplate.class).observeOn(FX_SCHEDULER).subscribe(this::handleMapTemplateEvents));
     }
 
     @Override
     public void destroy() {
-        for (MapTemplateSubcontroller controller : mapTemplateSubCons) {
+        for (MapTemplateSubcontroller controller : mapTemplateSubCons.values()) {
             controller.destroy();
         }
         mapTemplateSubCons.clear();
+        if (disposable != null) {
+            disposable.clear();
+        }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -102,16 +113,60 @@ public class MapTemplatesScreenController implements Controller{
                             maps.addAll(otherMaps);
 
                             for (MapTemplate template : maps) {
-                                boolean ownMap = idStorage.getID().equals(template.createdBy());
-                                String userName = userNames.getOrDefault(template.createdBy(), "");
-                                MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
-                                mapTemplateSubCons.add(controller);
-                                mapTemplates.add(controller.render());
+                                addMapTemplateItem(template, -1);
                             }
                         }
                 );
 
         return parent;
+    }
+
+    private void handleMapTemplateEvents(Event<MapTemplate> event) {
+        MapTemplate template = event.data();
+        if (event.event().endsWith(CREATED)) {
+            if (idStorage.getID().equals(template.createdBy())) {
+                int position = 0;
+                for (Parent mapTemplateItem : mapTemplates) {
+                    if (mapTemplateItem.getId().equals("")) {
+                        addMapTemplateItem(template, position);
+                    }
+                    position++;
+                }
+            }
+            else {
+                addMapTemplateItem(template, -1);
+            }
+        }
+        else if (event.event().endsWith(UPDATED)) {
+            MapTemplateSubcontroller controller = mapTemplateSubCons.get(template._id());
+            controller.setTemplate(template);
+            controller.updateContent();
+        }
+        else if (event.event().endsWith(DELETED)) {
+            MapTemplateSubcontroller controller = mapTemplateSubCons.get(template._id());
+            controller.destroy();
+            mapTemplateSubCons.remove(template._id());
+            for (Parent mapTemplateItem : mapTemplates) {
+                if (mapTemplateItem.getId().equals(template._id())){
+                    mapTemplates.remove(mapTemplateItem);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void addMapTemplateItem(MapTemplate template, int position) {
+        boolean ownMap = idStorage.getID().equals(template.createdBy());
+        String userName = userNames.getOrDefault(template.createdBy(), "");
+        MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
+        mapTemplateSubCons.put(template._id(), controller);
+        //if position is -1 then the item should be added at the end of the list
+        if (position == -1) {
+            mapTemplates.add(controller.render());
+        }
+        else {
+            mapTemplates.add(position, controller.render());
+        }
     }
 
     public void onBackButtonPressed() {
