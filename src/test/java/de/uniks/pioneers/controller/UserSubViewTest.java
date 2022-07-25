@@ -45,7 +45,7 @@ public class UserSubViewTest extends ApplicationTest {
 
     @InjectMocks
     UserSubView userSubView = new UserSubView(idStorage,userService,new Player("id","2",
-            "#000000", true, 2, hm, new HashMap<>(),2,2,null), gameFieldSubController, 10);
+            "#000000", true, 2, hm, new HashMap<>(),2,2,null, null), gameFieldSubController, 10);
 
 
     public void start(Stage stage){
@@ -54,7 +54,7 @@ public class UserSubViewTest extends ApplicationTest {
                 new User("1234","12345","2","testus","online",null, new ArrayList<>()))));
 
         userSubView = new UserSubView(idStorage,userService,new Player("id","2",
-                "#000000", true, 2, hm, new HashMap<>(),2,10,null), gameFieldSubController, 10);
+                "#000000", true, 2, hm, new HashMap<>(),2,10,null, null), gameFieldSubController, 10);
 
         final App app = new App(userSubView);
         app.start(stage);

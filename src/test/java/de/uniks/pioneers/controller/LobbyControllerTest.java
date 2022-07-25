@@ -89,7 +89,7 @@ class LobbyControllerTest extends ApplicationTest {
 
         List<Game> gameList = new ArrayList<>();
         gameList.add(new Game("0:00", "0:30",
-                "id", "name", "owner", 2, false,new GameSettings(2,10)));
+                "id", "name", "owner", 2, false,new GameSettings(2,10, null, false, 0)));
         when(gameService.findAllGames()).thenReturn(Observable.just(gameList));
 
         List<User> userList = new ArrayList<>();
@@ -142,9 +142,9 @@ class LobbyControllerTest extends ApplicationTest {
         waitForFxEvents();
 
         gameSubject.onNext(new Event<>(".created", new Game("0","1","2", "ert","2",0,false,
-                new GameSettings(2,10))));
+                new GameSettings(2,10, null, false, 0))));
         gameSubject.onNext(new Event<>(".updated", new Game("0","1","2", "ert","2",0,true,
-                new GameSettings(2,10))));
+                new GameSettings(2,10, null, false, 0))));
         waitForFxEvents();
 
         //members for Group
@@ -182,7 +182,7 @@ class LobbyControllerTest extends ApplicationTest {
         when(memberService.getAllGameMembers("id")).thenReturn(Observable.just(memberList));
         //when(memberService.join("id","00000")).thenReturn(Observable.empty());
         Game game = new Game("0","1","2", "ert","2",0,true,
-                new GameSettings(2,10));
+                new GameSettings(2,10, null, false, 0));
         lobbyController.joinGame(game);
 
         verify(memberService).getAllGameMembers("id");
@@ -192,7 +192,7 @@ class LobbyControllerTest extends ApplicationTest {
     void joinGameNullTest() {
         when(gameStorage.getId()).thenReturn(null);
         Game game = new Game("0", "1", "2", "ert", "2", 0, true,
-                new GameSettings(2, 10));
+                new GameSettings(2, 10, null, false, 0));
 
         Platform.runLater(() -> lobbyController.joinGame(game));
     }

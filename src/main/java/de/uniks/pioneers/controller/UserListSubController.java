@@ -71,12 +71,11 @@ public class UserListSubController implements Controller {
 
             if (this.user.status().equals("online")) {
                 this.userStatusCircle.setFill(Color.GREEN);
+                if (this.user.avatar() != null) {
+                    this.userImageView.setImage(new Image(this.user.avatar()));
+                }
             } else if (this.user.status().equals("offline")) {
                 this.userStatusCircle.setFill(Color.RED);
-            }
-
-            if (this.user.avatar() != null) {
-                this.userImageView.setImage(new Image(this.user.avatar()));
             }
 
             if (this.user.status().equals("offline") || user._id().equals(idStorage.getID())) {

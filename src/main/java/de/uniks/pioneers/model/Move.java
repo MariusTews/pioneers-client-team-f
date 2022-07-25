@@ -15,5 +15,6 @@ public record Move(
         String building,
 		RobDto rob,
 		HashMap<String, Integer> resources,
-		String partner
+		String partner,
+		String developmentCard
 ) {}

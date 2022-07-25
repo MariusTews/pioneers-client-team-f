@@ -67,9 +67,9 @@ public class LobbyViewTest extends ApplicationTest {
 	public void start(Stage stage) {
 		when(idStorage.getID()).thenReturn("4");
 		when(gameStorage.getId()).thenReturn("");
-		when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "627cf3c93496bc00158f3859", "testGame", "1", 2, false, new GameSettings(2, 10)),
-				new Game("1", "1", "14", "testGame", "3", MAX_MEMBERS, false, new GameSettings(2, 10)),
-				new Game("1", "1", "13", "testGame", "2", 2, true, new GameSettings(2, 10)))));
+		when(gameService.findAllGames()).thenReturn(Observable.just(List.of(new Game("1", "1", "627cf3c93496bc00158f3859", "testGame", "1", 2, false, new GameSettings(2, 10, null, false, 0)),
+				new Game("1", "1", "14", "testGame", "3", MAX_MEMBERS, false, new GameSettings(2, 10, null, false, 0)),
+				new Game("1", "1", "13", "testGame", "2", 2, true, new GameSettings(2, 10, null, false, 0)))));
 		when(userService.findAllUsers()).thenReturn(Observable.just(List.of(new User("1234", "12345", "1", "test", "online", null, new ArrayList<>()),
 				new User("1234", "12345", "4", "testus", "online", null, new ArrayList<>()),
 				new User("1234", "12345", "3", "testtest", "offline", null, new ArrayList<>()))));
