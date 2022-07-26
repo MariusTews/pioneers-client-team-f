@@ -88,11 +88,9 @@ public class MapTemplateSubController implements Controller {
         createdByLabel.setText("| " + createdBy);
         if ((int) template.votes() > 0) {
             votesLabel.setText("| +" + template.votes());
-        }
-        else if ((int) template.votes() == 0) {
+        } else if ((int) template.votes() == 0) {
             votesLabel.setText("|  " + template.votes());
-        }
-        else {
+        } else {
             votesLabel.setText("| " + template.votes());
         }
     }

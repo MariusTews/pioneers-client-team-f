@@ -9,71 +9,79 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplatesScreenController">
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplatesScreenController">
     <Label styleClass="white-title" text="Map Templates">
         <VBox.margin>
-          <Insets bottom="20.0" />
+            <Insets bottom="20.0"/>
         </VBox.margin>
     </Label>
     <VBox prefHeight="400.0" prefWidth="900.0" styleClass="map-templates-box">
         <VBox.margin>
-            <Insets />
+            <Insets/>
         </VBox.margin>
         <HBox prefHeight="20.0" prefWidth="600.0">
             <HBox id="descriptionHBox" prefHeight="20.0" prefWidth="520.0">
                 <HBox.margin>
-                    <Insets left="24.0" />
+                    <Insets left="24.0"/>
                 </HBox.margin>
                 <Label style="-fx-text-fill: white" text="Name">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
-                <ImageView fx:id="nameArrow" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
+                <ImageView fx:id="nameArrow" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true"/>
                 <Label style="-fx-text-fill: white" text="| Created By">
                     <HBox.margin>
-                        <Insets left="140.0" />
+                        <Insets left="140.0"/>
                     </HBox.margin>
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
-                <ImageView fx:id="createdByArrow" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
+                <ImageView fx:id="createdByArrow" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                           preserveRatio="true"/>
                 <Label style="-fx-text-fill: white" text="| Votes">
                     <HBox.margin>
-                        <Insets left="60.0" />
+                        <Insets left="60.0"/>
                     </HBox.margin>
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
-                <ImageView fx:id="votesArrow" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
+                <ImageView fx:id="votesArrow" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                           preserveRatio="true"/>
             </HBox>
             <Label fx:id="selectedLabel" prefWidth="240.0" style="-fx-text-fill: white" text="Selected: Default">
                 <font>
-                    <Font size="14.0" />
+                    <Font size="14.0"/>
                 </font>
-            <HBox.margin>
-               <Insets left="20.0" />
-            </HBox.margin>
+                <HBox.margin>
+                    <Insets left="20.0"/>
+                </HBox.margin>
             </Label>
         </HBox>
-        <ListView fx:id="mapTemplatesListView" prefHeight="340.0" prefWidth="800.0" styleClass="map-templates-list-view">
-         <VBox.margin>
-            <Insets top="12.0" />
-         </VBox.margin></ListView>
-      <padding>
-         <Insets bottom="20.0" left="50.0" right="50.0" top="20.0" />
-      </padding>
+        <ListView fx:id="mapTemplatesListView" prefHeight="340.0" prefWidth="800.0"
+                  styleClass="map-templates-list-view">
+            <VBox.margin>
+                <Insets top="12.0"/>
+            </VBox.margin>
+        </ListView>
+        <padding>
+            <Insets bottom="20.0" left="50.0" right="50.0" top="20.0"/>
+        </padding>
     </VBox>
     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
         <VBox.margin>
-            <Insets left="20.0" right="20.0" />
+            <Insets left="20.0" right="20.0"/>
         </VBox.margin>
-        <Button fx:id="backButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onBackButtonPressed" styleClass="redButton" text="Back" />
+        <Button fx:id="backButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onBackButtonPressed"
+                styleClass="redButton" text="Back"/>
         <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="820.0">
-            <Button fx:id="createButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onCreateButtonPressed" styleClass="blueButton" text="Create" />
-            <Button fx:id="selectButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onSelectButtonPressed" styleClass="greenButton" text="Select" />
+            <Button fx:id="createButton" contentDisplay="CENTER" mnemonicParsing="false"
+                    onAction="#onCreateButtonPressed" styleClass="blueButton" text="Create"/>
+            <Button fx:id="selectButton" contentDisplay="CENTER" mnemonicParsing="false"
+                    onAction="#onSelectButtonPressed" styleClass="greenButton" text="Select"/>
         </HBox>
     </HBox>
 </VBox>
