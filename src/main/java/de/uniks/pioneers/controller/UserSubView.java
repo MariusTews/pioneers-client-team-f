@@ -3,14 +3,13 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.GameStorage;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -204,6 +202,7 @@ public class UserSubView implements Controller {
     }
 
     public void onDev() {
+        AlertService alertService = new AlertService();
         pioneersService.findOneState(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER).subscribe(e -> {
                     if (e.expectedMoves().get(0).action().equals(BUILD) && e.expectedMoves().get(0).players().contains(this.idStorage.getID())) {
@@ -213,18 +212,10 @@ public class UserSubView implements Controller {
                                         .observeOn(FX_SCHEDULER).subscribe());
                     } else if (e.expectedMoves().get(0).action().equals(BUILD) &&
                             !e.expectedMoves().get(0).players().contains(this.idStorage.getID())) {
-                        alert("Not Your Turn");
+                        alertService.showAlert("Not Your Turn");
                     } else {
-                        alert("Wrong Action Sequence");
+                        alertService.showAlert("Wrong Action Sequence");
                     }
                 });
-    }
-
-    private void alert(String text) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, text);
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-        alert.showAndWait();
     }
 }
