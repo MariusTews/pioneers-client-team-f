@@ -34,20 +34,16 @@ public class DevelopmentCardController implements Controller {
     public HBox hBoxForLumberId;
     public Label labelForLumberId;
     public ImageView lumberImageId;
-    //label for first Development card
-    public Label currentLumberDevId;
     public ImageView roadImageId;
 
-    //label for roadDevelopment card
-    public Label labelForRoadId;
     public ImageView rocketImageId;
-    //label for rocketDevelopment card
-    public Label rocketLabelDevId;
     public ImageView threeUsersImageId;
     public ImageView rockImageId;
     public ImageView arrowImageId;
-    //label for fourth Development card
-    public Label threeImagesDevId;
+    public Label yearOfPlentyCard;
+    public Label roadBuildingCard;
+    public Label knightCard;
+    public Label monoPolyCard;
     private Stage primaryStage;
 
     private final GameStorage gameStorage;
@@ -114,6 +110,7 @@ public class DevelopmentCardController implements Controller {
 
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void calculateAllOwnedCards() {
         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
                 .observeOn(FX_SCHEDULER).subscribe(e -> {
@@ -134,11 +131,12 @@ public class DevelopmentCardController implements Controller {
                         if (card.type().equals(MONOPOLY)) {
                             monopoly++;
                         }
+
                     }
-                    currentLumberDevId.setText(String.valueOf(year_of_plenty));
-                    labelForRoadId.setText(String.valueOf(road_building));
-                    rocketLabelDevId.setText(String.valueOf(knight));
-                    threeImagesDevId.setText(String.valueOf(monopoly));
+                    yearOfPlentyCard.setText(String.valueOf(year_of_plenty));
+                    roadBuildingCard.setText(String.valueOf(road_building));
+                    knightCard.setText(String.valueOf(knight));
+                    monoPolyCard.setText(String.valueOf(monopoly));
                 });
     }
 
