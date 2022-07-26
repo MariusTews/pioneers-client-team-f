@@ -355,8 +355,11 @@ public class CalculateMap {
 			//Place a Label for the number
 			buildLabel(map, xCoordinate - 12, yCoordinate - 12, x, y, z);
 		} else {
-			buildButton(map, xCoordinate - 40, yCoordinate - 15, x, y, z, false);
-			buildButton(map, xCoordinate + 10, yCoordinate - 15, x, y, z, true);
+			hexagon.setFill(Color.TRANSPARENT);
+			hexagon.setStyle("-fx-background-color: rgba(255, 255, 255, .7)");
+			hexagon.setStroke(Color.BLACK);
+			buildButton(map, xCoordinate - 45, yCoordinate - 15, x, y, z, false);
+			buildButton(map, xCoordinate + 5, yCoordinate - 15, x, y, z, true);
 		}
 	}
 
@@ -367,13 +370,15 @@ public class CalculateMap {
 		map.getChildren().add(button);
 		button.setLayoutX(xCoordinate);
 		button.setLayoutY(yCoordinate);
-		button.toFront();
 		button.setText("+");
-		button.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+		button.toFront();
+
 		if (harbor) {
 			button.setId(createId(x, y, z) + "_harborButton");
+			button.setStyle("-fx-text-fill: orange");
 		} else {
 			button.setId(createId(x, y, z) + "_tileButton");
+			button.setStyle("-fx-text-fill: green");
 		}
 	}
 

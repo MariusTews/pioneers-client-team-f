@@ -11,13 +11,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MapEditorController implements Controller {
     @FXML
@@ -32,8 +38,11 @@ public class MapEditorController implements Controller {
     public Button saveButton;
     @FXML
     public ScrollPane mapPane;
+    @FXML
+    public VBox menu;
 
     private List<Polygon> hexagons = new ArrayList<>();
+    private Pane map;
 
     @Inject
     public MapEditorController() {
@@ -62,37 +71,67 @@ public class MapEditorController implements Controller {
             return null;
         }
 
-        Pane map = new CalculateMap().buildMap(2, true);
+        map = new CalculateMap().buildMap(0, true);
 
         this.mapPane.setContent(map);
 
+        addButtonsOnTiles();
+        menu.toFront();
+        return parent;
+    }
+
+    private void addButtonsOnTiles() {
         for (Node node : map.getChildren()) {
             if (node.getId().endsWith("_harborButton")) {
                 Button button = (Button) node;
                 button.setOnAction(this::harborButtonPressed);
+                button.setStyle("-fx-background-color: #d2dcde; -fx-text-fill: orange;");
             } else if (node.getId().endsWith("_tileButton")) {
                 Button button = (Button) node;
                 button.setOnAction(this::tileButtonPressed);
+                button.setStyle("-fx-background-color: #d2dcde; -fx-text-fill: green;");
             } else {
                 this.hexagons.add((Polygon) node);
             }
         }
-
-        return parent;
     }
 
     private void tileButtonPressed(ActionEvent event) {
+        Pattern pattern = Pattern.compile("=(.*?)_");
+        Matcher matcher = pattern.matcher(event.getSource().toString());
+        if (matcher.find()) {
+            for (Node node : map.getChildren()) {
+                if (node.getId().equals(matcher.group(1))) {
+                    Polygon hexagon = (Polygon) node;
+                    Button button = (Button) event.getSource();
+                    button.setVisible(false);
+                }
+            }
+        }
     }
 
     private void harborButtonPressed(ActionEvent event) {
     }
 
     public void mapSizeMinusButtonPressed(ActionEvent event) {
+        if (Integer.parseInt(this.mapSizeLabel.getText()) > 0) {
+            map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) - 1, true);
+            int mapSize = Integer.parseInt(this.mapSizeLabel.getText()) - 1;
+            this.mapSizeLabel.setText(String.valueOf(mapSize));
+            this.mapPane.setContent(map);
+            addButtonsOnTiles();
+        }
     }
 
     public void mapSizePlusButtonPressed(ActionEvent event) {
+        map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) + 1, true);
+        int mapSize = Integer.parseInt(this.mapSizeLabel.getText()) + 1;
+        this.mapSizeLabel.setText(String.valueOf(mapSize));
+        this.mapPane.setContent(map);
+        addButtonsOnTiles();
     }
 
     public void saveButtonPressed(ActionEvent event) {
     }
+
 }
