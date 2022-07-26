@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
+import de.uniks.pioneers.computation.LoadMapTemplate;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
@@ -93,9 +94,13 @@ public class GameFieldSubController implements Controller {
 
     @Override
     public Parent render() {
-        CalculateMap calculateMap = new CalculateMap();
-        this.parent = calculateMap.buildMap(this.gameStorage.getSize());
-
+        if (this.gameStorage.getMapTemplate() == null) {
+            CalculateMap calculateMap = new CalculateMap();
+            this.parent = calculateMap.buildMap(this.gameStorage.getSize());
+        } else {
+            LoadMapTemplate loadMapTemplate = new LoadMapTemplate();
+            loadMapTemplate.loadMap(this.gameStorage.getMapTemplate(), true);
+        }
         pioneersService.findAllTiles(gameStorage.getId()).observeOn(FX_SCHEDULER).subscribe(this::loadMap);
 
         return parent;
