@@ -96,7 +96,7 @@ public class GameFieldSubController implements Controller {
     public Parent render() {
         if (this.gameStorage.getMapTemplate() == null) {
             CalculateMap calculateMap = new CalculateMap();
-            this.parent = calculateMap.buildMap(this.gameStorage.getSize());
+            this.parent = calculateMap.buildMap(this.gameStorage.getSize(), false);
         } else {
             LoadMapTemplate loadMapTemplate = new LoadMapTemplate();
             loadMapTemplate.loadMap(this.gameStorage.getMapTemplate(), true);
