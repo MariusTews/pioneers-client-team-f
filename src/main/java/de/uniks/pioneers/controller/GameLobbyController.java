@@ -225,6 +225,7 @@ public class GameLobbyController implements Controller {
                     int victoryPoints = result.settings().victoryPoints();
                     int mapRadius = result.settings().mapRadius();
                     this.gameStorage.setSize(mapRadius);
+                    this.gameStorage.setMapTemplate(result.settings().mapTemplate());
                     this.gameStorage.setVictoryPoints(victoryPoints);
                     this.settingsLabel.setText("Settings: Map Size = " + mapRadius + "  Required VP = " + victoryPoints);
                     this.idTitleLabel.setText("Welcome to " + this.game.name());

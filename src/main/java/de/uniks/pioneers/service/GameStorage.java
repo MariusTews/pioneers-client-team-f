@@ -6,6 +6,8 @@ import javax.inject.Singleton;
 @Singleton
 public class GameStorage {
     private String id;
+
+    private String mapTemplate;
     private int size;
     private int victoryPoints;
 
@@ -35,5 +37,13 @@ public class GameStorage {
 
     public void setVictoryPoints(int victoryPoints) {
         this.victoryPoints = victoryPoints;
+    }
+
+    public String getMapTemplate() {
+        return mapTemplate;
+    }
+
+    public void setMapTemplate(String mapTemplate) {
+        this.mapTemplate = mapTemplate;
     }
 }
