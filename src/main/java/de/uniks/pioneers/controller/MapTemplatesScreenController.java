@@ -174,18 +174,20 @@ public class MapTemplatesScreenController implements Controller {
             emptyLine.setPrefHeight(25);
             mapTemplates.add(emptyLine);
         }
-        boolean ownMap = idStorage.getID().equals(template.createdBy());
-        String userName = userNames.getOrDefault(template.createdBy(), "");
-        MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
-        mapTemplateSubCons.put(template._id(), controller);
-        controller.init();
-        Parent item = controller.render();
-        item.setOnMouseClicked(this::selectMapTemplateItem);
-        //if position is -1 then the item should be added at the end of the list
-        if (position == -1) {
-            mapTemplates.add(item);
-        } else {
-            mapTemplates.add(position, item);
+        else {
+            boolean ownMap = idStorage.getID().equals(template.createdBy());
+            String userName = userNames.getOrDefault(template.createdBy(), "");
+            MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
+            mapTemplateSubCons.put(template._id(), controller);
+            controller.init();
+            Parent item = controller.render();
+            item.setOnMouseClicked(this::selectMapTemplateItem);
+            //if position is -1 then the item should be added at the end of the list
+            if (position == -1) {
+                mapTemplates.add(item);
+            } else {
+                mapTemplates.add(position, item);
+            }
         }
     }
 
