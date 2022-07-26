@@ -303,7 +303,6 @@ public class CalculateMap {
 				buildWaterTile(map, getxCoordinate(center, -i, waterMax), getyCoordinate(center, waterMax), -i, waterMin + i, waterMax, 5);
 			}
 		}
-		map.setStyle("-fx-background: transparent; -fx-background-color: transparent; ");
 		return map;
 	}
 
@@ -327,6 +326,7 @@ public class CalculateMap {
 
 			center = mapSize / 2;
 		}
+		map.setStyle("-fx-background: transparent; -fx-background-color: transparent; ");
 		return map;
 	}
 
