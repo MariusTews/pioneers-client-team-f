@@ -43,7 +43,7 @@ public class CalculateMap {
 		return hexagon;
 	}
 
-	public Circle buildCircle( double xCoordinate, double yCoordinate, int x, int y, int z, int side) {
+	public Circle buildCircle(double xCoordinate, double yCoordinate, int x, int y, int z, int side) {
 		//creates a Circle at the given coordinate
 		Circle circle = new Circle(15);
 		String id = createId(x, y, z) + "_" + side;
@@ -144,7 +144,7 @@ public class CalculateMap {
 	private void buildWaterTile(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, int position) {
 
 		//all cases need the image
-		pane.getChildren().add(buildImage( xCoordinate, yCoordinate, x, y, z, true));
+		pane.getChildren().add(buildImage(xCoordinate, yCoordinate, x, y, z, true));
 
 		switch (position) {
 			case 1, 2, 10 -> {

@@ -26,22 +26,20 @@ public class LoadMapTemplate {
 
 		maxRange = 0;
 
-		for (Tile tile: map.tiles()) {
+		for (Tile tile : map.tiles()) {
 			checkRange(tile.x(), tile.y(), tile.z());
 		}
 
-		for (Harbor harbor: map.harbors()) {
+		for (Harbor harbor : map.harbors()) {
 			checkRange(harbor.x(), harbor.y(), harbor.z());
 		}
-
-
 
 
 		this.pane = calculateMap.buildPane(maxRange);
 		double center = calculateMap.getCenter();
 
 
-		for (Tile tile: map.tiles()) {
+		for (Tile tile : map.tiles()) {
 			int x = tile.x().intValue();
 			int y = tile.y().intValue();
 			int z = tile.z().intValue();
@@ -62,7 +60,7 @@ public class LoadMapTemplate {
 		}
 
 
-		for (Harbor harbor: map.harbors()) {
+		for (Harbor harbor : map.harbors()) {
 			int x = harbor.x().intValue();
 			int y = harbor.y().intValue();
 			int z = harbor.z().intValue();
@@ -122,7 +120,7 @@ public class LoadMapTemplate {
 		switch (i) {
 			// top left
 			case 1 -> {
-				Circle circle = calculateMap.buildCircle(xCoordinate - 26, yCoordinate - 45, x, y, z, 11 );
+				Circle circle = calculateMap.buildCircle(xCoordinate - 26, yCoordinate - 45, x, y, z, 11);
 				addToPane(circle);
 				Polygon road = calculateMap.buildRoad(xCoordinate - 26, yCoordinate - 45, x, y, z, 60, false);
 				addToPane(road);
@@ -168,8 +166,7 @@ public class LoadMapTemplate {
 
 	private void addToPane(Node toAdd) {
 		boolean contains = false;
-		for (Node node: this.pane.getChildren())
-		{
+		for (Node node : this.pane.getChildren()) {
 			if (node.getId().equals(toAdd.getId())) {
 				contains = true;
 			}
@@ -194,7 +191,7 @@ public class LoadMapTemplate {
 			}
 			// Circle top right
 			case 3 -> {
-				Circle circle = calculateMap.buildCircle(xCoordinate + 52, yCoordinate - 30, x + 1, y, z - 1, 6 );
+				Circle circle = calculateMap.buildCircle(xCoordinate + 52, yCoordinate - 30, x + 1, y, z - 1, 6);
 				addToPane(circle);
 			}
 			// Circle top left
@@ -209,7 +206,7 @@ public class LoadMapTemplate {
 			}
 			// Circle bottom left
 			case 6 -> {
-				Circle circle = calculateMap.buildCircle(xCoordinate - 52,  yCoordinate + 30, x - 1, y, z + 1, 0 );
+				Circle circle = calculateMap.buildCircle(xCoordinate - 52, yCoordinate + 30, x - 1, y, z + 1, 0);
 				addToPane(circle);
 			}
 		}
