@@ -15,9 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -422,9 +420,20 @@ public class GameScreenController implements Controller {
 
             for (Player p : playerOwnView) {
                 if (p.userId().equals(player.userId())) {
+                    if(!player.developmentCards().isEmpty()) {
+                        if (player.developmentCards().get(player.developmentCards().size() - 1).type().equals("victory-point")
+                                && player.developmentCards().size() != p.developmentCards().size()) {
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Congratulations," +
+                                    "you acquired Victory point card");
+                            DialogPane dialogPane = alert.getDialogPane();
+                            dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                    .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                            alert.showAndWait();
+                        }
+                    }
                     playerOwnView.set(playerOwnView.indexOf(p), player);
-                    // check if the user dropped or received resources and play the according sound
 
+                    // check if the user dropped or received resources and play the according sound
                     int amountResources = 0;
                     for (int resource : p.resources().values()) {
                         amountResources += resource;
@@ -438,7 +447,6 @@ public class GameScreenController implements Controller {
                     } else if (amountNewResources < amountResources) {
                         this.soundService.playSound("drop");
                     }
-
                     //call All calculate method for calculating all the owned cards
                     allTheCards();
                 }
