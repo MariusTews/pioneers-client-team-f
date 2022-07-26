@@ -119,18 +119,13 @@ public class MapTemplatesScreenController implements Controller {
                         maps -> {
                             List<MapTemplate> ownMaps = new ArrayList<>(maps.stream().filter(mapTemplate -> idStorage.getID().equals(mapTemplate.createdBy())).toList());
                             List<MapTemplate> otherMaps = new ArrayList<>(maps.stream().filter(mapTemplate -> !(idStorage.getID().equals(mapTemplate.createdBy()))).toList());
-                            maps.clear();
-                            maps.addAll(ownMaps);
-                            //add empty template to create distance between own and other maps
-                            maps.add(new MapTemplate(null, null, "", null, null, null, null, null, null));
-                            maps.addAll(otherMaps);
 
-                            for (MapTemplate template : maps) {
-                                if (!(template._id().equals(""))) {
-                                    addMapTemplateItem(template, -1);
-                                } else {
-                                    addEmptyLine();
-                                }
+                            for (MapTemplate template : ownMaps) {
+                                addMapTemplateItem(template, -1);
+                            }
+                            addEmptyLine();
+                            for (MapTemplate template : otherMaps) {
+                                addMapTemplateItem(template, -1);
                             }
                         }
                 );
@@ -144,7 +139,7 @@ public class MapTemplatesScreenController implements Controller {
             if (idStorage.getID().equals(template.createdBy())) {
                 int position = 0;
                 for (Parent mapTemplate : mapTemplates) {
-                    //the id "" is only used for the empty line box between own and other players' maps
+                    //the id "" is only used for the empty line between own and other players' maps
                     if (mapTemplate.getId().equals("")) {
                         break;
                     }
@@ -191,6 +186,7 @@ public class MapTemplatesScreenController implements Controller {
         HBox emptyLine = new HBox();
         emptyLine.setPrefWidth(720);
         emptyLine.setPrefHeight(25);
+        emptyLine.setId("");
         mapTemplates.add(emptyLine);
     }
 
