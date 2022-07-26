@@ -182,11 +182,11 @@ public class MapTemplatesScreenController implements Controller {
     }
 
     public void onCreateButtonPressed() {
-
+        //TODO
     }
 
     public void onSelectButtonPressed() {
-
+        //TODO
     }
 
     public HashMap<String, MapTemplateSubcontroller> getMapTemplateSubCons() {

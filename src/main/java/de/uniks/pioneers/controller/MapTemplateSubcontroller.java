@@ -95,16 +95,20 @@ public class MapTemplateSubcontroller implements Controller {
     public void onLeftActionImagePressed() {
         if (ownMap) {
             //edit map
+            //TODO
         } else {
             //up-vote map
+            //TODO
         }
     }
 
     public void onRightActionImagePressed() {
         if (ownMap) {
             //delete map
+            //TODO
         } else {
             //down-vote map
+            //TODO
         }
     }
 

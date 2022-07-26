@@ -165,4 +165,5 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         //assert that there are only two list items left (one for the empty line, one for the own map)
         Assertions.assertThat(mapTemplates.size()).isEqualTo(2);
     }
+
 }

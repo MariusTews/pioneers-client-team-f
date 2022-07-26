@@ -197,6 +197,7 @@ public class CreateGameController implements Controller {
         }
     }
 
+    //TODO will be used later when selecting map template in map template screen
 	public void setMapTemplate(String mapTemplate) {
 		this.mapTemplate = mapTemplate;
 	}
