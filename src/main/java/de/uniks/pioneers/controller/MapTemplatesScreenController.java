@@ -126,7 +126,11 @@ public class MapTemplatesScreenController implements Controller {
                             maps.addAll(otherMaps);
 
                             for (MapTemplate template : maps) {
-                                addMapTemplateItem(template, -1);
+                                if (!(template._id().equals(""))) {
+                                    addMapTemplateItem(template, -1);
+                                } else {
+                                    addEmptyLine();
+                                }
                             }
                         }
                 );
@@ -168,27 +172,26 @@ public class MapTemplatesScreenController implements Controller {
     }
 
     private void addMapTemplateItem(MapTemplate template, int position) {
-        if (template._id().equals("")) {
-            HBox emptyLine = new HBox();
-            emptyLine.setPrefWidth(720);
-            emptyLine.setPrefHeight(25);
-            mapTemplates.add(emptyLine);
+        boolean ownMap = idStorage.getID().equals(template.createdBy());
+        String userName = userNames.getOrDefault(template.createdBy(), "");
+        MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
+        mapTemplateSubCons.put(template._id(), controller);
+        controller.init();
+        Parent item = controller.render();
+        item.setOnMouseClicked(this::selectMapTemplateItem);
+        //if position is -1 then the item should be added at the end of the list
+        if (position == -1) {
+            mapTemplates.add(item);
+        } else {
+            mapTemplates.add(position, item);
         }
-        else {
-            boolean ownMap = idStorage.getID().equals(template.createdBy());
-            String userName = userNames.getOrDefault(template.createdBy(), "");
-            MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
-            mapTemplateSubCons.put(template._id(), controller);
-            controller.init();
-            Parent item = controller.render();
-            item.setOnMouseClicked(this::selectMapTemplateItem);
-            //if position is -1 then the item should be added at the end of the list
-            if (position == -1) {
-                mapTemplates.add(item);
-            } else {
-                mapTemplates.add(position, item);
-            }
-        }
+    }
+
+    private void addEmptyLine() {
+        HBox emptyLine = new HBox();
+        emptyLine.setPrefWidth(720);
+        emptyLine.setPrefHeight(25);
+        mapTemplates.add(emptyLine);
     }
 
     public void onBackButtonPressed() {
@@ -205,7 +208,7 @@ public class MapTemplatesScreenController implements Controller {
     }
 
     private void selectMapTemplateItem(MouseEvent mouseEvent) {
-        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+        if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
             if (mouseEvent.getClickCount() == 2) {
                 if (selectedMapTemplateSubcontroller != null) {
                     selectedMapTemplateSubcontroller.unselectItem();
