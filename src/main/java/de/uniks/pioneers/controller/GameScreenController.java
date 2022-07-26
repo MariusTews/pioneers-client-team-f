@@ -7,7 +7,7 @@ import de.uniks.pioneers.computation.RandomAction;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;

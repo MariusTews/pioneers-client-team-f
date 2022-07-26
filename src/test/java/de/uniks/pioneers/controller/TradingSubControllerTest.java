@@ -5,7 +5,7 @@ import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
