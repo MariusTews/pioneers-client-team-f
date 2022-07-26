@@ -80,10 +80,6 @@ public class MapTemplateSubcontroller implements Controller {
         leftActionImageView.setImage(leftActionImage);
         rightActionImageView.setImage(rightActionImage);
 
-        if (template._id().equals("")) {
-            ((HBox) parent).getChildren().clear();
-        }
-
         parent.setId(template._id());
 
         return parent;

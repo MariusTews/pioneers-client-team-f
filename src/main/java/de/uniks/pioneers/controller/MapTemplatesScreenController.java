@@ -22,6 +22,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -127,12 +128,6 @@ public class MapTemplatesScreenController implements Controller {
                             for (MapTemplate template : maps) {
                                 addMapTemplateItem(template, -1);
                             }
-
-                            for (Parent item : mapTemplates) {
-                                if (!(item.getId().equals(""))) {
-                                    item.setOnMouseClicked(this::selectMapTemplateItem);
-                                }
-                            }
                         }
                 );
 
@@ -173,16 +168,24 @@ public class MapTemplatesScreenController implements Controller {
     }
 
     private void addMapTemplateItem(MapTemplate template, int position) {
+        if (template._id().equals("")) {
+            HBox emptyLine = new HBox();
+            emptyLine.setPrefWidth(720);
+            emptyLine.setPrefHeight(25);
+            mapTemplates.add(emptyLine);
+        }
         boolean ownMap = idStorage.getID().equals(template.createdBy());
         String userName = userNames.getOrDefault(template.createdBy(), "");
         MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
         mapTemplateSubCons.put(template._id(), controller);
         controller.init();
+        Parent item = controller.render();
+        item.setOnMouseClicked(this::selectMapTemplateItem);
         //if position is -1 then the item should be added at the end of the list
         if (position == -1) {
-            mapTemplates.add(controller.render());
+            mapTemplates.add(item);
         } else {
-            mapTemplates.add(position, controller.render());
+            mapTemplates.add(position, item);
         }
     }
 
@@ -202,14 +205,13 @@ public class MapTemplatesScreenController implements Controller {
     private void selectMapTemplateItem(MouseEvent mouseEvent) {
         if(mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
             if (mouseEvent.getClickCount() == 2) {
-                String mapTemplateId = ((Node) mouseEvent.getSource()).getId();
-                MapTemplateSubcontroller controller = mapTemplateSubCons.get(mapTemplateId);
                 if (selectedMapTemplateSubcontroller != null) {
                     selectedMapTemplateSubcontroller.unselectItem();
                 }
-                controller.selectItem();
-                selectedLabel.setText("Selected: " + controller.getTemplate().name());
-                selectedMapTemplateSubcontroller = controller;
+                String mapTemplateId = ((Node) mouseEvent.getSource()).getId();
+                selectedMapTemplateSubcontroller = mapTemplateSubCons.get(mapTemplateId);
+                selectedMapTemplateSubcontroller.selectItem();
+                selectedLabel.setText("Selected: " + selectedMapTemplateSubcontroller.getTemplate().name());
             }
         }
     }
