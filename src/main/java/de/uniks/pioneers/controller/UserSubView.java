@@ -5,6 +5,7 @@ import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -192,7 +193,7 @@ public class UserSubView implements Controller {
         gameFieldSubController.build("city");
     }
 
-    public void onDevelopmentCards() {
-        //Todo: implement methode
+    public void onDev(ActionEvent event) {
+        //TODO:action on clicked Dev card
     }
 }
