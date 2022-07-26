@@ -135,7 +135,7 @@ public class MessageViewSubController implements Controller {
 
     @Override
     public void destroy() {
-        disposable.dispose();
+        disposable.clear();
     }
 
     @Override
