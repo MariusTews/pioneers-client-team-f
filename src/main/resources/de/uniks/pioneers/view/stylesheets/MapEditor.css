@@ -1,0 +1,6 @@
+.button {
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+    -fx-font-size: 20;
+    -fx-text-fill: #F5F5F5;
+}

@@ -356,7 +356,6 @@ public class CalculateMap {
 			buildLabel(map, xCoordinate - 12, yCoordinate - 12, x, y, z);
 		} else {
 			hexagon.setFill(Color.TRANSPARENT);
-			hexagon.setStyle("-fx-background-color: rgba(255, 255, 255, .7)");
 			hexagon.setStroke(Color.BLACK);
 			buildButton(map, xCoordinate - 45, yCoordinate - 15, x, y, z, false);
 			buildButton(map, xCoordinate + 5, yCoordinate - 15, x, y, z, true);

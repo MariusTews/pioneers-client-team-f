@@ -28,7 +28,8 @@ public class App extends Application {
 
     public App() {
         final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
-        controller = mainComponent.loginController();
+        //controller = mainComponent.loginController();
+        controller = mainComponent.mapEditorController();
     }
 
     public App(Controller controller) {
@@ -39,8 +40,8 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         Locale.setDefault(new Locale("English", "England"));
         this.stage = primaryStage;
-        stage.setWidth(900);
-        stage.setHeight(600);
+        stage.setWidth(1100);
+        stage.setHeight(700);
         stage.setTitle("Pioneers");
 
         final Scene scene = new Scene(new Label("Loading ... "));
