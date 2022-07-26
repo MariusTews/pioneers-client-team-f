@@ -166,4 +166,25 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         Assertions.assertThat(mapTemplates.size()).isEqualTo(2);
     }
 
+    @Test
+    void selectMapTemplateItem() {
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#" + user1Map._id()).clickOn("#" + user1Map._id());
+        WaitForAsyncUtils.waitForFxEvents();
+
+        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubcontroller controller = mapTemplateSubCons.get(user1Map._id());
+        Assertions.assertThat(controller.selectedImageView.getImage()).isNotNull();
+        Assertions.assertThat(mapTemplatesScreenController.selectedLabel).hasText("Selected: " + user1Map.name());
+
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#" + user2Map._id()).clickOn("#" + user2Map._id());
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(controller.selectedImageView.getImage()).isNull();
+        controller = mapTemplateSubCons.get(user2Map._id());
+        Assertions.assertThat(controller.selectedImageView.getImage()).isNotNull();
+        Assertions.assertThat(mapTemplatesScreenController.selectedLabel).hasText("Selected: " + user2Map.name());
+    }
+
 }
