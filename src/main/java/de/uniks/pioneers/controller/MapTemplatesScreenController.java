@@ -14,18 +14,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
@@ -56,6 +58,7 @@ public class MapTemplatesScreenController implements Controller {
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     private final HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
+    private MapTemplateSubcontroller selectedMapTemplateSubcontroller;
     private CompositeDisposable disposable;
 
     @Inject
@@ -124,6 +127,12 @@ public class MapTemplatesScreenController implements Controller {
                             for (MapTemplate template : maps) {
                                 addMapTemplateItem(template, -1);
                             }
+
+                            for (Parent item : mapTemplates) {
+                                if (!(item.getId().equals(""))) {
+                                    item.setOnMouseClicked(this::selectMapTemplateItem);
+                                }
+                            }
                         }
                 );
 
@@ -136,7 +145,7 @@ public class MapTemplatesScreenController implements Controller {
             if (idStorage.getID().equals(template.createdBy())) {
                 int position = 0;
                 for (Parent mapTemplate : mapTemplates) {
-                    //the id "" is only used for the empty line hbox between own and other players' maps
+                    //the id "" is only used for the empty line box between own and other players' maps
                     if (mapTemplate.getId().equals("")) {
                         break;
                     }
@@ -168,6 +177,7 @@ public class MapTemplatesScreenController implements Controller {
         String userName = userNames.getOrDefault(template.createdBy(), "");
         MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
         mapTemplateSubCons.put(template._id(), controller);
+        controller.init();
         //if position is -1 then the item should be added at the end of the list
         if (position == -1) {
             mapTemplates.add(controller.render());
@@ -187,6 +197,21 @@ public class MapTemplatesScreenController implements Controller {
 
     public void onSelectButtonPressed() {
         //TODO
+    }
+
+    private void selectMapTemplateItem(MouseEvent mouseEvent) {
+        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+            if (mouseEvent.getClickCount() == 2) {
+                String mapTemplateId = ((Node) mouseEvent.getSource()).getId();
+                MapTemplateSubcontroller controller = mapTemplateSubCons.get(mapTemplateId);
+                if (selectedMapTemplateSubcontroller != null) {
+                    selectedMapTemplateSubcontroller.unselectItem();
+                }
+                controller.selectItem();
+                selectedLabel.setText("Selected: " + controller.getTemplate().name());
+                selectedMapTemplateSubcontroller = controller;
+            }
+        }
     }
 
     public HashMap<String, MapTemplateSubcontroller> getMapTemplateSubCons() {

@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class MapTemplateSubcontroller implements Controller {
     private final String createdBy;
     private Image leftActionImage;
     private Image rightActionImage;
+    private Image selectedMapIcon;
     @FXML
     public Label nameLabel;
     @FXML
@@ -43,13 +45,14 @@ public class MapTemplateSubcontroller implements Controller {
 
     @Override
     public void init() {
-
+        selectedMapIcon = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/selectedMapIcon.png")).toString());
     }
 
     @Override
     public void destroy() {
         leftActionImage = null;
         rightActionImage = null;
+        selectedMapIcon = null;
     }
 
     @Override
@@ -110,6 +113,18 @@ public class MapTemplateSubcontroller implements Controller {
             //down-vote map
             //TODO
         }
+    }
+
+    public void selectItem() {
+        selectedImageView.setImage(selectedMapIcon);
+    }
+
+    public void unselectItem() {
+        selectedImageView.setImage(null);
+    }
+
+    public MapTemplate getTemplate() {
+        return template;
     }
 
     public void setTemplate(MapTemplate template) {
