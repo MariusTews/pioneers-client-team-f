@@ -92,7 +92,12 @@ public class MapTemplateSubcontroller implements Controller {
     public void updateContent() {
         nameLabel.setText(template.name());
         createdByLabel.setText("| " + createdBy);
-        votesLabel.setText("| " + template.votes());
+        if ((int) template.votes() > 0) {
+            votesLabel.setText("| +" + template.votes());
+        }
+        else {
+            votesLabel.setText("| " + template.votes());
+        }
     }
 
     public void onLeftActionImagePressed() {
