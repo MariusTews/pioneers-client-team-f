@@ -204,7 +204,10 @@ public class MapTemplatesScreenController implements Controller {
     }
 
     public void onSelectButtonPressed() {
-        //TODO
+        final CreateGameController controller = createGameController.get();
+        MapTemplate selectedTemplate = selectedMapTemplateSubcontroller.getTemplate();
+        controller.setMapTemplate(selectedTemplate.name(), selectedTemplate._id());
+        this.app.show(controller);
     }
 
     private void selectMapTemplateItem(MouseEvent mouseEvent) {
