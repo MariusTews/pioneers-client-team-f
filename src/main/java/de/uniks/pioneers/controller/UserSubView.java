@@ -183,7 +183,7 @@ public class UserSubView implements Controller {
         this.sett.setText(RENAME_SETTLEMENT);
         this.city.disableProperty().set(true);
         this.city.setText(RENAME_CITY);
-        //this.developmentBuyIdButton.disableProperty().set(true);
+        this.developmentBuyIdButton.disableProperty().set(true);
 
         Tooltip.install(this.road, new Tooltip("1 Earth cactus, \n1 Mars bar "));
         Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));

@@ -366,8 +366,8 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, gameStorage,userService, player, gameFieldSubController,
-                this.gameStorage.getVictoryPoints(),pioneersService);
+        UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService, player, gameFieldSubController,
+                this.gameStorage.getVictoryPoints(), pioneersService);
         userSubView.init();
         this.tradingSubController.setPlayer(player);
         return userSubView.render();
@@ -518,7 +518,6 @@ public class GameScreenController implements Controller {
                     default -> nextMoveLabel.setText(currentMove);
                 }
                 // change the currentPlayerLabel to the current player
-                System.out.println(state.expectedMoves().get(0).players());
                 User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
                 currentPlayerLabel.setText(currentPlayer.name());
 
