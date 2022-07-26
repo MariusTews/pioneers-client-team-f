@@ -6,7 +6,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox prefHeight="25.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateSubcontroller">
+<HBox prefHeight="25.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateSubController">
     <Label fx:id="nameLabel" prefWidth="170.0" style="-fx-text-fill: white" text="NAME">
       <HBox.margin>
          <Insets left="18.0" />

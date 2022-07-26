@@ -57,9 +57,9 @@ public class MapTemplatesScreenController implements Controller {
     @FXML
     public ListView<Parent> mapTemplatesListView;
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
-    private final HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = new HashMap<>();
+    private final HashMap<String, MapTemplateSubController> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
-    private MapTemplateSubcontroller selectedMapTemplateSubcontroller;
+    private MapTemplateSubController selectedMapTemplateSubController;
     private CompositeDisposable disposable;
 
     @Inject
@@ -82,7 +82,7 @@ public class MapTemplatesScreenController implements Controller {
 
     @Override
     public void destroy() {
-        for (MapTemplateSubcontroller controller : mapTemplateSubCons.values()) {
+        for (MapTemplateSubController controller : mapTemplateSubCons.values()) {
             controller.destroy();
         }
         mapTemplateSubCons.clear();
@@ -155,11 +155,11 @@ public class MapTemplatesScreenController implements Controller {
                 addMapTemplateItem(template, -1);
             }
         } else if (event.event().endsWith(UPDATED)) {
-            MapTemplateSubcontroller controller = mapTemplateSubCons.get(template._id());
+            MapTemplateSubController controller = mapTemplateSubCons.get(template._id());
             controller.setTemplate(template);
             controller.updateContent();
         } else if (event.event().endsWith(DELETED)) {
-            MapTemplateSubcontroller controller = mapTemplateSubCons.get(template._id());
+            MapTemplateSubController controller = mapTemplateSubCons.get(template._id());
             controller.destroy();
             mapTemplateSubCons.remove(template._id());
             for (Parent mapTemplateItem : mapTemplates) {
@@ -174,7 +174,7 @@ public class MapTemplatesScreenController implements Controller {
     private void addMapTemplateItem(MapTemplate template, int position) {
         boolean ownMap = idStorage.getID().equals(template.createdBy());
         String userName = userNames.getOrDefault(template.createdBy(), "");
-        MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
+        MapTemplateSubController controller = new MapTemplateSubController(template, ownMap, userName);
         mapTemplateSubCons.put(template._id(), controller);
         controller.init();
         Parent item = controller.render();
@@ -205,7 +205,7 @@ public class MapTemplatesScreenController implements Controller {
 
     public void onSelectButtonPressed() {
         final CreateGameController controller = createGameController.get();
-        MapTemplate selectedTemplate = selectedMapTemplateSubcontroller.getTemplate();
+        MapTemplate selectedTemplate = selectedMapTemplateSubController.getTemplate();
         controller.setMapTemplate(selectedTemplate.name(), selectedTemplate._id());
         this.app.show(controller);
     }
@@ -213,18 +213,18 @@ public class MapTemplatesScreenController implements Controller {
     private void selectMapTemplateItem(MouseEvent mouseEvent) {
         if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
             if (mouseEvent.getClickCount() == 2) {
-                if (selectedMapTemplateSubcontroller != null) {
-                    selectedMapTemplateSubcontroller.unselectItem();
+                if (selectedMapTemplateSubController != null) {
+                    selectedMapTemplateSubController.unselectItem();
                 }
                 String mapTemplateId = ((Node) mouseEvent.getSource()).getId();
-                selectedMapTemplateSubcontroller = mapTemplateSubCons.get(mapTemplateId);
-                selectedMapTemplateSubcontroller.selectItem();
-                selectedLabel.setText("Selected: " + selectedMapTemplateSubcontroller.getTemplate().name());
+                selectedMapTemplateSubController = mapTemplateSubCons.get(mapTemplateId);
+                selectedMapTemplateSubController.selectItem();
+                selectedLabel.setText("Selected: " + selectedMapTemplateSubController.getTemplate().name());
             }
         }
     }
 
-    public HashMap<String, MapTemplateSubcontroller> getMapTemplateSubCons() {
+    public HashMap<String, MapTemplateSubController> getMapTemplateSubCons() {
         return mapTemplateSubCons;
     }
 

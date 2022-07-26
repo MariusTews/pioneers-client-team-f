@@ -9,13 +9,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 import java.util.Objects;
 
-public class MapTemplateSubcontroller implements Controller {
+public class MapTemplateSubController implements Controller {
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
@@ -37,7 +35,7 @@ public class MapTemplateSubcontroller implements Controller {
     @FXML
     public ImageView rightActionImageView;
 
-    public MapTemplateSubcontroller(MapTemplate template, boolean ownMap, String createdBy) {
+    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy) {
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
