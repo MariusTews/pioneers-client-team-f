@@ -21,7 +21,7 @@
           <Insets left="54.0" />
         </HBox.margin>
     </Label>
-    <ImageView fx:id="selectedImageView" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+    <ImageView fx:id="selectedImageView" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
         <HBox.margin>
           <Insets left="6.0" />
         </HBox.margin>
