@@ -94,7 +94,7 @@ public class GameFieldSubController implements Controller {
     @Override
     public Parent render() {
         CalculateMap calculateMap = new CalculateMap();
-        this.parent = calculateMap.buildMap(this.gameStorage.getSize());
+        this.parent = calculateMap.buildMap(this.gameStorage.getSize(), false);
 
         pioneersService.findAllTiles(gameStorage.getId()).observeOn(FX_SCHEDULER).subscribe(this::loadMap);
 
