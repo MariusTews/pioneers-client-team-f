@@ -2,6 +2,8 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -75,7 +77,9 @@ public class MapEditorController implements Controller {
         this.mapPane.setContent(map);
 
         addButtonsOnTiles();
+
         menu.toFront();
+
         return parent;
     }
 
@@ -141,12 +145,17 @@ public class MapEditorController implements Controller {
 
                     // choice box
                     choiceBox = new ChoiceBox(FXCollections.observableArrayList(
-                            "Random", "desert", "venus", "moon", "mars", "earth", "neptune"
+                            "random", "desert", "venus", "moon", "mars", "earth", "neptune"
                     ));
+
+                    choiceBox.getSelectionModel().selectedIndexProperty().addListener(
+                            (observable, oldValue, newValue) -> selectedChoice(hexagon, newValue.intValue())
+                    );
+
                     choiceBox.setPrefWidth(100);
                     choiceBox.setPrefHeight(30);
                     choiceBox.setLayoutX(hexagon.getLayoutX() - 50);
-                    choiceBox.setLayoutY(hexagon.getLayoutY() );
+                    choiceBox.setLayoutY(hexagon.getLayoutY());
                     choiceBox.toFront();
                     choiceBox.setId(hexagon.getId() + "_choiceBox");
                     choiceBox.getSelectionModel().selectFirst();
@@ -158,6 +167,86 @@ public class MapEditorController implements Controller {
             map.getChildren().add(number);
             map.getChildren().add(choiceBox);
         }
+    }
+
+    private void selectedChoice(Polygon hexagon, int newValue) {
+        final List<String> choices = new ArrayList<>();
+        choices.add(0, "random");
+        choices.add(1, "desert");
+        choices.add(2, "venus");
+        choices.add(3, "moon");
+        choices.add(4, "mars");
+        choices.add(5, "earth");
+        choices.add(6, "neptune");
+
+        TextField numberField = new TextField();
+
+        for (Node node : map.getChildren()) {
+            if (node.getId().equals(hexagon.getId() + "_numberField")) {
+                numberField = (TextField) node;
+            }
+        }
+
+        switch (choices.get(newValue)) {
+            case "random" -> {
+                // TODO find out, if numberField can be written on, when random is chosen
+                numberField.setVisible(true);
+                hexagon.setFill(Color.grayRgb(200, 0.5));
+                System.out.println("Random");
+            }
+            case "desert" -> {
+                numberField.setVisible(false);
+                hexagon.setFill(
+                        new ImagePattern(
+                                new Image(Objects.requireNonNull(
+                                        Main.class.getResource("view/assets/2_desert.png")).toExternalForm())
+                        ));
+            }
+            case "venus" -> {
+                numberField.setVisible(true);
+                hexagon.setFill(
+                        new ImagePattern(
+                                new Image(Objects.requireNonNull(
+                                        Main.class.getResource("view/assets/4_venus.png")).toExternalForm())
+                        ));
+            }
+            case "moon" -> {
+                numberField.setVisible(true);
+                hexagon.setFill(
+                        new ImagePattern(
+                                new Image(Objects.requireNonNull(
+                                        Main.class.getResource("view/assets/3_moon.png")).toExternalForm())
+                        ));
+            }
+            case "mars" -> {
+                numberField.setVisible(true);
+                hexagon.setFill(
+                        new ImagePattern(
+                                new Image(Objects.requireNonNull(
+                                        Main.class.getResource("view/assets/1_mars.png")).toExternalForm())
+                        ));
+            }
+            case "earth" -> {
+                numberField.setVisible(true);
+                hexagon.setFill(
+                        new ImagePattern(
+                                new Image(Objects.requireNonNull(
+                                        Main.class.getResource("view/assets/6_earth.png")).toExternalForm())
+                        ));
+            }
+            case "neptune" -> {
+                numberField.setVisible(true);
+                hexagon.setFill(
+                        new ImagePattern(
+                                new Image(Objects.requireNonNull(
+                                        Main.class.getResource("view/assets/5_neptun.png")).toExternalForm())
+                        ));
+            }
+            default -> {
+
+            }
+        }
+
     }
 
     private void harborButtonPressed(ActionEvent event) {

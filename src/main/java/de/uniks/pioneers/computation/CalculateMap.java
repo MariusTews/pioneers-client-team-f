@@ -367,6 +367,7 @@ public class CalculateMap {
 		button.setPrefWidth(30);
 		button.setPrefHeight(30);
 		map.getChildren().add(button);
+		// set position of button on hexagon
 		button.setLayoutX(xCoordinate);
 		button.setLayoutY(yCoordinate);
 		button.setText("+");
@@ -374,10 +375,8 @@ public class CalculateMap {
 
 		if (harbor) {
 			button.setId(createId(x, y, z) + "_harborButton");
-			button.setStyle("-fx-text-fill: orange");
 		} else {
 			button.setId(createId(x, y, z) + "_tileButton");
-			button.setStyle("-fx-text-fill: green");
 		}
 	}
 
