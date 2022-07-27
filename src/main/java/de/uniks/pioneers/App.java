@@ -39,8 +39,8 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         Locale.setDefault(new Locale("English", "England"));
         this.stage = primaryStage;
-        stage.setWidth(1100);
-        stage.setHeight(700);
+        stage.setWidth(900);
+        stage.setHeight(600);
         stage.setTitle("Pioneers");
 
         final Scene scene = new Scene(new Label("Loading ... "));
