@@ -10,8 +10,7 @@ import javax.inject.Singleton;
 @Component(modules = MainModule.class)
 @Singleton
 public interface MainComponent {
-    //LoginController loginController();
-    MapEditorController mapEditorController();
+    LoginController loginController();
 
     @Component.Builder
     interface Builder {

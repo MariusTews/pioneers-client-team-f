@@ -29,6 +29,6 @@ public class MapEditorControllerTest extends ApplicationTest {
         clickOn("#mapSizePlusButton");
         clickOn("#saveButton");
 
-        Assertions.assertEquals("0", mapSizeLabel.getText());
+        Assertions.assertEquals("1", mapSizeLabel.getText());
     }
 }
