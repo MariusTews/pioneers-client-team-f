@@ -9,11 +9,9 @@ import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.animation.PauseTransition;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +22,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -37,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -115,7 +111,8 @@ public class LobbyController implements Controller {
 
     private final CompositeDisposable disposable = new CompositeDisposable();
     public Button rejoinButton;
-    @FXML public Label loadingLabel;
+    @FXML
+    public Label loadingLabel;
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
@@ -202,6 +199,11 @@ public class LobbyController implements Controller {
         this.userSubCons.clear();
         this.gameSubCons.clear();
         this.directChatStorages.clear();
+
+        if (avatars != null) {
+            avatars.clear();
+            avatars = null;
+        }
 
         disposable.clear();
     }
@@ -295,6 +297,7 @@ public class LobbyController implements Controller {
             PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
             pause.setOnFinished(event -> {
                 avatars.forEach(this::renderAvatar);
+                avatars.clear();
                 avatars = null;
                 loadingLabel.setText("");
             });
