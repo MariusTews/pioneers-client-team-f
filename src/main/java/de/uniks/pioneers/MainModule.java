@@ -97,4 +97,8 @@ public class MainModule {
     @Provides
     @Singleton
     PioneersApiService pioneersApiService(Retrofit retrofit) {return retrofit.create(PioneersApiService.class);}
+
+    @Provides
+    @Singleton
+    AchievementsApiService achievementsApiService(Retrofit retrofit) {return retrofit.create(AchievementsApiService.class);}
 }

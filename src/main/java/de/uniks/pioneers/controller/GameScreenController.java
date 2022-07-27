@@ -38,6 +38,7 @@ import static de.uniks.pioneers.computation.CalculateMap.createId;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameScreenController implements Controller {
 
+    private final AchievementsService achievementsService;
     private final UserStorage userStorage;
     private List<CircleSubController> circleSubControllers = new ArrayList<>();
 
@@ -132,6 +133,7 @@ public class GameScreenController implements Controller {
                                 GameService gameService,
                                 MessageService messageService,
                                 MemberService memberService,
+                                AchievementsService achievementsService,
                                 UserStorage userStorage) {
         this.lobbyController = lobbyController;
         this.app = app;
@@ -144,6 +146,7 @@ public class GameScreenController implements Controller {
         this.messageService = messageService;
         this.memberIDStorage = memberIDStorage;
         this.memberService = memberService;
+        this.achievementsService = achievementsService;
         this.userStorage = userStorage;
     }
 
@@ -243,6 +246,9 @@ public class GameScreenController implements Controller {
         this.tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
         this.tradeAcceptSubcontroller.init();
 
+        // init AchievementsService
+        achievementsService.init();
+        disposable.add(achievementsService.initUserAchievements().observeOn(FX_SCHEDULER).subscribe());
     }
 
     @Override
@@ -290,7 +296,7 @@ public class GameScreenController implements Controller {
             }
         });
 
-        this.gameFieldSubController = new GameFieldSubController(gameStorage, pioneersService, userService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(gameStorage, pioneersService, userService, idStorage, eventListener, achievementsService);
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
 

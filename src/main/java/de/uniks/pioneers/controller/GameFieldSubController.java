@@ -3,10 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
 import de.uniks.pioneers.model.*;
-import de.uniks.pioneers.service.GameStorage;
-import de.uniks.pioneers.service.IDStorage;
-import de.uniks.pioneers.service.PioneersService;
-import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -46,6 +43,7 @@ public class GameFieldSubController implements Controller {
     private final GameStorage gameStorage;
     private final PioneersService pioneersService;
     private final EventListener eventListener;
+    private final AchievementsService achievementsService;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
 
@@ -58,12 +56,14 @@ public class GameFieldSubController implements Controller {
                                   PioneersService pioneersService,
                                   UserService userService,
                                   IDStorage idStorage,
-                                  EventListener eventListener) {
+                                  EventListener eventListener,
+                                  AchievementsService achievementsService) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
         this.userService = userService;
         this.idStorage = idStorage;
         this.eventListener = eventListener;
+        this.achievementsService = achievementsService;
     }
 
     @Override
@@ -156,7 +156,7 @@ public class GameFieldSubController implements Controller {
                 if (road.getId().contains(node.getId())) {
                     CircleSubController circleSubController = new CircleSubController(
                             (Circle) node, (Polygon) road, pioneersService, gameStorage,
-                            idStorage, buildingCircles, this);
+                            idStorage, buildingCircles, this, achievementsService);
                     circleSubController.init();
                     this.circleSubControllers.add(circleSubController);
                 }
@@ -164,7 +164,7 @@ public class GameFieldSubController implements Controller {
             if (node.getId().endsWith("_0") || node.getId().endsWith("_6")) {
                 CircleSubController circleSubController = new CircleSubController(
                         (Circle) node, null, pioneersService, gameStorage,
-                        idStorage, buildingCircles, this);
+                        idStorage, buildingCircles, this, achievementsService);
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
             }

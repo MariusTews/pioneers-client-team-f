@@ -38,7 +38,7 @@ public class AchievementsService {
         return achievementsApiService.listUserAchievements(idStorage.getID());
     }
 
-    public void initUserAchievements() {
+    public Observable<List<Achievement>> initUserAchievements() {
         Observable<List<Achievement>> userAchievementsList = achievementsApiService.listUserAchievements(idStorage.getID());
         disposable.add(userAchievementsList
                 .observeOn(FX_SCHEDULER)
@@ -51,6 +51,7 @@ public class AchievementsService {
                             }
                         }
                 ));
+        return userAchievementsList;
     }
 
     public Observable<List<Achievement>> getUserAchievement(String userId, String achievementId) {
@@ -69,7 +70,7 @@ public class AchievementsService {
         String unlocked = null;
         // check if an achievement gets unlocked
         if (ACHIEVEMENT_UNLOCK_VALUES.get(id) >= progress) {
-            unlocked = java.time.LocalDate.now().toString();
+            unlocked = java.time.LocalDateTime.now().toString();
         }
         achievementsProgress.put(id, progress);
         return achievementsApiService.putAchievement(idStorage.getID(), id, new CreateAchievementDto(unlocked, progress));
@@ -82,7 +83,7 @@ public class AchievementsService {
         // check if an achievement gets unlocked
         if (actProgress < ACHIEVEMENT_UNLOCK_VALUES.get(id) &&
                 newProgress >= ACHIEVEMENT_UNLOCK_VALUES.get(id)) {
-            unlocked = java.time.LocalDate.now().toString();
+            unlocked = java.time.LocalDateTime.now().toString();
         }
         achievementsProgress.replace(id, newProgress);
         return achievementsApiService.updateAchievement(idStorage.getID(), id, new UpdateAchievementDto(unlocked, newProgress));
