@@ -1,9 +1,6 @@
 package de.uniks.pioneers;
 
-import de.uniks.pioneers.controller.Controller;
-import de.uniks.pioneers.controller.GameLobbyController;
-import de.uniks.pioneers.controller.GameScreenController;
-import de.uniks.pioneers.controller.LobbyController;
+import de.uniks.pioneers.controller.*;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
@@ -133,6 +130,9 @@ public class App extends Application {
             } else if (controller.getClass().equals(GameLobbyController.class)) {
                 stage.setWidth(1010);
                 stage.setHeight(600);
+            } else if (controller.getClass().equals(MapEditorController.class)) {
+                stage.setWidth(1100);
+                stage.setHeight(700);
             }
         }
     }
