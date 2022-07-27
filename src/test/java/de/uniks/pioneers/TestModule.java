@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dagger.Module;
 import dagger.Provides;
 import de.uniks.pioneers.Template.MapTemplate;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
 import de.uniks.pioneers.service.TokenStorage;
-import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 
@@ -489,13 +489,8 @@ public class TestModule {
         };
     }
 
-	@Provides
-	static MapsApiService mapsApiService() {
-		return new MapsApiService() {
-			@Override
-			public Observable<List<MapTemplate>> findAllMaps() {
-				return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
-			}
-		};
-	}
+    @Provides
+    static MapsApiService mapsApiService() {
+        return () -> Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
+    }
 }
