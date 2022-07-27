@@ -3,10 +3,11 @@ package de.uniks.pioneers;
 
 import dagger.Module;
 import dagger.Provides;
+import de.uniks.pioneers.Template.MapTemplate;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -320,6 +321,16 @@ public class TestModule {
 			@Override
 			public Observable<Move> findOneMove(String gameId, String moveId) {
 				return null;
+			}
+		};
+	}
+
+	@Provides
+	static MapsApiService mapsApiService() {
+		return new MapsApiService() {
+			@Override
+			public Observable<List<MapTemplate>> findAllMaps() {
+				return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
 			}
 		};
 	}

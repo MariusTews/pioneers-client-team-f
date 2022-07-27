@@ -1,4 +1,4 @@
-package de.uniks.pioneers.websocket;
+package de.uniks.pioneers.Websocket;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -42,7 +42,7 @@
                 <Button id="zoomButton" fx:id="zoomInButton" mnemonicParsing="false" onAction="#zoomIn" prefHeight="40.0" prefWidth="40.0" text="+" />
             </HBox>
         </VBox>
-        <Pane id="devCardsPane" layoutX="20.0" layoutY="-30.0" prefHeight="120.0" prefWidth="60.0" style="-fx-background-color: ff3333;">
+        <Pane id="devCardsPane" layoutX="20.0" layoutY="-30.0" onMouseClicked="#onShowDevCard" prefHeight="120.0" prefWidth="60.0" style="-fx-background-color: ff3333;">
             <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                 <Image url="@assets/helmet.png" />
             </ImageView>

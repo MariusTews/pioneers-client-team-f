@@ -79,6 +79,14 @@ public class Constants {
     public static final String ROB_ACTION = "rob";
     public static final String ROAD = "road";
 
+    //Card names
+    public static final String KNIGHT = "Knight";
+    public static final String ROAD_BUILDING = "road-building";
+
+    public static final String YEAR_OF_PLENTY = "year-of-plenty";
+
+    public static final String MONOPOLY = "monopoly";
+
     //Array of Colors as Strings for the Label text
     public static final String[] COLORSTRINGARRAY = {"DARKRED", "BLUE", "ORANGE", "DARKVIOLET", "TEAL", "YELLOW",
             "ROSYBROWN", "OLIVE", "MAGENTA", "AQUA"};
