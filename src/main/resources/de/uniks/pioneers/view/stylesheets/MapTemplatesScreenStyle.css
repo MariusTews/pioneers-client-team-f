@@ -1,0 +1,32 @@
+/**************** map templates screen specific styles ****************/
+
+.white-title {
+    -fx-text-fill: white;
+    -fx-font-size: 30;
+}
+
+.map-templates-box {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 850 400;
+    -fx-background-color: transparent;
+}
+
+.list-view.map-templates-list-view {
+    -fx-background-color: transparent;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+}
+
+#showButton {
+    -fx-background-color: #fcfcfc;
+    -fx-text-fill: grey;
+    -fx-font-size: 12;
+}
+
+#descriptionHBox {
+    -fx-border-color: transparent transparent white transparent;
+}
