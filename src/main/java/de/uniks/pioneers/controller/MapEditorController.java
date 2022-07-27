@@ -2,8 +2,6 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,7 +40,6 @@ public class MapEditorController implements Controller {
     @FXML
     public VBox menu;
 
-    private List<Polygon> hexagons = new ArrayList<>();
     private Pane map;
 
     @Inject
@@ -72,18 +69,19 @@ public class MapEditorController implements Controller {
             return null;
         }
 
+        // load initial transparent map with size zero
         map = new CalculateMap().buildMap(0, true);
-
         this.mapPane.setContent(map);
-
         addButtonsOnTiles();
 
+        // place the menu to front, so the hexagons don't overlay the buttons
         menu.toFront();
 
         return parent;
     }
 
     private void addButtonsOnTiles() {
+        // look for the buttons with matching id's and initialize
         for (Node node : map.getChildren()) {
             if (node.getId().endsWith("_harborButton")) {
                 Button button = (Button) node;
@@ -93,17 +91,16 @@ public class MapEditorController implements Controller {
                 Button button = (Button) node;
                 button.setOnAction(this::tileButtonPressed);
                 button.setStyle("-fx-background-color: #d2dcde; -fx-text-fill: green;");
-            } else {
-                this.hexagons.add((Polygon) node);
             }
         }
     }
 
     private void tileButtonPressed(ActionEvent event) {
+        // regex to filter the substring with the id from the event
         Pattern pattern = Pattern.compile("=(.*?)_");
         Matcher matcher = pattern.matcher(event.getSource().toString());
         Button cancelTileButton = null;
-        TextField number = null;
+        TextField numberField = null;
         ChoiceBox choiceBox = null;
 
         if (matcher.find()) {
@@ -114,6 +111,7 @@ public class MapEditorController implements Controller {
                     harborButton.setVisible(false);
                 }
 
+                // look for the matching hexagon
                 if (node.getId().equals(matcher.group(1))) {
                     Polygon hexagon = (Polygon) node;
                     hexagon.setFill(Color.grayRgb(200, 0.5));
@@ -133,15 +131,15 @@ public class MapEditorController implements Controller {
                     cancelTileButton.setId(hexagon.getId() + "_cancelButton");
 
                     // number box
-                    number = new TextField();
-                    number.setPrefWidth(35);
-                    number.setPrefHeight(30);
-                    number.setText("-");
-                    number.setStyle("-fx-text-fill: green");
-                    number.setLayoutX(hexagon.getLayoutX() - 18);
-                    number.setLayoutY(hexagon.getLayoutY() - 35);
-                    number.toFront();
-                    number.setId(hexagon.getId() + "_numberField");
+                    numberField = new TextField();
+                    numberField.setPrefWidth(35);
+                    numberField.setPrefHeight(30);
+                    numberField.setText("-");
+                    numberField.setStyle("-fx-text-fill: green");
+                    numberField.setLayoutX(hexagon.getLayoutX() - 18);
+                    numberField.setLayoutY(hexagon.getLayoutY() - 35);
+                    numberField.toFront();
+                    numberField.setId(hexagon.getId() + "_numberField");
 
                     // choice box
                     choiceBox = new ChoiceBox(FXCollections.observableArrayList(
@@ -162,9 +160,10 @@ public class MapEditorController implements Controller {
                 }
             }
         }
+        // add the objects to the map
         if (cancelTileButton != null) {
             map.getChildren().add(cancelTileButton);
-            map.getChildren().add(number);
+            map.getChildren().add(numberField);
             map.getChildren().add(choiceBox);
         }
     }
@@ -181,18 +180,18 @@ public class MapEditorController implements Controller {
 
         TextField numberField = new TextField();
 
+        // the number field needs to be looked up for the desert tile
         for (Node node : map.getChildren()) {
             if (node.getId().equals(hexagon.getId() + "_numberField")) {
                 numberField = (TextField) node;
             }
         }
 
+        // initialize the choosen tile
         switch (choices.get(newValue)) {
             case "random" -> {
-                // TODO find out, if numberField can be written on, when random is chosen
                 numberField.setVisible(true);
                 hexagon.setFill(Color.grayRgb(200, 0.5));
-                System.out.println("Random");
             }
             case "desert" -> {
                 numberField.setVisible(false);
@@ -243,45 +242,50 @@ public class MapEditorController implements Controller {
                         ));
             }
             default -> {
-
             }
         }
 
     }
 
     private void harborButtonPressed(ActionEvent event) {
-
+        //TODO: implement the placing of harbors
     }
 
     private void cancelTileButtonPressed(ActionEvent event) {
         Pattern pattern = Pattern.compile("=(.*?)_");
         Matcher matcher = pattern.matcher(event.getSource().toString());
-        // elements to remove from map
+
+        // dummy elements to remove from map
         Button cancelTileButton = null;
         TextField number = null;
         ChoiceBox choiceBox = null;
 
-
+        // reset the tile
         if (matcher.find()) {
             for (Node node : map.getChildren()) {
                 if (node.getId().equals(matcher.group(1) + "_cancelButton")) {
                     cancelTileButton = (Button) node;
                 }
                 if (node.getId().equals(matcher.group(1) + "_numberField")) {
+                    assert node instanceof TextField;
                     number = (TextField) node;
                 }
                 if (node.getId().equals(matcher.group(1) + "_choiceBox")) {
+                    assert node instanceof ChoiceBox;
                     choiceBox = (ChoiceBox) node;
                 }
                 if (node.getId().equals(matcher.group(1) + "_harborButton")) {
+                    assert node instanceof Button;
                     Button harborButton = (Button) node;
                     harborButton.setVisible(true);
                 }
                 if (node.getId().equals(matcher.group(1) + "_tileButton")) {
+                    assert node instanceof Button;
                     Button tileButton = (Button) node;
                     tileButton.setVisible(true);
                 }
                 if (node.getId().equals(matcher.group(1))) {
+                    assert node instanceof Polygon;
                     Polygon hexagon = (Polygon) node;
                     hexagon.setFill(Color.TRANSPARENT);
                 }
@@ -293,6 +297,9 @@ public class MapEditorController implements Controller {
         map.getChildren().remove(choiceBox);
     }
 
+    /*
+    * increase or decrease the map size and place the buttons
+    * */
     public void mapSizeMinusButtonPressed(ActionEvent event) {
         if (Integer.parseInt(this.mapSizeLabel.getText()) > 0) {
             map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) - 1, true);
@@ -312,6 +319,7 @@ public class MapEditorController implements Controller {
     }
 
     public void saveButtonPressed(ActionEvent event) {
+        //TODO: pressing the save button creates a new map template
     }
 
 }

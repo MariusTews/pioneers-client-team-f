@@ -355,6 +355,7 @@ public class CalculateMap {
 			//Place a Label for the number
 			buildLabel(map, xCoordinate - 12, yCoordinate - 12, x, y, z);
 		} else {
+			// set a transparent hexagon and place to button on it
 			hexagon.setFill(Color.TRANSPARENT);
 			hexagon.setStroke(Color.BLACK);
 			buildButton(map, xCoordinate - 45, yCoordinate - 15, x, y, z, false);
@@ -373,6 +374,7 @@ public class CalculateMap {
 		button.setText("+");
 		button.toFront();
 
+		// set id for either a harbor or tile button
 		if (harbor) {
 			button.setId(createId(x, y, z) + "_harborButton");
 		} else {
