@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.ACHIEVEMENT_UNLOCK_VALUES;
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class AchievementsService {
 
@@ -35,6 +36,21 @@ public class AchievementsService {
 
     public Observable<List<Achievement>> listUserAchievements() {
         return achievementsApiService.listUserAchievements(idStorage.getID());
+    }
+
+    public void initUserAchievements() {
+        Observable<List<Achievement>> userAchievementsList = achievementsApiService.listUserAchievements(idStorage.getID());
+        disposable.add(userAchievementsList
+                .observeOn(FX_SCHEDULER)
+                .subscribe(
+                        achievements -> {
+                            for (Achievement achievement : achievements) {
+                                int achievementProgress = (int) achievement.progress();
+                                achievementsProgress.put(achievement.id(), achievementProgress);
+
+                            }
+                        }
+                ));
     }
 
     public Observable<List<Achievement>> getUserAchievement(String userId, String achievementId) {
