@@ -119,7 +119,6 @@ public class LobbyController implements Controller {
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
     HashMap<String, String> avatars = new HashMap<>();
-    private boolean init = true;
     private final EventHandler<ScrollEvent> userListScrollHandler = this::loadRemainingAvatars;
 
     @Inject
@@ -254,19 +253,8 @@ public class LobbyController implements Controller {
             rejoinButton.disableProperty().set(true);
         }
 
-        this.users.addListener((ListChangeListener<? super User>) c -> {
-            ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
-            if (init) {
-                renderInitialAvatars();
-                userScrollPane.addEventFilter(ScrollEvent.ANY, userListScrollHandler);
-                init = false;
-            }
-        });
-
-
         this.games.addListener((ListChangeListener<? super Game>) c -> ((VBox) this.gamesScrollPane.getContent())
                 .getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList()));
-
 
         this.tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 handleTabSwitching(oldValue, newValue));
@@ -294,6 +282,7 @@ public class LobbyController implements Controller {
     private void loadRemainingAvatars(ScrollEvent scrollEvent) {
         if (avatars != null) {
             loadingLabel.setText("Loading remaining avatars...");
+            //use PauseTransition because otherwise the text in the loading label will not be displayed
             PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
             pause.setOnFinished(event -> {
                 avatars.forEach(this::renderAvatar);
@@ -583,15 +572,19 @@ public class LobbyController implements Controller {
     }
 
     private void loadUsers(List<User> users) {
-
         for (User user : users) {
             memberHash.put(user._id(), user);
         }
+
+        this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
 
         List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
         List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
         this.users.addAll(online);
         this.users.addAll(offline);
+
+        renderInitialAvatars();
+        userScrollPane.addEventFilter(ScrollEvent.ANY, userListScrollHandler);
 
         //get all messages from the user that are in lobby
         messageService
@@ -794,4 +787,7 @@ public class LobbyController implements Controller {
         }
     }
 
+    private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
+        ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
+    }
 }
