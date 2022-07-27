@@ -63,12 +63,12 @@ public class AppTest extends ApplicationTest {
 		write("12\t");
 		type(KeyCode.SPACE);
 		write("\t\t");
-		System.out.println();
+       		System.out.println();
 		for (int i = 0; i < 7; i++) {
 			type(KeyCode.SPACE);
 		}
 		System.out.println();
-		write("\t\t");
+		write("\t\t\t");
 
 		type(KeyCode.SPACE);
 

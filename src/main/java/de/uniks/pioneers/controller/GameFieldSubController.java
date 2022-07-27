@@ -7,7 +7,7 @@ import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -94,7 +94,7 @@ public class GameFieldSubController implements Controller {
     @Override
     public Parent render() {
         CalculateMap calculateMap = new CalculateMap();
-        this.parent = calculateMap.buildMap(this.gameStorage.getSize());
+        this.parent = calculateMap.buildMap(this.gameStorage.getSize(), false);
 
         pioneersService.findAllTiles(gameStorage.getId()).observeOn(FX_SCHEDULER).subscribe(this::loadMap);
 

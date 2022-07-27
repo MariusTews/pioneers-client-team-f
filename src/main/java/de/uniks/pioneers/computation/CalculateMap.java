@@ -1,8 +1,11 @@
 package de.uniks.pioneers.computation;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -10,8 +13,7 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 
 public class CalculateMap {
-
-	private Polygon buildHexagon(int x, int y, int z) {
+	public Polygon buildHexagon(int x, int y, int z) {
 		//creates a Hexagon at the given coordinate
 		double hexPoint1 = 0.0;
 		double hexPoint2 = 30.0;
@@ -235,7 +237,7 @@ public class CalculateMap {
 		}
 	}
 
-	public Pane buildMap(int size) {
+	public Pane buildMap(int size, boolean isTemplate) {
 
 		Pane map = new Pane();
 		double paneBaseSize = 350;
@@ -266,62 +268,64 @@ public class CalculateMap {
 				int y = -x - z;
 
 				if ((z == 0) || (!(y > size) && !(y < (-size)))) {
-					buildAtPosition(map, center, x, y, z);
+					buildAtPosition(map, center, x, y, z, isTemplate);
 				}
 				x++;
 			}
 			z++;
 		}
 
-		int waterMin = (size + 1) * -1;
-		int waterMax = (size + 1);
+		if (!isTemplate) {
+			int waterMin = (size + 1) * -1;
+			int waterMax = (size + 1);
 
-		//Build the 6 Constant WaterTileCorners
-		//top right
-		buildWaterTile(map, getxCoordinate(center, waterMax, waterMin), getyCoordinate(center, waterMin), waterMax, 0, waterMin, 10);
+			//Build the 6 Constant WaterTileCorners
+			//top right
+			buildWaterTile(map, getxCoordinate(center, waterMax, waterMin), getyCoordinate(center, waterMin), waterMax, 0, waterMin, 10);
 
-		//top left
-		buildWaterTile(map, getxCoordinate(center, 0, waterMin), getyCoordinate(center, waterMin), 0, waterMax, waterMin, 12);
+			//top left
+			buildWaterTile(map, getxCoordinate(center, 0, waterMin), getyCoordinate(center, waterMin), 0, waterMax, waterMin, 12);
 
-		//mid left
-		buildWaterTile(map, getxCoordinate(center, waterMin, 0), getyCoordinate(center, 0), waterMin, waterMax, 0, 9);
+			//mid left
+			buildWaterTile(map, getxCoordinate(center, waterMin, 0), getyCoordinate(center, 0), waterMin, waterMax, 0, 9);
 
-		//bottom left
-		buildWaterTile(map, getxCoordinate(center, waterMin, waterMax), getyCoordinate(center, waterMax), waterMin, 0, waterMax, 6);
+			//bottom left
+			buildWaterTile(map, getxCoordinate(center, waterMin, waterMax), getyCoordinate(center, waterMax), waterMin, 0, waterMax, 6);
 
-		//bottom right
-		buildWaterTile(map, getxCoordinate(center, 0, waterMax), getyCoordinate(center, waterMax), 0, waterMin, waterMax, 8);
+			//bottom right
+			buildWaterTile(map, getxCoordinate(center, 0, waterMax), getyCoordinate(center, waterMax), 0, waterMin, waterMax, 8);
 
-		//mid right
-		buildWaterTile(map, getxCoordinate(center, waterMax, 0), getyCoordinate(center, 0), waterMax, waterMin, 0, 3);
+			//mid right
+			buildWaterTile(map, getxCoordinate(center, waterMax, 0), getyCoordinate(center, 0), waterMax, waterMin, 0, 3);
 
-		if (size > 0) {
-			// Build the dynamic WaterTiles
-			for (int i = 1; i <= size; i++) {
-				//bottom left
-				buildWaterTile(map, getxCoordinate(center, waterMin, i), getyCoordinate(center, i), waterMin, waterMax - i, i, 7);
+			if (size > 0) {
+				// Build the dynamic WaterTiles
+				for (int i = 1; i <= size; i++) {
+					//bottom left
+					buildWaterTile(map, getxCoordinate(center, waterMin, i), getyCoordinate(center, i), waterMin, waterMax - i, i, 7);
 
-				//bottom right
-				buildWaterTile(map, getxCoordinate(center, waterMax - i, i), getyCoordinate(center, i), waterMax - i, waterMin, i, 4);
+					//bottom right
+					buildWaterTile(map, getxCoordinate(center, waterMax - i, i), getyCoordinate(center, i), waterMax - i, waterMin, i, 4);
 
-				//top center
-				buildWaterTile(map, getxCoordinate(center, i, waterMin), getyCoordinate(center, waterMin), i, waterMax - i, waterMin, 2);
+					//top center
+					buildWaterTile(map, getxCoordinate(center, i, waterMin), getyCoordinate(center, waterMin), i, waterMax - i, waterMin, 2);
 
-				//top right
-				buildWaterTile(map, getxCoordinate(center, waterMax, -i), getyCoordinate(center, -i), waterMax, waterMin + i, -i, 1);
+					//top right
+					buildWaterTile(map, getxCoordinate(center, waterMax, -i), getyCoordinate(center, -i), waterMax, waterMin + i, -i, 1);
 
-				//top left
-				buildWaterTile(map, getxCoordinate(center, waterMin + i, -i), getyCoordinate(center, -i), waterMin + i, waterMax, -i, 11);
+					//top left
+					buildWaterTile(map, getxCoordinate(center, waterMin + i, -i), getyCoordinate(center, -i), waterMin + i, waterMax, -i, 11);
 
-				//bottom center
-				buildWaterTile(map, getxCoordinate(center, -i, waterMax), getyCoordinate(center, waterMax), -i, waterMin + i, waterMax, 5);
+					//bottom center
+					buildWaterTile(map, getxCoordinate(center, -i, waterMax), getyCoordinate(center, waterMax), -i, waterMin + i, waterMax, 5);
+				}
 			}
 		}
 		map.setStyle("-fx-background: transparent; -fx-background-color: transparent; ");
 		return map;
 	}
 
-	private void buildAtPosition(Pane map, double center, int x, int y, int z) {
+	private void buildAtPosition(Pane map, double center, int x, int y, int z, boolean isTemplate) {
 		double xCoordinate = getxCoordinate(center, x, z);
 		double yCoordinate = getyCoordinate(center, z);
 
@@ -330,25 +334,47 @@ public class CalculateMap {
 		hexagon.setLayoutY(yCoordinate);
 		map.getChildren().add(hexagon);
 
-		// for the buildings
-		buildCircle(map, xCoordinate, yCoordinate - 60, x, y, z, 0);
-		buildCircle(map, xCoordinate, yCoordinate + 60, x, y, z, 6);
+		if (!isTemplate) {
+			// for the buildings
+			buildCircle(map, xCoordinate, yCoordinate - 60, x, y, z, 0);
+			buildCircle(map, xCoordinate, yCoordinate + 60, x, y, z, 6);
 
-		//for the roads
-		buildCircle(map, xCoordinate + 52, yCoordinate, x, y, z, 3);
-		buildCircle(map, xCoordinate - 26, yCoordinate + 45, x, y, z, 7);
-		buildCircle(map, xCoordinate - 26, yCoordinate - 45, x, y, z, 11);
+			//for the roads
+			buildCircle(map, xCoordinate + 52, yCoordinate, x, y, z, 3);
+			buildCircle(map, xCoordinate - 26, yCoordinate + 45, x, y, z, 7);
+			buildCircle(map, xCoordinate - 26, yCoordinate - 45, x, y, z, 11);
 
-		//Create Polygons required for the roads
-		buildRoad(map, xCoordinate + 52, yCoordinate, x, y, z, 0.0, false);
-		buildRoad(map, xCoordinate - 26, yCoordinate + 45, x, y, z, 120.0, false);
-		buildRoad(map, xCoordinate - 26, yCoordinate - 45, x, y, z, 60.0, false);
+			//Create Polygons required for the roads
+			buildRoad(map, xCoordinate + 52, yCoordinate, x, y, z, 0.0, false);
+			buildRoad(map, xCoordinate - 26, yCoordinate + 45, x, y, z, 120.0, false);
+			buildRoad(map, xCoordinate - 26, yCoordinate - 45, x, y, z, 60.0, false);
 
-		//Place the image view for robber
-		buildImage(map, xCoordinate, yCoordinate, x, y, z, false);
+			//Place the image view for robber
+			buildImage(map, xCoordinate, yCoordinate, x, y, z, false);
 
-		//Place a Label fot the number
-		buildLabel(map, xCoordinate - 12, yCoordinate - 12, x, y, z);
+			//Place a Label for the number
+			buildLabel(map, xCoordinate - 12, yCoordinate - 12, x, y, z);
+		} else {
+			buildButton(map, xCoordinate - 40, yCoordinate - 15, x, y, z, false);
+			buildButton(map, xCoordinate + 10, yCoordinate - 15, x, y, z, true);
+		}
+	}
+
+	private void buildButton(Pane map, double xCoordinate, double yCoordinate, int x, int y, int z, boolean harbor) {
+		Button button = new Button();
+		button.setPrefWidth(30);
+		button.setPrefHeight(30);
+		map.getChildren().add(button);
+		button.setLayoutX(xCoordinate);
+		button.setLayoutY(yCoordinate);
+		button.toFront();
+		button.setText("+");
+		button.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+		if (harbor) {
+			button.setId(createId(x, y, z) + "_harborButton");
+		} else {
+			button.setId(createId(x, y, z) + "_tileButton");
+		}
 	}
 
 	private void buildLabel(Pane map, double xCoordinate, double yCoordinate, int x, int y, int z) {
@@ -364,7 +390,6 @@ public class CalculateMap {
 		label.setTextFill(Color.BLACK);
 		label.setId(createId(x, y, z) + "_label");
 	}
-
 
 	private double getxCoordinate(double center, int x, int z) {
 		int xOffset = 104;
