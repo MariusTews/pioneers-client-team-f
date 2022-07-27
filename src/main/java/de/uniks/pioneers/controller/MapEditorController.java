@@ -1,5 +1,6 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
 import javafx.collections.FXCollections;
@@ -17,6 +18,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MapEditorController implements Controller {
+    private final App app;
+    private final Provider<MapTemplatesScreenController> mapTemplatesScreenController;
     @FXML
     public TextField nameTextField;
     @FXML
@@ -43,7 +47,10 @@ public class MapEditorController implements Controller {
     private Pane map;
 
     @Inject
-    public MapEditorController() {
+    public MapEditorController(App app,
+                               Provider<MapTemplatesScreenController> mapTemplatesScreenController) {
+        this.app = app;
+        this.mapTemplatesScreenController = mapTemplatesScreenController;
     }
 
     @Override
@@ -320,6 +327,10 @@ public class MapEditorController implements Controller {
 
     public void saveButtonPressed(ActionEvent event) {
         //TODO: pressing the save button creates a new map template
+
+        // for temporary use, to get back
+        final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
+        this.app.show(controller);
     }
 
 }
