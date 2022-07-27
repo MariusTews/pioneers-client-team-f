@@ -53,6 +53,22 @@ public class Constants {
 
     public static final String CREATE_MAP = "create-map";
 
+    public static final String SETTLEMENT_BUILDER = "settlement-builder";
+
+    public static final String CITY_BUILDER = "city_builder";
+
+    public static final String TRADER = "trader";
+
+    public static final String VENUS_GRAIN_PICKER = "venus-grain-picker";
+
+    public static final String MARS_BAR_PICKER = "mars-bar-picker";
+
+    public static final String MOON_ROCK_PICKER = "moon-rock-picker";
+
+    public static final String EARTH_CACTUS_PICKER = "earth-cactus-picker";
+
+    public static final String NEPTUNE_CRYSTAL_PICKER = "neptune-crystal-picker";
+
     public static final HashMap<String, Integer> ACHIEVEMENT_UNLOCK_VALUES = new HashMap<>();
 
     static {
@@ -60,6 +76,14 @@ public class Constants {
         ACHIEVEMENT_UNLOCK_VALUES.put(ROAD_BUILDER, 100);
         ACHIEVEMENT_UNLOCK_VALUES.put(WIN_GAME, 1);
         ACHIEVEMENT_UNLOCK_VALUES.put(CREATE_MAP, 1);
+        ACHIEVEMENT_UNLOCK_VALUES.put(SETTLEMENT_BUILDER, 20);
+        ACHIEVEMENT_UNLOCK_VALUES.put(CITY_BUILDER, 20);
+        ACHIEVEMENT_UNLOCK_VALUES.put(TRADER, 30);
+        ACHIEVEMENT_UNLOCK_VALUES.put(VENUS_GRAIN_PICKER, 50);
+        ACHIEVEMENT_UNLOCK_VALUES.put(MARS_BAR_PICKER, 50);
+        ACHIEVEMENT_UNLOCK_VALUES.put(MOON_ROCK_PICKER, 50);
+        ACHIEVEMENT_UNLOCK_VALUES.put(EARTH_CACTUS_PICKER, 50);
+        ACHIEVEMENT_UNLOCK_VALUES.put(NEPTUNE_CRYSTAL_PICKER, 50);
     }
 
     //Sorting
