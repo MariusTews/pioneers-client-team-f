@@ -8,9 +8,13 @@ import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -20,8 +24,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -30,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -52,7 +60,7 @@ public class LobbyController implements Controller {
 
     private final List<String> deletedMessages = new ArrayList<>();
     private final List<String> deletedAllMessages = new ArrayList<>();
-    private final List<UserListSubController> userSubCons = new ArrayList<>();
+    private final HashMap<String, UserListSubController> userSubCons = new HashMap<>();
     private final List<GameListSubController> gameSubCons = new ArrayList<>();
     private final List<DirectChatStorage> directChatStorages = new ArrayList<>();
     //store id and user
@@ -107,11 +115,15 @@ public class LobbyController implements Controller {
 
     private final CompositeDisposable disposable = new CompositeDisposable();
     public Button rejoinButton;
+    @FXML public Label loadingLabel;
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
+    HashMap<String, String> avatars = new HashMap<>();
+    private boolean init = true;
+    private final EventHandler<ScrollEvent> userListScrollHandler = this::loadRemainingAvatars;
 
     @Inject
     public LobbyController(App app,
@@ -185,7 +197,7 @@ public class LobbyController implements Controller {
 
     @Override
     public void destroy() {
-        this.userSubCons.forEach(UserListSubController::destroy);
+        this.userSubCons.values().forEach(UserListSubController::destroy);
         this.gameSubCons.forEach(GameListSubController::destroy);
         this.userSubCons.clear();
         this.gameSubCons.clear();
@@ -240,8 +252,15 @@ public class LobbyController implements Controller {
             rejoinButton.disableProperty().set(true);
         }
 
-        this.users.addListener((ListChangeListener<? super User>) c -> ((VBox) this.userScrollPane.getContent())
-                .getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList()));
+        this.users.addListener((ListChangeListener<? super User>) c -> {
+            ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
+            if (init) {
+                renderInitialAvatars();
+                userScrollPane.addEventFilter(ScrollEvent.ANY, userListScrollHandler);
+                init = false;
+            }
+        });
+
 
         this.games.addListener((ListChangeListener<? super Game>) c -> ((VBox) this.gamesScrollPane.getContent())
                 .getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList()));
@@ -252,6 +271,36 @@ public class LobbyController implements Controller {
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
 
         return parent;
+    }
+
+    private void renderInitialAvatars() {
+        VBox content = (VBox) userScrollPane.getContent();
+        int max = Math.min(content.getChildren().size(), 7);
+        List<String> renderedAvatarIds = new ArrayList<>();
+        for (int i = 0; i < max; i++) {
+            String id = content.getChildren().get(i).getId();
+            if (avatars.containsKey(id)) {
+                renderAvatar(id, avatars.get(id));
+                renderedAvatarIds.add(id);
+            }
+        }
+        for (String id : renderedAvatarIds) {
+            avatars.remove(id);
+        }
+    }
+
+    private void loadRemainingAvatars(ScrollEvent scrollEvent) {
+        if (avatars != null) {
+            loadingLabel.setText("Loading remaining avatars...");
+            PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
+            pause.setOnFinished(event -> {
+                avatars.forEach(this::renderAvatar);
+                avatars = null;
+                loadingLabel.setText("");
+            });
+            pause.play();
+        }
+        userScrollPane.removeEventFilter(ScrollEvent.ANY, userListScrollHandler);
     }
 
     //takes action when the application is forcefully closed
@@ -371,14 +420,16 @@ public class LobbyController implements Controller {
         if (user._id().equals(this.idStorage.getID())) {
             this.userWelcomeLabel.setText(WELCOME + user.name() + "!");
         }
-        for (UserListSubController subCon : this.userSubCons) {
-            if (subCon.getId().equals(user._id())) {
-                return subCon.getParent();
-            }
+        if (this.userSubCons.containsKey(user._id())) {
+            return userSubCons.get(user._id()).getParent();
         }
-        UserListSubController userCon = new UserListSubController(this, user, idStorage);
-        userSubCons.add(userCon);
+        UserListSubController userCon = new UserListSubController(this, user, idStorage, avatars);
+        userSubCons.put(user._id(), userCon);
         return userCon.render();
+    }
+
+    private void renderAvatar(String id, String avatar) {
+        userSubCons.get(id).userImageView.setImage(new Image(avatar));
     }
 
     private Node renderGame(Game game) {
@@ -419,12 +470,7 @@ public class LobbyController implements Controller {
     }
 
     private void removeUserSubCon(User updatedUser) {
-        for (UserListSubController subCon : this.userSubCons) {
-            if (subCon.getId().equals(updatedUser._id())) {
-                this.userSubCons.remove(subCon);
-                break;
-            }
-        }
+        this.userSubCons.remove(updatedUser._id());
     }
 
     private void handleGameEvents(Event<Game> gameEvent) {
@@ -743,6 +789,6 @@ public class LobbyController implements Controller {
                     .subscribe();
             this.app.show(gameScreenController.get());
         }
-
     }
+
 }
