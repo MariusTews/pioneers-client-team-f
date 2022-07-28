@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class MapTemplatesScreenController implements Controller {
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     private final HashMap<String, MapTemplateSubController> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
+    private final HashMap<String, Boolean> reverseSortFlags = new HashMap<>();
     private MapTemplateSubController selectedMapTemplateSubController;
     private CompositeDisposable disposable;
 
@@ -78,6 +80,9 @@ public class MapTemplatesScreenController implements Controller {
     public void init() {
         disposable = new CompositeDisposable();
         disposable.add(eventListener.listen("maps.*.*", MapTemplate.class).observeOn(FX_SCHEDULER).subscribe(this::handleMapTemplateEvents));
+        reverseSortFlags.put("name", false);
+        reverseSortFlags.put("createdBy", false);
+        reverseSortFlags.put("votes", false);
     }
 
     @Override
@@ -197,6 +202,7 @@ public class MapTemplatesScreenController implements Controller {
 
     public void onCreateButtonPressed() {
         //TODO
+        sortByName();
     }
 
     public void onSelectButtonPressed() {
@@ -218,6 +224,64 @@ public class MapTemplatesScreenController implements Controller {
                 selectedLabel.setText("Selected: " + selectedMapTemplateSubController.getTemplate().name());
             }
         }
+    }
+
+    private void sortByName() {
+        HashMap<String, List<String>> namesToIdsOwnMaps = new HashMap<>();
+        HashMap<String, List<String>> namesToIdsOtherMaps = new HashMap<>();
+        for (String id : mapTemplateSubCons.keySet()) {
+            MapTemplateSubController controller = mapTemplateSubCons.get(id);
+            String name = controller.getName();
+            if (controller.isOwnMap()) {
+                if (namesToIdsOwnMaps.containsKey(name)) {
+                    namesToIdsOwnMaps.get(name).add(id);
+                } else {
+                    List<String> idList = new ArrayList<>();
+                    idList.add(id);
+                    namesToIdsOwnMaps.put(name, idList);
+                }
+            }
+            else {
+                if (namesToIdsOtherMaps.containsKey(name)) {
+                    namesToIdsOtherMaps.get(name).add(id);
+                } else {
+                    List<String> idList = new ArrayList<>();
+                    idList.add(id);
+                    namesToIdsOtherMaps.put(name, idList);
+                }
+            }
+        }
+
+        List<String> sortedOwnNames = new ArrayList<>(namesToIdsOwnMaps.keySet().stream().sorted().toList());
+        if (reverseSortFlags.get("name")) {
+            Collections.reverse(sortedOwnNames);
+        }
+
+        List<String> sortedOtherNames = new ArrayList<>(namesToIdsOtherMaps.keySet().stream().sorted().toList());
+        if (reverseSortFlags.get("name")) {
+            Collections.reverse(sortedOtherNames);
+        }
+
+        ObservableList<Parent> tempOwnMaps = FXCollections.observableArrayList();
+        for (String name : sortedOwnNames) {
+            for (String id : namesToIdsOwnMaps.get(name)) {
+                tempOwnMaps.add(mapTemplateSubCons.get(id).getParent());
+            }
+        }
+
+        ObservableList<Parent> tempOtherMaps = FXCollections.observableArrayList();
+        for (String name : sortedOtherNames) {
+            for (String id : namesToIdsOtherMaps.get(name)) {
+                tempOtherMaps.add(mapTemplateSubCons.get(id).getParent());
+            }
+        }
+
+        mapTemplates.clear();
+        mapTemplates.addAll(tempOwnMaps);
+        addEmptyLine();
+        mapTemplates.addAll(tempOtherMaps);
+        mapTemplatesListView.refresh();
+        reverseSortFlags.put("name", !reverseSortFlags.get("name"));
     }
 
     public HashMap<String, MapTemplateSubController> getMapTemplateSubCons() {
