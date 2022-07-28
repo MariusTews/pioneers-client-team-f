@@ -3,11 +3,16 @@ package de.uniks.pioneers.service;
 import de.uniks.pioneers.Main;
 import javafx.scene.media.AudioClip;
 
+import javax.inject.Inject;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.ROB_ACTION;
 
 public class SoundService {
+    @Inject
+    public SoundService() {
+
+    }
     public void playSound(String action) {
         AudioClip audioClip;
         switch (action) {

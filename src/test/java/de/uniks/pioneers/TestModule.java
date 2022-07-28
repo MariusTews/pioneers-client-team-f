@@ -23,6 +23,14 @@ import java.util.Objects;
 @Module
 public class TestModule {
 
+    @Provides
+    SoundService soundService() {
+        return new SoundService() {
+            public void playSound(String action) {
+            }
+        };
+    }
+
     static class TestEventListener extends EventListener {
         java.util.Map<String, ObservableEmitter<?>> emitterMap = new HashMap<>();
 
@@ -93,15 +101,6 @@ public class TestModule {
         };
     }
 
-    @Provides
-    SoundService soundService() {
-        return new SoundService() {
-            @Override
-            public void playSound(String action) {
-
-            }
-        };
-    }
 
     @Provides
     @Singleton
