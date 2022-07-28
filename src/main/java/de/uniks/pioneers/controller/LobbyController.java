@@ -6,6 +6,8 @@ import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
@@ -300,11 +302,21 @@ public class LobbyController implements Controller {
     public void logout() {
         userService.statusUpdate(idStorage.getID(), "offline")
                 .observeOn(FX_SCHEDULER)
-                .subscribe();
-        authService.logout()
-                .subscribeOn(FX_SCHEDULER)
-                .subscribe(onSuccess -> app.show(loginController.get()), onError -> {
-                });
+                .subscribe(
+                        result -> authService.logout()
+                                .subscribeOn(FX_SCHEDULER)
+                                .subscribe(
+                                        onSuccess -> {
+                                            ResourceManager.saveConfig(JsonUtil.createDefaultConfig());
+                                            app.show(loginController.get());
+                                        },
+                                        onError -> {
+                                        }
+                                ),
+                        error -> {
+                        }
+                );
+
     }
 
     public void sendButtonPressed() {

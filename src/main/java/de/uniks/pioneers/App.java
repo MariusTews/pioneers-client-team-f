@@ -1,24 +1,28 @@
 package de.uniks.pioneers;
 
-import de.uniks.pioneers.controller.Controller;
-import de.uniks.pioneers.controller.GameLobbyController;
-import de.uniks.pioneers.controller.GameScreenController;
-import de.uniks.pioneers.controller.LobbyController;
+import de.uniks.pioneers.controller.*;
+import de.uniks.pioneers.util.ResourceManager;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import kong.unirest.json.JSONObject;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.util.Locale;
 import java.util.Objects;
+
+import static de.uniks.pioneers.Constants.*;
 
 public class App extends Application {
 
@@ -43,7 +47,7 @@ public class App extends Application {
         stage.setHeight(600);
         stage.setTitle("Pioneers");
 
-        final Scene scene = new Scene(new Label("Loading ... "));
+        final Scene scene = new Scene(new Label());
         stage.setScene(scene);
 
         // Load css into the scene for the design
@@ -94,47 +98,76 @@ public class App extends Application {
     public void show(Controller controller) {
         cleanup();
         this.controller = controller;
-        controller.init();
-        if (controller.getClass().equals(GameScreenController.class)) {
-            Screen screen = Screen.getPrimary();
-            Rectangle2D bounds = screen.getVisualBounds();
-            Scale scale = new Scale();
-            Pane pane = (Pane) controller.render();
-            // wide screens
-            if ((bounds.getHeight() / 950) * 1600 < bounds.getWidth()) {
-                double scaleFactor = bounds.getHeight() / 950;
-                scale.setX(scaleFactor);
-                scale.setY(scaleFactor);
-                Group group = new Group(pane);
-                group.getTransforms().add(scale);
-                stage.getScene().setRoot(group);
-                stage.setWidth(scaleFactor * 1600);
-                stage.setHeight(bounds.getHeight());
-                stage.centerOnScreen();
 
-            }
-            // "higher" screens
-            else {
-                double scaleFactor = bounds.getWidth() / 1600;
-                scale.setX(scaleFactor);
-                scale.setY(scaleFactor);
-                Group group = new Group(pane);
-                group.getTransforms().add(scale);
-                stage.getScene().setRoot(group);
-                stage.setWidth(bounds.getWidth());
-                stage.setHeight(scaleFactor * 950);
-                stage.centerOnScreen();
-            }
+        JSONObject loadConfig = ResourceManager.loadConfig();
+        if (controller instanceof LoginController loginController && loadConfig.get(JSON_REMEMBER_ME).equals(true)) {
+            showLoadingScreen();
+            String token = (String) loadConfig.get(JSON_TOKEN);
+            //noinspection ResultOfMethodCallIgnored
+            loginController.tryTokenLogin(token)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(
+                            result -> loginController.onSuccessfulLogin(result._id()),
+                            error -> {
+                                loginController.init();
+                                stage.getScene().setRoot(loginController.render());
+                            }
+                    );
         } else {
-            stage.getScene().setRoot(controller.render());
-            if (controller.getClass().equals(LobbyController.class)) {
-                stage.setWidth(900);
-                stage.setHeight(600);
-            } else if (controller.getClass().equals(GameLobbyController.class)) {
-                stage.setWidth(1010);
-                stage.setHeight(600);
+            controller.init();
+            if (controller.getClass().equals(GameScreenController.class)) {
+                Screen screen = Screen.getPrimary();
+                Rectangle2D bounds = screen.getVisualBounds();
+                Scale scale = new Scale();
+                Pane pane = (Pane) controller.render();
+                // wide screens
+                if ((bounds.getHeight() / 950) * 1600 < bounds.getWidth()) {
+                    double scaleFactor = bounds.getHeight() / 950;
+                    scale.setX(scaleFactor);
+                    scale.setY(scaleFactor);
+                    Group group = new Group(pane);
+                    group.getTransforms().add(scale);
+                    stage.getScene().setRoot(group);
+                    stage.setWidth(scaleFactor * 1600);
+                    stage.setHeight(bounds.getHeight());
+                    stage.centerOnScreen();
+
+                }
+                // "higher" screens
+                else {
+                    double scaleFactor = bounds.getWidth() / 1600;
+                    scale.setX(scaleFactor);
+                    scale.setY(scaleFactor);
+                    Group group = new Group(pane);
+                    group.getTransforms().add(scale);
+                    stage.getScene().setRoot(group);
+                    stage.setWidth(bounds.getWidth());
+                    stage.setHeight(scaleFactor * 950);
+                    stage.centerOnScreen();
+                }
+            } else {
+                stage.getScene().setRoot(controller.render());
+                if (controller.getClass().equals(LobbyController.class)) {
+                    stage.setWidth(900);
+                    stage.setHeight(600);
+                } else if (controller.getClass().equals(GameLobbyController.class)) {
+                    stage.setWidth(1010);
+                    stage.setHeight(600);
+                }
             }
         }
+    }
+
+    private void showLoadingScreen() {
+        VBox loadingScreen = new VBox(12);
+        ImageView logo = new ImageView();
+        logo.setFitWidth(211);
+        logo.setFitHeight(81);
+        logo.setImage(new Image(Objects.requireNonNull(App.class.getResource("FATARI_logo.png")).toString()));
+        Label label = new Label("Loading...");
+        loadingScreen.getChildren().addAll(logo, label);
+        loadingScreen.setAlignment(Pos.CENTER);
+        stage.getScene().setRoot(loadingScreen);
     }
 
     private void cleanup() {
