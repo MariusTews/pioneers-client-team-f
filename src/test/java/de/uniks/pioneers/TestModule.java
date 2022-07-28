@@ -9,6 +9,7 @@ import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
+import de.uniks.pioneers.service.SoundService;
 import de.uniks.pioneers.service.TokenStorage;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
@@ -88,6 +89,16 @@ public class TestModule {
             @Override
             public Observable<User> deleteUser(String id) {
                 return Observable.empty();
+            }
+        };
+    }
+
+    @Provides
+    SoundService soundService() {
+        return new SoundService() {
+            @Override
+            public void playSound(String action) {
+
             }
         };
     }
