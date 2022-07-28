@@ -118,7 +118,7 @@ public class LobbyController implements Controller {
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
-    HashMap<String, String> avatars = new HashMap<>();
+    private HashMap<String, String> avatars;
     private final EventHandler<ScrollEvent> userListScrollHandler = this::loadRemainingAvatars;
 
     @Inject
@@ -161,11 +161,13 @@ public class LobbyController implements Controller {
 
     @Override
     public void init() {
-
         if (this.gameStorage.getId() != null) {
             memberService.getAllGameMembers(this.gameStorage.getId())
                     .observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
         }
+
+        avatars = new HashMap<>();
+
         gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
         groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this::loadGroups);
