@@ -79,6 +79,7 @@ public class UserListSubController implements Controller {
                     if (avatars != null) {
                         avatars.put(this.id, avatar);
                     }
+                    // avatars == null when all saved avatars have been rendered
                     else {
                         this.userImageView.setImage(new Image(avatar));
                     }

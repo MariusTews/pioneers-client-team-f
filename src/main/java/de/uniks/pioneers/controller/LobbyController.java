@@ -282,7 +282,7 @@ public class LobbyController implements Controller {
     private void loadRemainingAvatars(ScrollEvent scrollEvent) {
         if (avatars != null) {
             loadingLabel.setText("Loading remaining avatars...");
-            //use PauseTransition because otherwise the text in the loading label will not be displayed
+            // use PauseTransition because otherwise the text in the loading label will not be displayed
             PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
             pause.setOnFinished(event -> {
                 avatars.forEach(this::renderAvatar);
@@ -292,6 +292,7 @@ public class LobbyController implements Controller {
             });
             pause.play();
         }
+        // remove filter again to prevent calling this method unnecessarily
         userScrollPane.removeEventFilter(ScrollEvent.ANY, userListScrollHandler);
     }
 
@@ -576,6 +577,7 @@ public class LobbyController implements Controller {
             memberHash.put(user._id(), user);
         }
 
+        // add listener here to be able to render the avatars directly
         this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
 
         List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
@@ -583,7 +585,10 @@ public class LobbyController implements Controller {
         this.users.addAll(online);
         this.users.addAll(offline);
 
+        // render avatars for the first few visible list elements
+        // this works because the onUsersChanged listener is already triggered directly after adding the users
         renderInitialAvatars();
+        // add scroll event handler which renders the rest of the avatars (only once)
         userScrollPane.addEventFilter(ScrollEvent.ANY, userListScrollHandler);
 
         //get all messages from the user that are in lobby
