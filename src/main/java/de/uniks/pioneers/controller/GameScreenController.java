@@ -103,7 +103,7 @@ public class GameScreenController implements Controller {
     private final GameService gameService;
     private final MessageService messageService;
     private final MemberService memberService;
-    private final SoundService soundService = new SoundService();
+    private final SoundService soundService;
 
 
     private GameFieldSubController gameFieldSubController;
@@ -135,6 +135,7 @@ public class GameScreenController implements Controller {
                                 GameService gameService,
                                 MessageService messageService,
                                 MemberService memberService,
+                                SoundService soundService,
                                 UserStorage userStorage) {
         this.lobbyController = lobbyController;
         this.app = app;
@@ -148,6 +149,7 @@ public class GameScreenController implements Controller {
         this.memberIDStorage = memberIDStorage;
         this.memberService = memberService;
         this.userStorage = userStorage;
+        this.soundService = soundService;
     }
 
     @Override
