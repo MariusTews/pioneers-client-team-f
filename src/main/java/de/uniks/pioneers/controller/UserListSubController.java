@@ -18,7 +18,6 @@ import javafx.scene.shape.Circle;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 public class UserListSubController implements Controller {
     @FXML

@@ -2,10 +2,10 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.animation.PauseTransition;
@@ -472,12 +472,12 @@ public class LobbyController implements Controller {
         if (gameEvent.event().endsWith(CREATED)) {
             this.games.add(game);
         } else if (gameEvent.event().endsWith(DELETED)) {
-            removeGameSubcon(game);
+            removeGameSubCon(game);
             this.games.removeIf(u -> u._id().equals(game._id()));
         } else if (gameEvent.event().endsWith(UPDATED)) {
             for (Game updatedGame : this.games) {
                 if (updatedGame._id().equals(game._id())) {
-                    removeGameSubcon(updatedGame);
+                    removeGameSubCon(updatedGame);
                     this.games.set(this.games.indexOf(updatedGame), game);
                     break;
                 }
@@ -485,7 +485,7 @@ public class LobbyController implements Controller {
         }
     }
 
-    private void removeGameSubcon(Game updatedGame) {
+    private void removeGameSubCon(Game updatedGame) {
         for (GameListSubController subCon : this.gameSubCons) {
             if (subCon.getId().equals(updatedGame._id())) {
                 this.gameSubCons.remove(subCon);
