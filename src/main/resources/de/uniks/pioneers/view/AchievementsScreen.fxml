@@ -13,7 +13,7 @@
    <padding>
       <Insets top="20.0"/>
    </padding>
-   <Label text="Achievements"/>
+   <Label text="Achievements" styleClass="achievements"/>
    <HBox alignment="CENTER_RIGHT" prefHeight="24.0" prefWidth="600.0" spacing="55.0">
       <padding>
          <Insets right="20.0"/>
@@ -22,7 +22,7 @@
       <Label text="needed"/>
       <Label text="current score"/>
    </HBox>
-   <ListView fx:id="achievementsList" prefHeight="247.0" prefWidth="600.0"/>
+   <ListView fx:id="achievementsList" prefHeight="247.0" prefWidth="600.0" styleClass="achievements"/>
    <HBox alignment="CENTER_RIGHT" prefHeight="43.0" prefWidth="600.0">
       <padding>
          <Insets right="20.0"/>

@@ -1,5 +1,6 @@
 package de.uniks.pioneers;
 
+import de.uniks.pioneers.model.Achievement;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.User;
 import io.reactivex.rxjava3.core.Scheduler;
@@ -84,6 +85,38 @@ public class Constants {
         ACHIEVEMENT_UNLOCK_VALUES.put(MOON_ROCK_PICKER, 50);
         ACHIEVEMENT_UNLOCK_VALUES.put(EARTH_CACTUS_PICKER, 50);
         ACHIEVEMENT_UNLOCK_VALUES.put(NEPTUNE_CRYSTAL_PICKER, 50);
+    }
+
+    public static final HashMap<String, String> ACHIEVEMENT_NAMES = new HashMap<>();
+    static {
+        ACHIEVEMENT_NAMES.put(FIRST_ROAD, "build your first road");
+        ACHIEVEMENT_NAMES.put(ROAD_BUILDER, "road builder");
+        ACHIEVEMENT_NAMES.put(SETTLEMENT_BUILDER, "settlement builder");
+        ACHIEVEMENT_NAMES.put(CITY_BUILDER, "city builder");
+        ACHIEVEMENT_NAMES.put(WIN_GAME, "win your first game");
+        ACHIEVEMENT_NAMES.put(CREATE_MAP, "create your own map");
+        ACHIEVEMENT_NAMES.put(TRADER, "trader");
+        ACHIEVEMENT_NAMES.put(VENUS_GRAIN_PICKER, "venus grain picker");
+        ACHIEVEMENT_NAMES.put(MARS_BAR_PICKER, "mars bar picker");
+        ACHIEVEMENT_NAMES.put(MOON_ROCK_PICKER, "moon rock picker");
+        ACHIEVEMENT_NAMES.put(EARTH_CACTUS_PICKER, "earth cactus picker");
+        ACHIEVEMENT_NAMES.put(NEPTUNE_CRYSTAL_PICKER, "neptune crystal picker");
+    }
+
+    public static final HashMap<String, String> ACHIEVEMENT_PATHS = new HashMap<>();
+    static {
+        ACHIEVEMENT_PATHS.put(FIRST_ROAD, "first_road");
+        ACHIEVEMENT_PATHS.put(ROAD_BUILDER, "100_roads");
+        ACHIEVEMENT_PATHS.put(SETTLEMENT_BUILDER, "");
+        ACHIEVEMENT_PATHS.put(CITY_BUILDER, "");
+        ACHIEVEMENT_PATHS.put(WIN_GAME, "win_game");
+        ACHIEVEMENT_PATHS.put(CREATE_MAP, "create_map");
+        ACHIEVEMENT_PATHS.put(TRADER, "");
+        ACHIEVEMENT_PATHS.put(VENUS_GRAIN_PICKER, "");
+        ACHIEVEMENT_PATHS.put(MARS_BAR_PICKER, "");
+        ACHIEVEMENT_PATHS.put(MOON_ROCK_PICKER, "");
+        ACHIEVEMENT_PATHS.put(EARTH_CACTUS_PICKER, "");
+        ACHIEVEMENT_PATHS.put(NEPTUNE_CRYSTAL_PICKER, "");
     }
 
     //Sorting

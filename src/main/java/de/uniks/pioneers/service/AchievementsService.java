@@ -69,7 +69,7 @@ public class AchievementsService {
     private Observable<Achievement> putAchievement(String id, int progress) {
         String unlocked = null;
         // check if an achievement gets unlocked
-        if (ACHIEVEMENT_UNLOCK_VALUES.get(id) >= progress) {
+        if (ACHIEVEMENT_UNLOCK_VALUES.get(id) <= progress) {
             unlocked = java.time.LocalDateTime.now().toString();
         }
         achievementsProgress.put(id, progress);
