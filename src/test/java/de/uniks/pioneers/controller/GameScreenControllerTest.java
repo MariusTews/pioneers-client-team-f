@@ -6,7 +6,7 @@ import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.dto.RobDto;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
@@ -32,7 +32,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testfx.api.FxAssert.verifyThat;
-import static org.testfx.util.WaitForAsyncUtils.waitForAsync;
 import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,6 +96,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(gameStorage.getId()).thenReturn("02");
         when(gameStorage.getSize()).thenReturn(1);
         when(idStorage.getID()).thenReturn("01");
+        when(pioneersService.findOnePlayer(any(), any())).thenReturn(Observable.empty());
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         List<Player> players = new ArrayList<>();
         players.add(new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null, null));
@@ -235,15 +235,20 @@ class GameScreenControllerTest extends ApplicationTest {
         waitForFxEvents();
 
         stateSubject.onNext(new Event<>(".updated", new State("0", "02", Collections.singletonList(ex), null)));
-        moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "rob", 8, null, new RobDto(0, 0,0, null), null, null, null)));
+        moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "rob", 8, null, new RobDto(0, 0, 0, null), null, null, null)));
         waitForFxEvents();
     }
 
+    /*
     @Test
     void zoomMap() {
-        clickOn("#zoomOut");
-        clickOn("#zoomIn");
+        Button zoomIn = lookup("#zoomInButton").query();
+        Button zoomOut = lookup("#zoomOutButton").query();
+        clickOn(zoomIn);
+        clickOn(zoomOut);
+
     }
+    */
 
     @Override
     public void stop() throws Exception {
