@@ -22,7 +22,8 @@ public class CreateGameController implements Controller {
     private final Provider<MapTemplatesScreenController> mapTemplatesScreenController;
     private final GameService gameService;
 
-    private String mapTemplate;
+    private String mapTemplateName;
+    private String mapTemplateId;
     private int mapSize;
     private int victoryPoints;
 
@@ -43,7 +44,7 @@ public class CreateGameController implements Controller {
     @FXML
     public Button victoryPointsPlusButton;
     @FXML
-	public Button mapsButton;
+    public Button mapsButton;
     @FXML
     public Label mapSizeLabel;
     @FXML
@@ -70,8 +71,8 @@ public class CreateGameController implements Controller {
     public void init() {
         this.mapSize = 2;
         this.victoryPoints = 10;
-        if (mapTemplate == null) {
-            mapTemplate = "Default";
+        if (mapTemplateName == null) {
+            mapTemplateName = "Default";
         }
     }
 
@@ -93,7 +94,7 @@ public class CreateGameController implements Controller {
         }
         mapSizeLabel.setText("" + mapSize);
         victoryPointsLabel.setText("" + victoryPoints);
-        mapTemplateLabel.setText("Map Template: " + mapTemplate);
+        mapTemplateLabel.setText("Map Template: " + mapTemplateName);
 
         return parent;
     }
@@ -103,10 +104,10 @@ public class CreateGameController implements Controller {
         this.app.show(controller);
     }
 
-	public void mapsButtonPressed() {
+    public void mapsButtonPressed() {
         final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
         this.app.show(controller);
-	}
+    }
 
     public void createGameButtonPressed() {
         if (gameNameTextField.getText().length() > 32 || gameNameTextField.getText().length() < 1) {
@@ -122,7 +123,7 @@ public class CreateGameController implements Controller {
             dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
             alert.showAndWait();
         } else {
-            gameService.create(gameNameTextField.getText(), passwordTextField.getText(), mapSize, victoryPoints,null,false,0)
+            gameService.create(gameNameTextField.getText(), passwordTextField.getText(), mapSize, victoryPoints, mapTemplateId, false, 0)
                     .observeOn(FX_SCHEDULER)
                     .subscribe(onSuccess -> app.show(gameLobbyController.get()), onError -> {
                     });
@@ -197,8 +198,8 @@ public class CreateGameController implements Controller {
         }
     }
 
-    //TODO will be used later when selecting map template in map template screen
-	public void setMapTemplate(String mapTemplate) {
-		this.mapTemplate = mapTemplate;
-	}
+    public void setMapTemplate(String mapTemplateName, String mapTemplateId) {
+        this.mapTemplateName = mapTemplateName;
+        this.mapTemplateId = mapTemplateId;
+    }
 }
