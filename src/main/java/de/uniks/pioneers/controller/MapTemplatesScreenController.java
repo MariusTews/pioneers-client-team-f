@@ -19,10 +19,10 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -42,12 +42,6 @@ public class MapTemplatesScreenController implements Controller {
     private final IDStorage idStorage;
     private final EventListener eventListener;
     @FXML
-    public ImageView nameArrow;
-    @FXML
-    public ImageView createdByArrow;
-    @FXML
-    public ImageView votesArrow;
-    @FXML
     public Label selectedLabel;
     @FXML
     public Button backButton;
@@ -60,7 +54,7 @@ public class MapTemplatesScreenController implements Controller {
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     private final HashMap<String, MapTemplateSubController> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
-    private final HashMap<String, Boolean> reverseSortFlags = new HashMap<>();
+    private final HashMap<String, Boolean> sortOrderFlags = new HashMap<>();
     private MapTemplateSubController selectedMapTemplateSubController;
     private CompositeDisposable disposable;
 
@@ -80,9 +74,10 @@ public class MapTemplatesScreenController implements Controller {
     public void init() {
         disposable = new CompositeDisposable();
         disposable.add(eventListener.listen("maps.*.*", MapTemplate.class).observeOn(FX_SCHEDULER).subscribe(this::handleMapTemplateEvents));
-        reverseSortFlags.put("name", false);
-        reverseSortFlags.put("createdBy", false);
-        reverseSortFlags.put("votes", false);
+        // false means sort in natural order, true means sort in reverse order
+        sortOrderFlags.put("name", false);
+        sortOrderFlags.put("createdBy", false);
+        sortOrderFlags.put("votes", false);
     }
 
     @Override
@@ -195,23 +190,6 @@ public class MapTemplatesScreenController implements Controller {
         mapTemplates.add(emptyLine);
     }
 
-    public void onBackButtonPressed() {
-        final CreateGameController controller = createGameController.get();
-        this.app.show(controller);
-    }
-
-    public void onCreateButtonPressed() {
-        //TODO
-        sortByName();
-    }
-
-    public void onSelectButtonPressed() {
-        final CreateGameController controller = createGameController.get();
-        MapTemplate selectedTemplate = selectedMapTemplateSubController.getTemplate();
-        controller.setMapTemplate(selectedTemplate.name(), selectedTemplate._id());
-        this.app.show(controller);
-    }
-
     private void selectMapTemplateItem(MouseEvent mouseEvent) {
         if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
             if (mouseEvent.getClickCount() == 2) {
@@ -226,62 +204,68 @@ public class MapTemplatesScreenController implements Controller {
         }
     }
 
-    private void sortByName() {
-        HashMap<String, List<String>> namesToIdsOwnMaps = new HashMap<>();
-        HashMap<String, List<String>> namesToIdsOtherMaps = new HashMap<>();
-        for (String id : mapTemplateSubCons.keySet()) {
-            MapTemplateSubController controller = mapTemplateSubCons.get(id);
-            String name = controller.getName();
-            if (controller.isOwnMap()) {
-                if (namesToIdsOwnMaps.containsKey(name)) {
-                    namesToIdsOwnMaps.get(name).add(id);
-                } else {
-                    List<String> idList = new ArrayList<>();
-                    idList.add(id);
-                    namesToIdsOwnMaps.put(name, idList);
-                }
-            }
-            else {
-                if (namesToIdsOtherMaps.containsKey(name)) {
-                    namesToIdsOtherMaps.get(name).add(id);
-                } else {
-                    List<String> idList = new ArrayList<>();
-                    idList.add(id);
-                    namesToIdsOtherMaps.put(name, idList);
-                }
-            }
-        }
+    public void onBackButtonPressed() {
+        final CreateGameController controller = createGameController.get();
+        this.app.show(controller);
+    }
 
-        List<String> sortedOwnNames = new ArrayList<>(namesToIdsOwnMaps.keySet().stream().sorted().toList());
-        if (reverseSortFlags.get("name")) {
-            Collections.reverse(sortedOwnNames);
-        }
+    public void onCreateButtonPressed() {
+        //TODO
+    }
 
-        List<String> sortedOtherNames = new ArrayList<>(namesToIdsOtherMaps.keySet().stream().sorted().toList());
-        if (reverseSortFlags.get("name")) {
-            Collections.reverse(sortedOtherNames);
-        }
+    public void onSelectButtonPressed() {
+        final CreateGameController controller = createGameController.get();
+        MapTemplate selectedTemplate = selectedMapTemplateSubController.getTemplate();
+        controller.setMapTemplate(selectedTemplate.name(), selectedTemplate._id());
+        this.app.show(controller);
+    }
 
-        ObservableList<Parent> tempOwnMaps = FXCollections.observableArrayList();
-        for (String name : sortedOwnNames) {
-            for (String id : namesToIdsOwnMaps.get(name)) {
-                tempOwnMaps.add(mapTemplateSubCons.get(id).getParent());
-            }
-        }
+    public void onNameArrowPressed(MouseEvent mouseEvent) {
+        sort("name");
+        Polygon source = ((Polygon) mouseEvent.getSource());
+        source.setRotate((source.getRotate() + 180) % 360);
+    }
 
-        ObservableList<Parent> tempOtherMaps = FXCollections.observableArrayList();
-        for (String name : sortedOtherNames) {
-            for (String id : namesToIdsOtherMaps.get(name)) {
-                tempOtherMaps.add(mapTemplateSubCons.get(id).getParent());
-            }
-        }
-
+    private void sort(String sortBy) {
+        List<String> ownMapTemplateIds = new ArrayList<>(mapTemplateSubCons.keySet().stream().filter(id -> mapTemplateSubCons.get(id).isOwnMap()).toList());
+        List<String> otherMapTemplateIds = new ArrayList<>(mapTemplateSubCons.keySet().stream().filter(id -> !(mapTemplateSubCons.get(id).isOwnMap())).toList());
+        ObservableList<Parent> ownMapTemplates = sortMapTemplates(ownMapTemplateIds, sortBy);
+        ObservableList<Parent> otherMapTemplates = sortMapTemplates(otherMapTemplateIds, sortBy);
         mapTemplates.clear();
-        mapTemplates.addAll(tempOwnMaps);
+        mapTemplates.addAll(ownMapTemplates);
         addEmptyLine();
-        mapTemplates.addAll(tempOtherMaps);
+        mapTemplates.addAll(otherMapTemplates);
         mapTemplatesListView.refresh();
-        reverseSortFlags.put("name", !reverseSortFlags.get("name"));
+        sortOrderFlags.put(sortBy, !sortOrderFlags.get(sortBy));
+    }
+
+    private ObservableList<Parent> sortMapTemplates(List<String> mapTemplateIds, String sortBy) {
+        HashMap<String, List<String>> valuesToIds = new HashMap<>();
+        for (String id : mapTemplateIds) {
+            MapTemplateSubController controller = mapTemplateSubCons.get(id);
+            String value = controller.getSortValue(sortBy);
+                if (valuesToIds.containsKey(value)) {
+                    valuesToIds.get(value).add(id);
+                } else {
+                    List<String> idList = new ArrayList<>();
+                    idList.add(id);
+                    valuesToIds.put(value, idList);
+                }
+        }
+
+        List<String> sortedValues = new ArrayList<>(valuesToIds.keySet().stream().sorted().toList());
+        if (sortOrderFlags.get(sortBy)) {
+            Collections.reverse(sortedValues);
+        }
+
+        ObservableList<Parent> _mapTemplates = FXCollections.observableArrayList();
+        for (String value : sortedValues) {
+            for (String id : valuesToIds.get(value)) {
+                _mapTemplates.add(mapTemplateSubCons.get(id).getParent());
+            }
+        }
+
+        return _mapTemplates;
     }
 
     public HashMap<String, MapTemplateSubController> getMapTemplateSubCons() {
@@ -291,4 +275,5 @@ public class MapTemplatesScreenController implements Controller {
     public ObservableList<Parent> getMapTemplates() {
         return mapTemplates;
     }
+
 }

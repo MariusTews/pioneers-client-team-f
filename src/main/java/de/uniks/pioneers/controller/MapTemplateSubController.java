@@ -129,8 +129,14 @@ public class MapTemplateSubController implements Controller {
         return template;
     }
 
-    public String getName() {
-        return template.name();
+    public String getSortValue(String sortBy) {
+        String value = "";
+        switch (sortBy) {
+            case "name" -> value = template.name();
+            case "createdBy" -> value = createdBy;
+            case "votes" -> value = String.valueOf(template.votes());
+        }
+        return value;
     }
 
     public boolean isOwnMap() {
