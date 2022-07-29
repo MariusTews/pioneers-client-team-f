@@ -102,7 +102,10 @@ public class App extends Application {
         JSONObject loadConfig = ResourceManager.loadConfig();
         if (controller instanceof LoginController loginController && loadConfig.get(JSON_REMEMBER_ME).equals(true)) {
             showLoadingScreen();
-            String token = (String) loadConfig.get(JSON_TOKEN);
+            String token = "";
+            if (loadConfig.has(JSON_TOKEN)) {
+                token = (String) loadConfig.get(JSON_TOKEN);
+            }
             //noinspection ResultOfMethodCallIgnored
             loginController.tryTokenLogin(token)
                     .observeOn(FX_SCHEDULER)

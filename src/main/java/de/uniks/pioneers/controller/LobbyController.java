@@ -6,6 +6,8 @@ import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.animation.PauseTransition;
