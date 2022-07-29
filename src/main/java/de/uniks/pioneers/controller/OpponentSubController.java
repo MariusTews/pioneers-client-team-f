@@ -1,8 +1,10 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.computation.RoadAndFleet;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.PioneersService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,6 +21,7 @@ import java.io.IOException;
 public class OpponentSubController implements Controller {
 
     private final int maxVictoryPoints;
+    private final PioneersService pioneersService;
     @FXML
     public VBox singleOpponentView;
     @FXML
@@ -54,13 +57,13 @@ public class OpponentSubController implements Controller {
     private Parent parent;
 
     @Inject
-    public OpponentSubController(Player player, User user, int maxVictoryPoints) {
+    public OpponentSubController(Player player, User user, int maxVictoryPoints, PioneersService pioneersService) {
         // Opponent as player needed for victory points and color
         this.opponent = player;
-
         // Opponents as user needed for username and avatar
         this.opponentAsUser = user;
         this.maxVictoryPoints = maxVictoryPoints;
+        this.pioneersService = pioneersService;
     }
 
     @Override
@@ -109,8 +112,16 @@ public class OpponentSubController implements Controller {
         Tooltip.install(neptunCrystalsImage, new Tooltip("Neptune crystals"));
         Tooltip.install(venusGrainImage, new Tooltip("Venus grain"));
 
+        roadAndFleet();
+
         this.parent = parent;
         return parent;
+    }
+
+    public void roadAndFleet() {
+        RoadAndFleet ld = new RoadAndFleet();
+        ld.calculateLongestRoad(pioneersService, opponent.gameId(), opponent.userId(), opponentLongestRoadIcon);
+        ld.calculateLargestFleet(pioneersService, opponent.gameId(), opponent.gameId(), opponentLargestFleetIcon);
     }
 
     public String getId() {

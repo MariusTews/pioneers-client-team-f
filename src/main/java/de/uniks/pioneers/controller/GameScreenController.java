@@ -2,12 +2,12 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.computation.DiceRoll;
 import de.uniks.pioneers.computation.RandomAction;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -423,11 +423,8 @@ public class GameScreenController implements Controller {
             for (Player p : playerOwnView) {
                 if (p.userId().equals(player.userId())) {
                     if (!player.developmentCards().isEmpty()) {
-                        if (player.developmentCards().get(player.developmentCards().size() - 1).type().equals("victory-point")
-                                && player.developmentCards().size() != p.developmentCards().size()) {
-                            AlertService alertService = new AlertService();
-                            alertService.showAlert("Congratulations, you acquired Victory point card");
-                        }
+                        AlertService alertService = new AlertService();
+                        alertService.alertForEachCard(player,p);
                     }
                     playerOwnView.set(playerOwnView.indexOf(p), player);
 
@@ -626,7 +623,7 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                this.gameStorage.getVictoryPoints());
+                this.gameStorage.getVictoryPoints(),pioneersService);
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }

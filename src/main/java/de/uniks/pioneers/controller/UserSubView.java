@@ -1,6 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.computation.RoadAndFleet;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
@@ -44,14 +45,14 @@ public class UserSubView implements Controller {
     private final PioneersService pioneersService;
     @FXML
     public ImageView largestFleetIconDisplay;
-    //Todo: set icon than user has largest fleet
     @FXML
     public Label fleetLabel;
     @FXML
     public ImageView longestRoadIconDisplay;
-    //Todo: set icon than user has longest road
     @FXML
     public Button developmentBuyIdButton;
+
+    private RoadAndFleet ld;
 
     @Inject
     public UserSubView(IDStorage idStorage, GameStorage gameStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
@@ -67,6 +68,7 @@ public class UserSubView implements Controller {
 
     @Override
     public void init() {
+        ld = new RoadAndFleet();
         userService.findAllUsers().observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.users.addAll(col);
@@ -183,10 +185,21 @@ public class UserSubView implements Controller {
         this.city.setText(RENAME_CITY);
         this.developmentBuyIdButton.disableProperty().set(true);
 
+
+        Tooltip.install(this.developmentBuyIdButton, new Tooltip("1 Venus grain \n1 Moon rock \n1 Neptune Crystal"));
         Tooltip.install(this.road, new Tooltip("1 Earth cactus, \n1 Mars bar "));
         Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
         Tooltip.install(this.city, new Tooltip("3 Moon rock, \n2 Venus grain "));
+
+        roadAndFleet();
+
         return parent;
+    }
+
+    public void roadAndFleet() {
+        ld.calculateLongestRoad(pioneersService, gameStorage.getId(), idStorage.getID(), longestRoadIconDisplay);
+        ld.calculateLargestFleet(pioneersService, gameStorage.getId(), idStorage.getID(), largestFleetIconDisplay);
+
     }
 
     public void onSett() {
