@@ -66,16 +66,19 @@ public class RoadAndFleet {
                     HashMap<String, String> userAndGameId = new HashMap<>();
                     HashMap<HashMap<String, String>, Integer> maxValue = new HashMap<>();
                     for (Player player : e) {
-                        if (player.developmentCards() != null) {
+                        if (player.developmentCards().size() != 0) {
                             //needs to count development cards of every player
                             int count = 0;
                             for (DevelopmentCard d : player.developmentCards()) {
-                                if (d.type().equals("knight")) {
+                                if (d.type().equals("knight") && d.revealed() && !d.locked()) {
                                     count++;
                                 }
                             }
-                            userAndGameId.put(player.gameId(), player.userId());
-                            maxValue.put(userAndGameId, count);
+                            //Only put values in hashmap if player has at least one Knight cards
+                            if(count != 0) {
+                                userAndGameId.put(player.gameId(), player.userId());
+                                maxValue.put(userAndGameId, count);
+                            }
                         }
                     }
 
