@@ -63,18 +63,15 @@ public class AppTest extends ApplicationTest {
         for (int i = 0; i < 7; i++) {
             type(KeyCode.SPACE);
         }
-        System.out.println();
         write("\t\t\t");
 
         type(KeyCode.SPACE);
 
         //test gameLobby
         WaitForAsyncUtils.waitForFxEvents();
-        System.out.println();
 
 
         write("\t\t\t\t\t\t");
-        System.out.println();
         type(KeyCode.SPACE);
         WaitForAsyncUtils.waitForFxEvents();
         sleep(5000);
