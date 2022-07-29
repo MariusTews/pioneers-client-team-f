@@ -424,7 +424,7 @@ public class GameScreenController implements Controller {
                 if (p.userId().equals(player.userId())) {
                     if (!player.developmentCards().isEmpty()) {
                         AlertService alertService = new AlertService();
-                        alertService.alertForEachCard(player,p);
+                        alertService.alertForEachCard(player, p);
                     }
                     playerOwnView.set(playerOwnView.indexOf(p), player);
 
@@ -623,7 +623,7 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                this.gameStorage.getVictoryPoints(),pioneersService);
+                this.gameStorage.getVictoryPoints(), pioneersService);
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }

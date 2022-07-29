@@ -186,7 +186,7 @@ public class UserSubView implements Controller {
         this.developmentBuyIdButton.disableProperty().set(true);
 
 
-        Tooltip.install(this.developmentBuyIdButton, new Tooltip("1 Venus grain \n1 Moon rock \n1 Neptune Crystal"));
+        Tooltip.install(this.developmentBuyIdButton, new Tooltip("1 Venus grain, \n1 Moon rock, \n1 Neptune Crystal"));
         Tooltip.install(this.road, new Tooltip("1 Earth cactus, \n1 Mars bar "));
         Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
         Tooltip.install(this.city, new Tooltip("3 Moon rock, \n2 Venus grain "));

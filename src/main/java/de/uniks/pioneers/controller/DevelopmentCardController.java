@@ -54,8 +54,7 @@ public class DevelopmentCardController implements Controller {
     private final Window owner;
 
     @Inject
-    public DevelopmentCardController(Window owner, GameStorage gameStorage, IDStorage idStorage,
-                                     PioneersService pioneersService) {
+    public DevelopmentCardController(Window owner, GameStorage gameStorage, IDStorage idStorage, PioneersService pioneersService) {
         this.owner = owner;
         this.gameStorage = gameStorage;
         this.idStorage = idStorage;
@@ -83,8 +82,7 @@ public class DevelopmentCardController implements Controller {
             // Set to UNDECORATED or TRANSPARENT (without white background) to remove minimize, maximize and close button of stage
             primaryStage.initStyle(StageStyle.TRANSPARENT);
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(Objects.requireNonNull(
-                    Main.class.getResource("view/stylesheets/DevelopmentCardStyle.css")).toString());
+            scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/DevelopmentCardStyle.css")).toString());
             primaryStage.setScene(scene);
             primaryStage.setTitle("");
             // Specify modality of the new window: interactions are only possible on the second window
@@ -112,32 +110,31 @@ public class DevelopmentCardController implements Controller {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void calculateAllOwnedCards() {
-        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
-                .observeOn(FX_SCHEDULER).subscribe(e -> {
-                    int year_of_plenty = 0;
-                    int road_building = 0;
-                    int knight = 0;
-                    int monopoly = 0;
-                    for (DevelopmentCard card : e.developmentCards()) {
-                        if (card.type().equals(KNIGHT)) {
-                            knight++;
-                        }
-                        if (card.type().equals(YEAR_OF_PLENTY)) {
-                            year_of_plenty++;
-                        }
-                        if (card.type().equals(ROAD_BUILDING)) {
-                            road_building++;
-                        }
-                        if (card.type().equals(MONOPOLY)) {
-                            monopoly++;
-                        }
+        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID()).observeOn(FX_SCHEDULER).subscribe(e -> {
+            int year_of_plenty = 0;
+            int road_building = 0;
+            int knight = 0;
+            int monopoly = 0;
+            for (DevelopmentCard card : e.developmentCards()) {
+                if (card.type().equals(KNIGHT)) {
+                    knight++;
+                }
+                if (card.type().equals(YEAR_OF_PLENTY)) {
+                    year_of_plenty++;
+                }
+                if (card.type().equals(ROAD_BUILDING)) {
+                    road_building++;
+                }
+                if (card.type().equals(MONOPOLY)) {
+                    monopoly++;
+                }
 
-                    }
-                    yearOfPlentyCard.setText(String.valueOf(year_of_plenty));
-                    roadBuildingCard.setText(String.valueOf(road_building));
-                    knightCard.setText(String.valueOf(knight));
-                    monoPolyCard.setText(String.valueOf(monopoly));
-                });
+            }
+            yearOfPlentyCard.setText(String.valueOf(year_of_plenty));
+            roadBuildingCard.setText(String.valueOf(road_building));
+            knightCard.setText(String.valueOf(knight));
+            monoPolyCard.setText(String.valueOf(monopoly));
+        });
     }
 
     public void onClickCancel() {
