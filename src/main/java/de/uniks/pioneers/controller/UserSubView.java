@@ -5,12 +5,14 @@ import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.UserService;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Pane;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
@@ -39,10 +41,17 @@ public class UserSubView implements Controller {
     public Button sett;
     public Button road;
     public Button city;
-    public Pane settlementPane;
-    public Pane roadPane;
-    public Pane cityPane;
     public final int maxVictoryPoints;
+    @FXML
+    public ImageView largestFleetIconDisplay;
+    //Todo: set icon than user has largest fleet
+    @FXML
+    public Label fleetLabel;
+    @FXML
+    public ImageView longestRoadIconDisplay;
+    //Todo: set icon than user has longest road
+    @FXML
+    public Button developmentCardsButton;
 
     @Inject
     public UserSubView(IDStorage idStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
@@ -166,9 +175,9 @@ public class UserSubView implements Controller {
         this.city.disableProperty().set(true);
         this.city.setText(RENAME_CITY);
 
-        Tooltip.install(this.roadPane, new Tooltip("1 Earth cactus, \n1 Mars bar "));
-        Tooltip.install(this.settlementPane, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
-        Tooltip.install(this.cityPane, new Tooltip("3 Moon rock, \n2 Venus grain "));
+        Tooltip.install(this.road, new Tooltip("1 Earth cactus, \n1 Mars bar "));
+        Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
+        Tooltip.install(this.city, new Tooltip("3 Moon rock, \n2 Venus grain "));
         return parent;
     }
 
@@ -184,4 +193,7 @@ public class UserSubView implements Controller {
         gameFieldSubController.build("city");
     }
 
+    public void onDev(ActionEvent event) {
+        //TODO:action on clicked Dev card
+    }
 }

@@ -7,7 +7,7 @@ import de.uniks.pioneers.computation.RandomAction;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -40,6 +40,7 @@ public class GameScreenController implements Controller {
 
     private final AchievementsService achievementsService;
     private final UserStorage userStorage;
+
     private List<CircleSubController> circleSubControllers = new ArrayList<>();
 
     private final ObservableList<Player> opponents = FXCollections.observableArrayList();
@@ -72,8 +73,6 @@ public class GameScreenController implements Controller {
     @FXML
     public Label currentPlayerLabel;
     @FXML
-    public Label playerLongestRoadLabel;
-    @FXML
     public Button leave;
     @FXML
     public VBox remainingTimeView;
@@ -86,6 +85,10 @@ public class GameScreenController implements Controller {
     public Pane userViewPane;
     @FXML
     public Pane tradingPane;
+
+    //total amount of cards currently at the moment
+    @FXML
+    public Label devCardsAmountLabel;
 
     private final App app;
     private final GameStorage gameStorage;
@@ -331,11 +334,20 @@ public class GameScreenController implements Controller {
             e.consume();
         });
 
+        //calculate all the owned cards
+        allTheCards();
+
         return parent;
     }
 
-    private void actionOnCloseScreen() {
+    private void allTheCards() {
+        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
+                .observeOn(FX_SCHEDULER).subscribe(e -> {
+                    devCardsAmountLabel.setText(String.valueOf(e.developmentCards().size()));
+                });
+    }
 
+    private void actionOnCloseScreen() {
         if (playerOwnView.size() + opponents.size() == 1) {
             gameService
                     .deleteGame(gameStorage.getId())
@@ -420,6 +432,7 @@ public class GameScreenController implements Controller {
                 if (p.userId().equals(player.userId())) {
                     playerOwnView.set(playerOwnView.indexOf(p), player);
                     // check if the user dropped or received resources and play the according sound
+
                     int amountResources = 0;
                     for (int resource : p.resources().values()) {
                         amountResources += resource;
@@ -436,6 +449,9 @@ public class GameScreenController implements Controller {
                     } else if (amountNewResources < amountResources) {
                         this.soundService.playSound("drop");
                     }
+
+                    //call All calculate method for calculating all the owned cards
+                    allTheCards();
                 }
             }
 
@@ -445,8 +461,6 @@ public class GameScreenController implements Controller {
                     opponents.set(opponents.indexOf(p), player);
                 }
             }
-            //sets name of the longest road
-            updateLongestRoad(playerOwnView, opponents);
             //sets the winner
             winnerScreen(playerOwnView, opponents);
         } else if (playerEvent.event().endsWith(CREATED)) {
@@ -460,36 +474,6 @@ public class GameScreenController implements Controller {
         }
     }
 
-    //Sets the name of the user who has longestRoad
-    private void updateLongestRoad(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
-        String userId = "";
-        int longestRoad = 0;
-        for (Player p : playerOwnView) {
-            if (p.longestRoad() != null) {
-                if (((int) p.longestRoad()) > longestRoad) {
-                    userId = p.userId();
-                    longestRoad = (int) p.longestRoad();
-                }
-            }
-        }
-
-        for (Player p : opponents) {
-            if (p.longestRoad() != null) {
-                if (((int) p.longestRoad()) > longestRoad) {
-                    userId = p.userId();
-                    longestRoad = (int) p.longestRoad();
-                }
-            }
-        }
-
-        for (User u : allUser) {
-            if (u._id().equals(userId)) {
-                playerLongestRoadLabel.setText(u.name());
-                break;
-            }
-        }
-    }
-
     private void winnerScreen(ObservableList<Player> playerOwnView, ObservableList<Player> opponents) {
         // If winner screen appears during rob move - change cursor back to default
         this.mapPane.getScene().setCursor(Cursor.DEFAULT);
@@ -497,7 +481,6 @@ public class GameScreenController implements Controller {
         //This saves username and their respective points from game in hashmap
         for (User user : this.allUser) {
             save(playerOwnView, userNumberPoints, user);
-
             save(opponents, userNumberPoints, user);
         }
 
@@ -771,5 +754,11 @@ public class GameScreenController implements Controller {
         } else {
             this.diceTwo.setVisible(false);
         }
+    }
+
+    public void onShowDevCard() {
+        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(), gameStorage,
+                idStorage, pioneersService);
+        developmentCardController.render();
     }
 }

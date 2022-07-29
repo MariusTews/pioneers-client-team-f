@@ -1,4 +1,4 @@
-package de.uniks.pioneers.websocket;
+package de.uniks.pioneers.Websocket;
 
 import javax.websocket.*;
 import java.io.IOException;
