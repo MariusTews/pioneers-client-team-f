@@ -92,6 +92,7 @@ public class TradingSubController implements Controller {
 
     private final GameStorage gameStorage;
     private final PioneersService pioneersService;
+    private final AchievementsService achievementsService;
     private final IDStorage idStorage;
     private final EventListener eventListener;
     private Player player;
@@ -117,10 +118,12 @@ public class TradingSubController implements Controller {
     @Inject
     public TradingSubController(GameStorage gameStorage,
                                 PioneersService pioneersService,
+                                AchievementsService achievementsService,
                                 IDStorage idStorage,
                                 EventListener eventListener) {
         this.gameStorage = gameStorage;
         this.pioneersService = pioneersService;
+        this.achievementsService = achievementsService;
         this.idStorage = idStorage;
         this.eventListener = eventListener;
     }
@@ -414,17 +417,20 @@ public class TradingSubController implements Controller {
                 this.pioneersService
                         .tradeBank(this.gameStorage.getId(), tmp)
                         .observeOn(FX_SCHEDULER)
-                        .subscribe(result ->
-                                pioneersService
-                                        .findAllPlayers(this.gameStorage.getId())
-                                        .observeOn(FX_SCHEDULER)
-                                        .subscribe(c -> {
-                                            for (Player player : c) {
-                                                if (player.userId().equals(idStorage.getID())) {
-                                                    this.player = player;
+                        .subscribe(result -> {
+                                    achievementsService.putOrUpdateAchievement(TRADE_BANK, 1).blockingFirst();
+                                    pioneersService
+                                            .findAllPlayers(this.gameStorage.getId())
+                                            .observeOn(FX_SCHEDULER)
+                                            .subscribe(c -> {
+                                                for (Player player : c) {
+                                                    if (player.userId().equals(idStorage.getID())) {
+                                                        this.player = player;
+                                                    }
                                                 }
-                                            }
-                                        }));
+                                            });
+                                }
+                        );
             }
         }
     }

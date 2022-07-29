@@ -1,6 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.AchievementsService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
@@ -30,6 +31,9 @@ class TradeAcceptSubcontrollerTest extends ApplicationTest {
     @Mock
     PioneersService pioneersService;
 
+    @Mock
+    AchievementsService achievementsService;
+
     @Spy
     GameStorage gameStorage;
 
@@ -39,7 +43,7 @@ class TradeAcceptSubcontrollerTest extends ApplicationTest {
     public void start(Stage stage) {
         when(userService.findAllUsers()).thenReturn(Observable.just(user).buffer(1));
 
-        TradeAcceptSubcontroller tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
+        TradeAcceptSubcontroller tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, achievementsService, gameStorage);
         tradeAcceptSubcontroller.init();
         tradeAcceptSubcontroller.addUser(user);
         tradeAcceptSubcontroller.render();

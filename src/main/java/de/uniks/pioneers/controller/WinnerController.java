@@ -2,9 +2,9 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.GameService;
-import de.uniks.pioneers.service.GameStorage;
-import de.uniks.pioneers.service.IDStorage;
+import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.*;
+import io.reactivex.rxjava3.core.Observable;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.WIN_GAME;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class WinnerController implements Controller {
@@ -35,12 +36,14 @@ public class WinnerController implements Controller {
     public Label loserTitel;
     public VBox loserBoxId;
 
-    private final HashMap<String, List<String>> userNumberPoints ;
+    private final HashMap<String, List<String>> userNumberPoints;
 
     private final GameStorage gameStorage;
 
     private final IDStorage idStorage;
 
+    private final UserService userService;
+    private final AchievementsService achievementsService;
     private final GameService gameService;
     private final Window owner;
     private Stage primaryStage;
@@ -51,12 +54,15 @@ public class WinnerController implements Controller {
 
     @Inject
     public WinnerController(HashMap<String, List<String>> userNumberPoints, Window window,
-                             GameStorage gameStorage, IDStorage idStorage,
+                            GameStorage gameStorage, IDStorage idStorage,
+                            UserService userService, AchievementsService achievementsService,
                             GameService gameService, App app, Provider<LobbyController> lobbyController) {
         this.userNumberPoints = userNumberPoints;
         this.owner = window;
         this.gameStorage = gameStorage;
         this.idStorage = idStorage;
+        this.userService = userService;
+        this.achievementsService = achievementsService;
         this.gameService = gameService;
         this.app = app;
         this.lobbyController = lobbyController;
@@ -102,15 +108,19 @@ public class WinnerController implements Controller {
         for (Map.Entry<String, List<String>> entry : userNumberPoints.entrySet()) {
             String key = entry.getKey();
             List<String> value = entry.getValue();
-            if(value.contains(String.valueOf(this.gameStorage.getVictoryPoints()))){
+            if (value.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
+                User myUser = userService.findOne(idStorage.getID()).blockingFirst();
+                if (myUser.name().equals(key)) {
+                    achievementsService.putOrUpdateAchievement(WIN_GAME, 1).blockingFirst();
+                }
                 winnerName.setText(key);
                 winnerName.setTextFill(Color.web(value.get(0)));
 
-            }else {
+            } else {
                 //changes for Labels for loser
                 //needs to be taken here
                 Label loserNames = new Label();
-                loserNames.setText(key + "("+value.get(1)+"UP)");
+                loserNames.setText(key + "(" + value.get(1) + "UP)");
                 loserNames.setTextFill(Color.web(value.get(0)));
                 loserNames.setFont(new Font(22.0));
                 this.loserBoxId.setAlignment(Pos.CENTER);
@@ -125,22 +135,22 @@ public class WinnerController implements Controller {
     //this close the winner screen and the whole game Screen
     public void onClickCloseGame() {
         gameService.findOneGame(this.gameStorage.getId()).observeOn(FX_SCHEDULER).
-                doOnError(e->{
+                doOnError(e -> {
                     this.gameStorage.setId(null);
                     this.app.show(lobbyController.get());
                 }).
-                subscribe( c ->{
-                    if(c.owner().equals(this.idStorage.getID())){
+                subscribe(c -> {
+                    if (c.owner().equals(this.idStorage.getID())) {
                         gameService.
                                 deleteGame(this.gameStorage.getId()).
                                 observeOn(FX_SCHEDULER).
-                                subscribe(onSuccess ->{
-                                        //setting gameStorage to null will make sure
-                                        //user cannot join the game
-                                        this.gameStorage.setId(null);
-                                        this.app.show(lobbyController.get());
+                                subscribe(onSuccess -> {
+                                    //setting gameStorage to null will make sure
+                                    //user cannot join the game
+                                    this.gameStorage.setId(null);
+                                    this.app.show(lobbyController.get());
                                 });
-                    }else{
+                    } else {
                         this.gameStorage.setId(null);
                         this.app.show(lobbyController.get());
                     }

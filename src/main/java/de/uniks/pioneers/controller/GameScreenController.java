@@ -246,7 +246,7 @@ public class GameScreenController implements Controller {
 
         this.calculateMove = new RandomAction(this.gameStorage, this.pioneersService);
 
-        this.tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
+        this.tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, achievementsService, gameStorage);
         this.tradeAcceptSubcontroller.init();
 
         // init AchievementsService
@@ -320,7 +320,7 @@ public class GameScreenController implements Controller {
          * hand over own player to trading sub view
          * */
 
-        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener);
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, achievementsService, idStorage, eventListener);
         tradingSubController.init();
         this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
@@ -399,6 +399,10 @@ public class GameScreenController implements Controller {
             tradeOfferSubcontroller.render();
         }
 
+        if (move.action().equals("accept") && Objects.equals(move.partner(), idStorage.getID())) {
+            achievementsService.putOrUpdateAchievement(TRADE_PLAYER,1).blockingFirst();
+        }
+
         // set flag to true, so accept window only renders once
         if (move.action().equals("build") &&
                 move.partner() == null &&
@@ -443,7 +447,15 @@ public class GameScreenController implements Controller {
                     }
                     if (amountNewResources > amountResources) {
                         if (p.resources().getOrDefault("lumber", 0) < player.resources().getOrDefault("lumber", 0)) {
-
+                            achievementsService.putOrUpdateAchievement(EARTH_CACTUS_PICKER, player.resources().get("lumber") - p.resources().getOrDefault("lumber", 0)).blockingFirst();
+                        } else if (p.resources().getOrDefault("brick", 0) < player.resources().getOrDefault("brick", 0)) {
+                            achievementsService.putOrUpdateAchievement(MARS_BAR_PICKER, player.resources().get("brick") - p.resources().getOrDefault("brick", 0)).blockingFirst();
+                        } else if (p.resources().getOrDefault("ore", 0) < player.resources().getOrDefault("ore", 0)) {
+                            achievementsService.putOrUpdateAchievement(MOON_ROCK_PICKER, player.resources().get("ore") - p.resources().getOrDefault("ore", 0)).blockingFirst();
+                        } else if (p.resources().getOrDefault("wool", 0) < player.resources().getOrDefault("wool", 0)) {
+                            achievementsService.putOrUpdateAchievement(NEPTUNE_CRYSTAL_PICKER, player.resources().get("wool") - p.resources().getOrDefault("wool", 0)).blockingFirst();
+                        } else if (p.resources().getOrDefault("grain", 0) < player.resources().getOrDefault("grain", 0)) {
+                            achievementsService.putOrUpdateAchievement(VENUS_GRAIN_PICKER, player.resources().get("grain") - p.resources().getOrDefault("grain", 0)).blockingFirst();
                         }
                         this.soundService.playSound("receive");
                     } else if (amountNewResources < amountResources) {
@@ -487,7 +499,7 @@ public class GameScreenController implements Controller {
         for (List<String> s : userNumberPoints.values()) {
             if (s.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
-                        , gameStorage, idStorage, gameService, app, lobbyController);
+                        , gameStorage, idStorage, userService, achievementsService, gameService, app, lobbyController);
                 winnerController.render();
             }
         }
