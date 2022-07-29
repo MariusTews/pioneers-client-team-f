@@ -1,0 +1,84 @@
+package de.uniks.pioneers.computation;
+
+import de.uniks.pioneers.Main;
+import de.uniks.pioneers.model.DevelopmentCard;
+import de.uniks.pioneers.model.Player;
+import de.uniks.pioneers.service.PioneersService;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import javax.inject.Inject;
+import java.util.Collections;
+import java.util.HashMap;
+
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+
+
+public class RoadAndFleet {
+
+    @Inject
+    public RoadAndFleet() {
+
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void calculateLongestRoad(PioneersService pioneersService, String gameId, String userId,
+                                     ImageView longestRoadIconDisplay) {
+        pioneersService.findAllPlayers(gameId).observeOn(FX_SCHEDULER)
+                .subscribe(e -> {
+                    HashMap<String, String> userAndGameId = new HashMap<>();
+                    HashMap<HashMap<String, String>, Integer> maxValue = new HashMap<>();
+                    for (Player player : e) {
+                        if (player.longestRoad() != null) {
+                            userAndGameId.put(player.gameId(), player.userId());
+                            maxValue.put(userAndGameId, (Integer) player.longestRoad());
+                        }
+                    }
+
+                    //shows the icon for longest Road
+                    showIcon(maxValue, userAndGameId, gameId, userId, longestRoadIconDisplay);
+                });
+
+    }
+
+    private void showIcon(HashMap<HashMap<String, String>, Integer> maxValue, HashMap<String, String> userAndGameId, String gameId, String userId, ImageView longestRoadIconDisplay) {
+        if (!maxValue.isEmpty()) {
+            int longestRoad = Collections.max(maxValue.values());
+            if ((Collections.frequency(maxValue.values(), longestRoad)) == 1) {
+                if (userAndGameId.get(gameId).equals(userId)) {
+                    if (maxValue.get(userAndGameId).equals(longestRoad)) {
+                        longestRoadIconDisplay.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/longestRoadIcon.png"))));
+                    }
+                }
+
+            } else {
+                longestRoadIconDisplay.disableProperty().set(true);
+            }
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void calculateLargestFleet(PioneersService pioneersService, String gameStorageId, String idStorageId, ImageView largestFleetIconDisplay) {
+        pioneersService.findAllPlayers(gameStorageId).observeOn(FX_SCHEDULER)
+                .subscribe(e -> {
+                    HashMap<String, String> userAndGameId = new HashMap<>();
+                    HashMap<HashMap<String, String>, Integer> maxValue = new HashMap<>();
+                    for (Player player : e) {
+                        if (player.developmentCards() != null) {
+                            //needs to count development cards of every player
+                            int count = 0;
+                            for (DevelopmentCard d : player.developmentCards()) {
+                                if (d.type().equals("knight")) {
+                                    count++;
+                                }
+                            }
+                            userAndGameId.put(player.gameId(), player.userId());
+                            maxValue.put(userAndGameId, count);
+                        }
+                    }
+
+                    //shows the icon for largestFleet
+                    showIcon(maxValue, userAndGameId, gameStorageId, idStorageId, largestFleetIconDisplay);
+                });
+    }
+}
