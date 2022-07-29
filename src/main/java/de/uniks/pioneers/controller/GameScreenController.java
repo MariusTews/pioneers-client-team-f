@@ -429,6 +429,9 @@ public class GameScreenController implements Controller {
                         amountNewResources += resource;
                     }
                     if (amountNewResources > amountResources) {
+                        if (p.resources().getOrDefault("lumber", 0) < player.resources().getOrDefault("lumber", 0)) {
+
+                        }
                         this.soundService.playSound("receive");
                     } else if (amountNewResources < amountResources) {
                         this.soundService.playSound("drop");

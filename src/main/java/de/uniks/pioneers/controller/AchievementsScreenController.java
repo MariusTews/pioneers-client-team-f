@@ -58,7 +58,8 @@ public class AchievementsScreenController implements Controller {
             achievementExits.put(ROAD_BUILDER, false);
             achievementExits.put(CITY_BUILDER, false);
             achievementExits.put(SETTLEMENT_BUILDER, false);
-            achievementExits.put(TRADER, false);
+            achievementExits.put(TRADE_BANK, false);
+            achievementExits.put(TRADE_PLAYER, false);
             achievementExits.put(CREATE_MAP, false);
             achievementExits.put(WIN_GAME, false);
             achievementExits.put(VENUS_GRAIN_PICKER, false);

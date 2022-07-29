@@ -58,7 +58,9 @@ public class Constants {
 
     public static final String CITY_BUILDER = "city_builder";
 
-    public static final String TRADER = "trader";
+    public static final String TRADE_BANK = "trade-bank";
+
+    public static final String TRADE_PLAYER = "trade-player";
 
     public static final String VENUS_GRAIN_PICKER = "venus-grain-picker";
 
@@ -79,7 +81,8 @@ public class Constants {
         ACHIEVEMENT_UNLOCK_VALUES.put(CREATE_MAP, 1);
         ACHIEVEMENT_UNLOCK_VALUES.put(SETTLEMENT_BUILDER, 20);
         ACHIEVEMENT_UNLOCK_VALUES.put(CITY_BUILDER, 20);
-        ACHIEVEMENT_UNLOCK_VALUES.put(TRADER, 30);
+        ACHIEVEMENT_UNLOCK_VALUES.put(TRADE_BANK, 30);
+        ACHIEVEMENT_UNLOCK_VALUES.put(TRADE_PLAYER, 30);
         ACHIEVEMENT_UNLOCK_VALUES.put(VENUS_GRAIN_PICKER, 50);
         ACHIEVEMENT_UNLOCK_VALUES.put(MARS_BAR_PICKER, 50);
         ACHIEVEMENT_UNLOCK_VALUES.put(MOON_ROCK_PICKER, 50);
@@ -95,7 +98,8 @@ public class Constants {
         ACHIEVEMENT_NAMES.put(CITY_BUILDER, "city builder");
         ACHIEVEMENT_NAMES.put(WIN_GAME, "win your first game");
         ACHIEVEMENT_NAMES.put(CREATE_MAP, "create your own map");
-        ACHIEVEMENT_NAMES.put(TRADER, "trader");
+        ACHIEVEMENT_NAMES.put(TRADE_BANK, "trade with the bank");
+        ACHIEVEMENT_NAMES.put(TRADE_PLAYER, "trade with a player");
         ACHIEVEMENT_NAMES.put(VENUS_GRAIN_PICKER, "venus grain picker");
         ACHIEVEMENT_NAMES.put(MARS_BAR_PICKER, "mars bar picker");
         ACHIEVEMENT_NAMES.put(MOON_ROCK_PICKER, "moon rock picker");
@@ -107,16 +111,17 @@ public class Constants {
     static {
         ACHIEVEMENT_PATHS.put(FIRST_ROAD, "first_road");
         ACHIEVEMENT_PATHS.put(ROAD_BUILDER, "100_roads");
-        ACHIEVEMENT_PATHS.put(SETTLEMENT_BUILDER, "");
-        ACHIEVEMENT_PATHS.put(CITY_BUILDER, "");
+        ACHIEVEMENT_PATHS.put(SETTLEMENT_BUILDER, "settlement_builder");
+        ACHIEVEMENT_PATHS.put(CITY_BUILDER, "city_builder");
         ACHIEVEMENT_PATHS.put(WIN_GAME, "win_game");
         ACHIEVEMENT_PATHS.put(CREATE_MAP, "create_map");
-        ACHIEVEMENT_PATHS.put(TRADER, "");
-        ACHIEVEMENT_PATHS.put(VENUS_GRAIN_PICKER, "");
-        ACHIEVEMENT_PATHS.put(MARS_BAR_PICKER, "");
-        ACHIEVEMENT_PATHS.put(MOON_ROCK_PICKER, "");
-        ACHIEVEMENT_PATHS.put(EARTH_CACTUS_PICKER, "");
-        ACHIEVEMENT_PATHS.put(NEPTUNE_CRYSTAL_PICKER, "");
+        ACHIEVEMENT_PATHS.put(TRADE_BANK, "trade_bank");
+        ACHIEVEMENT_PATHS.put(TRADE_PLAYER, "trade_player");
+        ACHIEVEMENT_PATHS.put(VENUS_GRAIN_PICKER, "venus_grain");
+        ACHIEVEMENT_PATHS.put(MARS_BAR_PICKER, "mars_bar");
+        ACHIEVEMENT_PATHS.put(MOON_ROCK_PICKER, "moon_rock");
+        ACHIEVEMENT_PATHS.put(EARTH_CACTUS_PICKER, "earth_kaktus");
+        ACHIEVEMENT_PATHS.put(NEPTUNE_CRYSTAL_PICKER, "neptune_crystal");
     }
 
     //Sorting
