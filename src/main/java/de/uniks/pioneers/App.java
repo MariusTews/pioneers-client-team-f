@@ -7,14 +7,12 @@ import de.uniks.pioneers.controller.LobbyController;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
-import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;

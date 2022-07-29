@@ -60,7 +60,6 @@ public class AppTest extends ApplicationTest {
         write("12\t");
         type(KeyCode.SPACE);
         write("\t\t");
-        System.out.println();
         for (int i = 0; i < 7; i++) {
             type(KeyCode.SPACE);
         }
