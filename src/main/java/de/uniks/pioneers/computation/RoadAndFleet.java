@@ -36,23 +36,25 @@ public class RoadAndFleet {
                     }
 
                     //shows the icon for longest Road
-                    showIcon(maxValue, userAndGameId, gameId, userId, longestRoadIconDisplay);
+                    String imageLocation = "view/assets/longestRoadIcon.png";
+                    showIcon(maxValue, userAndGameId, gameId, userId, longestRoadIconDisplay, imageLocation);
                 });
 
     }
 
-    private void showIcon(HashMap<HashMap<String, String>, Integer> maxValue, HashMap<String, String> userAndGameId, String gameId, String userId, ImageView longestRoadIconDisplay) {
+    private void showIcon(HashMap<HashMap<String, String>, Integer> maxValue, HashMap<String, String> userAndGameId,
+                          String gameId, String userId, ImageView IconDisplay, String imageLocation) {
         if (!maxValue.isEmpty()) {
-            int longestRoad = Collections.max(maxValue.values());
-            if ((Collections.frequency(maxValue.values(), longestRoad)) == 1) {
+            int largestValue = Collections.max(maxValue.values());
+            if ((Collections.frequency(maxValue.values(), largestValue)) == 1) {
                 if (userAndGameId.get(gameId).equals(userId)) {
-                    if (maxValue.get(userAndGameId).equals(longestRoad)) {
-                        longestRoadIconDisplay.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/longestRoadIcon.png"))));
+                    if (maxValue.get(userAndGameId).equals(largestValue)) {
+                        IconDisplay.setImage(new Image(String.valueOf(Main.class.getResource(imageLocation))));
                     }
                 }
 
             } else {
-                longestRoadIconDisplay.disableProperty().set(true);
+                IconDisplay.disableProperty().set(true);
             }
         }
     }
@@ -77,8 +79,9 @@ public class RoadAndFleet {
                         }
                     }
 
+                    String imageLocation = "view/assets/largestFleetIcon.png";
                     //shows the icon for largestFleet
-                    showIcon(maxValue, userAndGameId, gameStorageId, idStorageId, largestFleetIconDisplay);
+                    showIcon(maxValue, userAndGameId, gameStorageId, idStorageId, largestFleetIconDisplay, imageLocation);
                 });
     }
 }
