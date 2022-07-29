@@ -77,7 +77,7 @@ public class RoadAndFleet {
                                     }
                                 }
                                 //Only put values in hashmap if player has at least one Knight cards
-                                if (count != 0) {
+                                if (count != 0 && count >=5) {
                                     userAndGameId.put(player.gameId(), player.userId());
                                     maxValue.put(userAndGameId, count);
                                 }
