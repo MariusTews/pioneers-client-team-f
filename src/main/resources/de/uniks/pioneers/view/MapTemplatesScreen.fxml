@@ -30,7 +30,7 @@
                         <Font size="14.0" />
                     </font>
                 </Label>
-            <Polygon fill="#d5dfe8" onMouseClicked="#onNameArrowPressed" points="0.0, 40.0, 20.0, 40.0, 10.0, 50.0" stroke="BLACK" strokeType="INSIDE">
+            <Polygon id="nameArrow" fill="#d5dfe8" onMouseClicked="#onNameArrowPressed" points="0.0, 40.0, 20.0, 40.0, 10.0, 50.0" stroke="BLACK" strokeType="INSIDE">
                <HBox.margin>
                   <Insets left="12.0" top="5.0" />
                </HBox.margin>

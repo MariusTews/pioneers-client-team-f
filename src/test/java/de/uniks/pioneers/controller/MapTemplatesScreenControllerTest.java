@@ -186,4 +186,28 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         Assertions.assertThat(mapTemplatesScreenController.selectedLabel).hasText("Selected: " + user2Map.name());
     }
 
+    @Test
+    void sortByName() {
+        MapTemplate map1 = new MapTemplate("", "", "01", "b", null, user1._id(), 10, List.of(), List.of());
+        MapTemplate map2 = new MapTemplate("", "", "02", "a", null, user1._id(), -17, List.of(), List.of());
+        MapTemplate map3 = new MapTemplate("", "", "03", "bb", null, user2._id(), 3, List.of(), List.of());
+        MapTemplate map4 = new MapTemplate("", "", "04", "aa", null, user2._id(), 28, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(CREATED, map1));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map2));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map3));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map4));
+
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#nameArrow");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        Assertions.assertThat(mapTemplates.get(0).getId()).isEqualTo(map2._id());
+        Assertions.assertThat(mapTemplates.get(1).getId()).isEqualTo(map1._id());
+        Assertions.assertThat(mapTemplates.get(2).getId()).isEqualTo(user1Map._id());
+        Assertions.assertThat(mapTemplates.get(4).getId()).isEqualTo(map4._id());
+        Assertions.assertThat(mapTemplates.get(5).getId()).isEqualTo(map3._id());
+        Assertions.assertThat(mapTemplates.get(6).getId()).isEqualTo(user2Map._id());
+    }
+
 }
