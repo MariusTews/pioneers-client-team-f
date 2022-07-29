@@ -46,6 +46,7 @@ public class OpponentSubControllerTest extends ApplicationTest {
     public void start(Stage stage) {
         // start application with the created opponent sub controller
         when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
+        when(pioneersService.findOnePlayer(any(),any())).thenReturn(Observable.empty());
         opponentSubController = new OpponentSubController(new Player("01", "00",
                 Color.DARKORCHID.toString(), true,6, resources, null,2,2,null, null),
                 new User("1234","12345","00", "bob", "online", avatar, null), 4, pioneersService);

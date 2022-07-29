@@ -34,5 +34,5 @@
       <VBox.margin>
          <Insets />
       </VBox.margin></Label>
-   <Label maxHeight="24.0" maxWidth="200.0" text="Development cards: " />
+   <Label fx:id="developmentCardsLabel" maxHeight="24.0" maxWidth="200.0" text="Development cards: " />
 </VBox>

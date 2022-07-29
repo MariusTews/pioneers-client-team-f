@@ -4,6 +4,7 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.service.PioneersService;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -66,18 +67,20 @@ public class RoadAndFleet {
                     HashMap<String, String> userAndGameId = new HashMap<>();
                     HashMap<HashMap<String, String>, Integer> maxValue = new HashMap<>();
                     for (Player player : e) {
-                        if (player.developmentCards().size() != 0) {
-                            //needs to count development cards of every player
-                            int count = 0;
-                            for (DevelopmentCard d : player.developmentCards()) {
-                                if (d.type().equals("knight") && d.revealed() && !d.locked()) {
-                                    count++;
+                        if (player.developmentCards() != null) {
+                            if (player.developmentCards().size() != 0) {
+                                //needs to count development cards of every player
+                                int count = 0;
+                                for (DevelopmentCard d : player.developmentCards()) {
+                                    if (d.type().equals("knight") && d.revealed() && !d.locked()) {
+                                        count++;
+                                    }
                                 }
-                            }
-                            //Only put values in hashmap if player has at least one Knight cards
-                            if (count != 0) {
-                                userAndGameId.put(player.gameId(), player.userId());
-                                maxValue.put(userAndGameId, count);
+                                //Only put values in hashmap if player has at least one Knight cards
+                                if (count != 0) {
+                                    userAndGameId.put(player.gameId(), player.userId());
+                                    maxValue.put(userAndGameId, count);
+                                }
                             }
                         }
                     }
@@ -85,6 +88,16 @@ public class RoadAndFleet {
                     String imageLocation = "view/assets/largestFleetIcon.png";
                     //shows the icon for largestFleet
                     showIcon(maxValue, userAndGameId, gameStorageId, idStorageId, largestFleetIconDisplay, imageLocation);
+                });
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void showTotalDevelopmentCards(PioneersService pioneersService, String gameId, String userId, Label developmentCardsLabel) {
+        pioneersService.findOnePlayer(gameId, userId).observeOn(FX_SCHEDULER)
+                .subscribe(e -> {
+                    if (e.developmentCards() != null) {
+                        developmentCardsLabel.setText("Development cards: " + e.developmentCards().size());
+                    }
                 });
     }
 }

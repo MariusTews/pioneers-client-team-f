@@ -50,6 +50,7 @@ public class OpponentSubController implements Controller {
     public ImageView opponentLongestRoadIcon;
     private final Player opponent;
     private final User opponentAsUser;
+    public Label developmentCardsLabel;
 
     private String userId;
     private Parent parent;
@@ -120,6 +121,7 @@ public class OpponentSubController implements Controller {
         RoadAndFleet ld = new RoadAndFleet();
         ld.calculateLongestRoad(pioneersService, opponent.gameId(), opponent.userId(), opponentLongestRoadIcon);
         ld.calculateLargestFleet(pioneersService, opponent.gameId(), opponent.gameId(), opponentLargestFleetIcon);
+        ld.showTotalDevelopmentCards(pioneersService,opponent.gameId(),opponent.userId(),developmentCardsLabel);
     }
 
     public String getId() {
