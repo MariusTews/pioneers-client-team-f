@@ -22,6 +22,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
@@ -55,6 +56,7 @@ public class MapTemplatesScreenController implements Controller {
     private final HashMap<String, MapTemplateSubController> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
     private final HashMap<String, Boolean> sortOrderFlags = new HashMap<>();
+    private Polygon currentSortArrow;
     private MapTemplateSubController selectedMapTemplateSubController;
     private CompositeDisposable disposable;
 
@@ -130,6 +132,8 @@ public class MapTemplatesScreenController implements Controller {
                         }
                 );
 
+        selectButton.setDisable(true);
+
         return parent;
     }
 
@@ -200,6 +204,9 @@ public class MapTemplatesScreenController implements Controller {
                 selectedMapTemplateSubController = mapTemplateSubCons.get(mapTemplateId);
                 selectedMapTemplateSubController.selectItem();
                 selectedLabel.setText("Selected: " + selectedMapTemplateSubController.getTemplate().name());
+                if (selectButton.isDisable()) {
+                    selectButton.setDisable(false);
+                }
             }
         }
     }
@@ -224,6 +231,13 @@ public class MapTemplatesScreenController implements Controller {
         Polygon source = ((Polygon) mouseEvent.getSource());
         sort(source.getId().replace("Arrow", ""));
         source.setRotate((source.getRotate() + 180) % 360);
+        if (!(source.equals(currentSortArrow))) {
+            if (currentSortArrow != null) {
+                currentSortArrow.setFill(Color.web("#d5dfe8"));
+            }
+            source.setFill(Color.web("#ffffff"));
+            currentSortArrow = source;
+        }
     }
 
     private void sort(String sortBy) {
