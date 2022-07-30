@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static de.uniks.pioneers.Constants.*;
 
@@ -269,7 +270,15 @@ public class MapTemplatesScreenController implements Controller {
                 }
         }
 
-        List<String> sortedValues = new ArrayList<>(valuesToIds.keySet().stream().sorted().toList());
+        List<String> sortedValues;
+
+        if (sortBy.equals("votes")) {
+            // first create an integer stream, then sort it, then convert it back to string stream and to list
+            sortedValues = new ArrayList<>(valuesToIds.keySet().stream().map(Integer::parseInt).sorted().map(String::valueOf).toList());
+        }
+        else {
+            sortedValues = new ArrayList<>(valuesToIds.keySet().stream().sorted().toList());
+        }
         if (sortOrderFlags.get(sortBy)) {
             Collections.reverse(sortedValues);
         }
