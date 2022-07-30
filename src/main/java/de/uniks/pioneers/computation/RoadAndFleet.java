@@ -31,8 +31,10 @@ public class RoadAndFleet {
                     HashMap<HashMap<String, String>, Integer> maxValue = new HashMap<>();
                     for (Player player : e) {
                         if (player.longestRoad() != null) {
-                            userAndGameId.put(player.gameId(), player.userId());
-                            maxValue.put(userAndGameId, (Integer) player.longestRoad());
+                            if ((Integer) player.longestRoad() >= 5) {
+                                userAndGameId.put(player.gameId(), player.userId());
+                                maxValue.put(userAndGameId, (Integer) player.longestRoad());
+                            }
                         }
                     }
 
@@ -76,8 +78,8 @@ public class RoadAndFleet {
                                         count++;
                                     }
                                 }
-                                //Only put values in hashmap if player has at least one Knight cards
-                                if (count != 0 && count >=5) {
+                                //Only put values in hashmap if player has played three Knight cards
+                                if (count >= 3) {
                                     userAndGameId.put(player.gameId(), player.userId());
                                     maxValue.put(userAndGameId, count);
                                 }
