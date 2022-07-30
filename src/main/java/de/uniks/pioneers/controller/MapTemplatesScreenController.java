@@ -153,10 +153,12 @@ public class MapTemplatesScreenController implements Controller {
             } else {
                 addMapTemplateItem(template, -1);
             }
+            updateCurrentSort();
         } else if (event.event().endsWith(UPDATED)) {
             MapTemplateSubController controller = mapTemplateSubCons.get(template._id());
             controller.setTemplate(template);
             controller.updateContent();
+            updateCurrentSort();
         } else if (event.event().endsWith(DELETED)) {
             MapTemplateSubController controller = mapTemplateSubCons.get(template._id());
             controller.destroy();
@@ -280,6 +282,16 @@ public class MapTemplatesScreenController implements Controller {
         }
 
         return _mapTemplates;
+    }
+
+    private void updateCurrentSort() {
+        if (currentSortArrow != null) {
+            String currentSortBy = currentSortArrow.getId().replace("Arrow", "");
+            sort(currentSortBy);
+            /* invert sort order value again because it was inverted in the sort method which should not happen */
+            /* here because it is just an update of the current sort order                                      */
+            sortOrderFlags.put(currentSortBy, !sortOrderFlags.get(currentSortBy));
+        }
     }
 
     public HashMap<String, MapTemplateSubController> getMapTemplateSubCons() {
