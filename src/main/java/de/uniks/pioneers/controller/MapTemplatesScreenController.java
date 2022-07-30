@@ -296,10 +296,9 @@ public class MapTemplatesScreenController implements Controller {
     private void updateCurrentSort() {
         if (currentSortArrow != null) {
             String currentSortBy = currentSortArrow.getId().replace("Arrow", "");
-            sort(currentSortBy);
-            /* invert sort order value again because it was inverted in the sort method which should not happen */
-            /* here because it is just an update of the current sort order                                      */
+            /* invert sort order here, otherwise it will be inverted when calling sort, which is not wanted */
             sortOrderFlags.put(currentSortBy, !sortOrderFlags.get(currentSortBy));
+            sort(currentSortBy);
         }
     }
 

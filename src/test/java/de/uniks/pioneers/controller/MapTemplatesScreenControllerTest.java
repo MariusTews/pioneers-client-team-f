@@ -242,4 +242,62 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         Assertions.assertThat(mapTemplates.get(6).getId()).isEqualTo(map3._id());
     }
 
+    @Test
+    void sortByVotes() {
+        MapTemplate map1 = new MapTemplate("", "", "01", "b", null, user3._id(), 10, List.of(), List.of());
+        MapTemplate map2 = new MapTemplate("", "", "02", "a", null, user4._id(), -17, List.of(), List.of());
+        MapTemplate map3 = new MapTemplate("", "", "03", "bb", null, user5._id(), 3, List.of(), List.of());
+        MapTemplate map4 = new MapTemplate("", "", "04", "aa", null, user6._id(), 28, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(CREATED, map1));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map2));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map3));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map4));
+
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#votesArrow");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        Assertions.assertThat(mapTemplates.get(0).getId()).isEqualTo(user1Map._id());
+        Assertions.assertThat(mapTemplates.get(2).getId()).isEqualTo(map2._id());
+        Assertions.assertThat(mapTemplates.get(3).getId()).isEqualTo(user2Map._id());
+        Assertions.assertThat(mapTemplates.get(4).getId()).isEqualTo(map3._id());
+        Assertions.assertThat(mapTemplates.get(5).getId()).isEqualTo(map1._id());
+        Assertions.assertThat(mapTemplates.get(6).getId()).isEqualTo(map4._id());
+    }
+
+    @Test
+    void addMapTemplateThenUpdateSort() {
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#nameArrow");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        // this map will be added at the end of the list by default, but because the list was sorted before, it should be the 2nd item
+        MapTemplate user2NewMap = new MapTemplate("", "", "4", "a", null, user2._id(), 0, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(CREATED, user2NewMap));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        Assertions.assertThat(mapTemplates.get(0).getId()).isEqualTo(user1Map._id());
+        Assertions.assertThat(mapTemplates.get(2).getId()).isEqualTo(user2NewMap._id());
+        Assertions.assertThat(mapTemplates.get(3).getId()).isEqualTo(user2Map._id());
+    }
+
+    @Test
+    void updateMapTemplateThenUpdateSort() {
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#votesArrow");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        // this map will be added at the end of the list by default, but because the list was sorted before, it should be the 2nd item
+        MapTemplate user2NewMap = new MapTemplate("", "", "4", "a", null, user2._id(), -1, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(CREATED, user2NewMap));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        Assertions.assertThat(mapTemplates.get(0).getId()).isEqualTo(user1Map._id());
+        Assertions.assertThat(mapTemplates.get(2).getId()).isEqualTo(user2NewMap._id());
+        Assertions.assertThat(mapTemplates.get(3).getId()).isEqualTo(user2Map._id());
+    }
+
 }
