@@ -289,9 +289,11 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         clickOn("#votesArrow");
         WaitForAsyncUtils.waitForFxEvents();
 
-        // this map will be added at the end of the list by default, but because the list was sorted before, it should be the 2nd item
-        MapTemplate user2NewMap = new MapTemplate("", "", "4", "a", null, user2._id(), -1, List.of(), List.of());
+        MapTemplate user2NewMap = new MapTemplate("", "", "4", "a", null, user2._id(), 0, List.of(), List.of());
         mapTemplateSubject.onNext(new Event<>(CREATED, user2NewMap));
+        WaitForAsyncUtils.waitForFxEvents();
+        MapTemplate user2NewMapUpdate = new MapTemplate("", "", "4", "a", null, user2._id(), -1, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(UPDATED, user2NewMapUpdate));
         WaitForAsyncUtils.waitForFxEvents();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
