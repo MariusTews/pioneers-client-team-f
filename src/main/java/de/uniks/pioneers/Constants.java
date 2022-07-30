@@ -56,7 +56,7 @@ public class Constants {
 
     public static final String SETTLEMENT_BUILDER = "settlement-builder";
 
-    public static final String CITY_BUILDER = "city_builder";
+    public static final String CITY_BUILDER = "city-builder";
 
     public static final String TRADE_BANK = "trade-bank";
 
