@@ -220,9 +220,9 @@ public class MapTemplatesScreenController implements Controller {
         this.app.show(controller);
     }
 
-    public void onNameArrowPressed(MouseEvent mouseEvent) {
-        sort("name");
+    public void onSortArrowPressed(MouseEvent mouseEvent) {
         Polygon source = ((Polygon) mouseEvent.getSource());
+        sort(source.getId().replace("Arrow", ""));
         source.setRotate((source.getRotate() + 180) % 360);
     }
 

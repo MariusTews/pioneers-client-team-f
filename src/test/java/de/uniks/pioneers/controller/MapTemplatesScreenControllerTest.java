@@ -54,6 +54,10 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
     private Subject<Event<MapTemplate>> mapTemplateSubject;
     User user1;
     User user2;
+    User user3;
+    User user4;
+    User user5;
+    User user6;
     MapTemplate user1Map;
     MapTemplate user2Map;
 
@@ -61,9 +65,13 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         mapTemplateSubject = PublishSubject.create();
         user1 = new User("", "", "1", "bert", "online", null, null);
         user2 = new User("", "", "2", "kuno", "online", null, null);
-        user1Map = new MapTemplate("", "", user1._id(), "berts map", null, user1._id(), 0, List.of(), List.of());
-        user2Map = new MapTemplate("", "", user2._id(), "kunos map", null, user2._id(), 0, List.of(), List.of());
-        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(user2, user1)));
+        user3 = new User("", "", "3", "mark", "online", null, null);
+        user4 = new User("", "", "4", "john", "online", null, null);
+        user5 = new User("", "", "5", "paul", "online", null, null);
+        user6 = new User("", "", "6", "chris", "online", null, null);
+        user1Map = new MapTemplate("", "", user1._id(), "bert map", null, user1._id(), 0, List.of(), List.of());
+        user2Map = new MapTemplate("", "", user2._id(), "kuno map", null, user2._id(), 0, List.of(), List.of());
+        when(userService.findAllUsers()).thenReturn(Observable.just(List.of(user1, user2, user3, user4, user5, user6)));
         when(idStorage.getID()).thenReturn(user1._id());
         when(mapsService.findAllMaps()).thenReturn(Observable.just(new ArrayList<>(List.of(user2Map, user1Map))));
         when(eventListener.listen("maps.*.*", MapTemplate.class)).thenReturn(mapTemplateSubject);
@@ -91,7 +99,7 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
     @Test
     void updateMapTemplateName() {
-        String newName = "berts map v2";
+        String newName = "bert map v2";
         mapTemplateSubject.onNext(new Event<>(UPDATED, new MapTemplate(user1Map.createdAt(), user1Map.updatedAt(),
                 user1Map._id(), newName, user1Map.icon(), user1Map.createdBy(), user1Map.votes(), user1Map.tiles(), user1Map.harbors())));
 
@@ -105,7 +113,7 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
     @Test
     void addOwnMapTemplate() {
-        MapTemplate user1NewMap = new MapTemplate("", "", "3", "berts new map", null, user1._id(), 0, List.of(), List.of());
+        MapTemplate user1NewMap = new MapTemplate("", "", "3", "bert new map", null, user1._id(), 0, List.of(), List.of());
         mapTemplateSubject.onNext(new Event<>(CREATED, user1NewMap));
 
         WaitForAsyncUtils.waitForFxEvents();
@@ -121,7 +129,7 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
     @Test
     void addMapTemplate() {
-        MapTemplate user2NewMap = new MapTemplate("", "", "4", "kunos new map", null, user2._id(), 0, List.of(), List.of());
+        MapTemplate user2NewMap = new MapTemplate("", "", "4", "kuno new map", null, user2._id(), 0, List.of(), List.of());
         mapTemplateSubject.onNext(new Event<>(CREATED, user2NewMap));
 
         WaitForAsyncUtils.waitForFxEvents();
@@ -208,6 +216,30 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         Assertions.assertThat(mapTemplates.get(4).getId()).isEqualTo(map4._id());
         Assertions.assertThat(mapTemplates.get(5).getId()).isEqualTo(map3._id());
         Assertions.assertThat(mapTemplates.get(6).getId()).isEqualTo(user2Map._id());
+    }
+
+    @Test
+    void sortByOwner() {
+        MapTemplate map1 = new MapTemplate("", "", "01", "b", null, user3._id(), 10, List.of(), List.of());
+        MapTemplate map2 = new MapTemplate("", "", "02", "a", null, user4._id(), -17, List.of(), List.of());
+        MapTemplate map3 = new MapTemplate("", "", "03", "bb", null, user5._id(), 3, List.of(), List.of());
+        MapTemplate map4 = new MapTemplate("", "", "04", "aa", null, user6._id(), 28, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(CREATED, map1));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map2));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map3));
+        mapTemplateSubject.onNext(new Event<>(CREATED, map4));
+
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#createdByArrow");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        Assertions.assertThat(mapTemplates.get(0).getId()).isEqualTo(user1Map._id());
+        Assertions.assertThat(mapTemplates.get(2).getId()).isEqualTo(map4._id());
+        Assertions.assertThat(mapTemplates.get(3).getId()).isEqualTo(map2._id());
+        Assertions.assertThat(mapTemplates.get(4).getId()).isEqualTo(user2Map._id());
+        Assertions.assertThat(mapTemplates.get(5).getId()).isEqualTo(map1._id());
+        Assertions.assertThat(mapTemplates.get(6).getId()).isEqualTo(map3._id());
     }
 
 }
