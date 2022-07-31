@@ -4,7 +4,6 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Template.MapTemplate;
 import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
-import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MapsService;
@@ -98,8 +97,8 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
         WaitForAsyncUtils.waitForFxEvents();
 
-        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
-        MapTemplateSubcontroller controller = mapTemplateSubCons.get(user1Map._id());
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.get(user1Map._id());
 
         Assertions.assertThat(controller.nameLabel.getText()).isEqualTo(newName);
     }
@@ -111,8 +110,8 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
         WaitForAsyncUtils.waitForFxEvents();
 
-        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
-        MapTemplateSubcontroller controller = mapTemplateSubCons.getOrDefault(user1NewMap._id(), null);
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.getOrDefault(user1NewMap._id(), null);
         Assertions.assertThat(controller).isNotNull();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
@@ -127,8 +126,8 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
         WaitForAsyncUtils.waitForFxEvents();
 
-        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
-        MapTemplateSubcontroller controller = mapTemplateSubCons.getOrDefault(user2NewMap._id(), null);
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.getOrDefault(user2NewMap._id(), null);
         Assertions.assertThat(controller).isNotNull();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
@@ -142,8 +141,8 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
         WaitForAsyncUtils.waitForFxEvents();
 
-        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
-        MapTemplateSubcontroller controller = mapTemplateSubCons.getOrDefault(user1Map._id(), null);
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.getOrDefault(user1Map._id(), null);
         Assertions.assertThat(controller).isNull();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
@@ -157,13 +156,34 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
         WaitForAsyncUtils.waitForFxEvents();
 
-        HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
-        MapTemplateSubcontroller controller = mapTemplateSubCons.getOrDefault(user2Map._id(), null);
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.getOrDefault(user2Map._id(), null);
         Assertions.assertThat(controller).isNull();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
         //assert that there are only two list items left (one for the empty line, one for the own map)
         Assertions.assertThat(mapTemplates.size()).isEqualTo(2);
+    }
+
+    @Test
+    void selectMapTemplateItem() {
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#" + user1Map._id()).clickOn("#" + user1Map._id());
+        WaitForAsyncUtils.waitForFxEvents();
+
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.get(user1Map._id());
+        Assertions.assertThat(controller.selectedImageView.getImage()).isNotNull();
+        Assertions.assertThat(mapTemplatesScreenController.selectedLabel).hasText("Selected: " + user1Map.name());
+
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#" + user2Map._id()).clickOn("#" + user2Map._id());
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(controller.selectedImageView.getImage()).isNull();
+        controller = mapTemplateSubCons.get(user2Map._id());
+        Assertions.assertThat(controller.selectedImageView.getImage()).isNotNull();
+        Assertions.assertThat(mapTemplatesScreenController.selectedLabel).hasText("Selected: " + user2Map.name());
     }
 
 }
