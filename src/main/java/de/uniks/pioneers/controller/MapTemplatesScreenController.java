@@ -14,11 +14,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -32,6 +36,7 @@ import static de.uniks.pioneers.Constants.*;
 public class MapTemplatesScreenController implements Controller {
     private final App app;
     private final Provider<CreateGameController> createGameController;
+    private final Provider<MapEditorController> mapEditorController;
     private final MapsService mapsService;
     private final UserService userService;
     private final IDStorage idStorage;
@@ -53,16 +58,19 @@ public class MapTemplatesScreenController implements Controller {
     @FXML
     public ListView<Parent> mapTemplatesListView;
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
-    private final HashMap<String, MapTemplateSubcontroller> mapTemplateSubCons = new HashMap<>();
+    private final HashMap<String, MapTemplateSubController> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
+    private MapTemplateSubController selectedMapTemplateSubController;
     private CompositeDisposable disposable;
 
     @Inject
     public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController,
+                                        Provider<MapEditorController> mapEditorController,
                                         MapsService mapsService, UserService userService, IDStorage idStorage,
                                         EventListener eventListener) {
         this.app = app;
         this.createGameController = createGameController;
+        this.mapEditorController = mapEditorController;
         this.mapsService = mapsService;
         this.userService = userService;
         this.idStorage = idStorage;
@@ -77,7 +85,7 @@ public class MapTemplatesScreenController implements Controller {
 
     @Override
     public void destroy() {
-        for (MapTemplateSubcontroller controller : mapTemplateSubCons.values()) {
+        for (MapTemplateSubController controller : mapTemplateSubCons.values()) {
             controller.destroy();
         }
         mapTemplateSubCons.clear();
@@ -114,13 +122,12 @@ public class MapTemplatesScreenController implements Controller {
                         maps -> {
                             List<MapTemplate> ownMaps = new ArrayList<>(maps.stream().filter(mapTemplate -> idStorage.getID().equals(mapTemplate.createdBy())).toList());
                             List<MapTemplate> otherMaps = new ArrayList<>(maps.stream().filter(mapTemplate -> !(idStorage.getID().equals(mapTemplate.createdBy()))).toList());
-                            maps.clear();
-                            maps.addAll(ownMaps);
-                            //add empty template to create distance between own and other maps
-                            maps.add(new MapTemplate(null, null, "", null, null, null, null, null, null));
-                            maps.addAll(otherMaps);
 
-                            for (MapTemplate template : maps) {
+                            for (MapTemplate template : ownMaps) {
+                                addMapTemplateItem(template, -1);
+                            }
+                            addEmptyLine();
+                            for (MapTemplate template : otherMaps) {
                                 addMapTemplateItem(template, -1);
                             }
                         }
@@ -135,7 +142,7 @@ public class MapTemplatesScreenController implements Controller {
             if (idStorage.getID().equals(template.createdBy())) {
                 int position = 0;
                 for (Parent mapTemplate : mapTemplates) {
-                    //the id "" is only used for the empty line hbox between own and other players' maps
+                    //the id "" is only used for the empty line between own and other players' maps
                     if (mapTemplate.getId().equals("")) {
                         break;
                     }
@@ -146,11 +153,11 @@ public class MapTemplatesScreenController implements Controller {
                 addMapTemplateItem(template, -1);
             }
         } else if (event.event().endsWith(UPDATED)) {
-            MapTemplateSubcontroller controller = mapTemplateSubCons.get(template._id());
+            MapTemplateSubController controller = mapTemplateSubCons.get(template._id());
             controller.setTemplate(template);
             controller.updateContent();
         } else if (event.event().endsWith(DELETED)) {
-            MapTemplateSubcontroller controller = mapTemplateSubCons.get(template._id());
+            MapTemplateSubController controller = mapTemplateSubCons.get(template._id());
             controller.destroy();
             mapTemplateSubCons.remove(template._id());
             for (Parent mapTemplateItem : mapTemplates) {
@@ -165,14 +172,25 @@ public class MapTemplatesScreenController implements Controller {
     private void addMapTemplateItem(MapTemplate template, int position) {
         boolean ownMap = idStorage.getID().equals(template.createdBy());
         String userName = userNames.getOrDefault(template.createdBy(), "");
-        MapTemplateSubcontroller controller = new MapTemplateSubcontroller(template, ownMap, userName);
+        MapTemplateSubController controller = new MapTemplateSubController(template, ownMap, userName);
         mapTemplateSubCons.put(template._id(), controller);
+        controller.init();
+        Parent item = controller.render();
+        item.setOnMouseClicked(this::selectMapTemplateItem);
         //if position is -1 then the item should be added at the end of the list
         if (position == -1) {
-            mapTemplates.add(controller.render());
+            mapTemplates.add(item);
         } else {
-            mapTemplates.add(position, controller.render());
+            mapTemplates.add(position, item);
         }
+    }
+
+    private void addEmptyLine() {
+        HBox emptyLine = new HBox();
+        emptyLine.setPrefWidth(720);
+        emptyLine.setPrefHeight(25);
+        emptyLine.setId("");
+        mapTemplates.add(emptyLine);
     }
 
     public void onBackButtonPressed() {
@@ -181,14 +199,32 @@ public class MapTemplatesScreenController implements Controller {
     }
 
     public void onCreateButtonPressed() {
-        //TODO
+        final MapEditorController controller = mapEditorController.get();
+        this.app.show(controller);
     }
 
     public void onSelectButtonPressed() {
-        //TODO
+        final CreateGameController controller = createGameController.get();
+        MapTemplate selectedTemplate = selectedMapTemplateSubController.getTemplate();
+        controller.setMapTemplate(selectedTemplate.name(), selectedTemplate._id());
+        this.app.show(controller);
     }
 
-    public HashMap<String, MapTemplateSubcontroller> getMapTemplateSubCons() {
+    private void selectMapTemplateItem(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+            if (mouseEvent.getClickCount() == 2) {
+                if (selectedMapTemplateSubController != null) {
+                    selectedMapTemplateSubController.unselectItem();
+                }
+                String mapTemplateId = ((Node) mouseEvent.getSource()).getId();
+                selectedMapTemplateSubController = mapTemplateSubCons.get(mapTemplateId);
+                selectedMapTemplateSubController.selectItem();
+                selectedLabel.setText("Selected: " + selectedMapTemplateSubController.getTemplate().name());
+            }
+        }
+    }
+
+    public HashMap<String, MapTemplateSubController> getMapTemplateSubCons() {
         return mapTemplateSubCons;
     }
 

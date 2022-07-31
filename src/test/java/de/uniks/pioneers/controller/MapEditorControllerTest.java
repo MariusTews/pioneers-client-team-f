@@ -7,17 +7,20 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 
 @ExtendWith(MockitoExtension.class)
 public class MapEditorControllerTest extends ApplicationTest {
+    @Mock
+    App app;
     @InjectMocks
     MapEditorController mapEditorController;
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
-        App app = new App(mapEditorController);
+        app = new App(mapEditorController);
         app.start(stage);
     }
 
@@ -27,7 +30,6 @@ public class MapEditorControllerTest extends ApplicationTest {
 
         clickOn("#mapSizeMinusButton");
         clickOn("#mapSizePlusButton");
-        clickOn("#saveButton");
 
         Assertions.assertEquals("1", mapSizeLabel.getText());
     }

@@ -9,17 +9,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 import java.util.Objects;
 
-public class MapTemplateSubcontroller implements Controller {
+public class MapTemplateSubController implements Controller {
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
     private Image leftActionImage;
     private Image rightActionImage;
+    private Image selectedMapIcon;
     @FXML
     public Label nameLabel;
     @FXML
@@ -35,7 +35,7 @@ public class MapTemplateSubcontroller implements Controller {
     @FXML
     public ImageView rightActionImageView;
 
-    public MapTemplateSubcontroller(MapTemplate template, boolean ownMap, String createdBy) {
+    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy) {
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
@@ -43,13 +43,14 @@ public class MapTemplateSubcontroller implements Controller {
 
     @Override
     public void init() {
-
+        selectedMapIcon = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/selectedMapIcon.png")).toString());
     }
 
     @Override
     public void destroy() {
         leftActionImage = null;
         rightActionImage = null;
+        selectedMapIcon = null;
     }
 
     @Override
@@ -77,10 +78,6 @@ public class MapTemplateSubcontroller implements Controller {
         leftActionImageView.setImage(leftActionImage);
         rightActionImageView.setImage(rightActionImage);
 
-        if (template._id().equals("")) {
-            ((HBox) parent).getChildren().clear();
-        }
-
         parent.setId(template._id());
 
         return parent;
@@ -89,7 +86,13 @@ public class MapTemplateSubcontroller implements Controller {
     public void updateContent() {
         nameLabel.setText(template.name());
         createdByLabel.setText("| " + createdBy);
-        votesLabel.setText("| " + template.votes());
+        if ((int) template.votes() > 0) {
+            votesLabel.setText("| +" + template.votes());
+        } else if ((int) template.votes() == 0) {
+            votesLabel.setText("|  " + template.votes());
+        } else {
+            votesLabel.setText("| " + template.votes());
+        }
     }
 
     public void onLeftActionImagePressed() {
@@ -110,6 +113,18 @@ public class MapTemplateSubcontroller implements Controller {
             //down-vote map
             //TODO
         }
+    }
+
+    public void selectItem() {
+        selectedImageView.setImage(selectedMapIcon);
+    }
+
+    public void unselectItem() {
+        selectedImageView.setImage(null);
+    }
+
+    public MapTemplate getTemplate() {
+        return template;
     }
 
     public void setTemplate(MapTemplate template) {
