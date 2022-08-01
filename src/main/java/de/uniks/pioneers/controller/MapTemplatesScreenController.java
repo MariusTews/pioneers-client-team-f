@@ -2,8 +2,8 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Template.MapTemplate;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
@@ -178,7 +178,7 @@ public class MapTemplatesScreenController implements Controller {
     private void addMapTemplateItem(MapTemplate template, int position) {
         boolean ownMap = idStorage.getID().equals(template.createdBy());
         String userName = userNames.getOrDefault(template.createdBy(), "");
-        MapTemplateSubController controller = new MapTemplateSubController(template, ownMap, userName);
+        MapTemplateSubController controller = new MapTemplateSubController(template, ownMap, userName, this.mapsService);
         mapTemplateSubCons.put(template._id(), controller);
         controller.init();
         Parent item = controller.render();

@@ -2,7 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.computation.DiceRoll;
 import de.uniks.pioneers.computation.RandomAction;
 import de.uniks.pioneers.dto.Event;
