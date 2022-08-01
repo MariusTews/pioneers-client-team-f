@@ -53,16 +53,16 @@ public class UserSubViewTest extends ApplicationTest {
 
 
     public void start(Stage stage) {
-        List<DevelopmentCard> devCards =  new ArrayList<>();
-        DevelopmentCard d1 = new DevelopmentCard("knight", true,false);
-        DevelopmentCard d2 = new DevelopmentCard("knight", true,false);
-        DevelopmentCard d3 = new DevelopmentCard("knight", true,false);
+        List<DevelopmentCard> devCards = new ArrayList<>();
+        DevelopmentCard d1 = new DevelopmentCard("knight", true, false);
+        DevelopmentCard d2 = new DevelopmentCard("knight", true, false);
+        DevelopmentCard d3 = new DevelopmentCard("knight", true, false);
         devCards.add(d1);
         devCards.add(d2);
         devCards.add(d3);
 
-        Player player = new Player("id","3","#223",true,2,hm,null,
-                4,5,null, devCards);
+        Player player = new Player("id", "3", "#223", true, 2, hm, null,
+                4, 5, null, devCards);
         List<Player> players = new ArrayList<>();
         players.add(player);
 
@@ -122,14 +122,14 @@ public class UserSubViewTest extends ApplicationTest {
         expectedMoves.add(new ExpectedMove("build", players));
         when(pioneersService.findOneState("id")).thenReturn(Observable.just(
                 new State("12:30", "id", expectedMoves, null)));
-        when(pioneersService.findOnePlayer("id","2")).thenReturn(Observable.empty());
+        when(pioneersService.findOnePlayer("id", "2")).thenReturn(Observable.empty());
         Button onDev = lookup("#developmentBuyIdButton").query();
         clickOn(onDev);
 
     }
 
     @Test
-    public void onClickDevGetError(){
+    public void onClickDevGetError() {
         List<String> players = new ArrayList<>();
         players.add("d");
         List<ExpectedMove> expectedMoves = new ArrayList<>();
@@ -142,7 +142,7 @@ public class UserSubViewTest extends ApplicationTest {
     }
 
     @Test
-    public void onClickDevGetSecondError(){
+    public void onClickDevGetSecondError() {
         List<String> players = new ArrayList<>();
         players.add("d");
         List<ExpectedMove> expectedMoves = new ArrayList<>();
