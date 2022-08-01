@@ -1,5 +1,6 @@
 .root {
     -fx-font-family: "A-Space Black Demo";
+    -fx-font-size: 30;
 }
 
 .button.move {
@@ -23,7 +24,7 @@
     -fx-background-color: transparent;
 }
 
-#currentLumberDevId {
+#yearOfPlentyCard {
     -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
@@ -51,7 +52,7 @@
     -fx-background-color: #ff3333;
 }
 
-#labelForRoadId {
+#roadBuildingCard {
     -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
@@ -67,7 +68,7 @@
     -fx-background-color: #ff3333;
 }
 
-#rocketLabelDevId {
+#knightCard {
     -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
@@ -87,7 +88,7 @@
     -fx-background-color: #ff3333;
 }
 
-#threeImagesDevId {
+#monoPolyCard {
     -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
