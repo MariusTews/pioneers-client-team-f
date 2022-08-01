@@ -103,7 +103,7 @@ public class GameScreenController implements Controller {
     private final GameService gameService;
     private final MessageService messageService;
     private final MemberService memberService;
-    private final SoundService soundService = new SoundService();
+    private final SoundService soundService;
 
 
     private GameFieldSubController gameFieldSubController;
@@ -135,6 +135,7 @@ public class GameScreenController implements Controller {
                                 GameService gameService,
                                 MessageService messageService,
                                 MemberService memberService,
+                                SoundService soundService,
                                 UserStorage userStorage) {
         this.lobbyController = lobbyController;
         this.app = app;
@@ -148,6 +149,7 @@ public class GameScreenController implements Controller {
         this.memberIDStorage = memberIDStorage;
         this.memberService = memberService;
         this.userStorage = userStorage;
+        this.soundService = soundService;
     }
 
     @Override
@@ -524,6 +526,9 @@ public class GameScreenController implements Controller {
                 }
                 // change the currentPlayerLabel to the current player
                 User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
+                if (currentPlayer == null) {
+                    currentPlayer = userService.findOne(state.expectedMoves().get(0).players().get(0)).blockingFirst();
+                }
                 currentPlayerLabel.setText(currentPlayer.name());
 
                 // open screen for discarding resources if its current player's screen + state is drop
@@ -633,7 +638,7 @@ public class GameScreenController implements Controller {
     // diceRoll if the current move is "roll"
     public void diceRoll() {
         if (nextMoveLabel.getText().equals("roll")) {
-            pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement", null, null)
+            pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), null, null, null, null, null, null, null)
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                     }, Throwable::printStackTrace);

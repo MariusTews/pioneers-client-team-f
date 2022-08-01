@@ -29,26 +29,25 @@ public class AuthService {
         this.refreshTokenStorage = refreshTokenStorage;
     }
 
-    public Observable<String> login(String username, String password) {
+    public Observable<LoginResult> login(String username, String password) {
         return authApiService
                 .login(new LoginDto(username, password))
                 .doOnNext(result -> {
                     tokenStorage.setToken(result.accessToken());
                     idStorage.setID(result._id());
                     refreshTokenStorage.setRefreshToken(result.refreshToken());
-                })
-                .map(LoginResult::_id);
+                });
     }
 
-    public  Observable<String> refreshToken(String refreshToken){
+    public Observable<LoginResult> refreshToken(String refreshToken) {
         return authApiService.refresh(new RefreshDto(refreshToken))
-                .doOnNext(result ->{
+                .doOnNext(result -> {
                     tokenStorage.setToken(result.accessToken());
                     idStorage.setID((result._id()));
                     refreshTokenStorage.setRefreshToken(result.refreshToken());
-                })
-                .map(LoginResult::refreshToken);
+                });
     }
+
     public Observable<ErrorResponse> logout() {
         return authApiService
                 .logout();
