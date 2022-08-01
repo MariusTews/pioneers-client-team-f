@@ -43,6 +43,6 @@
             <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonPressed" text="Save" />
          </children>
       </VBox>
-      <ScrollPane fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="700.0" prefWidth="1100.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT;" vbarPolicy="NEVER" vvalue="0.5" />
+      <ScrollPane id="map" fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="700.0" prefWidth="1100.0" vbarPolicy="NEVER" vvalue="0.5" />
    </children>
 </Pane>
