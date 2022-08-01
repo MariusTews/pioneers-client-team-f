@@ -1,8 +1,8 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.Template.MapTemplate;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
