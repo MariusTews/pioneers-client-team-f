@@ -8,8 +8,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class LoadMapTemplate {
 
@@ -18,11 +16,7 @@ public class LoadMapTemplate {
 
 	private final CalculateMap calculateMap = new CalculateMap();
 
-	public Pane loadMap(String mapTemplate, boolean loadForIngame) {
-		//Todo: load mapTemplate
-		List<Tile> tiles = new ArrayList<>();
-		List<Harbor> harbors = new ArrayList<>();
-		Map map = new Map("temporary", tiles, harbors);
+	public Pane loadMap(Map map, boolean loadForIngame) {
 
 		maxRange = 0;
 
@@ -33,11 +27,8 @@ public class LoadMapTemplate {
 		for (Harbor harbor : map.harbors()) {
 			checkRange(harbor.x(), harbor.y(), harbor.z());
 		}
-
-
 		this.pane = calculateMap.buildPane(maxRange);
 		double center = calculateMap.getCenter();
-
 
 		for (Tile tile : map.tiles()) {
 			int x = tile.x().intValue();
@@ -59,14 +50,10 @@ public class LoadMapTemplate {
 			}
 		}
 
-
 		for (Harbor harbor : map.harbors()) {
 			int x = harbor.x().intValue();
 			int y = harbor.y().intValue();
 			int z = harbor.z().intValue();
-
-			double xCoordinate = calculateMap.getxCoordinate(center, x, z);
-			double yCoordinate = calculateMap.getyCoordinate(center, z);
 
 			if (loadForIngame) {
 				this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x, y, z, true));
@@ -161,7 +148,6 @@ public class LoadMapTemplate {
 				addToPane(road);
 			}
 		}
-
 	}
 
 	private void addToPane(Node toAdd) {
