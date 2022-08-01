@@ -2,10 +2,12 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.dto.LoginResult;
 import de.uniks.pioneers.service.AuthService;
 import de.uniks.pioneers.service.UserService;
 import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
+import io.reactivex.rxjava3.core.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
@@ -112,19 +114,27 @@ public class LoginController implements Controller {
                     }
                 })
                 .subscribe(result -> {
-                    userService.statusUpdate(result, "online")
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe();
-                    app.show(lobbyController.get());
+                    if (rememberMeCheckBox.isSelected()) {
+                        ResourceManager.saveConfig(JsonUtil.createRememberMeConfig(usernameTextField.getText(), result.refreshToken()));
+                    } else {
+                        ResourceManager.saveConfig(JsonUtil.createDefaultConfig());
+                    }
+                    onSuccessfulLogin(result._id());
                 });
     }
 
+    public void onSuccessfulLogin(String userId) {
+        userService.statusUpdate(userId, "online")
+                .observeOn(FX_SCHEDULER)
+                .subscribe();
+        app.show(lobbyController.get());
+    }
+
+    public Observable<LoginResult> tryTokenLogin(String token) {
+        return authService.refreshToken(token);
+    }
+
     public void loginButtonPressed() {
-        if (rememberMeCheckBox.isSelected()) {
-            ResourceManager.saveConfig(JsonUtil.createRememberMeConfig(usernameTextField.getText()));
-        } else {
-            ResourceManager.saveConfig(JsonUtil.createDefaultConfig());
-        }
         login(usernameTextField.getText(), userPasswordField.getText());
     }
 
