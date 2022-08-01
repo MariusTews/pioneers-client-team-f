@@ -1,13 +1,17 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.model.ExpectedMove;
 import de.uniks.pioneers.model.Player;
+import de.uniks.pioneers.model.State;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
 import io.reactivex.rxjava3.core.Observable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import java.util.ArrayList;
@@ -62,14 +67,56 @@ public class UserSubViewTest extends ApplicationTest {
 
         final App app = new App(userSubView);
         app.start(stage);
-        testParameters();
-
     }
 
     @Test
     public void testParameters() {
+        Label item1 = lookup("#item1").query();
+        Label item2 = lookup("#item2").query();
+        Label item3 = lookup("#item3").query();
+        Label item4 = lookup("#item4").query();
+        Label item5 = lookup("#item5").query();
+        Assertions.assertThat(item1.getText()).isEqualTo("2");
+        Assertions.assertThat(item2.getText()).isEqualTo("6");
+        Assertions.assertThat(item3.getText()).isEqualTo("2");
+        Assertions.assertThat(item4.getText()).isEqualTo("2");
+        Assertions.assertThat(item5.getText()).isEqualTo("3");
 
-        // will be added in 4h release, old version did not test anything
+        Label name = lookup("#name").query();
+        Assertions.assertThat(name.getText()).isEqualTo("tests (YOU)");
+    }
+
+    @Test
+    public void onClickTests() {
+        Button onBuild = lookup("#sett").query();
+        clickOn(onBuild);
+
+        org.junit.jupiter.api.Assertions.assertEquals(onBuild.getText(), "UFO");
+
+        Button onRoad = lookup("#road").query();
+        clickOn(onRoad);
+
+        org.junit.jupiter.api.Assertions.assertEquals(onRoad.getText(), "Tube");
+
+        Button onCity = lookup("#city").query();
+        clickOn(onCity);
+
+        org.junit.jupiter.api.Assertions.assertEquals(onCity.getText(), "Station");
+    }
+
+    @Test
+    public void onClickDevTests() {
+        //Player player = new Player()
+        List<String> players = new ArrayList<>();
+        players.add("3");
+        List<ExpectedMove> expectedMoves = new ArrayList<>();
+        expectedMoves.add(new ExpectedMove("build", players));
+        when(pioneersService.findOneState("2")).thenReturn(Observable.just(
+                new State("12:30", "2", expectedMoves, null)));
+        //when(pioneersService.findOnePlayer("2","3")).thenReturn(Observable.just());
+        Button onDev = lookup("#developmentBuyIdButton").query();
+        clickOn(onDev);
+
     }
 
     @Override
