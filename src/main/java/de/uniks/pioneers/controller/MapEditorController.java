@@ -93,11 +93,9 @@ public class MapEditorController implements Controller {
             if (node.getId().endsWith("_harborButton")) {
                 Button button = (Button) node;
                 button.setOnAction(this::harborButtonPressed);
-                button.setStyle("-fx-background-color: #d2dcde; -fx-text-fill: orange;");
             } else if (node.getId().endsWith("_tileButton")) {
                 Button button = (Button) node;
                 button.setOnAction(this::tileButtonPressed);
-                button.setStyle("-fx-background-color: #d2dcde; -fx-text-fill: green;");
             }
         }
     }

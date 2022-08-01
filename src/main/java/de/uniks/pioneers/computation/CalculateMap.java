@@ -4,8 +4,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -377,8 +375,10 @@ public class CalculateMap {
 		// set id for either a harbor or tile button
 		if (harbor) {
 			button.setId(createId(x, y, z) + "_harborButton");
+			button.getStyleClass().add("harborButton");
 		} else {
 			button.setId(createId(x, y, z) + "_tileButton");
+			button.getStyleClass().add("tileButton");
 		}
 	}
 
