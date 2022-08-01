@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
+import de.uniks.pioneers.service.HexFillService;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -128,7 +129,7 @@ public class MapEditorController implements Controller {
                     cancelTileButton.setPrefWidth(30);
                     cancelTileButton.setPrefHeight(30);
                     cancelTileButton.setText("x");
-                    cancelTileButton.setStyle("-fx-text-fill: red");
+                    cancelTileButton.getStyleClass().add("cancelTileButton");
                     cancelTileButton.setLayoutX(hexagon.getLayoutX() - 21);
                     cancelTileButton.setLayoutY(hexagon.getLayoutY() - 65);
                     cancelTileButton.toFront();
@@ -140,7 +141,7 @@ public class MapEditorController implements Controller {
                     numberField.setPrefWidth(35);
                     numberField.setPrefHeight(30);
                     numberField.setText("-");
-                    numberField.setStyle("-fx-text-fill: green");
+                    numberField.getStyleClass().add("numberField");
                     numberField.setLayoutX(hexagon.getLayoutX() - 18);
                     numberField.setLayoutY(hexagon.getLayoutY() - 35);
                     numberField.toFront();
@@ -174,6 +175,8 @@ public class MapEditorController implements Controller {
     }
 
     private void selectedChoice(Polygon hexagon, int newValue) {
+        HexFillService hexFillService = new HexFillService();
+
         final List<String> choices = new ArrayList<>();
         choices.add(0, "random");
         choices.add(1, "desert");
@@ -192,64 +195,11 @@ public class MapEditorController implements Controller {
             }
         }
 
-        // initialize the choosen tile
-        switch (choices.get(newValue)) {
-            case "random" -> {
-                numberField.setVisible(true);
-                hexagon.setFill(Color.grayRgb(200, 0.5));
-            }
-            case "desert" -> {
-                numberField.setVisible(false);
-                hexagon.setFill(
-                        new ImagePattern(
-                                new Image(Objects.requireNonNull(
-                                        Main.class.getResource("view/assets/2_desert.png")).toExternalForm())
-                        ));
-            }
-            case "venus" -> {
-                numberField.setVisible(true);
-                hexagon.setFill(
-                        new ImagePattern(
-                                new Image(Objects.requireNonNull(
-                                        Main.class.getResource("view/assets/4_venus.png")).toExternalForm())
-                        ));
-            }
-            case "moon" -> {
-                numberField.setVisible(true);
-                hexagon.setFill(
-                        new ImagePattern(
-                                new Image(Objects.requireNonNull(
-                                        Main.class.getResource("view/assets/3_moon.png")).toExternalForm())
-                        ));
-            }
-            case "mars" -> {
-                numberField.setVisible(true);
-                hexagon.setFill(
-                        new ImagePattern(
-                                new Image(Objects.requireNonNull(
-                                        Main.class.getResource("view/assets/1_mars.png")).toExternalForm())
-                        ));
-            }
-            case "earth" -> {
-                numberField.setVisible(true);
-                hexagon.setFill(
-                        new ImagePattern(
-                                new Image(Objects.requireNonNull(
-                                        Main.class.getResource("view/assets/6_earth.png")).toExternalForm())
-                        ));
-            }
-            case "neptune" -> {
-                numberField.setVisible(true);
-                hexagon.setFill(
-                        new ImagePattern(
-                                new Image(Objects.requireNonNull(
-                                        Main.class.getResource("view/assets/5_neptun.png")).toExternalForm())
-                        ));
-            }
-            default -> {
-            }
-        }
+        // the desert has no number field
+        numberField.setVisible(!choices.get(newValue).equals("desert"));
 
+        // fill hexagon by choice
+        hexFillService.fillHexagon(hexagon, choices.get(newValue));
     }
 
     private void harborButtonPressed(ActionEvent event) {

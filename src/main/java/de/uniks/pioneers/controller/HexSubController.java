@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.*;
+import de.uniks.pioneers.service.HexFillService;
 import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
 import javafx.scene.Cursor;
@@ -192,38 +193,7 @@ public class HexSubController implements Controller {
     }
 
     private void setPolygonColor() {
-        String type = tile.type();
-        switch (type) {
-            case "desert" -> {
-                Image desert = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/2_desert.png")).toExternalForm());
-                ImagePattern desertPattern = new ImagePattern(desert);
-                view.setFill(desertPattern);
-            }
-            case "fields" -> {
-                Image fields = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/4_venus.png")).toExternalForm());
-                ImagePattern fieldPattern = new ImagePattern(fields);
-                view.setFill(fieldPattern);
-            }
-            case "mountains" -> {
-                Image hills = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/3_moon.png")).toExternalForm());
-                ImagePattern hillPattern = new ImagePattern(hills);
-                view.setFill(hillPattern);
-            }
-            case "hills" -> {
-                Image mountains = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/1_mars.png")).toExternalForm());
-                ImagePattern mountainPattern = new ImagePattern(mountains);
-                view.setFill(mountainPattern);
-            }
-            case "forest" -> {
-                Image forest = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/6_earth.png")).toExternalForm());
-                ImagePattern forestPattern = new ImagePattern(forest);
-                view.setFill(forestPattern);
-            }
-            case "pasture" -> {
-                Image pasture = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/5_neptun.png")).toExternalForm());
-                ImagePattern pasturePattern = new ImagePattern(pasture);
-                view.setFill(pasturePattern);
-            }
-        }
+        HexFillService hexFillService = new HexFillService();
+        hexFillService.fillHexagon(view, tile.type());
     }
 }

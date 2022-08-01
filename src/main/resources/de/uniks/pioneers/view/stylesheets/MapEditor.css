@@ -15,3 +15,10 @@
     -fx-text-fill: orange;
 }
 
+.cancelTileButton {
+    -fx-text-fill: red;
+}
+
+.numberField {
+    -fx-text-fill: green;
+}
