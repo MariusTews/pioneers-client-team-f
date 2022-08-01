@@ -412,7 +412,7 @@ public class GameLobbyController implements Controller {
     }
 
     public void startGame() {
-        gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints(), null, false, 100)
+        gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints(), null, false, 0)
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error -> {
                     if ("HTTP 403 ".equals(error.getMessage())) {
