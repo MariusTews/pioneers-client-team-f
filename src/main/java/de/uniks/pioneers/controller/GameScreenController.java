@@ -444,7 +444,7 @@ public class GameScreenController implements Controller {
                     } else if (amountNewResources < amountResources) {
                         this.soundService.playSound("drop");
                     }
-                    //call All calculate method for calculating all the owned cards
+                    //call calculate method for calculating all the owned cards
                     allTheCards();
                 }
             }
