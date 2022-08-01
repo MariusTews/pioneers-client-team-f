@@ -27,13 +27,13 @@ public class AlertService {
     public void alertForEachCard(Player player, Player p) {
         if (player.developmentCards().get(player.developmentCards().size() - 1).type().equals("victory-point")
                 && player.developmentCards().size() != p.developmentCards().size()) {
-            System.out.println("hallo");
             showAlert("Congratulations, you acquired Victory point card");
         } else if (player.developmentCards().get(player.developmentCards().size() - 1).type().equals("knight")
                 && player.developmentCards().size() != p.developmentCards().size()) {
             showAlert("Congratulations, you acquired Knight card");
         } else if (player.developmentCards().get(player.developmentCards().size() - 1).type().equals("road-building")
                 && player.developmentCards().size() != p.developmentCards().size()) {
+
             showAlert("Congratulations, you acquired Road-building card");
         } else if (player.developmentCards().get(player.developmentCards().size() - 1).type().equals("year-of-plenty")
                 && player.developmentCards().size() != p.developmentCards().size()) {
