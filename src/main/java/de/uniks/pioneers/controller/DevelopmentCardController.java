@@ -155,7 +155,6 @@ public class DevelopmentCardController implements Controller {
     }
 
     public void onYearOfPlentyClick(ActionEvent event) {
-        //TODO:implement action when year of plenty card is clicked
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || yearOfPlentyCard.getText().equals("0")) {
             showAlert();
@@ -173,7 +172,6 @@ public class DevelopmentCardController implements Controller {
     }
 
     public void onRoadBuildingClick(ActionEvent event) {
-        //TODO:implement action when roadBuilding card is played
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || roadBuildingCard.getText().equals("0")) {
             showAlert();
@@ -190,7 +188,6 @@ public class DevelopmentCardController implements Controller {
     }
 
     public void onKnightClick(ActionEvent event) {
-        //TODO :implement action Knight card is played
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || knightCard.getText().equals("0")) {
             showAlert();
@@ -206,7 +203,6 @@ public class DevelopmentCardController implements Controller {
     }
 
     public void onMonopolyClick(ActionEvent event) {
-        //TODO : implement action when Monopoly card is played
         //if it's not your turn
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
             !nextMove.action().equals("build") || monoPolyCard.getText().equals("0")) {
