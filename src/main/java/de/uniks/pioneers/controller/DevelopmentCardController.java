@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.ExpectedMove;
+import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
@@ -12,9 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -57,13 +56,14 @@ public class DevelopmentCardController implements Controller {
     private final IDStorage idStorage;
     private final PioneersService pioneersService;
 
-    private GameScreenController gameScreenController;
+    private final GameScreenController gameScreenController;
     private final Window owner;
-    private ExpectedMove nextMove;
-    private HashMap<String, User> userHash;
+    private final ExpectedMove nextMove;
+    private final HashMap<String, User> userHash;
+    private final Player player;
 
     @Inject
-    public DevelopmentCardController(GameScreenController gameScreenController, Window owner, GameStorage gameStorage, IDStorage idStorage, PioneersService pioneersService, ExpectedMove nextMove, HashMap<String, User> userHash) {
+    public DevelopmentCardController(GameScreenController gameScreenController, Window owner, GameStorage gameStorage, IDStorage idStorage, PioneersService pioneersService, ExpectedMove nextMove, HashMap<String, User> userHash, Player player) {
         this.gameScreenController = gameScreenController;
         this.owner = owner;
         this.gameStorage = gameStorage;
@@ -71,6 +71,7 @@ public class DevelopmentCardController implements Controller {
         this.pioneersService = pioneersService;
         this.nextMove = nextMove;
         this.userHash = userHash;
+        this.player = player;
     }
 
     @Override
@@ -162,7 +163,12 @@ public class DevelopmentCardController implements Controller {
             pioneersService
                     .playDevCard(gameStorage.getId(), "year-of-plenty")
                     .observeOn(FX_SCHEDULER)
-                    .subscribe();
+                    .doOnError(error -> AlertSameRound())
+                    .subscribe(onSuccess -> {
+                        primaryStage.close();
+                        YearOfPlentyController yearOfPlentyController = new YearOfPlentyController(player, gameStorage.getId(), pioneersService, owner);
+                        yearOfPlentyController.render();
+                    });
         }
     }
 
@@ -175,7 +181,11 @@ public class DevelopmentCardController implements Controller {
             pioneersService
                     .playDevCard(gameStorage.getId(), "road-building")
                     .observeOn(FX_SCHEDULER)
-                    .subscribe();
+                    .doOnError(error -> AlertSameRound())
+                    .subscribe(onSuccess -> {
+                        primaryStage.close();
+                    });
+
         }
     }
 
@@ -188,7 +198,10 @@ public class DevelopmentCardController implements Controller {
             pioneersService
                     .playDevCard(gameStorage.getId(), "knight")
                     .observeOn(FX_SCHEDULER)
-                    .subscribe();
+                    .doOnError(error -> AlertSameRound())
+                    .subscribe(onSuccess -> {
+                        primaryStage.close();
+                    });
         }
     }
 
@@ -202,7 +215,30 @@ public class DevelopmentCardController implements Controller {
             pioneersService
                     .playDevCard(gameStorage.getId(), "monopoly")
                     .observeOn(FX_SCHEDULER)
-                    .subscribe();
+                    .doOnError(error -> AlertSameRound())
+                    .subscribe(onSuccess -> {
+                        primaryStage.close();
+                        String types[] = {"grain", "brick", "ore", "lumber", "wool"};
+                        ChoiceDialog<String> choosingResource = new ChoiceDialog<>(types[1], types);
+                        choosingResource.getDialogPane().lookupButton(ButtonType.CANCEL).setVisible(false);
+                        // set stylesheet
+                        choosingResource.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
+                                .getResource("view/stylesheets/ChoiceDialogRob.css")).toExternalForm());
+                        choosingResource.setHeaderText("Rob resource");
+                        // remove close/maximize/minimize button
+                        choosingResource.initStyle(StageStyle.UNDECORATED);
+                        // Get the chosen target and make a server request with this target
+                        choosingResource.showAndWait();
+                        String resource = choosingResource.getSelectedItem();
+                        HashMap<String, Integer> resourcesMap = new HashMap<>() {{
+                            put(resource, 0);
+                        }};
+
+                        pioneersService
+                                .monopolyCard(gameStorage.getId(),resourcesMap)
+                                .observeOn(FX_SCHEDULER)
+                                .subscribe();
+                    });
         }
     }
 
@@ -214,6 +250,16 @@ public class DevelopmentCardController implements Controller {
                 .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
         alert.showAndWait();
     }
+
+    private void AlertSameRound() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "You just bought the card this round!");
+        // Set style
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        alert.showAndWait();
+    }
+
 }
 
 
