@@ -2,12 +2,12 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -412,7 +412,7 @@ public class GameLobbyController implements Controller {
     }
 
     public void startGame() {
-        gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints(), null,false,0)
+        gameService.updateGame(gameStorage.getId(), null, null, this.idStorage.getID(), true, game.settings().mapRadius(), game.settings().victoryPoints(), null, false, 100)
                 .observeOn(FX_SCHEDULER)
                 .doOnError(error -> {
                     if ("HTTP 403 ".equals(error.getMessage())) {

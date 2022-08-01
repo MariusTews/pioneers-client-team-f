@@ -190,7 +190,7 @@ public class YearOfPlentyController implements Controller {
         this.resourcesMap.put(NEPTUNE_CRYSTAL, Integer.parseInt(wool.getText()));
         System.out.println(resourcesMap);
 
-        pioneersService.yearOfPlentyCard(gameID,resourcesMap)
+        pioneersService.yearOfPlentyCard(gameID, resourcesMap)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(
                         // after success display a notification and close the stage/window automatically

@@ -9,7 +9,6 @@ import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -205,7 +204,7 @@ public class DevelopmentCardController implements Controller {
     public void onMonopolyClick(ActionEvent event) {
         //if it's not your turn
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
-            !nextMove.action().equals("build") || monoPolyCard.getText().equals("0")) {
+                !nextMove.action().equals("build") || monoPolyCard.getText().equals("0")) {
             showAlert();
         } else {
             pioneersService
@@ -231,7 +230,7 @@ public class DevelopmentCardController implements Controller {
                         }};
 
                         pioneersService
-                                .monopolyCard(gameStorage.getId(),resourcesMap)
+                                .monopolyCard(gameStorage.getId(), resourcesMap)
                                 .observeOn(FX_SCHEDULER)
                                 .subscribe();
                     });
