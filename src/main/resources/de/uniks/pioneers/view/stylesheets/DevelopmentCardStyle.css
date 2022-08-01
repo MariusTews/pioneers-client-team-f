@@ -1,5 +1,6 @@
 .root {
     -fx-font-family: "A-Space Black Demo";
+    -fx-font-size: 30;
 }
 
 .button.move {
@@ -11,7 +12,7 @@
     -fx-text-fill: #666666;
 }
 
-#mainHboxId {
+#mainHBoxId {
     -fx-background-image: url("../assets/yellow_panel.png");
     -fx-background-position: center;
     -fx-background-repeat: stretch;
@@ -23,7 +24,7 @@
     -fx-background-color: transparent;
 }
 
-#currentLumberDevId {
+#yearOfPlentyCard {
     -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
@@ -51,7 +52,7 @@
     -fx-background-color: #ff3333;
 }
 
-#labelForRoadId {
+#roadBuildingCard {
     -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
@@ -67,7 +68,7 @@
     -fx-background-color: #ff3333;
 }
 
-#rocketLabelDevId {
+#knightCard {
     -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
@@ -77,7 +78,7 @@
     -fx-background-color: transparent;
 }
 
-#threeImgesHBoxId {
+#threeImagesHBoxId {
     -fx-background-color: transparent;
 }
 
@@ -87,13 +88,8 @@
     -fx-background-color: #ff3333;
 }
 
-#threeImagesDevId {
+#monoPolyCard {
     -fx-font-family: "A-Space Black Demo";
     -fx-font-size: 30;
     -fx-text-fill: #ffffff;
 }
-
-
-
-
-

@@ -1,11 +1,11 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.Websocket.EventListener;
 import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
@@ -57,10 +57,10 @@ class LobbyControllerTest extends ApplicationTest {
 
     @SuppressWarnings("unused")
     @Spy
-	GameStorage gameStorage;
+    GameStorage gameStorage;
 
-     @Spy
-     App app;
+    @Spy
+    App app;
 
     @InjectMocks
     LobbyController lobbyController;
@@ -83,34 +83,34 @@ class LobbyControllerTest extends ApplicationTest {
         messageSubject = PublishSubject.create();
         groupSubject = PublishSubject.create();
 
-        List<Member> memberList =  new ArrayList<>();
-        memberList.add(new Member("0","2","id","3",true,"#00012f",false));
+        List<Member> memberList = new ArrayList<>();
+        memberList.add(new Member("0", "2", "id", "3", true, "#00012f", false));
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(memberList));
 
         List<Game> gameList = new ArrayList<>();
         gameList.add(new Game("0:00", "0:30",
-                "id", "name", "owner", 2, false,new GameSettings(2,10, null, false, 0)));
+                "id", "name", "owner", 2, false, new GameSettings(2, 10, null, false, 0)));
         when(gameService.findAllGames()).thenReturn(Observable.just(gameList));
 
         List<User> userList = new ArrayList<>();
-        userList.add(new User("0","1", "7", "Bob", "online",null, null));
+        userList.add(new User("0", "1", "7", "Bob", "online", null, null));
         when(userService.findAllUsers()).thenReturn(Observable.just(userList));
 
         List<Message> messages = new ArrayList<>();
-        messages.add(new Message("0","1", "78", "7", "first message"));
-        when(messageService.getAllMessages(any(),any())).thenReturn(Observable.just(messages));
+        messages.add(new Message("0", "1", "78", "7", "first message"));
+        when(messageService.getAllMessages(any(), any())).thenReturn(Observable.just(messages));
 
         List<Group> groupList = new ArrayList<>();
-        groupList.add(new Group("0","2","uid","Tom",new ArrayList<>()));
+        groupList.add(new Group("0", "2", "uid", "Tom", new ArrayList<>()));
         when(groupService.getAll()).thenReturn(Observable.just(groupList));
         when(gameStorage.getId()).thenReturn("627cf3c93496bc00158f3859");
 
         when(app.getStage()).thenReturn(new Stage());
 
-        when(eventListener.listen("users.*.*",User.class)).thenReturn(userSubject);
-        when(eventListener.listen("games.*.*",Game.class)).thenReturn(gameSubject);
-        when(eventListener.listen("group.*.*",Group.class)).thenReturn(groupSubject);
-        when(eventListener.listen("global.627cf3c93496bc00158f3859.messages.*.*",Message.class)).thenReturn(messageSubject);
+        when(eventListener.listen("users.*.*", User.class)).thenReturn(userSubject);
+        when(eventListener.listen("games.*.*", Game.class)).thenReturn(gameSubject);
+        when(eventListener.listen("group.*.*", Group.class)).thenReturn(groupSubject);
+        when(eventListener.listen("global.627cf3c93496bc00158f3859.messages.*.*", Message.class)).thenReturn(messageSubject);
 
         // start application
         app = new App(lobbyController);
@@ -121,8 +121,8 @@ class LobbyControllerTest extends ApplicationTest {
     @Test
     void logout() {
         when(idStorage.getID()).thenReturn("4");
-        when(userService.statusUpdate("4", "offline")).thenReturn(Observable.just(new User("1234","12345","id",
-                                                    "name", "status", "avatar", new ArrayList<>())));
+        when(userService.statusUpdate("4", "offline")).thenReturn(Observable.just(new User("1234", "12345", "id",
+                "name", "status", "avatar", new ArrayList<>())));
         when(authService.logout()).thenReturn(Observable.just(new ErrorResponse(123, "error", "message")));
 
         write("\t");
@@ -133,31 +133,31 @@ class LobbyControllerTest extends ApplicationTest {
     }
 
     @Test
-    void lobbyEventListenerTest(){
+    void lobbyEventListenerTest() {
 
-        userSubject.onNext(new Event<>(".created",new User("0","1","8","Tom","online",null,
+        userSubject.onNext(new Event<>(".created", new User("0", "1", "8", "Tom", "online", null,
                 new ArrayList<>())));
-        userSubject.onNext(new Event<>(".updated",new User("0","1","8","Tom","online",null,
+        userSubject.onNext(new Event<>(".updated", new User("0", "1", "8", "Tom", "online", null,
                 new ArrayList<>())));
         waitForFxEvents();
 
-        gameSubject.onNext(new Event<>(".created", new Game("0","1","2", "ert","2",0,false,
-                new GameSettings(2,10, null, false, 0))));
-        gameSubject.onNext(new Event<>(".updated", new Game("0","1","2", "ert","2",0,true,
-                new GameSettings(2,10, null, false, 0))));
+        gameSubject.onNext(new Event<>(".created", new Game("0", "1", "2", "ert", "2", 0, false,
+                new GameSettings(2, 10, null, false, 0))));
+        gameSubject.onNext(new Event<>(".updated", new Game("0", "1", "2", "ert", "2", 0, true,
+                new GameSettings(2, 10, null, false, 0))));
         waitForFxEvents();
 
         //members for Group
         List<String> memberForGroup = new ArrayList<>();
-        groupSubject.onNext(new Event<>(".created",new Group("1","2","id","ert",memberForGroup)));
+        groupSubject.onNext(new Event<>(".created", new Group("1", "2", "id", "ert", memberForGroup)));
         memberForGroup.add("Tom");
-        groupSubject.onNext(new Event<>(".updated",new Group("1","2","id","ert",memberForGroup)));
+        groupSubject.onNext(new Event<>(".updated", new Group("1", "2", "id", "ert", memberForGroup)));
         waitForFxEvents();
 
-        messageSubject.onNext(new Event<>(".created", new Message("1","2",
-                "627cf3c93496bc00158f3859","7","Hello!!")));
-        messageSubject.onNext(new Event<>(".updated", new Message("1","2",
-                "627cf3c93496bc00158f3859","7","no!!")));
+        messageSubject.onNext(new Event<>(".created", new Message("1", "2",
+                "627cf3c93496bc00158f3859", "7", "Hello!!")));
+        messageSubject.onNext(new Event<>(".updated", new Message("1", "2",
+                "627cf3c93496bc00158f3859", "7", "no!!")));
         waitForFxEvents();
 
     }
@@ -166,8 +166,8 @@ class LobbyControllerTest extends ApplicationTest {
     void createGameTest() {
         when(gameStorage.getId()).thenReturn("id");
         when(idStorage.getID()).thenReturn("3");
-        List<Member> memberList =  new ArrayList<>();
-        memberList.add(new Member("0","2","id","3",true,"#00012f",false));
+        List<Member> memberList = new ArrayList<>();
+        memberList.add(new Member("0", "2", "id", "3", true, "#00012f", false));
         when(memberService.getAllGameMembers("id")).thenReturn(Observable.just(memberList));
 
         lobbyController.createGameButtonPressed();
@@ -177,12 +177,12 @@ class LobbyControllerTest extends ApplicationTest {
     void joinGameTest() {
         when(gameStorage.getId()).thenReturn("id");
         when(idStorage.getID()).thenReturn("3");
-        List<Member> memberList =  new ArrayList<>();
-        memberList.add(new Member("0","2","id","3",true,"#00012f",false));
+        List<Member> memberList = new ArrayList<>();
+        memberList.add(new Member("0", "2", "id", "3", true, "#00012f", false));
         when(memberService.getAllGameMembers("id")).thenReturn(Observable.just(memberList));
         //when(memberService.join("id","00000")).thenReturn(Observable.empty());
-        Game game = new Game("0","1","2", "ert","2",0,true,
-                new GameSettings(2,10, null, false, 0));
+        Game game = new Game("0", "1", "2", "ert", "2", 0, true,
+                new GameSettings(2, 10, null, false, 0));
         lobbyController.joinGame(game);
 
         verify(memberService).getAllGameMembers("id");
@@ -207,7 +207,7 @@ class LobbyControllerTest extends ApplicationTest {
         gameService = null;
         messageService = null;
         memberService = null;
-        groupService =  null;
+        groupService = null;
         authService = null;
         eventListener = null;
         idStorage = null;

@@ -29,32 +29,27 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uniks.pioneers.Constants.*;
 
 public class DevelopmentCardController implements Controller {
 
-    public HBox mainHboxId;
+    public HBox mainHBoxId;
     public Pane paneForLumberId;
     public VBox vBoxForLumberId;
     public HBox hBoxForLumberId;
     public Label labelForLumberId;
     public ImageView lumberImageId;
-    //label for first Development card
-    public Label currentLumberDevId;
     public ImageView roadImageId;
 
-    //label for roadDevelopment card
-    public Label labelForRoadId;
     public ImageView rocketImageId;
-    //label for rocketDevelopment card
-    public Label rocketLabelDevId;
     public ImageView threeUsersImageId;
     public ImageView rockImageId;
     public ImageView arrowImageId;
-    //label for fourth Development card
-    public Label threeImagesDevId;
+    public Label yearOfPlentyCard;
+    public Label roadBuildingCard;
+    public Label knightCard;
+    public Label monoPolyCard;
     private Stage primaryStage;
 
     private final GameStorage gameStorage;
@@ -99,8 +94,7 @@ public class DevelopmentCardController implements Controller {
             // Set to UNDECORATED or TRANSPARENT (without white background) to remove minimize, maximize and close button of stage
             primaryStage.initStyle(StageStyle.TRANSPARENT);
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(Objects.requireNonNull(
-                    Main.class.getResource("view/stylesheets/DevelopmentCardStyle.css")).toString());
+            scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/DevelopmentCardStyle.css")).toString());
             primaryStage.setScene(scene);
             primaryStage.setTitle("");
             // Specify modality of the new window: interactions are only possible on the second window
@@ -126,57 +120,33 @@ public class DevelopmentCardController implements Controller {
 
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void calculateAllOwnedCards() {
-        AtomicInteger year_of_plenty = new AtomicInteger();
-        AtomicInteger road_building = new AtomicInteger();
-        AtomicInteger knight = new AtomicInteger();
-        AtomicInteger monopoly = new AtomicInteger();
+        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID()).observeOn(FX_SCHEDULER).subscribe(e -> {
+            int year_of_plenty = 0;
+            int road_building = 0;
+            int knight = 0;
+            int monopoly = 0;
+            for (DevelopmentCard card : e.developmentCards()) {
+                if (card.type().equals(KNIGHT)) {
+                    knight++;
+                }
+                if (card.type().equals(YEAR_OF_PLENTY)) {
+                    year_of_plenty++;
+                }
+                if (card.type().equals(ROAD_BUILDING)) {
+                    road_building++;
+                }
+                if (card.type().equals(MONOPOLY)) {
+                    monopoly++;
+                }
 
-        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
-                .observeOn(FX_SCHEDULER).subscribe(e -> {
-                    for (DevelopmentCard card : e.developmentCards()) {
-                        if (card.type().equals(KNIGHT)) {
-                            knight.set(knight.get() + 1);
-                        }
-                        if (card.type().equals(YEAR_OF_PLENTY)) {
-                            year_of_plenty.set(year_of_plenty.get() + 1);
-                        }
-                        if (card.type().equals(ROAD_BUILDING)) {
-                            road_building.set(road_building.get() + 1);
-                        }
-                        if (card.type().equals(MONOPOLY)) {
-                            monopoly.set(monopoly.get() + 1);
-                        }
-                    }
-
-                    currentLumberDevId.setText(String.valueOf(year_of_plenty.get()));
-                    labelForRoadId.setText(String.valueOf(road_building.get()));
-                    rocketLabelDevId.setText(String.valueOf(knight.get()));
-                    threeImagesDevId.setText(String.valueOf(monopoly.get()));
-
-                });
-    }
-
-    public AtomicInteger getAllTheCards() {
-        AtomicInteger allTheCards = new AtomicInteger();
-        pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
-                .observeOn(FX_SCHEDULER).subscribe(e -> {
-                    for (DevelopmentCard card : e.developmentCards()) {
-                        if (card.type().equals(KNIGHT)) {
-                            allTheCards.set(allTheCards.get() + 1);
-                        }
-                        if (card.type().equals(YEAR_OF_PLENTY)) {
-                            allTheCards.set(allTheCards.get() + 1);
-                        }
-                        if (card.type().equals(ROAD_BUILDING)) {
-                            allTheCards.set(allTheCards.get() + 1);
-                        }
-                        if (card.type().equals(MONOPOLY)) {
-                            allTheCards.set(allTheCards.get() + 1);
-                        }
-                    }
-                });
-        return allTheCards;
+            }
+            yearOfPlentyCard.setText(String.valueOf(year_of_plenty));
+            roadBuildingCard.setText(String.valueOf(road_building));
+            knightCard.setText(String.valueOf(knight));
+            monoPolyCard.setText(String.valueOf(monopoly));
+        });
     }
 
     public void onClickCancel() {
@@ -186,7 +156,7 @@ public class DevelopmentCardController implements Controller {
     public void onYearOfPlentyClick(ActionEvent event) {
         //TODO:implement action when year of plenty card is clicked
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
-                !nextMove.action().equals("build") || currentLumberDevId.getText().equals("0")) {
+                !nextMove.action().equals("build") || yearOfPlentyCard.getText().equals("0")) {
             showAlert();
         } else {
             pioneersService
@@ -199,7 +169,7 @@ public class DevelopmentCardController implements Controller {
     public void onRoadBuildingClick(ActionEvent event) {
         //TODO:implement action when roadBuilding card is played
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
-                !nextMove.action().equals("build") || labelForRoadId.getText().equals("0")) {
+                !nextMove.action().equals("build") || roadBuildingCard.getText().equals("0")) {
             showAlert();
         } else {
             pioneersService
@@ -212,7 +182,7 @@ public class DevelopmentCardController implements Controller {
     public void onKnightClick(ActionEvent event) {
         //TODO :implement action Knight card is played
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
-                !nextMove.action().equals("build") || rocketLabelDevId.getText().equals("0")) {
+                !nextMove.action().equals("build") || knightCard.getText().equals("0")) {
             showAlert();
         } else {
             pioneersService
@@ -226,7 +196,7 @@ public class DevelopmentCardController implements Controller {
         //TODO : implement action when Monopoly card is played
         //if it's not your turn
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
-            !nextMove.action().equals("build") || threeImagesDevId.getText().equals("0")) {
+            !nextMove.action().equals("build") || monoPolyCard.getText().equals("0")) {
             showAlert();
         } else {
             pioneersService
