@@ -16,6 +16,7 @@ public class RememberMeTest extends ApplicationTest {
         String expectedDefault = new JSONObject()
                 .put("rememberMe", false)
                 .put("name", "")
+                .put("token", "")
                 .toString();
         String jsonObject = JsonUtil.createDefaultConfig();
         assertEquals(expectedDefault, jsonObject);
@@ -23,8 +24,9 @@ public class RememberMeTest extends ApplicationTest {
         String expectedRememberMe = new JSONObject()
                 .put("rememberMe", true)
                 .put("name", "Bob")
+                .put("token", "123")
                 .toString();
-        String jsonObjectRememberMe = JsonUtil.createRememberMeConfig("Bob");
+        String jsonObjectRememberMe = JsonUtil.createRememberMeConfig("Bob", "123");
         assertEquals(expectedRememberMe, jsonObjectRememberMe);
     }
 
@@ -33,6 +35,7 @@ public class RememberMeTest extends ApplicationTest {
         String expectedDefault = new JSONObject()
                 .put("rememberMe", false)
                 .put("name", "Bob")
+                .put("token", "123")
                 .toString();
         ResourceManager.saveConfig(expectedDefault);
 
@@ -43,6 +46,7 @@ public class RememberMeTest extends ApplicationTest {
         String reset = new JSONObject()
                 .put("rememberMe", false)
                 .put("name", "")
+                .put("token", "")
                 .toString();
         ResourceManager.saveConfig(reset);
 

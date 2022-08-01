@@ -83,14 +83,14 @@ public class GameFieldSubController implements Controller {
 	}
 
 
-	@Override
-	public void destroy() {
-		hexSubControllers.forEach(HexSubController::destroy);
-		hexSubControllers.clear();
-		circleSubControllers.forEach(CircleSubController::destroy);
-		circleSubControllers.clear();
-		disposable.dispose();
-	}
+    @Override
+    public void destroy() {
+        hexSubControllers.forEach(HexSubController::destroy);
+        hexSubControllers.clear();
+        circleSubControllers.forEach(CircleSubController::destroy);
+        circleSubControllers.clear();
+        disposable.clear();
+    }
 
 	@Override
 	public Parent render() {
