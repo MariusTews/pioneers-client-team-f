@@ -1,10 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.model.ExpectedMove;
-import de.uniks.pioneers.model.Player;
-import de.uniks.pioneers.model.State;
-import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
@@ -26,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,10 +53,24 @@ public class UserSubViewTest extends ApplicationTest {
 
 
     public void start(Stage stage) {
+        List<DevelopmentCard> devCards =  new ArrayList<>();
+        DevelopmentCard d1 = new DevelopmentCard("knight", true,false);
+        DevelopmentCard d2 = new DevelopmentCard("knight", true,false);
+        DevelopmentCard d3 = new DevelopmentCard("knight", true,false);
+        devCards.add(d1);
+        devCards.add(d2);
+        devCards.add(d3);
+
+        Player player = new Player("id","3","#223",true,2,hm,null,
+                4,5,null, devCards);
+        List<Player> players = new ArrayList<>();
+        players.add(player);
+
         when(idStorage.getID()).thenReturn("2");
+        when(gameStorage.getId()).thenReturn("id");
         when(userService.findAllUsers()).thenReturn(Observable.just(List.of(
                 new User("1234", "12345", "2", "tests", "online", null, new ArrayList<>()))));
-        when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
+        when(pioneersService.findAllPlayers("id")).thenReturn(Observable.just(players));
 
         userSubView = new UserSubView(idStorage, gameStorage, userService, new Player("id", "2",
                 "#000000", true, 2, hm, new HashMap<>(), 2, 10, null, null), gameFieldSubController, 10, pioneersService);
@@ -106,17 +116,41 @@ public class UserSubViewTest extends ApplicationTest {
 
     @Test
     public void onClickDevTests() {
-        //Player player = new Player()
         List<String> players = new ArrayList<>();
-        players.add("3");
+        players.add("2");
         List<ExpectedMove> expectedMoves = new ArrayList<>();
         expectedMoves.add(new ExpectedMove("build", players));
-        when(pioneersService.findOneState("2")).thenReturn(Observable.just(
-                new State("12:30", "2", expectedMoves, null)));
-        //when(pioneersService.findOnePlayer("2","3")).thenReturn(Observable.just());
+        when(pioneersService.findOneState("id")).thenReturn(Observable.just(
+                new State("12:30", "id", expectedMoves, null)));
+        when(pioneersService.findOnePlayer("id","2")).thenReturn(Observable.empty());
         Button onDev = lookup("#developmentBuyIdButton").query();
         clickOn(onDev);
 
+    }
+
+    @Test
+    public void onClickDevGetError(){
+        List<String> players = new ArrayList<>();
+        players.add("d");
+        List<ExpectedMove> expectedMoves = new ArrayList<>();
+        expectedMoves.add(new ExpectedMove("build", players));
+        when(pioneersService.findOneState("id")).thenReturn(Observable.just(
+                new State("12:30", "id", expectedMoves, null)));
+        Button onDev = lookup("#developmentBuyIdButton").query();
+        clickOn(onDev);
+
+    }
+
+    @Test
+    public void onClickDevGetSecondError(){
+        List<String> players = new ArrayList<>();
+        players.add("d");
+        List<ExpectedMove> expectedMoves = new ArrayList<>();
+        expectedMoves.add(new ExpectedMove("", players));
+        when(pioneersService.findOneState("id")).thenReturn(Observable.just(
+                new State("12:30", "id", expectedMoves, null)));
+        Button onDev = lookup("#developmentBuyIdButton").query();
+        clickOn(onDev);
     }
 
     @Override
