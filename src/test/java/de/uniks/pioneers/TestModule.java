@@ -499,8 +499,18 @@ public class TestModule {
         };
     }
 
-    @Provides
-    static MapsApiService mapsApiService() {
-        return () -> Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
-    }
+	@Provides
+	static MapsApiService mapsApiService() {
+		return new MapsApiService() {
+			@Override
+			public Observable<List<MapTemplate>> findAllMaps() {
+				return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
+			}
+
+			@Override
+			public Observable<MapTemplate> delete(String id) {
+				return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of()));
+			}
+		};
+	}
 }
