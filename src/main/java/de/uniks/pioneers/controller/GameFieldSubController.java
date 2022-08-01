@@ -88,7 +88,7 @@ public class GameFieldSubController implements Controller {
         hexSubControllers.clear();
         circleSubControllers.forEach(CircleSubController::destroy);
         circleSubControllers.clear();
-        disposable.dispose();
+        disposable.clear();
     }
 
     @Override
