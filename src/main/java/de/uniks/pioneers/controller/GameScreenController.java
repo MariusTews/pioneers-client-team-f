@@ -422,7 +422,7 @@ public class GameScreenController implements Controller {
 
             for (Player p : playerOwnView) {
                 if (p.userId().equals(player.userId())) {
-                    if(player.developmentCards() != null) {
+                    if (player.developmentCards() != null) {
                         if (!player.developmentCards().isEmpty()) {
                             AlertService alertService = new AlertService();
                             alertService.alertForEachCard(player, p);
