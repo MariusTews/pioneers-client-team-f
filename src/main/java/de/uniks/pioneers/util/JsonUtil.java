@@ -3,8 +3,7 @@ package de.uniks.pioneers.util;
 import kong.unirest.JsonNode;
 import kong.unirest.json.JSONObject;
 
-import static de.uniks.pioneers.Constants.JSON_NAME;
-import static de.uniks.pioneers.Constants.JSON_REMEMBER_ME;
+import static de.uniks.pioneers.Constants.*;
 
 public class JsonUtil {
 
@@ -12,10 +11,11 @@ public class JsonUtil {
         return new JsonNode(json);
     }
 
-    public static String createRememberMeConfig(String nickname) {
+    public static String createRememberMeConfig(String nickname, String token) {
         return new JSONObject()
                 .put(JSON_REMEMBER_ME, true)
                 .put(JSON_NAME, nickname)
+                .put(JSON_TOKEN, token)
                 .toString();
     }
 
@@ -23,6 +23,7 @@ public class JsonUtil {
         return new JSONObject()
                 .put(JSON_REMEMBER_ME, false)
                 .put(JSON_NAME, "")
+                .put(JSON_TOKEN, "")
                 .toString();
     }
 }
