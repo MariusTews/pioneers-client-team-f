@@ -125,6 +125,7 @@ public class UserSubViewTest extends ApplicationTest {
         when(pioneersService.findOnePlayer("id", "2")).thenReturn(Observable.empty());
         Button onDev = lookup("#developmentBuyIdButton").query();
         clickOn(onDev);
+        org.junit.jupiter.api.Assertions.assertEquals(onDev.getText(), "Dev card");
 
     }
 
@@ -138,6 +139,7 @@ public class UserSubViewTest extends ApplicationTest {
                 new State("12:30", "id", expectedMoves, null)));
         Button onDev = lookup("#developmentBuyIdButton").query();
         clickOn(onDev);
+        org.junit.jupiter.api.Assertions.assertEquals(onDev.getText(), "Dev card");
 
     }
 
@@ -151,6 +153,7 @@ public class UserSubViewTest extends ApplicationTest {
                 new State("12:30", "id", expectedMoves, null)));
         Button onDev = lookup("#developmentBuyIdButton").query();
         clickOn(onDev);
+        org.junit.jupiter.api.Assertions.assertEquals(onDev.getText(), "Dev card");
     }
 
     @Override
