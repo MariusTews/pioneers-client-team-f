@@ -20,6 +20,7 @@ public class MapTemplateSubController implements Controller {
     private Image leftActionImage;
     private Image rightActionImage;
     private Image selectedMapIcon;
+    private Parent parent;
     @FXML
     public Label nameLabel;
     @FXML
@@ -79,6 +80,7 @@ public class MapTemplateSubController implements Controller {
         rightActionImageView.setImage(rightActionImage);
 
         parent.setId(template._id());
+        this.parent = parent;
 
         return parent;
     }
@@ -125,6 +127,24 @@ public class MapTemplateSubController implements Controller {
 
     public MapTemplate getTemplate() {
         return template;
+    }
+
+    public String getSortValue(String sortBy) {
+        String value = "";
+        switch (sortBy) {
+            case "name" -> value = template.name();
+            case "createdBy" -> value = createdBy;
+            case "votes" -> value = String.valueOf(template.votes());
+        }
+        return value;
+    }
+
+    public boolean isOwnMap() {
+        return ownMap;
+    }
+
+    public Parent getParent() {
+        return parent;
     }
 
     public void setTemplate(MapTemplate template) {
