@@ -27,7 +27,7 @@
                style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT;">
       <VBox fx:id="loserBoxId" prefHeight="103.0" prefWidth="206.0"/>
    </ScrollPane>
-   <Button mnemonicParsing="false" onAction="#onClickCloseGame" prefHeight="33.0"
+   <Button id="CloseGameButton" mnemonicParsing="false" onAction="#onClickCloseGame" prefHeight="33.0"
            prefWidth="148.0" text="CLOSE GAME">
       <VBox.margin>
          <Insets left="30.0" top="10.0"/>
