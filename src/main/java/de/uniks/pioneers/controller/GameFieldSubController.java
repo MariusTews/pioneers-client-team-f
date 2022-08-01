@@ -1,7 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.computation.CalculateMap;
 import de.uniks.pioneers.computation.LoadMapTemplate;
 import de.uniks.pioneers.model.*;
