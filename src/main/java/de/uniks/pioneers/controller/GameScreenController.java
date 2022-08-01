@@ -752,7 +752,7 @@ public class GameScreenController implements Controller {
 
     public void onShowDevCard() {
         DevelopmentCardController developmentCardController = new DevelopmentCardController(this,this.currentPlayerLabel.getScene().getWindow(), gameStorage,
-                idStorage, pioneersService, nextMove, userHash);
+                idStorage, pioneersService, nextMove, userHash, playerOwnView.get(0));
         developmentCardController.render();
     }
 }
