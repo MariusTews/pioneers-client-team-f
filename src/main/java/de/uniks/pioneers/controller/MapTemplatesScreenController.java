@@ -19,15 +19,17 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,12 +44,6 @@ public class MapTemplatesScreenController implements Controller {
     private final IDStorage idStorage;
     private final EventListener eventListener;
     @FXML
-    public ImageView nameArrow;
-    @FXML
-    public ImageView createdByArrow;
-    @FXML
-    public ImageView votesArrow;
-    @FXML
     public Label selectedLabel;
     @FXML
     public Button backButton;
@@ -60,6 +56,8 @@ public class MapTemplatesScreenController implements Controller {
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     private final HashMap<String, MapTemplateSubController> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
+    private final HashMap<String, Boolean> sortOrderFlags = new HashMap<>();
+    private Polygon currentSortArrow;
     private MapTemplateSubController selectedMapTemplateSubController;
     private CompositeDisposable disposable;
 
@@ -81,6 +79,10 @@ public class MapTemplatesScreenController implements Controller {
     public void init() {
         disposable = new CompositeDisposable();
         disposable.add(eventListener.listen("maps.*.*", MapTemplate.class).observeOn(FX_SCHEDULER).subscribe(this::handleMapTemplateEvents));
+        // false means sort in natural order, true means sort in reverse order
+        sortOrderFlags.put("name", false);
+        sortOrderFlags.put("createdBy", false);
+        sortOrderFlags.put("votes", false);
     }
 
     @Override
@@ -133,6 +135,8 @@ public class MapTemplatesScreenController implements Controller {
                         }
                 );
 
+        selectButton.setDisable(true);
+
         return parent;
     }
 
@@ -152,10 +156,12 @@ public class MapTemplatesScreenController implements Controller {
             } else {
                 addMapTemplateItem(template, -1);
             }
+            updateCurrentSort();
         } else if (event.event().endsWith(UPDATED)) {
             MapTemplateSubController controller = mapTemplateSubCons.get(template._id());
             controller.setTemplate(template);
             controller.updateContent();
+            updateCurrentSort();
         } else if (event.event().endsWith(DELETED)) {
             MapTemplateSubController controller = mapTemplateSubCons.get(template._id());
             controller.destroy();
@@ -193,6 +199,23 @@ public class MapTemplatesScreenController implements Controller {
         mapTemplates.add(emptyLine);
     }
 
+    private void selectMapTemplateItem(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+            if (mouseEvent.getClickCount() == 2) {
+                if (selectedMapTemplateSubController != null) {
+                    selectedMapTemplateSubController.unselectItem();
+                }
+                String mapTemplateId = ((Node) mouseEvent.getSource()).getId();
+                selectedMapTemplateSubController = mapTemplateSubCons.get(mapTemplateId);
+                selectedMapTemplateSubController.selectItem();
+                selectedLabel.setText("Selected: " + selectedMapTemplateSubController.getTemplate().name());
+                if (selectButton.isDisable()) {
+                    selectButton.setDisable(false);
+                }
+            }
+        }
+    }
+
     public void onBackButtonPressed() {
         final CreateGameController controller = createGameController.get();
         this.app.show(controller);
@@ -210,17 +233,74 @@ public class MapTemplatesScreenController implements Controller {
         this.app.show(controller);
     }
 
-    private void selectMapTemplateItem(MouseEvent mouseEvent) {
-        if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-            if (mouseEvent.getClickCount() == 2) {
-                if (selectedMapTemplateSubController != null) {
-                    selectedMapTemplateSubController.unselectItem();
-                }
-                String mapTemplateId = ((Node) mouseEvent.getSource()).getId();
-                selectedMapTemplateSubController = mapTemplateSubCons.get(mapTemplateId);
-                selectedMapTemplateSubController.selectItem();
-                selectedLabel.setText("Selected: " + selectedMapTemplateSubController.getTemplate().name());
+    public void onSortArrowPressed(MouseEvent mouseEvent) {
+        Polygon source = ((Polygon) mouseEvent.getSource());
+        sort(source.getId().replace("Arrow", ""));
+        source.setRotate((source.getRotate() + 180) % 360);
+        if (!(source.equals(currentSortArrow))) {
+            if (currentSortArrow != null) {
+                currentSortArrow.setFill(Color.web("#d5dfe8"));
             }
+            source.setFill(Color.web("#ffffff"));
+            currentSortArrow = source;
+        }
+    }
+
+    private void sort(String sortBy) {
+        List<String> ownMapTemplateIds = new ArrayList<>(mapTemplateSubCons.keySet().stream().filter(id -> mapTemplateSubCons.get(id).isOwnMap()).toList());
+        List<String> otherMapTemplateIds = new ArrayList<>(mapTemplateSubCons.keySet().stream().filter(id -> !(mapTemplateSubCons.get(id).isOwnMap())).toList());
+        ObservableList<Parent> ownMapTemplates = sortMapTemplates(ownMapTemplateIds, sortBy);
+        ObservableList<Parent> otherMapTemplates = sortMapTemplates(otherMapTemplateIds, sortBy);
+        mapTemplates.clear();
+        mapTemplates.addAll(ownMapTemplates);
+        addEmptyLine();
+        mapTemplates.addAll(otherMapTemplates);
+        mapTemplatesListView.refresh();
+        sortOrderFlags.put(sortBy, !sortOrderFlags.get(sortBy));
+    }
+
+    private ObservableList<Parent> sortMapTemplates(List<String> mapTemplateIds, String sortBy) {
+        HashMap<String, List<String>> valuesToIds = new HashMap<>();
+        for (String id : mapTemplateIds) {
+            MapTemplateSubController controller = mapTemplateSubCons.get(id);
+            String value = controller.getSortValue(sortBy);
+            if (valuesToIds.containsKey(value)) {
+                valuesToIds.get(value).add(id);
+            } else {
+                List<String> idList = new ArrayList<>();
+                idList.add(id);
+                valuesToIds.put(value, idList);
+            }
+        }
+
+        List<String> sortedValues;
+
+        if (sortBy.equals("votes")) {
+            // first create an integer stream, then sort it, then convert it back to string stream and to list
+            sortedValues = new ArrayList<>(valuesToIds.keySet().stream().map(Integer::parseInt).sorted().map(String::valueOf).toList());
+        } else {
+            sortedValues = new ArrayList<>(valuesToIds.keySet().stream().sorted().toList());
+        }
+        if (sortOrderFlags.get(sortBy)) {
+            Collections.reverse(sortedValues);
+        }
+
+        ObservableList<Parent> _mapTemplates = FXCollections.observableArrayList();
+        for (String value : sortedValues) {
+            for (String id : valuesToIds.get(value)) {
+                _mapTemplates.add(mapTemplateSubCons.get(id).getParent());
+            }
+        }
+
+        return _mapTemplates;
+    }
+
+    private void updateCurrentSort() {
+        if (currentSortArrow != null) {
+            String currentSortBy = currentSortArrow.getId().replace("Arrow", "");
+            /* invert sort order here, otherwise it will be inverted when calling sort, which is not wanted */
+            sortOrderFlags.put(currentSortBy, !sortOrderFlags.get(currentSortBy));
+            sort(currentSortBy);
         }
     }
 
@@ -231,4 +311,5 @@ public class MapTemplatesScreenController implements Controller {
     public ObservableList<Parent> getMapTemplates() {
         return mapTemplates;
     }
+
 }
