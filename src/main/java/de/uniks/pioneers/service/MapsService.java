@@ -18,4 +18,8 @@ public class MapsService {
     public Observable<List<MapTemplate>> findAllMaps() {
         return this.mapsApiService.findAllMaps();
     }
+
+    public Observable<MapTemplate> deleteMapTemplate(String id) {
+        return this.mapsApiService.delete(id);
+    }
 }

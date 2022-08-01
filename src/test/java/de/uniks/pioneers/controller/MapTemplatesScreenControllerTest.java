@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -145,12 +146,18 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
     @Test
     void deleteOwnMapTemplate() {
-        mapTemplateSubject.onNext(new Event<>(DELETED, user1Map));
-
+        when(mapsService.deleteMapTemplate(anyString())).thenReturn(Observable.just(user1Map));
         WaitForAsyncUtils.waitForFxEvents();
-
         HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
         MapTemplateSubController controller = mapTemplateSubCons.getOrDefault(user1Map._id(), null);
+        Assertions.assertThat(controller).isNotNull();
+
+        clickOn(controller.rightActionImageView);
+        clickOn("Yes");
+        mapTemplateSubject.onNext(new Event<>(DELETED, user1Map));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        controller = mapTemplateSubCons.getOrDefault(user1Map._id(), null);
         Assertions.assertThat(controller).isNull();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
