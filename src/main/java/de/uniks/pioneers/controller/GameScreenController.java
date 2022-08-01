@@ -422,9 +422,11 @@ public class GameScreenController implements Controller {
 
             for (Player p : playerOwnView) {
                 if (p.userId().equals(player.userId())) {
-                    if (!player.developmentCards().isEmpty()) {
-                        AlertService alertService = new AlertService();
-                        alertService.alertForEachCard(player, p);
+                    if(player.developmentCards() != null) {
+                        if (!player.developmentCards().isEmpty()) {
+                            AlertService alertService = new AlertService();
+                            alertService.alertForEachCard(player, p);
+                        }
                     }
                     playerOwnView.set(playerOwnView.indexOf(p), player);
 
