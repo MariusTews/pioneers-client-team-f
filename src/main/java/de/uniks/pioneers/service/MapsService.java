@@ -1,6 +1,6 @@
 package de.uniks.pioneers.service;
 
-import de.uniks.pioneers.Template.MapTemplate;
+import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.rest.MapsApiService;
 import io.reactivex.rxjava3.core.Observable;
 
