@@ -64,6 +64,10 @@ public class Constants {
 
     // Game
     public static final int MAX_MEMBERS = 6;
+
+    public static final String BUILD = "build";
+
+    public static final String NEW = "new";
     public static final String RENAME_SETTLEMENT = "UFO";
     public static final String RENAME_CITY = "Station";
     public static final String RENAME_ROAD = "Tube";
@@ -81,7 +85,7 @@ public class Constants {
     public static final String ROAD = "road";
 
     //Card names
-    public static final String KNIGHT = "Knight";
+    public static final String KNIGHT = "knight";
     public static final String ROAD_BUILDING = "road-building";
 
     public static final String YEAR_OF_PLENTY = "year-of-plenty";
