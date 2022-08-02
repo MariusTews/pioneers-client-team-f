@@ -17,7 +17,6 @@ import javafx.scene.shape.Circle;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.HashMap;
 
 public class UserListSubController implements Controller {
     @FXML
@@ -98,7 +97,7 @@ public class UserListSubController implements Controller {
         return id;
     }
 
-    public void setAvatar(){
+    public void setAvatar() {
         String avatar = this.user.avatar();
         if (avatar != null) {
             this.userImageView.setImage(new Image(avatar));
