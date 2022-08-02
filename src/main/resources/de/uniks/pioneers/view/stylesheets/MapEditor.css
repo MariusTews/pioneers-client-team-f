@@ -1,3 +1,9 @@
+#background {
+    -fx-background-image: url("../assets/ingame_background.png");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 1100 700;
+}
+
 .tileButton {
     -fx-background-color: #d2dcde;
     -fx-text-fill: green;
@@ -19,4 +25,11 @@
 #map {
     -fx-background-color: TRANSPARENT;
     -fx-background: TRANSPARENT;
+}
+
+#templateMenu {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 420 420;
 }

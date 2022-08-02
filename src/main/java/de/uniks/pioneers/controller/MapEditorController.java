@@ -10,9 +10,14 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -23,6 +28,7 @@ import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +52,7 @@ public class MapEditorController implements Controller {
 
     private Pane map;
 
-    // TODO: needed for later use
+    private final HexFillService hexFillService = new HexFillService();
     private final List<String> choices = new ArrayList<>();
     private List<TileTemplate> tiles = new ArrayList<>();
     private List<HarborTemplate> harbors = new ArrayList<>();
@@ -112,6 +118,21 @@ public class MapEditorController implements Controller {
         }
     }
 
+    private Button initCancelButton(Polygon hexagon) {
+        Button cancelTileButton = new Button();
+        cancelTileButton.setPrefWidth(30);
+        cancelTileButton.setPrefHeight(30);
+        cancelTileButton.setText("x");
+        cancelTileButton.getStyleClass().add("cancelTileButton");
+        cancelTileButton.setLayoutX(hexagon.getLayoutX() - 21);
+        cancelTileButton.setLayoutY(hexagon.getLayoutY() - 65);
+        cancelTileButton.toFront();
+        cancelTileButton.setOnAction(this::cancelTileButtonPressed);
+        cancelTileButton.setId(hexagon.getId() + "_cancelButton");
+
+        return cancelTileButton;
+    }
+
     private void tileButtonPressed(ActionEvent event) {
         // regex to filter the substring with the id from the event
         Pattern pattern = Pattern.compile("=(.*?)_");
@@ -131,27 +152,18 @@ public class MapEditorController implements Controller {
                 // look for the matching hexagon
                 if (node.getId().equals(matcher.group(1))) {
                     Polygon hexagon = (Polygon) node;
-                    hexagon.setFill(Color.grayRgb(200, 0.5));
                     Button tileButton = (Button) event.getSource();
                     tileButton.setVisible(false);
 
                     // cancel button
-                    cancelTileButton = new Button();
-                    cancelTileButton.setPrefWidth(30);
-                    cancelTileButton.setPrefHeight(30);
-                    cancelTileButton.setText("x");
-                    cancelTileButton.getStyleClass().add("cancelTileButton");
-                    cancelTileButton.setLayoutX(hexagon.getLayoutX() - 21);
-                    cancelTileButton.setLayoutY(hexagon.getLayoutY() - 65);
-                    cancelTileButton.toFront();
-                    cancelTileButton.setOnAction(this::cancelTileButtonPressed);
-                    cancelTileButton.setId(hexagon.getId() + "_cancelButton");
+                    cancelTileButton = initCancelButton(hexagon);
 
                     // number box
                     numberField = new TextField();
                     numberField.setPrefWidth(35);
                     numberField.setPrefHeight(30);
-                    numberField.setText("-");
+                    numberField.setAlignment(Pos.CENTER);
+                    numberField.setPromptText("-");
                     numberField.getStyleClass().add("numberField");
                     numberField.setLayoutX(hexagon.getLayoutX() - 18);
                     numberField.setLayoutY(hexagon.getLayoutY() - 35);
@@ -185,18 +197,36 @@ public class MapEditorController implements Controller {
         }
     }
 
+    // checks the number token
+    private boolean isNumeric(String number) {
+        try {
+            Double.parseDouble(number);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
+        }
+    }
+
     private void selectedChoice(Polygon hexagon, int newValue) {
-        HexFillService hexFillService = new HexFillService();
         TextField numberField = new TextField();
+        TileTemplate tileTemplate;
+        boolean numberValidFlag = false;
 
         // get positions
-        // TODO: needed for later purpose
         List<Integer> pos = hexFillService.parseID(hexagon.getId());
+        int x = pos.get(0);
+        int y = pos.get(1);
+        int z = pos.get(2);
 
         // the number field needs to be looked up for the desert tile
         for (Node node : map.getChildren()) {
             if (node.getId().equals(hexagon.getId() + "_numberField")) {
                 numberField = (TextField) node;
+                if (isNumeric(numberField.getText())) {
+                    if (Integer.parseInt(numberField.getText()) > 1 && Integer.parseInt(numberField.getText()) < 13) {
+                        numberValidFlag = true;
+                    }
+                }
             }
         }
 
@@ -205,16 +235,75 @@ public class MapEditorController implements Controller {
 
         // fill hexagon by choice
         hexFillService.fillHexagon(hexagon, choices.get(newValue));
+
+        // create tile template
+        if (choices.get(newValue).equals("random")) {
+            if (numberValidFlag) {
+                tileTemplate = new TileTemplate(x, y, z, null, Integer.parseInt(numberField.getText()));
+            } else {
+                tileTemplate = new TileTemplate(x, y, z, null, 0);
+            }
+        } else {
+            if (numberValidFlag) {
+                tileTemplate = new TileTemplate(x, y, z, choices.get(newValue), Integer.parseInt(numberField.getText()));
+            } else {
+                tileTemplate = new TileTemplate(x, y, z, choices.get(newValue), 0);
+            }
+        }
+
+        // set tile template if it does not already exist
+        tiles.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
+
+        tiles.add(tileTemplate);
+
+        System.out.println(tiles);
     }
 
     private void harborButtonPressed(ActionEvent event) {
-        //TODO: implement
-    }
+        // regex to filter the substring with the id from the event
+        Pattern pattern = Pattern.compile("=(.*?)_");
+        Matcher matcher = pattern.matcher(event.getSource().toString());
+        Button cancelTileButton = null;
 
+        ImageView imageView = new ImageView();
+
+        if (matcher.find()) {
+            for (Node node : map.getChildren()) {
+                // make buttons invisible
+                if (node.getId().equals(matcher.group(1) + "_tileButton")) {
+                    Button tileButton = (Button) node;
+                    tileButton.setVisible(false);
+                }
+                Button harborButton = (Button) event.getSource();
+                harborButton.setVisible(false);
+
+                if (node.getId().equals(matcher.group(1))) {
+                    assert node instanceof Polygon;
+                    Polygon hexagon = (Polygon) node;
+                    hexagon.setFill(Color.TRANSPARENT);
+                    imageView = new ImageView();
+                    Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/harbor.png")).toString());
+                    imageView.setImage(image);
+                    imageView.setLayoutX(hexagon.getLayoutX() - 17);
+                    imageView.setLayoutY(hexagon.getLayoutY() - 35);
+                    imageView.toFront();
+                    imageView.setFitWidth(30);
+                    imageView.setFitHeight(30);
+                    cancelTileButton = initCancelButton(hexagon);
+                }
+            }
+            map.getChildren().add(imageView);
+            map.getChildren().add(cancelTileButton);
+        }
+    }
 
     private void cancelTileButtonPressed(ActionEvent event) {
         Pattern pattern = Pattern.compile("=(.*?)_");
         Matcher matcher = pattern.matcher(event.getSource().toString());
+        List<Integer> pos;
+        int x;
+        int y;
+        int z;
 
         // dummy elements to remove from map
         Button cancelTileButton = null;
@@ -223,6 +312,12 @@ public class MapEditorController implements Controller {
 
         // reset the tile
         if (matcher.find()) {
+            // get id to remove from tile template list
+            pos = hexFillService.parseID(matcher.group(1));
+            x = pos.get(0);
+            y = pos.get(1);
+            z = pos.get(2);
+
             for (Node node : map.getChildren()) {
                 if (node.getId().equals(matcher.group(1) + "_cancelButton")) {
                     cancelTileButton = (Button) node;
@@ -248,14 +343,18 @@ public class MapEditorController implements Controller {
                 if (node.getId().equals(matcher.group(1))) {
                     assert node instanceof Polygon;
                     Polygon hexagon = (Polygon) node;
-                    hexagon.setFill(Color.TRANSPARENT);
+                    hexagon.setFill(Color.grayRgb(100, 0.5));
                 }
             }
+
+            map.getChildren().remove(cancelTileButton);
+            map.getChildren().remove(number);
+            map.getChildren().remove(choiceBox);
+
+            // remove tile from list
+            tiles.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
         }
 
-        map.getChildren().remove(cancelTileButton);
-        map.getChildren().remove(number);
-        map.getChildren().remove(choiceBox);
     }
 
     /*
@@ -268,6 +367,7 @@ public class MapEditorController implements Controller {
             this.mapSizeLabel.setText(String.valueOf(mapSize));
             this.mapPane.setContent(map);
             addButtonsOnTiles();
+            tiles.clear();
         }
     }
 
@@ -277,6 +377,7 @@ public class MapEditorController implements Controller {
         this.mapSizeLabel.setText(String.valueOf(mapSize));
         this.mapPane.setContent(map);
         addButtonsOnTiles();
+        tiles.clear();
     }
 
     public void saveButtonPressed(ActionEvent event) {
