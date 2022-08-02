@@ -2,6 +2,8 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.template.HarborTemplate;
+import de.uniks.pioneers.template.TileTemplate;
 import de.uniks.pioneers.computation.CalculateMap;
 import de.uniks.pioneers.service.HexFillService;
 import javafx.collections.FXCollections;
@@ -44,6 +46,11 @@ public class MapEditorController implements Controller {
 
     private Pane map;
 
+    // TODO: needed for later use
+    private final List<String> choices = new ArrayList<>();
+    private List<TileTemplate> tiles = new ArrayList<>();
+    private List<HarborTemplate> harbors = new ArrayList<>();
+
     @Inject
     public MapEditorController(App app,
                                Provider<MapTemplatesScreenController> mapTemplatesScreenController) {
@@ -53,7 +60,14 @@ public class MapEditorController implements Controller {
 
     @Override
     public void init() {
-
+        // init
+        choices.add(0, "random");
+        choices.add(1, "desert");
+        choices.add(2, "fields");
+        choices.add(3, "mountains");
+        choices.add(4, "hills");
+        choices.add(5, "forest");
+        choices.add(6, "pasture");
     }
 
     @Override
@@ -173,17 +187,11 @@ public class MapEditorController implements Controller {
 
     private void selectedChoice(Polygon hexagon, int newValue) {
         HexFillService hexFillService = new HexFillService();
-
-        final List<String> choices = new ArrayList<>();
-        choices.add(0, "random");
-        choices.add(1, "desert");
-        choices.add(2, "venus");
-        choices.add(3, "moon");
-        choices.add(4, "mars");
-        choices.add(5, "earth");
-        choices.add(6, "neptune");
-
         TextField numberField = new TextField();
+
+        // get positions
+        // TODO: needed for later purpose
+        List<Integer> pos = hexFillService.parseID(hexagon.getId());
 
         // the number field needs to be looked up for the desert tile
         for (Node node : map.getChildren()) {
@@ -200,8 +208,9 @@ public class MapEditorController implements Controller {
     }
 
     private void harborButtonPressed(ActionEvent event) {
-        //TODO: implement the placing of harbors
+        //TODO: implement
     }
+
 
     private void cancelTileButtonPressed(ActionEvent event) {
         Pattern pattern = Pattern.compile("=(.*?)_");
@@ -250,8 +259,8 @@ public class MapEditorController implements Controller {
     }
 
     /*
-    * increase or decrease the map size and place the buttons
-    * */
+     * increase or decrease the map size and place the buttons
+     * */
     public void mapSizeMinusButtonPressed(ActionEvent event) {
         if (Integer.parseInt(this.mapSizeLabel.getText()) > 0) {
             map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) - 1, true);
@@ -277,5 +286,4 @@ public class MapEditorController implements Controller {
         final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
         this.app.show(controller);
     }
-
 }

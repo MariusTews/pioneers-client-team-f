@@ -14,7 +14,7 @@ public class CalculateMap {
 
 	private double center;
 
-	public Polygon buildHexagon(double xCoordinate, double yCoordinate, int x, int y, int z) {
+	public Polygon buildHexagon(double xCoordinate, double yCoordinate, int x, int y, int z, boolean isTemplate) {
 		//creates a Hexagon at the given coordinate
 		double hexPoint1 = 0.0;
 		double hexPoint2 = 30.0;
@@ -37,6 +37,11 @@ public class CalculateMap {
 		hexagon.setId(id);
 		hexagon.setLayoutX(xCoordinate);
 		hexagon.setLayoutY(yCoordinate);
+
+		if (isTemplate) {
+			hexagon.setFill(Color.TRANSPARENT);
+			hexagon.setStroke(Color.BLACK);
+		}
 
 		return hexagon;
 	}
@@ -336,7 +341,7 @@ public class CalculateMap {
 		double xCoordinate = getxCoordinate(center, x, z);
 		double yCoordinate = getyCoordinate(center, z);
 
-		map.getChildren().add(buildHexagon(xCoordinate, yCoordinate, x, y, z));
+		map.getChildren().add(buildHexagon(xCoordinate, yCoordinate, x, y, z, isTemplate));
 
 		// for the buildings
 		if (!isTemplate) {
@@ -362,9 +367,6 @@ public class CalculateMap {
 			//Place a Label for the number
 			map.getChildren().add(buildLabel(xCoordinate, yCoordinate, x, y, z));
 		} else {
-			// set a transparent hexagon and place to button on it
-			hexagon.setFill(Color.TRANSPARENT);
-			hexagon.setStroke(Color.BLACK);
 			buildButton(map, xCoordinate - 45, yCoordinate - 15, x, y, z, false);
 			buildButton(map, xCoordinate + 5, yCoordinate - 15, x, y, z, true);
 		}

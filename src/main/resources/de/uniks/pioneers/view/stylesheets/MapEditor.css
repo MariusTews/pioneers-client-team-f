@@ -9,7 +9,7 @@
 }
 
 .cancelTileButton {
-    -fx-text-fill: red;
+    -fx-text-fill: #450606;
 }
 
 .numberField {
