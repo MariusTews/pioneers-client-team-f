@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.template.HarborTemplate;
 import de.uniks.pioneers.template.TileTemplate;
 import de.uniks.pioneers.computation.CalculateMap;
@@ -27,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -139,7 +141,7 @@ public class MapEditorController implements Controller {
         Matcher matcher = pattern.matcher(event.getSource().toString());
         Button cancelTileButton = null;
         TextField numberField = null;
-        ChoiceBox choiceBox = null;
+        ChoiceBox<String> choiceBox = null;
 
         if (matcher.find()) {
             for (Node node : map.getChildren()) {
@@ -171,7 +173,7 @@ public class MapEditorController implements Controller {
                     numberField.setId(hexagon.getId() + "_numberField");
 
                     // choice box
-                    choiceBox = new ChoiceBox(FXCollections.observableArrayList(
+                    choiceBox = new ChoiceBox<>(FXCollections.observableArrayList(
                             "random", "desert", "venus", "moon", "mars", "earth", "neptune"
                     ));
 
@@ -202,7 +204,7 @@ public class MapEditorController implements Controller {
         try {
             Double.parseDouble(number);
             return true;
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return false;
         }
     }
@@ -264,37 +266,135 @@ public class MapEditorController implements Controller {
         Pattern pattern = Pattern.compile("=(.*?)_");
         Matcher matcher = pattern.matcher(event.getSource().toString());
         Button cancelTileButton = null;
-
+        ChoiceBox<String> chooseResource = null;
+        ChoiceBox<String> chooseSide = null;
         ImageView imageView = new ImageView();
+        boolean flag = true;
 
         if (matcher.find()) {
             for (Node node : map.getChildren()) {
                 // make buttons invisible
                 if (node.getId().equals(matcher.group(1) + "_tileButton")) {
                     Button tileButton = (Button) node;
-                    tileButton.setVisible(false);
+                    if (flag) {
+                        tileButton.setVisible(false);
+                        Button harborButton = (Button) event.getSource();
+                        harborButton.setVisible(false);
+
+                    }
                 }
-                Button harborButton = (Button) event.getSource();
-                harborButton.setVisible(false);
+
 
                 if (node.getId().equals(matcher.group(1))) {
                     assert node instanceof Polygon;
                     Polygon hexagon = (Polygon) node;
                     hexagon.setFill(Color.TRANSPARENT);
+
                     imageView = new ImageView();
                     Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/harbor.png")).toString());
                     imageView.setImage(image);
                     imageView.setLayoutX(hexagon.getLayoutX() - 17);
-                    imageView.setLayoutY(hexagon.getLayoutY() - 35);
+                    imageView.setLayoutY(hexagon.getLayoutY() - 38);
                     imageView.toFront();
-                    imageView.setFitWidth(30);
-                    imageView.setFitHeight(30);
+                    imageView.setFitWidth(25);
+                    imageView.setFitHeight(25);
+                    imageView.setId(hexagon.getId() + "_imageView");
+
                     cancelTileButton = initCancelButton(hexagon);
+
+                    chooseResource = new ChoiceBox<>(FXCollections.observableArrayList(
+                            "3:1", "mars_bar", "moon_rock", "earth_cactus", "venus_grain", "neptune_crystals"
+                    ));
+
+                    chooseResource.getSelectionModel().selectedIndexProperty().addListener(
+                            (observable, oldValue, newValue) -> selectedResource(hexagon, newValue.intValue())
+                    );
+
+                    chooseResource.setPrefWidth(100);
+                    chooseResource.setPrefHeight(20);
+                    chooseResource.setLayoutX(hexagon.getLayoutX() - 50);
+                    chooseResource.setLayoutY(hexagon.getLayoutY() - 16);
+                    chooseResource.toFront();
+                    chooseResource.setId(hexagon.getId() + "_chooseResource");
+                    chooseResource.getSelectionModel().selectFirst();
+
+                    chooseSide = new ChoiceBox<>(FXCollections.observableArrayList());
+
+
+                    // check, if around the harbor is a normal tile and add option to choice box
+                    if (!initSides(chooseSide, hexagon)) {
+                        flag = false;
+                        hexagon.setFill(Color.grayRgb(100, 0.5));
+                        new AlertService().showAlert("You can only place a harbor next to a tile with a terrain!");
+                    } else {
+                        chooseSide.setPrefWidth(100);
+                        chooseSide.setPrefHeight(20);
+                        chooseSide.setLayoutX(hexagon.getLayoutX() - 50);
+                        chooseSide.setLayoutY(hexagon.getLayoutY() + 11);
+                        chooseSide.toFront();
+                        chooseSide.setId(hexagon.getId() + "_chooseSide");
+                        chooseSide.getSelectionModel().selectFirst();
+
+                        chooseSide.getSelectionModel().selectedIndexProperty().addListener(
+                                (observable, oldValue, newValue) -> selectedResource(hexagon, newValue.intValue())
+                        );
+                    }
                 }
             }
+        }
+
+        if (flag) {
             map.getChildren().add(imageView);
             map.getChildren().add(cancelTileButton);
+            map.getChildren().add(chooseResource);
+            map.getChildren().add(chooseSide);
         }
+    }
+
+    private boolean initSides(ChoiceBox<String> chooseSide, Polygon hexagon) {
+        HashMap<Integer, Boolean> sideHash = new HashMap<>();
+        List<Integer> pos = hexFillService.parseID(hexagon.getId());
+        int x = pos.get(0);
+        int y = pos.get(1);
+        int z = pos.get(2);
+
+        // change the coordinates of the harbor to the neighbor tile and check, if such exists
+        sideHash.put(1, checkSides(x + 1, y, z - 1));
+        sideHash.put(3, checkSides(x + 1, y - 1, z));
+        sideHash.put(5, checkSides(x, y - 1, z + 1));
+        sideHash.put(7, checkSides(x - 1, y, z + 1));
+        sideHash.put(9, checkSides(x - 1, y + 1, z));
+        sideHash.put(11, checkSides(x, y + 1, z - 1));
+
+        for (Integer key : sideHash.keySet()) {
+            if (sideHash.get(key)) {
+                switch (key) {
+                    case 1 -> chooseSide.getItems().add("Top_right");
+                    case 3 -> chooseSide.getItems().add("Middle_right");
+                    case 5 -> chooseSide.getItems().add("Bottom_right");
+                    case 7 -> chooseSide.getItems().add("Bottom_left");
+                    case 9 -> chooseSide.getItems().add("Middle_left");
+                    case 11 -> chooseSide.getItems().add("Top_left");
+                    default -> {
+                    }
+                }
+            }
+        }
+
+        return !chooseSide.getItems().isEmpty();
+    }
+
+    private boolean checkSides(int x, int y, int z) {
+        for (TileTemplate tile : tiles) {
+            if (tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void selectedResource(Polygon hexagon, int newValue) {
+
     }
 
     private void cancelTileButtonPressed(ActionEvent event) {
@@ -308,7 +408,10 @@ public class MapEditorController implements Controller {
         // dummy elements to remove from map
         Button cancelTileButton = null;
         TextField number = null;
-        ChoiceBox choiceBox = null;
+        ChoiceBox<String> choiceBox = null;
+        ImageView imageView = null;
+        ChoiceBox<String> chooseResource = null;
+        ChoiceBox<String> chooseSide = null;
 
         // reset the tile
         if (matcher.find()) {
@@ -340,6 +443,16 @@ public class MapEditorController implements Controller {
                     Button tileButton = (Button) node;
                     tileButton.setVisible(true);
                 }
+                if (node.getId().equals(matcher.group(1) + "_imageView")) {
+                    assert node instanceof ImageView;
+                    imageView = (ImageView) node;
+                }
+                if (node.getId().equals(matcher.group(1) + "_chooseResource")) {
+                    chooseResource = (ChoiceBox) node;
+                }
+                if (node.getId().equals(matcher.group(1) + "_chooseSide")) {
+                    chooseSide = (ChoiceBox) node;
+                }
                 if (node.getId().equals(matcher.group(1))) {
                     assert node instanceof Polygon;
                     Polygon hexagon = (Polygon) node;
@@ -350,6 +463,9 @@ public class MapEditorController implements Controller {
             map.getChildren().remove(cancelTileButton);
             map.getChildren().remove(number);
             map.getChildren().remove(choiceBox);
+            map.getChildren().remove(imageView);
+            map.getChildren().remove(chooseResource);
+            map.getChildren().remove(chooseSide);
 
             // remove tile from list
             tiles.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
