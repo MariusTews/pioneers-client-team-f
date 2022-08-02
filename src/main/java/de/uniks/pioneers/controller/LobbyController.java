@@ -82,6 +82,8 @@ public class LobbyController implements Controller {
     public Button editUserButton;
     @FXML
     public Button createGameButton;
+    @FXML
+    public Button rejoinButton;
 
     private final App app;
     private final IDStorage idStorage;
@@ -108,9 +110,6 @@ public class LobbyController implements Controller {
     private final PioneersService pioneersService;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
-    public Button rejoinButton;
-    @FXML
-    public Label loadingLabel;
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
