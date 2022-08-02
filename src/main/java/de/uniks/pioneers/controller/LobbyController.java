@@ -119,6 +119,9 @@ public class LobbyController implements Controller {
     private final Thread renderAvatarsThread = new Thread(() -> {
         List<UserListSubController> userSubConsCopy = new ArrayList<>(userSubCons.values());
         for (UserListSubController controller : userSubConsCopy) {
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
             controller.setAvatar();
         }
     });
