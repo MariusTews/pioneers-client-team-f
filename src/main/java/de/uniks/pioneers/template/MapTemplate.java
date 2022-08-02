@@ -1,4 +1,4 @@
-package de.uniks.pioneers.Template;
+package de.uniks.pioneers.template;
 
 import java.util.List;
 

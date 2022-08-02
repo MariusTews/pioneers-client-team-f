@@ -1,8 +1,8 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.Template.MapTemplate;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.IDStorage;
@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -145,12 +146,18 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
 
     @Test
     void deleteOwnMapTemplate() {
-        mapTemplateSubject.onNext(new Event<>(DELETED, user1Map));
-
+        when(mapsService.deleteMapTemplate(anyString())).thenReturn(Observable.just(user1Map));
         WaitForAsyncUtils.waitForFxEvents();
-
         HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
         MapTemplateSubController controller = mapTemplateSubCons.getOrDefault(user1Map._id(), null);
+        Assertions.assertThat(controller).isNotNull();
+
+        clickOn(controller.rightActionImageView);
+        clickOn("Yes");
+        mapTemplateSubject.onNext(new Event<>(DELETED, user1Map));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        controller = mapTemplateSubCons.getOrDefault(user1Map._id(), null);
         Assertions.assertThat(controller).isNull();
 
         ObservableList<Parent> mapTemplates = mapTemplatesScreenController.getMapTemplates();
