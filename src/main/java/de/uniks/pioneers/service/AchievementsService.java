@@ -49,10 +49,6 @@ public class AchievementsService {
                 );
     }
 
-    public Observable<List<Achievement>> getUserAchievement(String userId, String achievementId) {
-        return achievementsApiService.getUserAchievement(userId, achievementId);
-    }
-
     public Observable<Achievement> putOrUpdateAchievement(String id, int progress) {
         if (achievementsProgress.containsKey(id)) {
             return this.updateAchievement(id, progress);

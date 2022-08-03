@@ -16,12 +16,6 @@ public interface AchievementsApiService {
     @GET(USER_ACHIEVEMENTS_URL)
     Observable<List<Achievement>> listUserAchievements(@Path("userId") String id);
 
-    @GET(USER_ACHIEVEMENTS_BY_ID_URL)
-    Observable<List<Achievement>> getUserAchievement(
-            @Path("userId") String userId,
-            @Path("id") String id
-    );
-
     @PUT(USER_ACHIEVEMENTS_BY_ID_URL)
     Observable<Achievement> putAchievement(
             @Path("userId") String userId,
