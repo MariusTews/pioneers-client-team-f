@@ -61,8 +61,8 @@ public class MapTemplateSubController implements Controller {
     @Override
     public void init() {
         selectedMapIcon = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/selectedMapIcon.png")).toString());
-        darkColorAdjust.setBrightness(-0.7);
-        brightColorAdjust.setBrightness(0);
+        darkColorAdjust.setBrightness(-0.3);
+        brightColorAdjust.setBrightness(0.3);
     }
 
     @Override
@@ -160,16 +160,18 @@ public class MapTemplateSubController implements Controller {
             case -1 -> {
                 leftActionImageView.setDisable(true);
                 leftActionImageView.setEffect(darkColorAdjust);
+                rightActionImageView.setEffect(brightColorAdjust);
             }
             case 0 -> {
                 leftActionImageView.setDisable(false);
-                leftActionImageView.setEffect(brightColorAdjust);
+                leftActionImageView.setEffect(null);
                 rightActionImageView.setDisable(false);
-                rightActionImageView.setEffect(brightColorAdjust);
+                rightActionImageView.setEffect(null);
             }
             case 1 -> {
                 rightActionImageView.setDisable(true);
                 rightActionImageView.setEffect(darkColorAdjust);
+                leftActionImageView.setEffect(brightColorAdjust);
             }
         }
     }

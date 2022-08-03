@@ -1,5 +1,6 @@
 package de.uniks.pioneers.controller;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.template.MapTemplate;
@@ -14,6 +15,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -320,6 +322,7 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
         HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
         MapTemplateSubController controller = mapTemplateSubCons.get(user2Map._id());
+
         // up-vote
         clickOn(controller.leftActionImageView);
 
@@ -337,6 +340,29 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         Assertions.assertThat(controller.votesLabel).hasText("|  0");
+        Assertions.assertThat(controller.leftActionImageView.getEffect()).isNull();
+        Assertions.assertThat(controller.rightActionImageView.getEffect()).isNull();
+    }
+
+    @Test
+    void downVote() {
+        Vote vote = new Vote("", "", user2Map._id(), user1._id(), -1);
+        when(mapsService.voteMap(anyString(), anyInt())).thenReturn(Observable.just(vote));
+
+        WaitForAsyncUtils.waitForFxEvents();
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.get(user2Map._id());
+
+        // down-vote
+        clickOn(controller.rightActionImageView);
+
+        MapTemplate user2MapUpdate = new MapTemplate("", "", user2Map._id(), user2Map.name(), null, user2._id(), -1, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(UPDATED, user2MapUpdate));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(controller.votesLabel).hasText("| -1");
+        Assertions.assertThat(controller.leftActionImageView.getEffect()).isNotNull();
+        Assertions.assertThat(controller.rightActionImageView.getEffect()).isNotNull();
     }
 
 }
