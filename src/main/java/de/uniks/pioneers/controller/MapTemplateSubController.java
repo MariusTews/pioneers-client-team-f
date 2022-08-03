@@ -70,6 +70,9 @@ public class MapTemplateSubController implements Controller {
         leftActionImage = null;
         rightActionImage = null;
         selectedMapIcon = null;
+        if (!ownMap) {
+            voted.removeListener(voteListener);
+        }
     }
 
     @Override
@@ -97,7 +100,9 @@ public class MapTemplateSubController implements Controller {
         leftActionImageView.setImage(leftActionImage);
         rightActionImageView.setImage(rightActionImage);
 
-        voted.addListener(voteListener);
+        if (!ownMap) {
+            voted.addListener(voteListener);
+        }
 
         parent.setId(template._id());
         this.parent = parent;
