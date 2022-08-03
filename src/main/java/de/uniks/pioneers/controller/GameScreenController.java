@@ -756,7 +756,6 @@ public class GameScreenController implements Controller {
     }
 
     public void onShowDevCard() {
-        System.out.println("test123");
         DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(), gameStorage,
                 idStorage, pioneersService);
         developmentCardController.render();
