@@ -1,25 +1,30 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.Template.MapTemplate;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.service.MapsService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
+
+import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class MapTemplateSubController implements Controller {
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
+    private final MapsService mapsService;
     private Image leftActionImage;
     private Image rightActionImage;
     private Image selectedMapIcon;
+    private Parent parent;
     @FXML
     public Label nameLabel;
     @FXML
@@ -35,10 +40,11 @@ public class MapTemplateSubController implements Controller {
     @FXML
     public ImageView rightActionImageView;
 
-    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy) {
+    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy, MapsService mapsService) {
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
+        this.mapsService = mapsService;
     }
 
     @Override
@@ -79,6 +85,7 @@ public class MapTemplateSubController implements Controller {
         rightActionImageView.setImage(rightActionImage);
 
         parent.setId(template._id());
+        this.parent = parent;
 
         return parent;
     }
@@ -107,11 +114,26 @@ public class MapTemplateSubController implements Controller {
 
     public void onRightActionImagePressed() {
         if (ownMap) {
-            //delete map
-            //TODO
+            openDeleteDialog();
         } else {
             //down-vote map
             //TODO
+        }
+    }
+
+    private void openDeleteDialog() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        // Change style of alert
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        alert.setTitle("Deleting Map Template");
+        alert.setContentText("Are you sure you want to delete " + template.name() + "?");
+        alert.getButtonTypes().set(0, ButtonType.YES);
+        alert.getButtonTypes().set(1, ButtonType.NO);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.YES) {
+            //delete map
+            this.mapsService.deleteMapTemplate(this.template._id()).observeOn(FX_SCHEDULER).subscribe();
         }
     }
 
@@ -125,6 +147,24 @@ public class MapTemplateSubController implements Controller {
 
     public MapTemplate getTemplate() {
         return template;
+    }
+
+    public String getSortValue(String sortBy) {
+        String value = "";
+        switch (sortBy) {
+            case "name" -> value = template.name();
+            case "createdBy" -> value = createdBy;
+            case "votes" -> value = String.valueOf(template.votes());
+        }
+        return value;
+    }
+
+    public boolean isOwnMap() {
+        return ownMap;
+    }
+
+    public Parent getParent() {
+        return parent;
     }
 
     public void setTemplate(MapTemplate template) {

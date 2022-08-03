@@ -64,7 +64,7 @@ class CreateGameControllerTest extends ApplicationTest {
 		write("\t\t123\t\t\t\t\t\t\t");
 		type(KeyCode.SPACE);
 
-		verify(gameService).create("Test game", "123", 2, 10, null, false, 0);
+		verify(gameService).create("Test game", "123", 2, 10, null, true, 0);
 	}
 
 	@Test

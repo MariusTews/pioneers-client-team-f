@@ -55,6 +55,8 @@ public class PioneersService {
                     resources, null, null, null));
         } else if (action.equals(ROB_ACTION)) {
             return this.pioneersApiService.create(gameId, new CreateMoveDto(action, new RobDto(x, y, z, target), null, null, null, null));
+        } else if (action.equals("build") && type!=null && type.equals("new")) {
+            return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, type, null));
         } else if (x == null && y == null && z == null && side == null && type == null) {
             return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, null, null));
         } else {

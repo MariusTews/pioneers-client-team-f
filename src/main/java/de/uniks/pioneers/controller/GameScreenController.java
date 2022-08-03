@@ -2,12 +2,12 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.computation.DiceRoll;
 import de.uniks.pioneers.computation.RandomAction;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.Websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -104,7 +104,7 @@ public class GameScreenController implements Controller {
     private final GameService gameService;
     private final MessageService messageService;
     private final MemberService memberService;
-    private final SoundService soundService = new SoundService();
+    private final SoundService soundService;
 
 
     private GameFieldSubController gameFieldSubController;
@@ -136,6 +136,7 @@ public class GameScreenController implements Controller {
                                 GameService gameService,
                                 MessageService messageService,
                                 MemberService memberService,
+                                SoundService soundService,
                                 AchievementsService achievementsService,
                                 UserStorage userStorage) {
         this.lobbyController = lobbyController;
@@ -151,6 +152,7 @@ public class GameScreenController implements Controller {
         this.memberService = memberService;
         this.achievementsService = achievementsService;
         this.userStorage = userStorage;
+        this.soundService = soundService;
     }
 
     @Override
@@ -342,9 +344,7 @@ public class GameScreenController implements Controller {
 
     private void allTheCards() {
         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
-                .observeOn(FX_SCHEDULER).subscribe(e -> {
-                    devCardsAmountLabel.setText(String.valueOf(e.developmentCards().size()));
-                });
+                .observeOn(FX_SCHEDULER).subscribe(e -> devCardsAmountLabel.setText(String.valueOf(e.developmentCards().size())));
     }
 
     private void actionOnCloseScreen() {
@@ -374,8 +374,8 @@ public class GameScreenController implements Controller {
     }
 
     private Node renderSingleUser(Player player) {
-        UserSubView userSubView = new UserSubView(idStorage, userService, player, gameFieldSubController,
-                this.gameStorage.getVictoryPoints());
+        UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService, player, gameFieldSubController,
+                this.gameStorage.getVictoryPoints(), pioneersService);
         userSubView.init();
         this.tradingSubController.setPlayer(player);
         return userSubView.render();
@@ -434,9 +434,15 @@ public class GameScreenController implements Controller {
 
             for (Player p : playerOwnView) {
                 if (p.userId().equals(player.userId())) {
+                    if (player.developmentCards() != null) {
+                        if (!player.developmentCards().isEmpty()) {
+                            AlertService alertService = new AlertService();
+                            alertService.alertForEachCard(player, p);
+                        }
+                    }
                     playerOwnView.set(playerOwnView.indexOf(p), player);
-                    // check if the user dropped or received resources and play the according sound
 
+                    // check if the user dropped or received resources and play the according sound
                     int amountResources = 0;
                     for (int resource : p.resources().values()) {
                         amountResources += resource;
@@ -465,8 +471,7 @@ public class GameScreenController implements Controller {
                     } else if (amountNewResources < amountResources) {
                         this.soundService.playSound("drop");
                     }
-
-                    //call All calculate method for calculating all the owned cards
+                    //call calculate method for calculating all the owned cards
                     allTheCards();
                 }
             }
@@ -546,6 +551,9 @@ public class GameScreenController implements Controller {
                 }
                 // change the currentPlayerLabel to the current player
                 User currentPlayer = this.userHash.get(state.expectedMoves().get(0).players().get(0));
+                if (currentPlayer == null) {
+                    currentPlayer = userService.findOne(state.expectedMoves().get(0).players().get(0)).blockingFirst();
+                }
                 currentPlayerLabel.setText(currentPlayer.name());
 
                 // open screen for discarding resources if its current player's screen + state is drop
@@ -647,7 +655,7 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                this.gameStorage.getVictoryPoints());
+                this.gameStorage.getVictoryPoints(), pioneersService);
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }
@@ -655,7 +663,7 @@ public class GameScreenController implements Controller {
     // diceRoll if the current move is "roll"
     public void diceRoll() {
         if (nextMoveLabel.getText().equals("roll")) {
-            pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), 0, 0, 0, 0, "settlement", null, null)
+            pioneersService.move(gameStorage.getId(), nextMoveLabel.getText(), null, null, null, null, null, null, null)
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
                     }, Throwable::printStackTrace);

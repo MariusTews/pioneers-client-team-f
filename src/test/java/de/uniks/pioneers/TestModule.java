@@ -1,64 +1,71 @@
 package de.uniks.pioneers;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dagger.Module;
 import dagger.Provides;
 import de.uniks.pioneers.Template.MapTemplate;
 import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
+import de.uniks.pioneers.service.SoundService;
+import de.uniks.pioneers.service.TokenStorage;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.ObservableEmitter;
 
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import java.util.Objects;
 
 @Module
 public class TestModule {
 
-    public static final PublishSubject<Event<Member>> memberSubject = PublishSubject.create();
-    public static final PublishSubject<Event<Game>> gameSubject = PublishSubject.create();
-    public static final PublishSubject<Event<User>> userSubject = PublishSubject.create();
+    @Provides
+    SoundService soundService() {
+        return new SoundService() {
+            public void playSound(String action) {
+            }
+        };
+    }
+     static class TestEventListener extends EventListener {
+    java.util.Map<String, ObservableEmitter<?>> emitterMap = new HashMap<>();
 
-    public static final PublishSubject<Event<State>> stateSubject = PublishSubject.create();
-    public static final PublishSubject<Event<Building>> buildingSubject = PublishSubject.create();
-    public static final PublishSubject<Event<Move>> moveSubject = PublishSubject.create();
-    public static final PublishSubject<Event<Player>> playerSubject = PublishSubject.create();
-    public static final PublishSubject<Event<Message>> messageSubject = PublishSubject.create();
-    public static final PublishSubject<Event<Group>> groupSubject = PublishSubject.create();
+    public TestEventListener(TokenStorage tokenStorage, ObjectMapper mapper) {
+            super(tokenStorage, mapper);
+        }
+
+        @Override
+    public <T> Observable<Event<T>> listen(String pattern, Class<T> payloadType) {
+            return Observable.create(emitter -> {
+    emitterMap.put(pattern, emitter);
+    emitter.setCancellable(() -> emitterMap.remove(pattern));
+            });
+        }
+    public <T> void fireEvent(String pattern, Event<T> eventDto) {
+            @SuppressWarnings("unchecked")
+    ObservableEmitter<Event<T>> emitter = (ObservableEmitter<Event<T>>) emitterMap.get(pattern);
+            if (emitter != null) {
+                emitter.onNext(eventDto);
+            }
+        }
+    }
 
 
     @Provides
     @Singleton
     EventListener eventListener() {
-        EventListener eventListener = mock(EventListener.class);
 
-        when(eventListener.listen("users.*.*", User.class)).thenReturn(userSubject);
-        when(eventListener.listen("games.*.*", Game.class)).thenReturn(gameSubject);
 
-        when(eventListener.listen("games.01.members.*.*", Member.class)).thenReturn(memberSubject);
-        when(eventListener.listen("games.01.*.*", Message.class)).thenReturn(messageSubject);
-        when(eventListener.listen("games.01.messages.*.*", Message.class)).thenReturn(messageSubject);
-
-        when(eventListener.listen("games.01.state.*", State.class)).thenReturn(stateSubject);
-        when(eventListener.listen("games.01.moves.*.created", Move.class)).thenReturn(moveSubject);
-        when(eventListener.listen("games.01.players.*.*", Player.class)).thenReturn(playerSubject);
-        when(eventListener.listen("games.01.buildings.*.*", Building.class)).thenReturn(buildingSubject);
-
-        when(eventListener.listen("group.*.*", Group.class)).thenReturn(groupSubject);
-        when(eventListener.listen("global.627cf3c93496bc00158f3859.messages.*.*", Message.class)).thenReturn(messageSubject);
-
-        return eventListener;
+        return new TestEventListener(null, null);
     }
 
     @Provides
-    static UserApiService userApiService() {
+    @Singletonstatic UserApiService userApiService() {
         return new UserApiService() {
             @Override
             public Observable<User> createUser(CreateUserDto dto) {
@@ -74,7 +81,8 @@ public class TestModule {
 
             @Override
             public Observable<User> findUser(String id) {
-                return Observable.empty();
+                User user = new User("1", "2", "01", "me", "offline", null, null);
+                return Observable.just(user);
             }
 
             @Override
@@ -94,7 +102,7 @@ public class TestModule {
         };
     }
 
-    @Provides
+    @Provides@Singleton
     static AuthApiService authApiService() {
         return new AuthApiService() {
             @Override
@@ -109,13 +117,13 @@ public class TestModule {
 
             @Override
             public Observable<ErrorResponse> logout() {
-                return null;
+                return Observable.just(new ErrorResponse(null, null, null));
             }
         };
     }
 
     @Provides
-    static GroupApiService groupApiService() {
+    @Singletonstatic GroupApiService groupApiService() {
         return new GroupApiService() {
             @Override
             public Observable<List<Group>> getAll() {
@@ -145,7 +153,7 @@ public class TestModule {
     }
 
     @Provides
-    static MessageApiService messageApiService() {
+    @Singleton static MessageApiService messageApiService() {
         return new MessageApiService() {
             @Override
             public Observable<List<Message>> findAll(String namespace, String parent) {
@@ -175,7 +183,7 @@ public class TestModule {
     }
 
     @Provides
-    GameMembersApiService gameMembersApiService() {
+    @Singleton GameMembersApiService gameMembersApiService() {
         return new GameMembersApiService() {
             @Override
             public Observable<List<Member>> findAll(String gameId) {
@@ -208,8 +216,9 @@ public class TestModule {
     }
 
     @Provides
-    static GamesApiService gamesApiService() {
-        return new GamesApiService() {
+    @Singleton
+    static GamesApiService gamesApiService(EventListener eventListener) {
+        return new GamesApiService() {private final TestEventListener testEventListener = (TestEventListener) eventListener;
             @Override
             public Observable<List<Game>> findAll() {
                 return Observable.empty();
@@ -227,7 +236,10 @@ public class TestModule {
 
             @Override
             public Observable<Game> patch(String id, UpdateGameDto dto) {
-                return Observable.just(new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10, null, false, 0)));
+                Game game = new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10, null, false, 0));
+            Message message = new Message("1", "2", "01", "me", null);
+                testEventListener.fireEvent("games.01.*.*", new Event<>("games.01.state.created", message));
+                return Observable.just(game);
             }
 
             @Override
@@ -238,33 +250,27 @@ public class TestModule {
     }
 
     @Provides
-    static PioneersApiService pioneersApiService() {
-        return new PioneersApiService() {
+    @Singleton
+    static PioneersApiService pioneersApiService(EventListener eventListener) {
+        return new PioneersApiService() {private List<ExpectedMove> expectedMoves;
+            private final TestEventListener testEventListener = (TestEventListener) eventListener;
             @Override
             public Observable<Map> findAllTiles(String gameId) {
-                List<Tile> titles = new ArrayList<>();
-                titles.add(new Tile(-2, 2, 0, "fields", 5));
-                titles.add(new Tile(-2, 1, 1, "desert", 5));
-                titles.add(new Tile(-2, 0, 2, "hills", 5));
-                titles.add(new Tile(-1, 2, -1, "mountains", 5));
-                titles.add(new Tile(-1, 1, 0, "forest", 5));
-                titles.add(new Tile(-1, 0, 1, "pasture", 5));
-                titles.add(new Tile(-1, -1, 2, "fields", 5));
-                titles.add(new Tile(0, 2, -2, "fields", 5));
-                titles.add(new Tile(0, 1, -1, "fields", 5));
-                titles.add(new Tile(0, 0, 0, "fields", 5));
-                titles.add(new Tile(0, -1, 1, "fields", 5));
-                titles.add(new Tile(0, -2, 2, "fields", 5));
-                titles.add(new Tile(1, 1, -2, "fields", 5));
-                titles.add(new Tile(1, 0, -1, "fields", 5));
-                titles.add(new Tile(1, -1, 0, "fields", 5));
-                titles.add(new Tile(1, -2, 1, "fields", 5));
-                titles.add(new Tile(2, 0, -2, "fields", 5));
-                titles.add(new Tile(2, -1, -1, "fields", 5));
-                titles.add(new Tile(2, -2, 0, "fields", 5));
+                List<Tile> tiles = new ArrayList<>();
+                // radius 0
+                tiles.add(new Tile(0, 0, 0, "fields", 11));
+
+                // radius 1
+                tiles.add(new Tile(1, -1, 0, "fields", 2));
+                tiles.add(new Tile(-1, 0, 1, "hills", 3));
+                tiles.add(new Tile(-1, 1, 0, "mountains", 4));
+                tiles.add(new Tile(0, 1, -1, "forest", 5));
+                tiles.add(new Tile(1, 0, -1, "pasture", 6));
+                tiles.add(new Tile(0, -1, 1, "fields", 7));
+
                 List<Harbor> harbors = new ArrayList<>();
-                harbors.add(new Harbor(1, 0, -1, null, 1));
-                Map map = new Map("02", titles, harbors);
+                harbors.add(new Harbor(1, 0, -1, "lumber", 1));
+                Map map = new Map("02", tiles, harbors);
 
                 return Observable.just(map);
             }
@@ -292,10 +298,18 @@ public class TestModule {
             @Override
             public Observable<State> findOneState(String gameId) {
                 List<ExpectedMove> moves = new ArrayList<>();
-                List<String> players = new ArrayList<>();
+                if (expectedMoves == null) {List<String> players = new ArrayList<>();
                 players.add("01");
-                moves.add(new ExpectedMove("founding-settlement-1", players));
-                return Observable.just(new State("0", "02", moves, null));
+                moves.add(new ExpectedMove("founding-roll", players));
+                    moves.add(newExpectedMove("founding-settlement-1", players));
+                moves.add(new ExpectedMove("founding-road-1", players));
+                    moves.add(new ExpectedMove("founding-settlement-2", players));
+                    moves.add(new ExpectedMove("founding-road-2", players));
+                    moves.add(new ExpectedMove("roll", players));
+                } else {
+                    moves = expectedMoves;
+                }
+                return Observable.just(new State("0", "01", moves, null));
             }
 
             @Override
@@ -310,7 +324,154 @@ public class TestModule {
 
             @Override
             public Observable<Move> create(String gameId, CreateMoveDto dto) {
-                return Observable.empty();
+                if (dto.building() != null && !Objects.equals(dto.action(), "founding-roll")) {
+                    CreateBuildingDto createBuildingDto = dto.building();
+                    Building building;
+                    State state;
+                    Player player;
+                    HashMap<String, Integer> resources = new HashMap<>();
+                    HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                    switch (dto.action()) {
+                        //founding phase
+                        case "founding-settlement-1" -> {
+                            state = new State("", gameId, List.of(
+                                    new ExpectedMove("founding-road-1", List.of("01")),
+                                    new ExpectedMove("founding-settlement-2", List.of("01")),
+                                    new ExpectedMove("founding-road-2", List.of("01")),
+                                    new ExpectedMove("roll", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            resources.put("lumber", 10);
+                            resources.put("ore", 10);
+                            resources.put("brick", 10);
+                            resources.put("grain", 10);
+                            resources.put("wool", 10);
+                            remainingBuildings.put("settlement", 4);
+                            remainingBuildings.put("city", 4);
+                            remainingBuildings.put("road", 15);
+                            building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1234", createBuildingDto.side(), "settlement", gameId, "01");
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 1, 0, null, null);
+                        }
+                        case "founding-road-1" -> {
+                            state = new State("", gameId, List.of(
+                                    new ExpectedMove("founding-settlement-2", List.of("01")),
+                                    new ExpectedMove("founding-road-2", List.of("01")),
+                                    new ExpectedMove("roll", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            resources.put("lumber", 10);
+                            resources.put("ore", 10);
+                            resources.put("brick", 10);
+                            resources.put("grain", 10);
+                            resources.put("wool", 10);
+                            remainingBuildings.put("settlement", 4);
+                            remainingBuildings.put("city", 4);
+                            remainingBuildings.put("road", 14);
+                            building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1235", createBuildingDto.side(), "road", gameId, "01");
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 1, 0, null, null);
+                        }
+                        case "founding-settlement-2" -> {
+                            state = new State("", gameId, List.of(
+                                    new ExpectedMove("founding-road-2", List.of("01")),
+                                    new ExpectedMove("roll", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            resources.put("lumber", 10);
+                            resources.put("ore", 10);
+                            resources.put("brick", 10);
+                            resources.put("grain", 10);
+                            resources.put("wool", 10);
+                            remainingBuildings.put("settlement", 3);
+                            remainingBuildings.put("city", 4);
+                            remainingBuildings.put("road", 14);
+                            building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1236", createBuildingDto.side(), "settlement", gameId, "01");
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, null, null);
+                        }
+                        case "founding-road-2" -> {
+                            state = new State("", gameId, List.of(
+                                    new ExpectedMove("roll", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            resources.put("lumber", 10);
+                            resources.put("ore", 10);
+                            resources.put("brick", 10);
+                            resources.put("grain", 10);
+                            resources.put("wool", 10);
+                            remainingBuildings.put("settlement", 3);
+                            remainingBuildings.put("city", 4);
+                            remainingBuildings.put("road", 13);
+                            building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1237", createBuildingDto.side(), "road", gameId, "01");
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, null, null);
+                        }
+                        // normal building
+                        default -> {
+                            state = new State("", gameId, List.of(
+                                    new ExpectedMove("build", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            if (dto.building().type().equals("settlement")) {
+                                resources.put("lumber", 10);
+                                resources.put("ore", 10);
+                                resources.put("brick", 10);
+                                resources.put("grain", 10);
+                                resources.put("wool", 10);
+                                remainingBuildings.put("settlement", 2);
+                                remainingBuildings.put("city", 4);
+                                remainingBuildings.put("road", 12);
+                                building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1238", createBuildingDto.side(), "settlement", gameId, "01");
+                                player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 3, 0, null, null);
+
+                            } else {
+                                resources.put("lumber", 10);
+                                resources.put("ore", 10);
+                                resources.put("brick", 10);
+                                resources.put("grain", 10);
+                                resources.put("wool", 10);
+                                remainingBuildings.put("settlement", 3);
+                                remainingBuildings.put("city", 4);
+                                remainingBuildings.put("road", 12);
+                                building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1239", createBuildingDto.side(), "road", gameId, "01");
+                                player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, null, null);
+                            }
+                        }
+                    }
+                    // fire events to update UI
+                    testEventListener.fireEvent("games.01.buildings.*.*", new Event<>("games.01.updated", building));
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                    testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
+                    return Observable.just(new Move("1", "2", gameId, "01", "build", 3, "building", null, null, null, null));
+                }
+                // roll the dice
+                else if (Objects.equals(dto.action(), "roll")) {
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("build", List.of("01"))
+                    ), null);
+                    expectedMoves = state.expectedMoves();
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                    testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                            new Move("1", "2", gameId, "01", "roll", 3, null, null, null, null, null)));
+
+                }
+                // create move with action "build"
+                else if (Objects.equals(dto.action(), "build")) {
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("roll", List.of("01"))
+                    ), null);
+                    expectedMoves = state.expectedMoves();
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                }
+                // first founding roll
+                else if (Objects.equals(dto.action(), "founding-roll")) {
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("founding-settlement-1", List.of("01")),
+                            new ExpectedMove("founding-road-1", List.of("01")),
+                            new ExpectedMove("founding-settlement-2", List.of("01")),
+                            new ExpectedMove("founding-road-2", List.of("01")),
+                            new ExpectedMove("roll", List.of("01"))
+                    ), null);
+                    expectedMoves = state.expectedMoves();
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                }return Observable.empty();
             }
 
             @Override
@@ -332,8 +493,12 @@ public class TestModule {
             public Observable<List<MapTemplate>> findAllMaps() {
                 return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
             }
-        };
-    }
+
+    @Override
+			public Observable<MapTemplate> delete(String id) {
+				return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of()));
+			}
+		};}
 
     @Provides
     @Singleton

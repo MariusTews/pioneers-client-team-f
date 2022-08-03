@@ -135,6 +135,7 @@ public class Constants {
     //JSON
     public static final String JSON_REMEMBER_ME = "rememberMe";
     public static final String JSON_NAME = "name";
+    public static final String JSON_TOKEN = "token";
 
     //Lobby ID for listening and sending Messages
     public static final String LOBBY_ID = "627cf3c93496bc00158f3859";
@@ -150,6 +151,10 @@ public class Constants {
 
     // Game
     public static final int MAX_MEMBERS = 6;
+
+    public static final String BUILD = "build";
+
+    public static final String NEW = "new";
     public static final String RENAME_SETTLEMENT = "UFO";
     public static final String RENAME_CITY = "Station";
     public static final String RENAME_ROAD = "Tube";
@@ -167,7 +172,7 @@ public class Constants {
     public static final String ROAD = "road";
 
     //Card names
-    public static final String KNIGHT = "Knight";
+    public static final String KNIGHT = "knight";
     public static final String ROAD_BUILDING = "road-building";
 
     public static final String YEAR_OF_PLENTY = "year-of-plenty";

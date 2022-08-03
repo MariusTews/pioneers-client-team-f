@@ -90,9 +90,8 @@
          <Button fx:id="city" layoutX="-2.0" mnemonicParsing="false" onAction="#onCity" prefHeight="42.0" prefWidth="120.0" styleClass="move" text="City" />
       </Pane>
       <Pane prefHeight="56.0" prefWidth="142.0">
-         <children>
-            <Button fx:id="developmentId" layoutX="-1.0" layoutY="-1.0" mnemonicParsing="false" onAction="#onDev" prefHeight="42.0" prefWidth="134.0" styleClass="move" text="Dev card" />
-         </children>
+         <Button fx:id="developmentBuyIdButton" layoutX="-1.0" layoutY="-1.0" mnemonicParsing="false" onAction="#onDev"
+                 prefHeight="42.0" prefWidth="134.0" styleClass="move" text="Dev card"/>
       </Pane>
       <VBox.margin>
          <Insets />

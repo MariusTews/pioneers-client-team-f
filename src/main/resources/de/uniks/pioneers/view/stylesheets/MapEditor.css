@@ -1,0 +1,22 @@
+.tileButton {
+    -fx-background-color: #d2dcde;
+    -fx-text-fill: green;
+}
+
+.harborButton {
+    -fx-background-color: #d2dcde;
+    -fx-text-fill: orange;
+}
+
+.cancelTileButton {
+    -fx-text-fill: #450606;
+}
+
+.numberField {
+    -fx-text-fill: green;
+}
+
+#map {
+    -fx-background-color: TRANSPARENT;
+    -fx-background: TRANSPARENT;
+}

@@ -3,7 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

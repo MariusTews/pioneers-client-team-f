@@ -27,7 +27,7 @@
             </padding></HBox>
     </ScrollPane>
     <Pane layoutX="500.0" layoutY="687.0" prefHeight="200.0" prefWidth="600.0">
-        <Pane layoutX="250.0" layoutY="125.0" onMouseClicked="#diceRoll" prefWidth="130.0">
+        <Pane id="roll" layoutX="250.0" layoutY="125.0" onMouseClicked="#diceRoll" prefWidth="130.0">
             <ImageView fx:id="diceOne" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="diceTwo" fitHeight="60.0" fitWidth="60.0" layoutX="70.0" pickOnBounds="true" preserveRatio="true" />
         </Pane>

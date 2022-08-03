@@ -42,8 +42,8 @@ class AuthServiceTest {
                                                                     "status", "avatar", new ArrayList<>(),
                                                                 "accessToken", "refreshToken")));
 
-        final String result = authService.login("username", "password").blockingFirst();
-        assertEquals("123", result);
+        final LoginResult result = authService.login("username", "password").blockingFirst();
+        assertEquals("123", result._id());
 
         assertEquals("accessToken", tokenStorage.getToken());
 

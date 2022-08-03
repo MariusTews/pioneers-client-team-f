@@ -218,7 +218,7 @@ public class CircleSubController implements Controller {
 
     @Override
     public void destroy() {
-        disposable.dispose();
+        disposable.clear();
     }
 
     @Override
