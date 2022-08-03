@@ -20,6 +20,8 @@ public class MapTemplateSubController implements Controller {
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
+    private int voted;
+    private final String userId;
     private final MapsService mapsService;
     private Image leftActionImage;
     private Image rightActionImage;
@@ -40,10 +42,11 @@ public class MapTemplateSubController implements Controller {
     @FXML
     public ImageView rightActionImageView;
 
-    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy, MapsService mapsService) {
+    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy, String userId, MapsService mapsService) {
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
+        this.userId = userId;
         this.mapsService = mapsService;
     }
 
@@ -104,11 +107,25 @@ public class MapTemplateSubController implements Controller {
 
     public void onLeftActionImagePressed() {
         if (ownMap) {
-            //edit map
+            // edit map
             //TODO
         } else {
-            //up-vote map
-            //TODO
+            if (voted == 1) {
+                // delete vote
+                this.mapsService.deleteVote(template._id(), userId).observeOn(FX_SCHEDULER).subscribe(
+                        vote -> {
+                            voted = 0;
+                        }
+                );
+            }
+            else {
+                // up-vote map
+                this.mapsService.voteMap(template._id(), 1).observeOn(FX_SCHEDULER).subscribe(
+                        vote -> {
+                            voted = 1;
+                        }
+                );
+            }
         }
     }
 
@@ -116,8 +133,22 @@ public class MapTemplateSubController implements Controller {
         if (ownMap) {
             openDeleteDialog();
         } else {
-            //down-vote map
-            //TODO
+            if (voted == -1) {
+                // delete vote
+                this.mapsService.deleteVote(template._id(), userId).observeOn(FX_SCHEDULER).subscribe(
+                        vote -> {
+                            voted = 0;
+                        }
+                );
+            }
+            else {
+                // down-vote map
+                this.mapsService.voteMap(template._id(), -1).observeOn(FX_SCHEDULER).subscribe(
+                        vote -> {
+                            voted = -1;
+                        }
+                );
+            }
         }
     }
 
