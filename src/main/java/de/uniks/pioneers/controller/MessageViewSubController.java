@@ -5,7 +5,7 @@ import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.Websocket.EventListener;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
