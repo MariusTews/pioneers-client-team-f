@@ -520,11 +520,6 @@ public class TestModule {
             }
 
             @Override
-            public Observable<List<Achievement>> getUserAchievement(String userId, String id) {
-                return null;
-            }
-
-            @Override
             public Observable<Achievement> putAchievement(String userId, String id, CreateAchievementDto createAchievementDto) {
                 return Observable.just(new Achievement("", "", "1", "first-road", null, 0));
             }
