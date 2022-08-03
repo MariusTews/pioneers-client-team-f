@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
@@ -55,6 +56,7 @@ public class MapTemplatesScreenController implements Controller {
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     private final HashMap<String, MapTemplateSubController> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
+    private final HashMap<String, Integer> userVotes = new HashMap<>();
     private final HashMap<String, Boolean> sortOrderFlags = new HashMap<>();
     private Polygon currentSortArrow;
     private MapTemplateSubController selectedMapTemplateSubController;
@@ -112,6 +114,12 @@ public class MapTemplatesScreenController implements Controller {
 
         for (User user : users) {
             userNames.put(user._id(), user.name());
+        }
+
+        List<Vote> votes = userService.findVotes(idStorage.getID()).blockingFirst();
+
+        for (Vote vote : votes) {
+            userVotes.put(vote.mapId(), vote.score().intValue());
         }
 
         mapsService
@@ -180,6 +188,9 @@ public class MapTemplatesScreenController implements Controller {
         controller.init();
         Parent item = controller.render();
         item.setOnMouseClicked(this::selectMapTemplateItem);
+        if (!ownMap && userVotes.containsKey(template._id())) {
+            controller.setVoted(userVotes.get(template._id()));
+        }
         //if position is -1 then the item should be added at the end of the list
         if (position == -1) {
             mapTemplates.add(item);

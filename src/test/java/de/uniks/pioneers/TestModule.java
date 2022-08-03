@@ -85,6 +85,11 @@ public class TestModule {
             }
 
             @Override
+            public Observable<List<Vote>> findVotes(String id) {
+                return Observable.just(List.of(new Vote("", "", "01", "01", 1)));
+            }
+
+            @Override
             public Observable<User> updateUser(String id, UpdateUserDto dto) {
                 return Observable.just(new User("1234", "12345", "01", "Alice", "online", null, null));
             }
@@ -514,6 +519,11 @@ public class TestModule {
 
             @Override
             public Observable<Vote> vote(String id, CreateVoteDto dto) {
+                return null;
+            }
+
+            @Override
+            public Observable<Vote> deleteVote(String mapId, String userId) {
                 return null;
             }
         };

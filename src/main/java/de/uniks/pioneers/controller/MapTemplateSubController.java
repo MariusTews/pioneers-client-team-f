@@ -3,10 +3,15 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.service.MapsService;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -20,7 +25,6 @@ public class MapTemplateSubController implements Controller {
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
-    private int voted;
     private final String userId;
     private final MapsService mapsService;
     private Image leftActionImage;
@@ -41,6 +45,10 @@ public class MapTemplateSubController implements Controller {
     public ImageView leftActionImageView;
     @FXML
     public ImageView rightActionImageView;
+    private final IntegerProperty voted = new SimpleIntegerProperty();
+    private final ChangeListener<? super Number> voteListener = this::onVoteScoreChanged;
+    private final ColorAdjust darkColorAdjust =  new ColorAdjust();
+    private final ColorAdjust brightColorAdjust =  new ColorAdjust();
 
     public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy, String userId, MapsService mapsService) {
         this.template = template;
@@ -53,6 +61,8 @@ public class MapTemplateSubController implements Controller {
     @Override
     public void init() {
         selectedMapIcon = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/selectedMapIcon.png")).toString());
+        darkColorAdjust.setBrightness(-0.7);
+        brightColorAdjust.setBrightness(0);
     }
 
     @Override
@@ -87,6 +97,8 @@ public class MapTemplateSubController implements Controller {
         leftActionImageView.setImage(leftActionImage);
         rightActionImageView.setImage(rightActionImage);
 
+        voted.addListener(voteListener);
+
         parent.setId(template._id());
         this.parent = parent;
 
@@ -110,22 +122,7 @@ public class MapTemplateSubController implements Controller {
             // edit map
             //TODO
         } else {
-            if (voted == 1) {
-                // delete vote
-                this.mapsService.deleteVote(template._id(), userId).observeOn(FX_SCHEDULER).subscribe(
-                        vote -> {
-                            voted = 0;
-                        }
-                );
-            }
-            else {
-                // up-vote map
-                this.mapsService.voteMap(template._id(), 1).observeOn(FX_SCHEDULER).subscribe(
-                        vote -> {
-                            voted = 1;
-                        }
-                );
-            }
+            updateVote(1);
         }
     }
 
@@ -133,21 +130,41 @@ public class MapTemplateSubController implements Controller {
         if (ownMap) {
             openDeleteDialog();
         } else {
-            if (voted == -1) {
-                // delete vote
-                this.mapsService.deleteVote(template._id(), userId).observeOn(FX_SCHEDULER).subscribe(
-                        vote -> {
-                            voted = 0;
-                        }
-                );
+            updateVote(-1);
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void updateVote(int score) {
+        if (voted.get() == score) {
+            // delete vote
+            this.mapsService.deleteVote(template._id(), userId).observeOn(FX_SCHEDULER).subscribe(
+                    vote -> voted.set(0)
+            );
+        }
+        else {
+            // vote map according to score
+            this.mapsService.voteMap(template._id(), score).observeOn(FX_SCHEDULER).subscribe(
+                    vote -> voted.set(score)
+            );
+        }
+    }
+
+    private void onVoteScoreChanged(ObservableValue<? extends Number> observableValue, Number oldScore, Number newScore) {
+        switch (newScore.intValue()) {
+            case -1 -> {
+                leftActionImageView.setDisable(true);
+                leftActionImageView.setEffect(darkColorAdjust);
             }
-            else {
-                // down-vote map
-                this.mapsService.voteMap(template._id(), -1).observeOn(FX_SCHEDULER).subscribe(
-                        vote -> {
-                            voted = -1;
-                        }
-                );
+            case 0 -> {
+                leftActionImageView.setDisable(false);
+                leftActionImageView.setEffect(brightColorAdjust);
+                rightActionImageView.setDisable(false);
+                rightActionImageView.setEffect(brightColorAdjust);
+            }
+            case 1 -> {
+                rightActionImageView.setDisable(true);
+                rightActionImageView.setEffect(darkColorAdjust);
             }
         }
     }
@@ -200,5 +217,9 @@ public class MapTemplateSubController implements Controller {
 
     public void setTemplate(MapTemplate template) {
         this.template = template;
+    }
+
+    public void setVoted(int score) {
+        this.voted.set(score);
     }
 }
