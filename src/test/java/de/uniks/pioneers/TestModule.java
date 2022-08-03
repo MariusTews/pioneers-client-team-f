@@ -4,15 +4,13 @@ package de.uniks.pioneers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dagger.Module;
 import dagger.Provides;
-import de.uniks.pioneers.Template.MapTemplate;
-import de.uniks.pioneers.Websocket.EventListener;
-import de.uniks.pioneers.template.MapTemplate;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
 import de.uniks.pioneers.service.SoundService;
 import de.uniks.pioneers.service.TokenStorage;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 
@@ -32,23 +30,25 @@ public class TestModule {
             }
         };
     }
-     static class TestEventListener extends EventListener {
-    java.util.Map<String, ObservableEmitter<?>> emitterMap = new HashMap<>();
 
-    public TestEventListener(TokenStorage tokenStorage, ObjectMapper mapper) {
+    static class TestEventListener extends EventListener {
+        java.util.Map<String, ObservableEmitter<?>> emitterMap = new HashMap<>();
+
+        public TestEventListener(TokenStorage tokenStorage, ObjectMapper mapper) {
             super(tokenStorage, mapper);
         }
 
         @Override
-    public <T> Observable<Event<T>> listen(String pattern, Class<T> payloadType) {
+        public <T> Observable<Event<T>> listen(String pattern, Class<T> payloadType) {
             return Observable.create(emitter -> {
-    emitterMap.put(pattern, emitter);
-    emitter.setCancellable(() -> emitterMap.remove(pattern));
+                emitterMap.put(pattern, emitter);
+                emitter.setCancellable(() -> emitterMap.remove(pattern));
             });
         }
-    public <T> void fireEvent(String pattern, Event<T> eventDto) {
+
+        public <T> void fireEvent(String pattern, Event<T> eventDto) {
             @SuppressWarnings("unchecked")
-    ObservableEmitter<Event<T>> emitter = (ObservableEmitter<Event<T>>) emitterMap.get(pattern);
+            ObservableEmitter<Event<T>> emitter = (ObservableEmitter<Event<T>>) emitterMap.get(pattern);
             if (emitter != null) {
                 emitter.onNext(eventDto);
             }
@@ -59,13 +59,12 @@ public class TestModule {
     @Provides
     @Singleton
     EventListener eventListener() {
-
-
         return new TestEventListener(null, null);
     }
 
     @Provides
-    @Singletonstatic UserApiService userApiService() {
+    @Singleton
+    static UserApiService userApiService() {
         return new UserApiService() {
             @Override
             public Observable<User> createUser(CreateUserDto dto) {
@@ -102,7 +101,8 @@ public class TestModule {
         };
     }
 
-    @Provides@Singleton
+    @Provides
+    @Singleton
     static AuthApiService authApiService() {
         return new AuthApiService() {
             @Override
@@ -123,7 +123,8 @@ public class TestModule {
     }
 
     @Provides
-    @Singletonstatic GroupApiService groupApiService() {
+    @Singleton
+    static GroupApiService groupApiService() {
         return new GroupApiService() {
             @Override
             public Observable<List<Group>> getAll() {
@@ -153,7 +154,8 @@ public class TestModule {
     }
 
     @Provides
-    @Singleton static MessageApiService messageApiService() {
+    @Singleton
+    static MessageApiService messageApiService() {
         return new MessageApiService() {
             @Override
             public Observable<List<Message>> findAll(String namespace, String parent) {
@@ -183,7 +185,8 @@ public class TestModule {
     }
 
     @Provides
-    @Singleton GameMembersApiService gameMembersApiService() {
+    @Singleton
+    GameMembersApiService gameMembersApiService() {
         return new GameMembersApiService() {
             @Override
             public Observable<List<Member>> findAll(String gameId) {
@@ -218,7 +221,9 @@ public class TestModule {
     @Provides
     @Singleton
     static GamesApiService gamesApiService(EventListener eventListener) {
-        return new GamesApiService() {private final TestEventListener testEventListener = (TestEventListener) eventListener;
+        return new GamesApiService() {
+            private final TestEventListener testEventListener = (TestEventListener) eventListener;
+
             @Override
             public Observable<List<Game>> findAll() {
                 return Observable.empty();
@@ -237,7 +242,7 @@ public class TestModule {
             @Override
             public Observable<Game> patch(String id, UpdateGameDto dto) {
                 Game game = new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10, null, false, 0));
-            Message message = new Message("1", "2", "01", "me", null);
+                Message message = new Message("1", "2", "01", "me", null);
                 testEventListener.fireEvent("games.01.*.*", new Event<>("games.01.state.created", message));
                 return Observable.just(game);
             }
@@ -252,8 +257,10 @@ public class TestModule {
     @Provides
     @Singleton
     static PioneersApiService pioneersApiService(EventListener eventListener) {
-        return new PioneersApiService() {private List<ExpectedMove> expectedMoves;
+        return new PioneersApiService() {
+            private List<ExpectedMove> expectedMoves;
             private final TestEventListener testEventListener = (TestEventListener) eventListener;
+
             @Override
             public Observable<Map> findAllTiles(String gameId) {
                 List<Tile> tiles = new ArrayList<>();
@@ -298,11 +305,12 @@ public class TestModule {
             @Override
             public Observable<State> findOneState(String gameId) {
                 List<ExpectedMove> moves = new ArrayList<>();
-                if (expectedMoves == null) {List<String> players = new ArrayList<>();
-                players.add("01");
-                moves.add(new ExpectedMove("founding-roll", players));
-                    moves.add(newExpectedMove("founding-settlement-1", players));
-                moves.add(new ExpectedMove("founding-road-1", players));
+                if (expectedMoves == null) {
+                    List<String> players = new ArrayList<>();
+                    players.add("01");
+                    moves.add(new ExpectedMove("founding-roll", players));
+                    moves.add(new ExpectedMove("founding-settlement-1", players));
+                    moves.add(new ExpectedMove("founding-road-1", players));
                     moves.add(new ExpectedMove("founding-settlement-2", players));
                     moves.add(new ExpectedMove("founding-road-2", players));
                     moves.add(new ExpectedMove("roll", players));
@@ -471,7 +479,8 @@ public class TestModule {
                     ), null);
                     expectedMoves = state.expectedMoves();
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
-                }return Observable.empty();
+                }
+                return Observable.empty();
             }
 
             @Override
@@ -491,14 +500,15 @@ public class TestModule {
         return new MapsApiService() {
             @Override
             public Observable<List<MapTemplate>> findAllMaps() {
-                return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
+                return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, null, null)));
             }
 
-    @Override
-			public Observable<MapTemplate> delete(String id) {
-				return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of()));
-			}
-		};}
+            @Override
+            public Observable<MapTemplate> delete(String id) {
+                return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, null, null));
+            }
+        };
+    }
 
     @Provides
     @Singleton
