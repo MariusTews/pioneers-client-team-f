@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane id="gameView" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
+<Pane id="gameView" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
     <ScrollPane fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER" vvalue="0.5">
     </ScrollPane>
     <Pane prefHeight="900.0" prefWidth="520.0">
@@ -20,11 +20,14 @@
         </ScrollPane>
         <Pane fx:id="userViewPane" layoutX="25.0" layoutY="590.0" prefHeight="300.0" prefWidth="420.0" />
     </Pane>
-    <ScrollPane hbarPolicy="NEVER" layoutX="500.0" pannable="true" prefHeight="150.0" prefWidth="650.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
-        <HBox fx:id="spectatorPaneId" alignment="TOP_RIGHT" prefHeight="150.0" prefWidth="650.0">
+    <ScrollPane hbarPolicy="NEVER" layoutX="657.0" pannable="true" prefHeight="150.0" prefWidth="493.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
+        <HBox fx:id="spectatorPaneId" alignment="TOP_RIGHT" prefHeight="150.0" prefWidth="493.0">
             <padding>
-                <Insets right="10.0" />
+                <Insets right="300.0" />
             </padding></HBox>
+      <padding>
+         <Insets right="300.0" />
+      </padding>
     </ScrollPane>
     <Pane layoutX="500.0" layoutY="687.0" prefHeight="200.0" prefWidth="600.0">
         <Pane id="roll" layoutX="250.0" layoutY="125.0" onMouseClicked="#diceRoll" prefWidth="130.0">
@@ -77,4 +80,13 @@
          </Pane>
       <VBox id="gameTimer" fx:id="gameTimeView" layoutX="62.0" layoutY="549.0" prefHeight="30.0" prefWidth="150.0" />
     </Pane>
+   <Pane fx:id="foldOutPaneId" layoutX="450.0" onMouseClicked="#onShowSpectator" prefHeight="60.0" prefWidth="192.0">
+      <children>
+         <Label fx:id="spectatorTitleId" alignment="CENTER" layoutX="-1.0" layoutY="-2.0" prefHeight="40.0" prefWidth="164.0" text="Spectator" />
+         <ImageView fx:id="arrowImageId" fitHeight="60.0" fitWidth="40.0" layoutX="163.0" layoutY="-2.0" pickOnBounds="true" />
+      </children>
+      <padding>
+         <Insets left="200.0" />
+      </padding>
+   </Pane>
 </Pane>

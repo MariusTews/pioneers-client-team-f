@@ -2,12 +2,13 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.computation.DiceRoll;
 import de.uniks.pioneers.computation.RandomAction;
+import de.uniks.pioneers.computation.SpectatorRenderInGame;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -39,6 +40,8 @@ import static de.uniks.pioneers.computation.CalculateMap.createId;
 public class GameScreenController implements Controller {
 
     private final UserStorage userStorage;
+    public Label spectatorTitleId;
+    public ImageView arrowImageId;
 
     private List<CircleSubController> circleSubControllers = new ArrayList<>();
 
@@ -320,15 +323,14 @@ public class GameScreenController implements Controller {
         tradingSubController.init();
         this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
-        //spectator
-        this.spectatorMember.addListener((ListChangeListener<? super Member>) c ->
-                this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
-
         //Action is performed when the platform is close
         this.app.getStage().setOnCloseRequest(e -> {
             actionOnCloseScreen();
             e.consume();
         });
+
+        //arrow image
+        arrowImageId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/right.png"))));
 
         //calculate all the owned cards
         allTheCards();
@@ -355,16 +357,6 @@ public class GameScreenController implements Controller {
             userService.statusUpdate(this.idStorage.getID(), "offline").observeOn(FX_SCHEDULER)
                     .subscribe(s -> System.exit(0));
         }
-    }
-
-    private Node renderSpectator(Member member) {
-        for (User user : allUser) {
-            if (member.userId().equals(user._id())) {
-                this.spectatorViewController = new SpectatorViewController(user);
-                break;
-            }
-        }
-        return spectatorViewController.render();
     }
 
     private Node renderSingleUser(Player player) {
@@ -759,5 +751,12 @@ public class GameScreenController implements Controller {
         DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(), gameStorage,
                 idStorage, pioneersService);
         developmentCardController.render();
+    }
+
+    public void onShowSpectator() {
+        if(spectatorMember.size() >= 1){
+            SpectatorRenderInGame spectatorRenderInGame = new SpectatorRenderInGame();
+            spectatorRenderInGame.checkMember(spectatorMember,spectatorPaneId, allUser ,spectatorTitleId,arrowImageId);
+        }
     }
 }

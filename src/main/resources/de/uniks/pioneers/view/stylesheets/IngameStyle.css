@@ -172,3 +172,17 @@
     -fx-border-radius: 5;
     -fx-border-width: 3;
 }
+
+#foldOutPaneId{
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 200 60;
+
+}
+
+
+#spectatorTitleId{
+    -fx-background-color: transparent;
+    -fx-text-fill: WHITE;
+}
