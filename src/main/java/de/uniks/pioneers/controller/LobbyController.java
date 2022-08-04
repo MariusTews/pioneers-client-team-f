@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -47,6 +48,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class LobbyController implements Controller {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
+
+    private final ObservableList<User> friendsUserList = FXCollections.observableArrayList();
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Game> games = FXCollections.observableArrayList();
@@ -101,6 +104,7 @@ public class LobbyController implements Controller {
     private final AuthService authService;
     private final MemberService memberService;
     private final EventListener eventListener;
+    private final AlertService alertService;
     private final Provider<LoginController> loginController;
     private final Provider<RulesScreenController> rulesScreenController;
     private final Provider<CreateGameController> createGameController;
@@ -133,6 +137,7 @@ public class LobbyController implements Controller {
                            AuthService authService,
                            MemberService memberService,
                            EventListener eventListener,
+                           AlertService alertService,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
@@ -152,6 +157,7 @@ public class LobbyController implements Controller {
         this.authService = authService;
         this.memberService = memberService;
         this.eventListener = eventListener;
+        this.alertService = alertService;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
         this.createGameController = createGameController;
@@ -458,6 +464,7 @@ public class LobbyController implements Controller {
         } else if (userEvent.event().endsWith(DELETED)) {
             removeUserSubCon(user);
             this.users.removeIf(u -> u._id().equals(user._id()));
+            this.friendsUserList.removeIf(u -> u._id().equals(user._id()));
         } else if (userEvent.event().endsWith(UPDATED)) {
 
             for (DirectChatStorage directChatStorage : directChatStorages) {
@@ -466,11 +473,24 @@ public class LobbyController implements Controller {
                     directChatStorage.setUser(user);
                 }
             }
+
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
                     removeUserSubCon(user);
                     this.users.set(this.users.indexOf(updatedUser), user);
                     break;
+                }
+            }
+
+            //check for new friends
+            if (user._id().equals(idStorage.getID())) {
+                if (friendsUserList.size() != user.friends().size()) {
+                    for (User newFriend : this.users) {
+                        if (!friendsUserList.contains(newFriend) && user.friends().contains(newFriend._id())) {
+                            friendsUserList.add(newFriend);
+                            users.removeIf(u -> u._id().equals(newFriend._id()));
+                        }
+                    }
                 }
             }
         }
@@ -587,17 +607,45 @@ public class LobbyController implements Controller {
     }
 
     private void loadUsers(List<User> users) {
+        List<String> friends = new ArrayList<>();
         for (User user : users) {
             memberHash.put(user._id(), user);
+            if (user._id().equals(idStorage.getID())) {
+                friends = user.friends();
+            }
         }
+
 
         // add listener here to be able to render the avatars directly
         this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
+        this.friendsUserList.addListener((ListChangeListener<? super User>) this::onUsersChanged);
 
-        List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
-        List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
-        this.users.addAll(online);
-        this.users.addAll(offline);
+        List<User> onlineFriends = new ArrayList<>();
+        List<User> offlineFriends = new ArrayList<>();
+        List<User> onlineUser = new ArrayList<>();
+        List<User> offlineUser = new ArrayList<>();
+        for(User user : users) {
+            if (friends.contains(user._id())) {
+                if (user.status().equals("online")) {
+                    onlineFriends.add(user);
+                } else {
+                    offlineFriends.add(user);
+                }
+            }
+            else {
+                if (user.status().equals("online")) {
+                    onlineUser.add(user);
+                } else {
+                    offlineUser.add(user);
+                }
+            }
+        }
+
+        this.friendsUserList.addAll(onlineFriends);
+        this.friendsUserList.addAll(offlineFriends);
+        this.users.addAll(onlineUser);
+        this.users.addAll(offlineUser);
+
 
         // render avatars for the first few visible list elements
         // this works because the onUsersChanged listener is already triggered directly after adding the users
@@ -807,6 +855,36 @@ public class LobbyController implements Controller {
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
-        ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
+        //clear scrollpane
+        ((VBox) this.userScrollPane.getContent()).getChildren().clear();
+
+        //add header for friends
+        this.createHeader("Friends:");
+
+        //add friends
+        ((VBox) this.userScrollPane.getContent()).getChildren().addAll(friendsUserList.stream().sorted(userComparator).map(this::renderUser).toList());
+
+        //add header for rest of Users
+        this.createHeader("All Users:");
+
+        //add rest of users
+        ((VBox) this.userScrollPane.getContent()).getChildren().addAll(users.stream().sorted(userComparator).map(this::renderUser).toList());
+        //((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
+    }
+
+    private void createHeader(String headerText) {
+        Label header = new Label(headerText);
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        header.setStyle("-fx-font-size: 20");
+        hBox.getChildren().add(header);
+        ((VBox) this.userScrollPane.getContent()).getChildren().add(hBox);
+    }
+
+    public void showFriendsMenu(User user) {
+        boolean addFriend = alertService.showFriendsMenu("Do you want to add " + user.name() + " as a friend?");
+        if (addFriend) {
+            System.out.println("yes");
+        }
     }
 }
