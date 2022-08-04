@@ -79,9 +79,6 @@ public class CircleSubController implements Controller {
         this.side = Integer.parseInt(split2[1]);
 
         this.nextMove = new ExpectedMove("", Collections.singletonList(idStorage.getID()));
-
-        // init AchievementsService
-
     }
 
 

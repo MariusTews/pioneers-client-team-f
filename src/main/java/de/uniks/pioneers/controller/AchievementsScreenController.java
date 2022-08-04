@@ -162,7 +162,7 @@ public class AchievementsScreenController implements Controller {
         achievementsList.getItems().add(achievementHbox);
     }
 
-    public void OnBackClicked(ActionEvent actionEvent) {
+    public void OnBackClicked() {
         app.show(lobbyController.get());
     }
 }

@@ -120,7 +120,7 @@ public class WinnerController implements Controller {
                 //changes for Labels for loser
                 //needs to be taken here
                 Label loserNames = new Label();
-                loserNames.setText(key + "(" + value.get(1) + "UP)");
+                loserNames.setText(key + "(" + value.get(1) + "VP)");
                 loserNames.setTextFill(Color.web(value.get(0)));
                 loserNames.setFont(new Font(22.0));
                 this.loserBoxId.setAlignment(Pos.CENTER);

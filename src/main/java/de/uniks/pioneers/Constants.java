@@ -1,6 +1,5 @@
 package de.uniks.pioneers;
 
-import de.uniks.pioneers.model.Achievement;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.User;
 import io.reactivex.rxjava3.core.Scheduler;
