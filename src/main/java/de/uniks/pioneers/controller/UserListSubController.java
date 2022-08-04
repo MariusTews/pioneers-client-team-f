@@ -114,7 +114,9 @@ public class UserListSubController implements Controller {
 
     public void addFriend(MouseEvent mouseEvent) {
         if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-            this.lobbyController.showFriendsMenu(this.user);
+            if (lobbyController.isNotAFriend(user)) {
+                this.lobbyController.showFriendsMenu(this.user);
+            }
         }
     }
 }

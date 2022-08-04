@@ -2,12 +2,12 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.animation.PauseTransition;
@@ -33,10 +33,7 @@ import javafx.util.Duration;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -485,10 +482,11 @@ public class LobbyController implements Controller {
             //check for new friends
             if (user._id().equals(idStorage.getID())) {
                 if (friendsUserList.size() != user.friends().size()) {
-                    for (User newFriend : this.users) {
+                    for (Iterator<User> iterator = users.iterator(); iterator.hasNext();) {
+                        User newFriend = iterator.next();
                         if (!friendsUserList.contains(newFriend) && user.friends().contains(newFriend._id())) {
+                            iterator.remove();
                             friendsUserList.add(newFriend);
-                            users.removeIf(u -> u._id().equals(newFriend._id()));
                         }
                     }
                 }
@@ -624,15 +622,14 @@ public class LobbyController implements Controller {
         List<User> offlineFriends = new ArrayList<>();
         List<User> onlineUser = new ArrayList<>();
         List<User> offlineUser = new ArrayList<>();
-        for(User user : users) {
+        for (User user : users) {
             if (friends.contains(user._id())) {
                 if (user.status().equals("online")) {
                     onlineFriends.add(user);
                 } else {
                     offlineFriends.add(user);
                 }
-            }
-            else {
+            } else {
                 if (user.status().equals("online")) {
                     onlineUser.add(user);
                 } else {
@@ -884,7 +881,16 @@ public class LobbyController implements Controller {
     public void showFriendsMenu(User user) {
         boolean addFriend = alertService.showFriendsMenu("Do you want to add " + user.name() + " as a friend?");
         if (addFriend) {
-            System.out.println("yes");
+            List<String> updatedFriends = new ArrayList<>();
+            for (User oldFriends : friendsUserList) {
+                updatedFriends.add(oldFriends._id());
+            }
+            updatedFriends.add(user._id());
+            userService.userUpdate(idStorage.getID(), null, null, updatedFriends, null, null).blockingFirst();
         }
+    }
+
+    public boolean isNotAFriend(User user) {
+        return !friendsUserList.contains(user);
     }
 }
