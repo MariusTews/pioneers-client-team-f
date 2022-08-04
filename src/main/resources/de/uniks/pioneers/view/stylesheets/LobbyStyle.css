@@ -61,9 +61,8 @@
 }
 
 .button.achievementsButton {
-    -fx-graphic: url("../assets/entrance_icons8.png");
-    -fx-scale-x: 0.4;
-    -fx-scale-y: 0.4;
-    -fx-font-size: 18;
-    -fx-text-fill: dimgrey;
+    -fx-graphic: url("../assets/blue_button.png");
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+    -fx-font-size: 19;
 }
