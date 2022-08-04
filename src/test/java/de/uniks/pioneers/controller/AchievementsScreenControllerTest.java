@@ -63,7 +63,5 @@ class AchievementsScreenControllerTest extends ApplicationTest {
         verifyThat("#achievementsList", NodeMatchers.isVisible());
         ListView<HBox> list = lookup("#achievementsList").query();
         assertThat(list).hasExactlyNumItems(13);
-
     }
-
 }

@@ -129,7 +129,5 @@ public class AchievementsServiceTest {
         Achievement result3 = achievementsService.putOrUpdateAchievement("settlement-builder", 1).blockingFirst();
         assertEquals(result3, new Achievement("", "", "1", "settlement-builder", null, 1));
         verify(achievementsApiService).putAchievement("1", "settlement-builder", new CreateAchievementDto(null, 1));
-
-
     }
 }
