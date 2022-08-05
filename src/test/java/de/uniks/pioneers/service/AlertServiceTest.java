@@ -32,9 +32,7 @@ public class AlertServiceTest {
         Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards_2);
 
-        PlatformImpl.startup(() -> {
-            alertService.alertForEachCard(player, player_2);
-        });
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
 
         Assertions.assertNotEquals(devCards.size(), devCards_2.size());
     }
@@ -57,12 +55,9 @@ public class AlertServiceTest {
         Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards_2);
 
-        PlatformImpl.startup(() -> {
-            alertService.alertForEachCard(player, player_2);
-        });
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
 
         Assertions.assertNotEquals(devCards.size(), devCards_2.size());
-
     }
 
     @Test
@@ -83,12 +78,9 @@ public class AlertServiceTest {
         Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards_2);
 
-        PlatformImpl.startup(() -> {
-            alertService.alertForEachCard(player, player_2);
-        });
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
 
         Assertions.assertNotEquals(devCards.size(), devCards_2.size());
-
     }
 
     @Test
@@ -109,12 +101,9 @@ public class AlertServiceTest {
         Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards_2);
 
-        PlatformImpl.startup(() -> {
-            alertService.alertForEachCard(player, player_2);
-        });
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
 
         Assertions.assertNotEquals(devCards.size(), devCards_2.size());
-
     }
 
     @Test
@@ -135,12 +124,9 @@ public class AlertServiceTest {
         Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards_2);
 
-        PlatformImpl.startup(() -> {
-            alertService.alertForEachCard(player, player_2);
-        });
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
 
         Assertions.assertNotEquals(devCards.size(), devCards_2.size());
-
     }
 
 

@@ -106,9 +106,8 @@ class GameScreenControllerTest extends ApplicationTest {
 
         Player player_1 = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards_1);
-        when(pioneersService.findOnePlayer("02","01")).thenReturn(Observable.just(player_1));
+        when(pioneersService.findOnePlayer("02", "01")).thenReturn(Observable.just(player_1));
 
-        //when(pioneersService.findOnePlayer(any(), any())).thenReturn(Observable.empty());
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         List<Player> players = new ArrayList<>();
         players.add(new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null, null));
@@ -251,9 +250,8 @@ class GameScreenControllerTest extends ApplicationTest {
         waitForFxEvents();
     }
 
-
     @Test
-    void onClickDevLabel(){
+    void onClickDevLabel() {
         Pane showCards = lookup("#devCardsPane").query();
         clickOn(showCards);
 
