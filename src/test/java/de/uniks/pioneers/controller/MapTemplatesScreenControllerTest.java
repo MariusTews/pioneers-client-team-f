@@ -1,21 +1,19 @@
 package de.uniks.pioneers.controller;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.model.Vote;
-import de.uniks.pioneers.template.MapTemplate;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MapsService;
 import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -32,7 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

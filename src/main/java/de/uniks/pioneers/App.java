@@ -153,7 +153,8 @@ public class App extends Application {
                 if (controller.getClass().equals(LobbyController.class)) {
                     stage.setWidth(900);
                     stage.setHeight(600);
-                } else if (controller.getClass().equals(GameLobbyController.class)) {
+                } else if (controller.getClass().equals(GameLobbyController.class)
+                        || controller.getClass().equals(MapTemplatesScreenController.class)) {
                     stage.setWidth(1010);
                     stage.setHeight(600);
                 }

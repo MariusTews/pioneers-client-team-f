@@ -6,20 +6,20 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateSubController">
-    <Label fx:id="nameLabel" prefWidth="170.0" style="-fx-text-fill: white" text="NAME">
+<HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateSubController">
+    <Label fx:id="nameLabel" prefWidth="300.0" style="-fx-text-fill: white" text="NAME">
         <HBox.margin>
-            <Insets left="18.0" />
+            <Insets left="40.0" />
         </HBox.margin>
     </Label>
-    <Label fx:id="createdByLabel" prefWidth="140.0" style="-fx-text-fill: white" text="CREATED_BY">
+    <Label fx:id="createdByLabel" prefWidth="220.0" style="-fx-text-fill: white" text="CREATED_BY">
         <HBox.margin>
-            <Insets left="42.0" />
+            <Insets left="6.0" />
         </HBox.margin>
     </Label>
-    <Label fx:id="votesLabel" alignment="TOP_LEFT" prefWidth="60.0" style="-fx-text-fill: white" text="VOTES">
+    <Label fx:id="votesLabel" alignment="TOP_LEFT" prefWidth="80.0" style="-fx-text-fill: white" text="VOTES">
         <HBox.margin>
-            <Insets left="54.0" />
+            <Insets left="6.0" />
         </HBox.margin>
     </Label>
     <ImageView fx:id="selectedImageView" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
