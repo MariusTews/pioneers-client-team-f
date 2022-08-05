@@ -3,7 +3,6 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.ExpectedMove;
-import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.service.GameStorage;
@@ -62,10 +61,10 @@ public class DevelopmentCardController implements Controller {
     private final Window owner;
     private final ExpectedMove nextMove;
     private final HashMap<String, User> userHash;
-    private final Player player;
+
 
     @Inject
-    public DevelopmentCardController(GameScreenController gameScreenController, Window owner, GameStorage gameStorage, IDStorage idStorage, PioneersService pioneersService, ExpectedMove nextMove, HashMap<String, User> userHash, Player player) {
+    public DevelopmentCardController(GameScreenController gameScreenController, Window owner, GameStorage gameStorage, IDStorage idStorage, PioneersService pioneersService, ExpectedMove nextMove, HashMap<String, User> userHash) {
         this.gameScreenController = gameScreenController;
         this.owner = owner;
         this.gameStorage = gameStorage;
@@ -73,7 +72,6 @@ public class DevelopmentCardController implements Controller {
         this.pioneersService = pioneersService;
         this.nextMove = nextMove;
         this.userHash = userHash;
-        this.player = player;
     }
 
     @Override
@@ -171,7 +169,7 @@ public class DevelopmentCardController implements Controller {
                     })
                     .subscribe(onSuccess -> {
                         primaryStage.close();
-                        YearOfPlentyController yearOfPlentyController = new YearOfPlentyController(player, gameStorage.getId(), pioneersService, owner);
+                        YearOfPlentyController yearOfPlentyController = new YearOfPlentyController(gameStorage.getId(), pioneersService, owner);
                         yearOfPlentyController.render();
                     });
         }
