@@ -8,7 +8,6 @@ import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -30,6 +29,7 @@ import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DevelopmentCardController implements Controller {
 
     public HBox mainHBoxId;
@@ -179,9 +179,7 @@ public class DevelopmentCardController implements Controller {
                     .playDevCard(gameStorage.getId(), "road-building")
                     .observeOn(FX_SCHEDULER)
                     .doOnError(error -> AlertSameRound())
-                    .subscribe(onSuccess -> {
-                        primaryStage.close();
-                    });
+                    .subscribe(onSuccess -> primaryStage.close());
 
         }
     }
@@ -195,9 +193,7 @@ public class DevelopmentCardController implements Controller {
                     .playDevCard(gameStorage.getId(), "knight")
                     .observeOn(FX_SCHEDULER)
                     .doOnError(error -> AlertSameRound())
-                    .subscribe(onSuccess -> {
-                        primaryStage.close();
-                    });
+                    .subscribe(onSuccess -> primaryStage.close());
         }
     }
 
