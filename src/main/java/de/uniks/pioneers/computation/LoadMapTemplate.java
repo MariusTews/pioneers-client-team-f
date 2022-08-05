@@ -37,7 +37,7 @@ public class LoadMapTemplate {
 			double xCoordinate = calculateMap.getxCoordinate(center, x, z);
 			double yCoordinate = calculateMap.getyCoordinate(center, z);
 
-			this.pane.getChildren().add(calculateMap.buildHexagon(xCoordinate, yCoordinate, x, y, z));
+			this.pane.getChildren().add(calculateMap.buildHexagon(xCoordinate, yCoordinate, x, y, z, false));
 
 			if (loadForIngame) {
 				this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x, y, z, false));
