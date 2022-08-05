@@ -479,14 +479,22 @@ public class LobbyController implements Controller {
                 }
             }
 
-            //check for new friends
+            //check for new/removed friends
             if (user._id().equals(idStorage.getID())) {
-                if (friendsUserList.size() != user.friends().size()) {
+                if (friendsUserList.size() < user.friends().size()) {
                     for (Iterator<User> iterator = users.iterator(); iterator.hasNext();) {
                         User newFriend = iterator.next();
                         if (!friendsUserList.contains(newFriend) && user.friends().contains(newFriend._id())) {
                             iterator.remove();
                             friendsUserList.add(newFriend);
+                        }
+                    }
+                } else if (friendsUserList.size() > user.friends().size()) {
+                    for (Iterator<User> iterator = friendsUserList.iterator(); iterator.hasNext();) {
+                        User removedFriend = iterator.next();
+                        if (!user.friends().contains(removedFriend._id())) {
+                            iterator.remove();
+                            users.add(removedFriend);
                         }
                     }
                 }
@@ -888,6 +896,20 @@ public class LobbyController implements Controller {
             updatedFriends.add(user._id());
             userService.userUpdate(idStorage.getID(), null, null, updatedFriends, null, null).blockingFirst();
         }
+    }
+
+    public void showRemoveFriendMenu(User user) {
+        boolean removeFriend = alertService.showFriendsMenu("Do you want to remove " + user.name() + " as a friend?");
+        if (removeFriend) {
+            List<String> updatedFriends = new ArrayList<>();
+            for (User oldFriends : friendsUserList) {
+                if (!Objects.equals(oldFriends._id(), user._id())) {
+                    updatedFriends.add(oldFriends._id());
+                }
+            }
+            userService.userUpdate(idStorage.getID(), null, null, updatedFriends, null, null).blockingFirst();
+        }
+
     }
 
     public boolean isNotAFriend(User user) {
