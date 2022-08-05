@@ -5,13 +5,16 @@ import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.ExpectedMove;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -156,12 +159,16 @@ public class DevelopmentCardController implements Controller {
     public void onYearOfPlentyClick() {
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || yearOfPlentyCard.getText().equals("0")) {
-            showAlert();
+            AlertService alertService = new AlertService();
+            alertService.showAlert("Playing not possible!");
         } else {
             pioneersService
                     .playDevCard(gameStorage.getId(), "year-of-plenty")
                     .observeOn(FX_SCHEDULER)
-                    .doOnError(error -> AlertSameRound())
+                    .doOnError(error -> {
+                        AlertService alertService = new AlertService();
+                        alertService.showAlert("You just bought the card this round!");
+                    })
                     .subscribe(onSuccess -> {
                         primaryStage.close();
                         YearOfPlentyController yearOfPlentyController = new YearOfPlentyController(player, gameStorage.getId(), pioneersService, owner);
@@ -173,12 +180,16 @@ public class DevelopmentCardController implements Controller {
     public void onRoadBuildingClick() {
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || roadBuildingCard.getText().equals("0")) {
-            showAlert();
+            AlertService alertService = new AlertService();
+            alertService.showAlert("Playing not possible!");
         } else {
             pioneersService
                     .playDevCard(gameStorage.getId(), "road-building")
                     .observeOn(FX_SCHEDULER)
-                    .doOnError(error -> AlertSameRound())
+                    .doOnError(error -> {
+                        AlertService alertService = new AlertService();
+                        alertService.showAlert("You just bought the card this round!");
+                    })
                     .subscribe(onSuccess -> primaryStage.close());
 
         }
@@ -187,12 +198,16 @@ public class DevelopmentCardController implements Controller {
     public void onKnightClick() {
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || knightCard.getText().equals("0")) {
-            showAlert();
+            AlertService alertService = new AlertService();
+            alertService.showAlert("Playing not possible!");
         } else {
             pioneersService
                     .playDevCard(gameStorage.getId(), "knight")
                     .observeOn(FX_SCHEDULER)
-                    .doOnError(error -> AlertSameRound())
+                    .doOnError(error -> {
+                        AlertService alertService = new AlertService();
+                        alertService.showAlert("You just bought the card this round!");
+                    })
                     .subscribe(onSuccess -> primaryStage.close());
         }
     }
@@ -201,12 +216,16 @@ public class DevelopmentCardController implements Controller {
         //if it's not your turn
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || monoPolyCard.getText().equals("0")) {
-            showAlert();
+            AlertService alertService = new AlertService();
+            alertService.showAlert("Playing not possible!");
         } else {
             pioneersService
                     .playDevCard(gameStorage.getId(), "monopoly")
                     .observeOn(FX_SCHEDULER)
-                    .doOnError(error -> AlertSameRound())
+                    .doOnError(error -> {
+                        AlertService alertService = new AlertService();
+                        alertService.showAlert("You just bought the card this round!");
+                    })
                     .subscribe(onSuccess -> {
                         primaryStage.close();
                         String[] types = {"VENUS_GRAIN", "MARS_BAR", "MOON_ROCK", "EARTH_CACTUS", "NEPTUNE_CRYSTAL"};
@@ -240,25 +259,6 @@ public class DevelopmentCardController implements Controller {
                     });
         }
     }
-
-    public void showAlert() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Playing not possible!");
-        // set style
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-        alert.showAndWait();
-    }
-
-    private void AlertSameRound() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "You just bought the card this round!");
-        // Set style
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-        alert.showAndWait();
-    }
-
 }
 
 
