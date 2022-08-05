@@ -123,7 +123,8 @@ public class CreateGameController implements Controller {
             dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
             alert.showAndWait();
         } else {
-            gameService.create(gameNameTextField.getText(), passwordTextField.getText(), mapSize, victoryPoints, mapTemplateId, false, 0)
+            //Todo: add option to edit roll7 and startingResources?
+            gameService.create(gameNameTextField.getText(), passwordTextField.getText(), mapSize, victoryPoints, mapTemplateId, true, 0)
                     .observeOn(FX_SCHEDULER)
                     .subscribe(onSuccess -> app.show(gameLobbyController.get()), onError -> {
                     });

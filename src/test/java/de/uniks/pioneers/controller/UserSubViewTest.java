@@ -62,15 +62,13 @@ public class UserSubViewTest extends ApplicationTest {
 
         final App app = new App(userSubView);
         app.start(stage);
-        testParameters();
-
     }
 
     @Test
     public void testParameters() {
-
-        // will be added in 4h release, old version did not test anything
+        //TODO:finish test later
     }
+
 
     @Override
     public void stop() throws Exception {
