@@ -153,7 +153,7 @@ public class DevelopmentCardController implements Controller {
         primaryStage.close();
     }
 
-    public void onYearOfPlentyClick(ActionEvent event) {
+    public void onYearOfPlentyClick() {
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || yearOfPlentyCard.getText().equals("0")) {
             showAlert();
@@ -170,7 +170,7 @@ public class DevelopmentCardController implements Controller {
         }
     }
 
-    public void onRoadBuildingClick(ActionEvent event) {
+    public void onRoadBuildingClick() {
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || roadBuildingCard.getText().equals("0")) {
             showAlert();
@@ -186,7 +186,7 @@ public class DevelopmentCardController implements Controller {
         }
     }
 
-    public void onKnightClick(ActionEvent event) {
+    public void onKnightClick() {
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || knightCard.getText().equals("0")) {
             showAlert();
@@ -201,7 +201,7 @@ public class DevelopmentCardController implements Controller {
         }
     }
 
-    public void onMonopolyClick(ActionEvent event) {
+    public void onMonopolyClick() {
         //if it's not your turn
         if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
                 !nextMove.action().equals("build") || monoPolyCard.getText().equals("0")) {
@@ -213,7 +213,7 @@ public class DevelopmentCardController implements Controller {
                     .doOnError(error -> AlertSameRound())
                     .subscribe(onSuccess -> {
                         primaryStage.close();
-                        String types[] = {"grain", "brick", "ore", "lumber", "wool"};
+                        String[] types = {"VENUS_GRAIN", "MARS_BAR", "MOON_ROCK", "EARTH_CACTUS", "NEPTUNE_CRYSTAL"};
                         ChoiceDialog<String> choosingResource = new ChoiceDialog<>(types[1], types);
                         choosingResource.getDialogPane().lookupButton(ButtonType.CANCEL).setVisible(false);
                         // set stylesheet
@@ -225,8 +225,16 @@ public class DevelopmentCardController implements Controller {
                         // Get the chosen target and make a server request with this target
                         choosingResource.showAndWait();
                         String resource = choosingResource.getSelectedItem();
+                        HashMap<String, String> ResourceMap = new HashMap<>() {{
+                            put("VENUS_GRAIN", VENUS_GRAIN);
+                            put("MARS_BAR", MARS_BAR);
+                            put("MOON_ROCK", MOON_ROCK);
+                            put("EARTH_CACTUS", EARTH_CACTUS);
+                            put("NEPTUNE_CRYSTAL", NEPTUNE_CRYSTAL);
+                        }};
+                        String selectedResource = ResourceMap.get(resource);
                         HashMap<String, Integer> resourcesMap = new HashMap<>() {{
-                            put(resource, 0);
+                            put(selectedResource, 0);
                         }};
 
                         pioneersService
