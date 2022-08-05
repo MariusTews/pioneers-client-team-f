@@ -1,7 +1,6 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.service.PioneersService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -67,7 +66,6 @@ public class YearOfPlentyController implements Controller {
     private final List<Label> allLabels = new ArrayList<>();
     private final PioneersService pioneersService;
     private final String gameID;
-    private final Player player;
     private final Window owner;
     private Stage primaryStage;
     private final HashMap<String, Integer> resourcesMap = new HashMap<>() {{
@@ -79,8 +77,7 @@ public class YearOfPlentyController implements Controller {
     }};
 
     @Inject
-    public YearOfPlentyController(Player player, String gameID, PioneersService pioneersService, Window owner) {
-        this.player = player;
+    public YearOfPlentyController(String gameID, PioneersService pioneersService, Window owner) {
         this.gameID = gameID;
         this.pioneersService = pioneersService;
         this.owner = owner;
@@ -98,7 +95,7 @@ public class YearOfPlentyController implements Controller {
 
     @Override
     public Parent render() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/DiscardResourcesView.fxml"));
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/YearOfPlentyView.fxml"));
         loader.setControllerFactory(c -> this);
         Parent root;
         try {
@@ -200,9 +197,5 @@ public class YearOfPlentyController implements Controller {
                             primaryStage.close();
                         }
                 );
-    }
-
-    public Stage getPrimaryStage() {
-        return this.primaryStage;
     }
 }
