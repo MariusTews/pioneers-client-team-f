@@ -186,3 +186,17 @@
     -fx-background-color: transparent;
     -fx-text-fill: WHITE;
 }
+
+#paneTradingId{
+    -fx-background-image: url("../assets/green_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 220 180;
+}
+
+#tradingFoldOutId{
+    -fx-background-color: transparent;
+    -fx-font-size: 18;
+    -fx-text-fill: WHITE;
+
+}

@@ -42,6 +42,9 @@ public class GameScreenController implements Controller {
     private final UserStorage userStorage;
     public Label spectatorTitleId;
     public ImageView arrowImageId;
+    public ImageView imageTradingFoldoutId;
+    public ImageView imageTradingFoldInId;
+    public Pane paneTradingId;
 
     private List<CircleSubController> circleSubControllers = new ArrayList<>();
 
@@ -114,7 +117,7 @@ public class GameScreenController implements Controller {
     private TradingSubController tradingSubController;
     private TradeAcceptSubcontroller tradeAcceptSubcontroller;
 
-    private SpectatorViewController spectatorViewController;
+    //private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
@@ -314,14 +317,16 @@ public class GameScreenController implements Controller {
         this.playerOwnView.addListener((ListChangeListener<? super Player>) c ->
                 this.userViewPane.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
+        imageTradingFoldoutId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/down.png"))));
+
         /*
          * Render trading sub view
          * hand over own player to trading sub view
          * */
 
-        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener);
-        tradingSubController.init();
-        this.tradingPane.getChildren().setAll(this.tradingSubController.render());
+        //this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener);
+        ///tradingSubController.init();
+        ///this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
         //Action is performed when the platform is close
         this.app.getStage().setOnCloseRequest(e -> {
@@ -754,9 +759,27 @@ public class GameScreenController implements Controller {
     }
 
     public void onShowSpectator() {
-        if(spectatorMember.size() >= 1){
+        if (spectatorMember.size() >= 1) {
             SpectatorRenderInGame spectatorRenderInGame = new SpectatorRenderInGame();
-            spectatorRenderInGame.checkMember(spectatorMember,spectatorPaneId, allUser ,spectatorTitleId,arrowImageId);
+            spectatorRenderInGame.checkMember(spectatorMember, spectatorPaneId, allUser, spectatorTitleId, arrowImageId);
         }
+    }
+
+    public void onClickTradeView() {
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener);
+        tradingSubController.init();
+        this.tradingPane.getChildren().setAll(this.tradingSubController.render());
+        imageTradingFoldInId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/up.png"))));
+        imageTradingFoldInId.disableProperty().set(false);
+        paneTradingId.visibleProperty().set(false);
+        paneTradingId.disableProperty().set(true);
+    }
+
+    public void onClickUP() {
+        this.tradingPane.getChildren().clear();
+        imageTradingFoldInId.setImage(null);
+        imageTradingFoldInId.disableProperty().set(true);
+        paneTradingId.disableProperty().set(false);
+        paneTradingId.visibleProperty().set(true);
     }
 }

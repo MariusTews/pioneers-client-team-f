@@ -79,6 +79,13 @@
          <VBox fx:id="remainingTimeView" layoutY="30.0" prefHeight="30.0" prefWidth="150.0" />
          </Pane>
       <VBox id="gameTimer" fx:id="gameTimeView" layoutX="62.0" layoutY="549.0" prefHeight="30.0" prefWidth="150.0" />
+      <ImageView fx:id="imageTradingFoldInId" fitHeight="25.0" fitWidth="90.0" layoutX="334.0" layoutY="340.0" onMouseClicked="#onClickUP" pickOnBounds="true" preserveRatio="true" />
+      <Pane fx:id="paneTradingId" layoutX="240.0" layoutY="74.0" onMouseClicked="#onClickTradeView" prefHeight="70.0" prefWidth="243.0">
+         <children>
+            <Label fx:id="tradingFoldOutId" alignment="CENTER" layoutX="4.0" layoutY="-1.0" prefHeight="47.0" prefWidth="243.0" text="Trading " />
+            <ImageView fx:id="imageTradingFoldoutId" fitHeight="21.0" fitWidth="50.0" layoutX="97.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Pane>
     </Pane>
    <Pane fx:id="foldOutPaneId" layoutX="450.0" onMouseClicked="#onShowSpectator" prefHeight="60.0" prefWidth="192.0">
       <children>
