@@ -112,7 +112,6 @@ public class CircleSubController implements Controller {
                         }
                     });
         } else if (nextMove.action().equals("build-road")) {
-            System.out.println(nextMove.action());
             this.pioneersService.move(gameStorage.getId(), "build-road", x, y, z, side, "road", null, null)
                     .observeOn(FX_SCHEDULER)
                     .doOnError(error -> notAllowedToPlace())

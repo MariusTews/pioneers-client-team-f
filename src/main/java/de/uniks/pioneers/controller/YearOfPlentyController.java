@@ -169,8 +169,6 @@ public class YearOfPlentyController implements Controller {
         }
     }
 
-    // Check the resources everytime an increment/decrement button is pressed and refresh the discard button text
-    // Pressing the discard button is only possible when all requirements are satisfied.
     public void checkChosenResources() {
         int quantity = 0;
         for (Label amountLabel : allLabels) {
@@ -188,7 +186,6 @@ public class YearOfPlentyController implements Controller {
         this.resourcesMap.put(MOON_ROCK, Integer.parseInt(ore.getText()));
         this.resourcesMap.put(EARTH_CACTUS, Integer.parseInt(lumber.getText()));
         this.resourcesMap.put(NEPTUNE_CRYSTAL, Integer.parseInt(wool.getText()));
-        System.out.println(resourcesMap);
 
         pioneersService.yearOfPlentyCard(gameID, resourcesMap)
                 .observeOn(FX_SCHEDULER)
