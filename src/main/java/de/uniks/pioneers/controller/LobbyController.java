@@ -29,10 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 
 import static de.uniks.pioneers.Constants.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class LobbyController implements Controller {
@@ -108,7 +106,7 @@ public class LobbyController implements Controller {
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
-    private LobbyTabsAndMessage lb;
+    private LobbyTabsAndMessage lb = new LobbyTabsAndMessage();
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
@@ -184,7 +182,8 @@ public class LobbyController implements Controller {
 
         //refreshed Token and runs for an hour
         if (this.gameStorage.getId() == null) {
-            beepForAHour();
+            //call this method every 30 minutes to refresh refreshToken and ActiveToken
+            lb.beepForAnHour(refreshTokenStorage, authService, scheduler);
         }
 
         this.app.getStage().setOnCloseRequest(e -> {
@@ -204,19 +203,6 @@ public class LobbyController implements Controller {
         disposable.clear();
     }
 
-    //call this method every 30 minutes to refresh refreshToken and ActiveToken
-    public void beepForAHour() {
-        String refreshToken = this.refreshTokenStorage.getRefreshToken();
-        final Runnable beeper = () -> authService.refreshToken(refreshToken).
-                observeOn(FX_SCHEDULER).subscribe();
-
-        final ScheduledFuture<?> beeperHandle =
-                scheduler.scheduleAtFixedRate(beeper, 10, 30 * 60, SECONDS);
-        scheduler.schedule(() -> beeperHandle.cancel(true)
-                , 60 * 60, SECONDS);
-    }
-
-
     @Override
     public Parent render() {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/LobbyScreen.fxml"));
@@ -228,27 +214,9 @@ public class LobbyController implements Controller {
             e.printStackTrace();
             return null;
         }
-
-        //make the rejoin button visible
-        //based upon if a user is in game or not
-        if (this.gameStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                        boolean trace = true;
-                        for (Member member : result) {
-                            if (member.userId().equals(this.idStorage.getID())) {
-                                rejoinButton.disableProperty().set(false);
-                                trace = false;
-                                break;
-                            }
-                        }
-                        if (trace) {
-                            rejoinButton.disableProperty().set(true);
-                        }
-                    });
-        } else {
-            rejoinButton.disableProperty().set(true);
-        }
+        // create instance of LobbyTabs andMessage
+        //lb = new LobbyTabsAndMessage();
+        lb.rejoinButton(gameStorage, memberService, rejoinButton, idStorage);
 
         this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
 
@@ -259,14 +227,10 @@ public class LobbyController implements Controller {
                 handleTabSwitching(oldValue, newValue));
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
 
-        // create instance of LobbyTabs andMessage
-        lb = new LobbyTabsAndMessage();
-
         return parent;
     }
 
-    //takes action when the application is forcefully closed
-    //such as logging out
+    //takes action when the application is forcefully closed such as logging out
     private void actionOnclose() {
         userService.statusUpdate(idStorage.getID(), "offline")
                 .observeOn(FX_SCHEDULER)
@@ -284,8 +248,6 @@ public class LobbyController implements Controller {
         for (DirectChatStorage directChatStorage : directChatStorages) {
             if (directChatStorage.getTab() != null && directChatStorage.getTab().equals(newValue)) {
                 this.currentDirectStorage = directChatStorage;
-                System.out.println(directChatStorage.getGroupId());
-
                 this.loadMessages(currentDirectStorage.getGroupId(), currentDirectStorage.getTab());
                 tabDisposable = eventListener.listen("groups." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
                     if (messageEvent.event().endsWith(CREATED)) {
@@ -544,11 +506,7 @@ public class LobbyController implements Controller {
     }
 
     private void addToDirectChatStorage(String groupId, User user, Tab tab) {
-        DirectChatStorage directChatStorage = new DirectChatStorage();
-        directChatStorage.setGroupId(groupId);
-        directChatStorage.setUser(user);
-        directChatStorage.setTab(tab);
-        this.directChatStorages.add(directChatStorage);
+        this.directChatStorages.add(lb.addToDirectChatStorage(groupId, user, tab));
     }
 
     private void handleAllTabMessages(Event<Message> event) {

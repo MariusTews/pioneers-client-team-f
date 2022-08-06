@@ -24,8 +24,11 @@ import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 import static de.uniks.pioneers.Constants.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SuppressWarnings("ALL")
 public class LobbyTabsAndMessage {
@@ -43,7 +46,6 @@ public class LobbyTabsAndMessage {
                                 .subscribeOn(FX_SCHEDULER)
                                 .subscribe(
                                         onSuccess -> {
-                                            System.out.println("hallos");
                                             ResourceManager.saveConfig(JsonUtil.createDefaultConfig());
                                             app.show(loginController.get());
                                         },
@@ -248,5 +250,47 @@ public class LobbyTabsAndMessage {
                 }
             });
         }
+    }
+
+    public void rejoinButton(GameStorage gameStorage, MemberService memberService, Button rejoinButton, IDStorage idStorage) {
+        //make the rejoin button visible
+        //based upon if a user is in game or not
+        if (gameStorage.getId() != null) {
+            memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                        boolean trace = true;
+                        for (Member member : result) {
+                            if (member.userId().equals(idStorage.getID())) {
+                                rejoinButton.disableProperty().set(false);
+                                trace = false;
+                                break;
+                            }
+                        }
+                        if (trace) {
+                            rejoinButton.disableProperty().set(true);
+                        }
+                    });
+        } else {
+            rejoinButton.disableProperty().set(true);
+        }
+    }
+
+    public void beepForAnHour(RefreshTokenStorage refreshTokenStorage, AuthService authService, ScheduledExecutorService scheduler) {
+        String refreshToken = refreshTokenStorage.getRefreshToken();
+        final Runnable beeper = () -> authService.refreshToken(refreshToken).
+                observeOn(FX_SCHEDULER).subscribe();
+
+        final ScheduledFuture<?> beeperHandle =
+                scheduler.scheduleAtFixedRate(beeper, 10, 30 * 60, SECONDS);
+        scheduler.schedule(() -> beeperHandle.cancel(true)
+                , 60 * 60, SECONDS);
+    }
+
+    public DirectChatStorage addToDirectChatStorage(String groupId, User user, Tab tab) {
+        DirectChatStorage directChatStorage = new DirectChatStorage();
+        directChatStorage.setGroupId(groupId);
+        directChatStorage.setUser(user);
+        directChatStorage.setTab(tab);
+        return directChatStorage;
     }
 }
