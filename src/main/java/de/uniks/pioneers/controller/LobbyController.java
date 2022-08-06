@@ -593,7 +593,7 @@ public class LobbyController implements Controller {
         List<User> onlineUser = new ArrayList<>();
         List<User> offlineUser = new ArrayList<>();
         for (User user : users) {
-            if (friends.contains(user._id())) {
+            if (friends != null && friends.contains(user._id())) {
                 if (user.status().equals("online")) {
                     onlineFriends.add(user);
                 } else {
