@@ -38,7 +38,8 @@ public class LobbyTabsAndMessage {
     }
 
 
-    public void logout(UserService userService, IDStorage idStorage, AuthService authService, Provider<LoginController> loginController, App app) {
+    public void logout(UserService userService, IDStorage idStorage, AuthService authService,
+                       Provider<LoginController> loginController, App app) {
         userService.statusUpdate(idStorage.getID(), "offline")
                 .observeOn(FX_SCHEDULER)
                 .subscribe(
@@ -57,7 +58,8 @@ public class LobbyTabsAndMessage {
                 );
     }
 
-    public void createGame(GameStorage gameStorage, MemberService memberService, IDStorage idStorage, Provider<CreateGameController> createGameController, App app) {
+    public void createGame(GameStorage gameStorage, MemberService memberService, IDStorage idStorage,
+                           Provider<CreateGameController> createGameController, App app) {
         if (gameStorage.getId() != null) {
             memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
@@ -100,7 +102,8 @@ public class LobbyTabsAndMessage {
         }
     }
 
-    public void renderSingleMessage(String groupID, Tab tab, Message message, HashMap<String, User> memberHash, IDStorage idStorage, MessageService messageService) {
+    public void renderSingleMessage(String groupID, Tab tab, Message message, HashMap<String, User> memberHash,
+                                    IDStorage idStorage, MessageService messageService) {
         HBox box = new HBox(3);
         Label label = new Label();
         ImageView imageView = new ImageView();
@@ -153,7 +156,8 @@ public class LobbyTabsAndMessage {
         });
     }
 
-    public void joinGame(GameStorage gameStorage, MemberService memberService, IDStorage idStorage, Game game, Provider<GameLobbyController> gameLobbyController, App app) {
+    public void joinGame(GameStorage gameStorage, MemberService memberService, IDStorage idStorage, Game game,
+                         Provider<GameLobbyController> gameLobbyController, App app) {
         if (gameStorage.getId() != null) {
             memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
@@ -204,8 +208,8 @@ public class LobbyTabsAndMessage {
                         }));
     }
 
-    public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController, IDStorage idStorage, GameStorage
-            gameStorage, Provider<GameScreenController> gameScreenController, PioneersService pioneersService) {
+    public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController, IDStorage idStorage,
+                       GameStorage gameStorage, Provider<GameScreenController> gameScreenController, PioneersService pioneersService) {
         boolean changeToPlayer = false;
         for (Member m : members) {
             if (m.gameId().equals(gameStorage.getId()) && m.userId().equals(idStorage.getID())
@@ -224,7 +228,8 @@ public class LobbyTabsAndMessage {
     }
 
     public void loadMessages(Tab allTab, Tab tab, String groupId, MessageService messageService, ObservableList<Message> lobby_messages,
-                             List<String> deletedAllMessages, List<String> deletedMessages, ObservableList<Message> messages, HashMap<String, User> memberHash, IDStorage idStorage) {
+                             List<String> deletedAllMessages, List<String> deletedMessages, ObservableList<Message> messages,
+                             HashMap<String, User> memberHash, IDStorage idStorage) {
         if (tab.equals(allTab)) {
             messageService.getAllMessages(GLOBAL, LOBBY_ID).observeOn(FX_SCHEDULER).subscribe(m -> {
                 lobby_messages.clear();
