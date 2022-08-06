@@ -1,6 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.service.MapsService;
 import javafx.beans.property.IntegerProperty;
@@ -9,13 +10,21 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,7 +35,8 @@ public class MapTemplateSubController implements Controller {
     private final boolean ownMap;
     private final String createdBy;
     private final String userId;
-    private final MapsService mapsService;
+    private final MapTemplatesScreenController parentController;
+    private MapsService mapsService;
     private Image leftActionImage;
     private Image rightActionImage;
     private Image selectedMapIcon;
@@ -45,17 +55,19 @@ public class MapTemplateSubController implements Controller {
     public ImageView leftActionImageView;
     @FXML
     public ImageView rightActionImageView;
+    private Pane mainPane;
     private final IntegerProperty voted = new SimpleIntegerProperty();
     private final ChangeListener<? super Number> voteListener = this::onVoteScoreChanged;
-    private final ColorAdjust darkColorAdjust =  new ColorAdjust();
-    private final ColorAdjust brightColorAdjust =  new ColorAdjust();
+    private final ColorAdjust darkColorAdjust = new ColorAdjust();
+    private final ColorAdjust brightColorAdjust = new ColorAdjust();
+    private HashMap<String, String> userNames;
 
-    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy, String userId, MapsService mapsService) {
+    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy, String userId, MapTemplatesScreenController parentController) {
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
         this.userId = userId;
-        this.mapsService = mapsService;
+        this.parentController = parentController;
     }
 
     @Override
@@ -63,6 +75,7 @@ public class MapTemplateSubController implements Controller {
         selectedMapIcon = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/selectedMapIcon.png")).toString());
         darkColorAdjust.setBrightness(-0.3);
         brightColorAdjust.setBrightness(0.3);
+        mapsService = parentController.getMapsService();
     }
 
     @Override
@@ -72,6 +85,7 @@ public class MapTemplateSubController implements Controller {
         selectedMapIcon = null;
         if (!ownMap) {
             voted.removeListener(voteListener);
+            votesLabel.setOnMouseClicked(null);
         }
     }
 
@@ -101,7 +115,10 @@ public class MapTemplateSubController implements Controller {
         rightActionImageView.setImage(rightActionImage);
 
         if (!ownMap) {
+            mainPane = parentController.getMainPane();
+            userNames = parentController.getUserNames();
             voted.addListener(voteListener);
+            votesLabel.setOnMouseClicked(this::showVotes);
         }
 
         parent.setId(template._id());
@@ -146,8 +163,7 @@ public class MapTemplateSubController implements Controller {
             this.mapsService.deleteVote(template._id(), userId).observeOn(FX_SCHEDULER).subscribe(
                     vote -> voted.set(0)
             );
-        }
-        else {
+        } else {
             // vote map according to score
             this.mapsService.voteMap(template._id(), score).observeOn(FX_SCHEDULER).subscribe(
                     vote -> voted.set(score)
@@ -174,6 +190,61 @@ public class MapTemplateSubController implements Controller {
                 leftActionImageView.setEffect(brightColorAdjust);
             }
         }
+    }
+
+    private void showVotes(MouseEvent mouseEvent) {
+        Pane pane = new Pane();
+        pane.setStyle("-fx-background-color: linear-gradient(to bottom, #666666, #F5F5F5); -fx-border-color: grey; -fx-border-radius: 3px");
+        pane.setLayoutX(325);
+        pane.setLayoutY(25);
+        VBox vBox = new VBox();
+        HBox upperHBox = new HBox(6);
+        upperHBox.setPrefHeight(28);
+        ImageView upVoteImageView = new ImageView(leftActionImage);
+        upVoteImageView.setFitHeight(25);
+        upVoteImageView.setFitWidth(25);
+        upVoteImageView.setTranslateX(35);
+        upVoteImageView.setTranslateY(5);
+        ImageView downVoteImageView = new ImageView(rightActionImage);
+        downVoteImageView.setFitHeight(25);
+        downVoteImageView.setFitWidth(25);
+        downVoteImageView.setTranslateX(185);
+        downVoteImageView.setTranslateY(5);
+        Button closeButton = new Button("Close");
+        closeButton.setTranslateX(210);
+        closeButton.setOnAction(event -> mainPane.getChildren().remove(pane));
+        upperHBox.getChildren().addAll(upVoteImageView, downVoteImageView, closeButton);
+        HBox lowerHBox = new HBox();
+        ScrollPane upVoteScrollPane = new ScrollPane();
+        ScrollPane downVoteScrollPane = new ScrollPane();
+        upVoteScrollPane.setPrefWidth(180);
+        upVoteScrollPane.setPrefHeight(300);
+        downVoteScrollPane.setPrefWidth(180);
+        downVoteScrollPane.setPrefHeight(300);
+        VBox upVoteVBox = new VBox();
+        upVoteVBox.setPadding(new Insets(6, 0, 0, 6));
+        VBox downVoteVBox = new VBox();
+        downVoteVBox.setPadding(new Insets(6, 0, 0, 6));
+        upVoteScrollPane.setContent(upVoteVBox);
+        downVoteScrollPane.setContent(downVoteVBox);
+        lowerHBox.getChildren().addAll(upVoteScrollPane, downVoteScrollPane);
+
+        List<Vote> votes = this.mapsService.findVotesByMapId(template._id()).blockingFirst();
+
+        for (Vote vote : votes) {
+            HBox item = new HBox();
+            Label nameLabel = new Label(userNames.getOrDefault(vote.userId(), ""));
+            item.getChildren().add(nameLabel);
+            if (vote.score().equals(1)) {
+                upVoteVBox.getChildren().add(item);
+            } else {
+                downVoteVBox.getChildren().add(item);
+            }
+        }
+
+        vBox.getChildren().addAll(upperHBox, lowerHBox);
+        pane.getChildren().add(vBox);
+        mainPane.getChildren().add(pane);
     }
 
     private void openDeleteDialog() {

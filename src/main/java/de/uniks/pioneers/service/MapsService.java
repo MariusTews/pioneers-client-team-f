@@ -22,6 +22,10 @@ public class MapsService {
         return this.mapsApiService.findAllMaps();
     }
 
+    public Observable<List<Vote>> findVotesByMapId(String id) {
+        return this.mapsApiService.findVotesByMapId(id);
+    }
+
     public Observable<MapTemplate> deleteMapTemplate(String id) {
         return this.mapsApiService.delete(id);
     }

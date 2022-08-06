@@ -12,6 +12,9 @@ public interface MapsApiService {
     @GET("maps")
     Observable<List<MapTemplate>> findAllMaps();
 
+    @GET("maps/{id}/votes")
+    Observable<List<Vote>> findVotesByMapId(@Path("id") String id);
+
     @DELETE("maps/{id}")
     Observable<MapTemplate> delete(@Path("id") String id);
 
