@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.computation.LobbyTabsAndMessage;
 import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
@@ -112,6 +113,8 @@ public class LobbyController implements Controller {
     private final CompositeDisposable disposable = new CompositeDisposable();
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
+
+    private LobbyTabsAndMessage lb;
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
@@ -262,6 +265,9 @@ public class LobbyController implements Controller {
                 handleTabSwitching(oldValue, newValue));
         tabPane.tabClosingPolicyProperty().set(TabPane.TabClosingPolicy.SELECTED_TAB);
 
+        // create instance of LobbyTabs andMessage
+        lb = new LobbyTabsAndMessage();
+
         return parent;
     }
 
@@ -284,6 +290,8 @@ public class LobbyController implements Controller {
         for (DirectChatStorage directChatStorage : directChatStorages) {
             if (directChatStorage.getTab() != null && directChatStorage.getTab().equals(newValue)) {
                 this.currentDirectStorage = directChatStorage;
+                System.out.println(directChatStorage.getGroupId());
+
                 this.loadMessages(currentDirectStorage.getGroupId(), currentDirectStorage.getTab());
                 tabDisposable = eventListener.listen("groups." + directChatStorage.getGroupId() + ".messages.*.*", Message.class).observeOn(FX_SCHEDULER).subscribe(messageEvent -> {
                     if (messageEvent.event().endsWith(CREATED)) {
@@ -308,22 +316,7 @@ public class LobbyController implements Controller {
     }
 
     public void logout() {
-        userService.statusUpdate(idStorage.getID(), "offline")
-                .observeOn(FX_SCHEDULER)
-                .subscribe(
-                        result -> authService.logout()
-                                .subscribeOn(FX_SCHEDULER)
-                                .subscribe(
-                                        onSuccess -> {
-                                            ResourceManager.saveConfig(JsonUtil.createDefaultConfig());
-                                            app.show(loginController.get());
-                                        },
-                                        onError -> {
-                                        }
-                                ),
-                        error -> {
-                        }
-                );
+        lb.logout(userService,idStorage,authService,loginController, app);
 
     }
 
@@ -337,33 +330,9 @@ public class LobbyController implements Controller {
     }
 
     public void createGameButtonPressed() {
-        //makes sure if user in game or not , and depending on that
-        //allows user to create the game
-        if (this.gameStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                        boolean trace = true;
-                        for (Member member : result) {
-                            if (member.userId().equals(this.idStorage.getID())) {
-                                Alert alert = new Alert(Alert.AlertType.ERROR, "You cannot create Game while being part of another Game");
-                                // Change style of error alert
-                                DialogPane dialogPane = alert.getDialogPane();
-                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                                alert.showAndWait();
-                                trace = false;
-                                break;
-                            }
-                        }
-                        if (trace) {
-                            final CreateGameController controller = createGameController.get();
-                            app.show(controller);
-                        }
-                    });
-        } else {
-            final CreateGameController controller = createGameController.get();
-            app.show(controller);
-        }
+        //makes sure if user in game or not , and depending on that allows user to create the game
+        lb.createGame(gameStorage, memberService,idStorage,createGameController,app);
+
     }
 
     public void enterKeyPressed(KeyEvent event) {
@@ -373,18 +342,7 @@ public class LobbyController implements Controller {
     }
 
     private void checkMessageField() {
-        if (!chatMessageField.getText().isEmpty()) {
-            if (currentDirectStorage != null) {
-                this.messageService.send(GROUPS, currentDirectStorage.getGroupId(), chatMessageField.getText())
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe(result -> this.chatMessageField.setText(""));
-            } else {
-                this.messageService.send(GLOBAL, LOBBY_ID, chatMessageField.getText())
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe();
-                this.chatMessageField.clear();
-            }
-        }
+        lb.checkMessageField(chatMessageField,currentDirectStorage,messageService);
     }
 
     private Node renderUser(User user) {
@@ -635,24 +593,7 @@ public class LobbyController implements Controller {
     }
 
     private void renderSingleMessage(String groupID, Tab tab, Message message) {
-
-        HBox box = new HBox(3);
-        Label label = new Label();
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(20);
-        imageView.setFitHeight(20);
-        if (this.memberHash.get(message.sender()).avatar() != null) {
-            imageView.setImage(new Image(this.memberHash.get(message.sender()).avatar()));
-        }
-        box.getChildren().add(imageView);
-        label.setMinWidth(100);
-        initRightClick(label, message._id(), message.sender(), groupID);
-        label.setText(memberHash.get(message.sender()).name() + ": " + message.body());
-        box.getChildren().add(label);
-
-        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
-
-        ((ScrollPane) tab.getContent()).vvalueProperty().bind(((VBox) ((ScrollPane) tab.getContent()).getContent()).heightProperty());
+        lb.renderSingleMessage(groupID,tab,message,memberHash,idStorage,messageService);
     }
 
     public void joinGame(Game game) {
@@ -706,39 +647,6 @@ public class LobbyController implements Controller {
                         })
                         .subscribe(result -> app.show(gameLobbyController.get()), onError -> {
                         }));
-    }
-
-    private void initRightClick(Label label, String messageId, String sender, String groupId) {
-        final ContextMenu contextMenu = new ContextMenu();
-        final MenuItem menuItem = new MenuItem("delete");
-
-        contextMenu.getItems().add(menuItem);
-        label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: LIGHTGREY"));
-        label.setOnMouseExited(event -> label.setStyle("-fx-background-color: TRANSPARENT"));
-        label.setContextMenu(contextMenu);
-
-        menuItem.setOnAction(event -> {
-            if (sender.equals(this.idStorage.getID())) {
-                if (groupId != null) {
-                    messageService
-                            .delete(GROUPS, groupId, messageId)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe();
-                } else {
-                    messageService
-                            .delete(GLOBAL, LOBBY_ID, messageId)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe();
-                }
-            } else {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.");
-                // set style of warning
-                DialogPane dialogPane = alert.getDialogPane();
-                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                alert.showAndWait();
-            }
-        });
     }
 
     //reactivate for the possibility of joining the game
