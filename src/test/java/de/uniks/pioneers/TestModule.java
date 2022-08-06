@@ -512,7 +512,12 @@ public class TestModule {
 				return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
 			}
 
-			@Override
+            @Override
+            public Observable<List<Vote>> findVotesByMapId(String id) {
+                return null;
+            }
+
+            @Override
 			public Observable<MapTemplate> delete(String id) {
 				return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of()));
 			}

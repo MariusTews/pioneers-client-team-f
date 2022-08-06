@@ -364,4 +364,22 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         Assertions.assertThat(controller.rightActionImageView.getEffect()).isNotNull();
     }
 
+    @Test
+    void showVotes() {
+        Vote vote1 = new Vote("", "", user2Map._id(), user1._id(), -1);
+        Vote vote2 = new Vote("", "", user2Map._id(), user3._id(), 1);
+        Vote vote3 = new Vote("", "", user2Map._id(), user4._id(), 1);
+        Vote vote4 = new Vote("", "", user2Map._id(), user5._id(), -1);
+        when(mapsService.findVotesByMapId(user2Map._id())).thenReturn(Observable.just(List.of(vote1, vote2, vote3, vote4)));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.get(user2Map._id());
+
+        clickOn(controller.votesLabel);
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(mapTemplatesScreenController.getMainPane().getChildren().size()).isEqualTo(2);
+    }
+
 }
