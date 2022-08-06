@@ -94,9 +94,9 @@ public class LoginController implements Controller {
         loginButton.disableProperty().bind(length.or(usernameLengthMin.or(usernameLengthMax.not())));
 
         //this makes sure enter key works while logging in
-        parent.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
-            if(event.getCode() == KeyCode.ENTER){
-                if(!(length.or(usernameLengthMin.or(usernameLengthMax.not())).get())){
+        parent.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                if (!(length.or(usernameLengthMin.or(usernameLengthMax.not())).get())) {
                     loginButtonPressed();
                 }
             }

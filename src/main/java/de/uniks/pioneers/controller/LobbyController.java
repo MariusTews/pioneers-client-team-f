@@ -444,16 +444,19 @@ public class LobbyController implements Controller {
 
             //check for new/removed friends
             if (user._id().equals(idStorage.getID())) {
+                //new friend
                 if (friendsUserList.size() < user.friends().size()) {
-                    for (Iterator<User> iterator = users.iterator(); iterator.hasNext();) {
+                    for (Iterator<User> iterator = users.iterator(); iterator.hasNext(); ) {
                         User newFriend = iterator.next();
                         if (!friendsUserList.contains(newFriend) && user.friends().contains(newFriend._id())) {
                             iterator.remove();
                             friendsUserList.add(newFriend);
                         }
                     }
-                } else if (friendsUserList.size() > user.friends().size()) {
-                    for (Iterator<User> iterator = friendsUserList.iterator(); iterator.hasNext();) {
+                }
+                //removed friend
+                else if (friendsUserList.size() > user.friends().size()) {
+                    for (Iterator<User> iterator = friendsUserList.iterator(); iterator.hasNext(); ) {
                         User removedFriend = iterator.next();
                         if (!user.friends().contains(removedFriend._id())) {
                             iterator.remove();
@@ -829,7 +832,6 @@ public class LobbyController implements Controller {
 
         //add rest of users
         ((VBox) this.userScrollPane.getContent()).getChildren().addAll(users.stream().sorted(userComparator).map(this::renderUser).toList());
-        //((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
     }
 
     private void createHeader(String headerText) {
