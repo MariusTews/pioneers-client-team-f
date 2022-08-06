@@ -3,13 +3,17 @@ package de.uniks.pioneers.computation;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.controller.CreateGameController;
+import de.uniks.pioneers.controller.GameLobbyController;
+import de.uniks.pioneers.controller.GameScreenController;
 import de.uniks.pioneers.controller.LoginController;
+import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
+import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,17 +21,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import javax.inject.Provider;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
-import static de.uniks.pioneers.Constants.LOBBY_ID;
 
 @SuppressWarnings("ALL")
 public class LobbyTabsAndMessage {
 
-    public LobbyTabsAndMessage(){
+    public LobbyTabsAndMessage() {
 
     }
 
@@ -106,7 +109,7 @@ public class LobbyTabsAndMessage {
         }
         box.getChildren().add(imageView);
         label.setMinWidth(100);
-        initRightClick(label, message._id(), message.sender(), groupID, idStorage,messageService);
+        initRightClick(label, message._id(), message.sender(), groupID, idStorage, messageService);
         label.setText(memberHash.get(message.sender()).name() + ": " + message.body());
         box.getChildren().add(label);
 
@@ -146,5 +149,104 @@ public class LobbyTabsAndMessage {
                 alert.showAndWait();
             }
         });
+    }
+
+    public void joinGame(GameStorage gameStorage, MemberService memberService, IDStorage idStorage, Game game, Provider<GameLobbyController> gameLobbyController, App app) {
+        if (gameStorage.getId() != null) {
+            memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
+                    .subscribe(result -> {
+                        boolean trace = true;
+                        for (Member member : result) {
+                            if (member.userId().equals(idStorage.getID())) {
+                                Alert alert = new Alert(Alert.AlertType.ERROR, "You can't join a game while \nbeing part of another game");
+                                // Change style of error alert
+                                DialogPane dialogPane = alert.getDialogPane();
+                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                alert.showAndWait();
+                                trace = false;
+                                break;
+                            }
+                        }
+                        if (trace) {
+                            joinMessage(game, memberService, gameLobbyController, app);
+                        }
+                    });
+        } else {
+            joinMessage(game, memberService, gameLobbyController, app);
+        }
+    }
+
+    private void joinMessage(Game game, MemberService memberService, Provider<GameLobbyController> gameLobbyController, App app) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Enter the password");
+        dialog.setHeaderText("password");
+        // Change style of password input dialog
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        dialog.showAndWait()
+                .ifPresent(password -> memberService.join(game._id(), password)
+                        .observeOn(FX_SCHEDULER)
+                        .doOnError(error -> {
+                            if ("HTTP 403 ".equals(error.getMessage())) {
+                                Alert alert = new Alert(Alert.AlertType.ERROR, "wrong password");
+                                // Change style of error alert
+                                DialogPane errorPane = alert.getDialogPane();
+                                errorPane.getStylesheets().add(Objects.requireNonNull(Main.class.
+                                        getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                alert.showAndWait();
+                            }
+                        })
+                        .subscribe(result -> app.show(gameLobbyController.get()), onError -> {
+                        }));
+    }
+
+    public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController, IDStorage idStorage, GameStorage
+            gameStorage, Provider<GameScreenController> gameScreenController, PioneersService pioneersService) {
+        boolean changeToPlayer = false;
+        for (Member m : members) {
+            if (m.gameId().equals(gameStorage.getId()) && m.userId().equals(idStorage.getID())
+                    && m.spectator()) {
+                app.show(gameScreenController.get());
+                changeToPlayer = true;
+                break;
+            }
+        }
+        if (!changeToPlayer) {
+            pioneersService.updatePlayer(gameStorage.getId(), idStorage.getID(), true)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe();
+            app.show(gameScreenController.get());
+        }
+    }
+
+    public void loadMessages(Tab allTab, Tab tab, String groupId, MessageService messageService, ObservableList<Message> lobby_messages,
+                             List<String> deletedAllMessages, List<String> deletedMessages, ObservableList<Message> messages, HashMap<String, User> memberHash, IDStorage idStorage) {
+        if (tab.equals(allTab)) {
+            messageService.getAllMessages(GLOBAL, LOBBY_ID).observeOn(FX_SCHEDULER).subscribe(m -> {
+                lobby_messages.clear();
+                lobby_messages.addAll(m);
+                ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
+
+                for (Message message : lobby_messages) {
+                    if (!deletedAllMessages.contains(message._id())) {
+                        renderSingleMessage(null, allTab, message, memberHash, idStorage, messageService);
+                    }
+                }
+            });
+        } else {
+            messageService.getAllMessages(GROUPS, groupId).observeOn(FX_SCHEDULER).subscribe(m -> {
+                messages.clear();
+                messages.addAll(m);
+                ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
+
+                for (Message message : messages) {
+                    if (!deletedMessages.contains(message._id())) {
+                        renderSingleMessage(groupId, tab, message, memberHash, idStorage, messageService);
+                    }
+                }
+            });
+        }
     }
 }

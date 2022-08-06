@@ -3,12 +3,10 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.LobbyTabsAndMessage;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.util.JsonUtil;
-import de.uniks.pioneers.util.ResourceManager;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
@@ -19,11 +17,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import javax.inject.Inject;
@@ -32,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -316,7 +310,7 @@ public class LobbyController implements Controller {
     }
 
     public void logout() {
-        lb.logout(userService,idStorage,authService,loginController, app);
+        lb.logout(userService, idStorage, authService, loginController, app);
 
     }
 
@@ -331,7 +325,7 @@ public class LobbyController implements Controller {
 
     public void createGameButtonPressed() {
         //makes sure if user in game or not , and depending on that allows user to create the game
-        lb.createGame(gameStorage, memberService,idStorage,createGameController,app);
+        lb.createGame(gameStorage, memberService, idStorage, createGameController, app);
 
     }
 
@@ -342,7 +336,7 @@ public class LobbyController implements Controller {
     }
 
     private void checkMessageField() {
-        lb.checkMessageField(chatMessageField,currentDirectStorage,messageService);
+        lb.checkMessageField(chatMessageField, currentDirectStorage, messageService);
     }
 
     private Node renderUser(User user) {
@@ -545,31 +539,8 @@ public class LobbyController implements Controller {
 
 
     private void loadMessages(String groupId, Tab tab) {
-        if (tab.equals(allTab)) {
-            this.messageService.getAllMessages(GLOBAL, LOBBY_ID).observeOn(FX_SCHEDULER).subscribe(messages -> {
-                this.lobby_messages.clear();
-                this.lobby_messages.addAll(messages);
-                ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
-
-                for (Message message : this.lobby_messages) {
-                    if (!this.deletedAllMessages.contains(message._id())) {
-                        renderSingleMessage(null, allTab, message);
-                    }
-                }
-            });
-        } else {
-            this.messageService.getAllMessages(GROUPS, groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
-                this.messages.clear();
-                this.messages.addAll(messages);
-                ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
-
-                for (Message message : this.messages) {
-                    if (!this.deletedMessages.contains(message._id())) {
-                        renderSingleMessage(groupId, tab, message);
-                    }
-                }
-            });
-        }
+        lb.loadMessages(allTab, tab, groupId, messageService, lobby_messages,
+                deletedAllMessages, deletedMessages, messages, memberHash, idStorage);
     }
 
     private void addToDirectChatStorage(String groupId, User user, Tab tab) {
@@ -593,79 +564,18 @@ public class LobbyController implements Controller {
     }
 
     private void renderSingleMessage(String groupID, Tab tab, Message message) {
-        lb.renderSingleMessage(groupID,tab,message,memberHash,idStorage,messageService);
+        lb.renderSingleMessage(groupID, tab, message, memberHash, idStorage, messageService);
     }
 
     public void joinGame(Game game) {
         //allows to join a game, if the user does not belong to another game
         //otherwise user cannot join the game
-        if (this.gameStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                        boolean trace = true;
-                        for (Member member : result) {
-                            if (member.userId().equals(this.idStorage.getID())) {
-                                Alert alert = new Alert(Alert.AlertType.ERROR, "You can't join a game while \nbeing part of another game");
-                                // Change style of error alert
-                                DialogPane dialogPane = alert.getDialogPane();
-                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                                alert.showAndWait();
-                                trace = false;
-                                break;
-                            }
-                        }
-                        if (trace) {
-                            joinMessage(game);
-                        }
-                    });
-        } else {
-            joinMessage(game);
-        }
-    }
-
-    private void joinMessage(Game game) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Enter the password");
-        dialog.setHeaderText("password");
-        // Change style of password input dialog
-        DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-        dialog.showAndWait()
-                .ifPresent(password -> this.memberService.join(game._id(), password)
-                        .observeOn(FX_SCHEDULER)
-                        .doOnError(error -> {
-                            if ("HTTP 403 ".equals(error.getMessage())) {
-                                Alert alert = new Alert(Alert.AlertType.ERROR, "wrong password");
-                                // Change style of error alert
-                                DialogPane errorPane = alert.getDialogPane();
-                                errorPane.getStylesheets().add(Objects.requireNonNull(Main.class.
-                                        getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                                alert.showAndWait();
-                            }
-                        })
-                        .subscribe(result -> app.show(gameLobbyController.get()), onError -> {
-                        }));
+        lb.joinGame(gameStorage, memberService, idStorage, game, gameLobbyController, app);
     }
 
     //reactivate for the possibility of joining the game
     public void onRejoin() {
-        boolean changeToPlayer = false;
-        for (Member m : this.members) {
-            if (m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())
-                    && m.spectator()) {
-                this.app.show(gameScreenController.get());
-                changeToPlayer = true;
-                break;
-            }
-        }
-        if (!changeToPlayer) {
-            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe();
-            this.app.show(gameScreenController.get());
-        }
+        lb.onJoin(members, app, gameLobbyController, idStorage, gameStorage, gameScreenController, pioneersService);
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
