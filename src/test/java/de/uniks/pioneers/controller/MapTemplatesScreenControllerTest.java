@@ -380,6 +380,11 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         Assertions.assertThat(mapTemplatesScreenController.getMainPane().getChildren().size()).isEqualTo(2);
+
+        clickOn("X");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(mapTemplatesScreenController.getMainPane().getChildren().size()).isEqualTo(1);
     }
 
 }
