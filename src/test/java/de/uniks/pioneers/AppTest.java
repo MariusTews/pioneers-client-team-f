@@ -51,8 +51,7 @@ public class AppTest extends ApplicationTest {
         write("123456789\t");
         write("123456789\t\t\t");
         type(KeyCode.SPACE);
-
-        write("\t\t\t\t\t\t");
+        write("\t\t\t\t\t\t\t");
         type(KeyCode.SPACE);
 
         //test CreateGameScreen
@@ -89,6 +88,21 @@ public class AppTest extends ApplicationTest {
         clickOn("#x1y0zM1_7");
         //roll dice
         clickOn("#roll");
+        //trade with bank
+        clickOn("#giveCactusPlusButton");
+        clickOn("#giveCactusPlusButton");
+        clickOn("#giveCactusPlusButton");
+        clickOn("#giveCactusPlusButton");
+        clickOn("#receiveMoonPlusButton");
+        clickOn("#offerBank");
+        //trade with player
+        clickOn("#giveCactusPlusButton");
+        clickOn("#receiveMoonPlusButton");
+        clickOn("#offerPlayer");
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#tradePartnerLabel");
+        clickOn("#tradeButton");
+
         //build road
         clickOn("#road");
         clickOn("#x1yM1z0_11");
