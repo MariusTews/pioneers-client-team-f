@@ -84,9 +84,9 @@ public class MapTemplateSubController implements Controller {
         leftActionImage = null;
         rightActionImage = null;
         selectedMapIcon = null;
+        votesLabel.setOnMouseClicked(null);
         if (!ownMap) {
             voted.removeListener(voteListener);
-            votesLabel.setOnMouseClicked(null);
         }
     }
 
@@ -116,13 +116,14 @@ public class MapTemplateSubController implements Controller {
         rightActionImageView.setImage(rightActionImage);
 
         if (!ownMap) {
-            mainPane = parentController.getMainPane();
-            userNames = parentController.getUserNames();
             voted.addListener(voteListener);
-            votesLabel.setOnMouseEntered(event -> ((Node) event.getSource()).setEffect(new Glow(0.7)));
-            votesLabel.setOnMouseExited(event -> ((Node) event.getSource()).setEffect(null));
-            votesLabel.setOnMouseClicked(this::showVotes);
         }
+
+        mainPane = parentController.getMainPane();
+        userNames = parentController.getUserNames();
+        votesLabel.setOnMouseEntered(event -> ((Node) event.getSource()).setEffect(new Glow(0.7)));
+        votesLabel.setOnMouseExited(event -> ((Node) event.getSource()).setEffect(null));
+        votesLabel.setOnMouseClicked(this::showVotes);
 
         parent.setId(template._id());
         this.parent = parent;
@@ -203,13 +204,15 @@ public class MapTemplateSubController implements Controller {
         pane.setLayoutX(325);
         pane.setLayoutY(25);
 
-        ImageView upVoteImageView = new ImageView(leftActionImage);
+        Image upVoteImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/thumbsUpIcon.png")).toString());
+        ImageView upVoteImageView = new ImageView(upVoteImage);
         upVoteImageView.setFitHeight(25);
         upVoteImageView.setFitWidth(25);
         upVoteImageView.setTranslateX(35);
         upVoteImageView.setTranslateY(5);
 
-        ImageView downVoteImageView = new ImageView(rightActionImage);
+        Image downVoteImage = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/thumbsDownIcon.png")).toString());
+        ImageView downVoteImageView = new ImageView(downVoteImage);
         downVoteImageView.setFitHeight(25);
         downVoteImageView.setFitWidth(25);
         downVoteImageView.setTranslateX(185);

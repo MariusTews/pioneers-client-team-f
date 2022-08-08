@@ -2,8 +2,8 @@ package de.uniks.pioneers.service;
 
 import de.uniks.pioneers.dto.CreateVoteDto;
 import de.uniks.pioneers.model.Vote;
-import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.rest.MapsApiService;
+import de.uniks.pioneers.template.MapTemplate;
 import io.reactivex.rxjava3.core.Observable;
 
 import javax.inject.Inject;
