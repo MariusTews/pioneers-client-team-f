@@ -509,6 +509,7 @@ public class TestModule {
                     State state = new State("", gameId, List.of(
                             new ExpectedMove("build", List.of("01"))
                     ), null);
+                    expectedMoves = state.expectedMoves();
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
                     //update player after accept
                     HashMap<String, Integer> remainingBuildings = new HashMap<>();
