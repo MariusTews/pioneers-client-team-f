@@ -82,9 +82,9 @@ public class GameLobbyController implements Controller {
 	public Label spectatorLabelId;
 
 	private MessageViewSubController messageViewSubController;
-	private MemberListSubcontroller memberListSubcontroller;
+	private MemberListSubController memberListSubcontroller;
 
-	private MemberListSubcontroller memberListSpectatorSubcontroller;
+	private MemberListSubController memberListSpectatorSubcontroller;
 	private final EventListener eventListener;
 	private final GameStorage gameStorage;
 	private final MemberIDStorage memberIDStorage;
@@ -476,12 +476,12 @@ public class GameLobbyController implements Controller {
 		for (User user : playerList) {
 			if (user._id().equals(member.userId()) && !member.spectator()) {
 				ch = true;
-				this.memberListSubcontroller = new MemberListSubcontroller(member, user);
+				this.memberListSubcontroller = new MemberListSubController(member, user);
 				break;
 			}
 		}
 		if (!ch) {
-			this.memberListSubcontroller = new MemberListSubcontroller(null, null);
+			this.memberListSubcontroller = new MemberListSubController(null, null);
 		}
 		return memberListSubcontroller.render();
 	}
@@ -492,12 +492,12 @@ public class GameLobbyController implements Controller {
 		for (User user : playerList) {
 			if (user._id().equals(member.userId()) && member.spectator()) {
 				ch = true;
-				this.memberListSpectatorSubcontroller = new MemberListSubcontroller(member, user);
+				this.memberListSpectatorSubcontroller = new MemberListSubController(member, user);
 				break;
 			}
 		}
 		if (!ch) {
-			this.memberListSpectatorSubcontroller = new MemberListSubcontroller(null, null);
+			this.memberListSpectatorSubcontroller = new MemberListSubController(null, null);
 		}
 		return memberListSpectatorSubcontroller.render();
 	}
