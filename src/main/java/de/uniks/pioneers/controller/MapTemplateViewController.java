@@ -9,7 +9,6 @@ import de.uniks.pioneers.model.Tile;
 import de.uniks.pioneers.template.HarborTemplate;
 import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.template.TileTemplate;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -31,14 +30,14 @@ public class MapTemplateViewController implements Controller {
 	@FXML
 	public ScrollPane mapPane;
 	private final App app;
-	private MapTemplatesScreenController mapTemplatesScreenController;
+	private final MapTemplatesScreenController mapTemplatesScreenController;
 	private final MapTemplate mapTemplate;
 
 	private Map map;
 
 	private LoadMapTemplate loadMapTemplate = new LoadMapTemplate();
-	private List<Tile> tiles = new ArrayList<>();
-	private List<Harbor> harbors = new ArrayList<>();
+	private final List<Tile> tiles = new ArrayList<>();
+	private final List<Harbor> harbors = new ArrayList<>();
 
 	public MapTemplateViewController(App app, MapTemplate mapTemplate, MapTemplatesScreenController mapTemplatesScreenController) {
 		this.app = app;
@@ -48,14 +47,14 @@ public class MapTemplateViewController implements Controller {
 
 	@Override
 	public void init() {
-		for (TileTemplate tileTemplate: mapTemplate.tiles()) {
+		for (TileTemplate tileTemplate : mapTemplate.tiles()) {
 			tiles.add(new Tile(tileTemplate.x(), tileTemplate.y(), tileTemplate.z(), tileTemplate.type(), tileTemplate.numberToken()));
 		}
 
-		for (HarborTemplate harborTemplate: mapTemplate.harbors()) {
+		for (HarborTemplate harborTemplate : mapTemplate.harbors()) {
 			harbors.add(new Harbor(harborTemplate.x(), harborTemplate.y(), harborTemplate.z(), harborTemplate.type(), harborTemplate.side()));
 		}
-		map = new Map(null,tiles, harbors);
+		map = new Map(null, tiles, harbors);
 	}
 
 	@Override
@@ -82,7 +81,7 @@ public class MapTemplateViewController implements Controller {
 		return parent;
 	}
 
-	public void backButtonPressed(ActionEvent actionEvent) {
+	public void backButtonPressed() {
 		this.app.show(mapTemplatesScreenController);
 	}
 }

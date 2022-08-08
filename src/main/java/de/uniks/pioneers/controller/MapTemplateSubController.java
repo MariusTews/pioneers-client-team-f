@@ -19,7 +19,7 @@ import java.util.Optional;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class MapTemplateSubController implements Controller {
-    private App app;
+    private final App app;
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
