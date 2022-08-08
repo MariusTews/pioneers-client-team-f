@@ -4,7 +4,6 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.service.MapsService;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -178,4 +177,9 @@ public class MapTemplateSubController implements Controller {
     public void setTemplate(MapTemplate template) {
         this.template = template;
     }
+
+	public void onShowClicked() {
+        final MapTemplateViewController controller = new MapTemplateViewController(this.app, this.template, this.mapTemplatesScreenController);
+        app.show(controller);
+	}
 }
