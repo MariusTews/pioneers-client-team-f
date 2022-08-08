@@ -1,8 +1,10 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.service.MapsService;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,10 +20,13 @@ import java.util.Optional;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class MapTemplateSubController implements Controller {
+    private App app;
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
     private final MapsService mapsService;
+    private MapTemplatesScreenController mapTemplatesScreenController;
+    private Provider<MapTemplateViewController> mapTemplateViewController;
     private Image leftActionImage;
     private Image rightActionImage;
     private Image selectedMapIcon;
@@ -40,11 +46,13 @@ public class MapTemplateSubController implements Controller {
     @FXML
     public ImageView rightActionImageView;
 
-    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy, MapsService mapsService) {
+    public MapTemplateSubController(App app, MapTemplate template, boolean ownMap, String createdBy, MapsService mapsService, MapTemplatesScreenController mapTemplatesScreenController) {
+        this.app = app;
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
         this.mapsService = mapsService;
+        this.mapTemplatesScreenController = mapTemplatesScreenController;
     }
 
     @Override
