@@ -517,6 +517,16 @@ public class TestModule {
             public Observable<MapTemplate> delete(String id) {
                 return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, null, null));
             }
+
+            @Override
+            public Observable<Vote> vote(String id, CreateVoteDto dto) {
+                return null;
+            }
+
+            @Override
+            public Observable<Vote> deleteVote(String mapId, String userId) {
+                return null;
+            }
         };
     }
 
@@ -537,17 +547,7 @@ public class TestModule {
             @Override
             public Observable<Achievement> updateAchievement(String userId, String id, UpdateAchievementDto updateAchievementDto) {
                 return Observable.just(new Achievement("", "", "1", "first-road", null, 0));
-			}
-
-            @Override
-            public Observable<Vote> vote(String id, CreateVoteDto dto) {
-                return null;
-            }
-
-            @Override
-            public Observable<Vote> deleteVote(String mapId, String userId) {
-                return null;
             }
         };
-	}
+    }
 }
