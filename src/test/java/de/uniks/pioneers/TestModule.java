@@ -267,6 +267,8 @@ public class TestModule {
             private List<ExpectedMove> expectedMoves;
             private final TestEventListener testEventListener = (TestEventListener) eventListener;
 
+            private boolean firstRoll = true;
+
             private final HashMap<String, Integer> playerResources = new HashMap<>();
             {
                 playerResources.put("lumber", 10);
@@ -437,13 +439,26 @@ public class TestModule {
                 }
                 // roll the dice
                 else if (Objects.equals(dto.action(), "roll")) {
-                    State state = new State("", gameId, List.of(
-                            new ExpectedMove("build", List.of("01"))
-                    ), null);
-                    expectedMoves = state.expectedMoves();
-                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
-                    testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
-                            new Move("1", "2", gameId, "01", "roll", 3, null, null, null, null, null)));
+                    if (firstRoll) {
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("build", List.of("01"))
+                        ), null);
+                        expectedMoves = state.expectedMoves();
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                                new Move("1", "2", gameId, "01", "roll", 3, null, null, null, null, null)));
+                        firstRoll = false;
+                    }
+                    //roll 7
+                    else {
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("drop", List.of("01"))
+                        ), null);
+                        expectedMoves = state.expectedMoves();
+                        testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                                new Move("1", "2", gameId, "01", "roll", 7, null, null, null, null, null)));
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                    }
 
                 }
                 // create move with action "build"
@@ -464,7 +479,7 @@ public class TestModule {
 
                     }
                     //private trade
-                    else {
+                    else if (dto.resources() != null) {
                         //make first move
                         HashMap<String, Integer> resources = new HashMap<>();
                         resources.put("lumber", -1);
@@ -483,6 +498,16 @@ public class TestModule {
                         ), null);
                         expectedMoves = state.expectedMoves();
                         //new expected move is "accept" now
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+
+                    }
+                    //finish move
+                    else {
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("roll", List.of("01"))
+                        ), null);
+                        expectedMoves = state.expectedMoves();
+                        //new expected move is "roll" now
                         testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
 
                     }
@@ -519,6 +544,26 @@ public class TestModule {
                     Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, null);
                     testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
                 }
+                //action = drop
+                else if (Objects.equals(dto.action(), "drop")) {
+                    //new move with action "drop"
+                    HashMap<String, Integer> dropResources = new HashMap<>();
+                    dropResources.put("lumber", -5);
+                    dropResources.put("ore", -5);
+                    dropResources.put("wool", -5);
+                    dropResources.put("brick", -5);
+                    dropResources.put("grain", -5);
+                    testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                            new Move("1", "2", gameId, "01", "drop", 3, null, null, dropResources, null, null)));
+                    //new state with exptected move rob
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("rob", List.of("01"))
+                    ), null);
+                    expectedMoves = state.expectedMoves();
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                }
+                //action = rob
+                //TODO
                 return Observable.empty();
             }
 

@@ -102,6 +102,38 @@ public class AppTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
         clickOn("#tradePartnerLabel");
         clickOn("#tradeButton");
+        //finish turn
+        clickOn("#finishTurnButton");
+        clickOn("#roll");
+        sleep(5000);
+        //discard resources
+        clickOn("#increment_lumber");
+        clickOn("#increment_lumber");
+        clickOn("#increment_lumber");
+        clickOn("#increment_lumber");
+        clickOn("#increment_lumber");
+        clickOn("increment_brick");
+        clickOn("increment_brick");
+        clickOn("increment_brick");
+        clickOn("increment_brick");
+        clickOn("increment_brick");
+        clickOn("#increment_ore");
+        clickOn("#increment_ore");
+        clickOn("#increment_ore");
+        clickOn("#increment_ore");
+        clickOn("#increment_ore");
+        clickOn("#increment_wool");
+        clickOn("#increment_wool");
+        clickOn("#increment_wool");
+        clickOn("#increment_wool");
+        clickOn("#increment_wool");
+        clickOn("#increment_grain");
+        clickOn("#increment_grain");
+        clickOn("#increment_grain");
+        clickOn("#increment_grain");
+        clickOn("#increment_grain");
+        clickOn("#discardButton");
+        //TODO rob action
 
         //build road
         clickOn("#road");
