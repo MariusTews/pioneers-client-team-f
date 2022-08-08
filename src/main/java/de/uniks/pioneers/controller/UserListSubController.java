@@ -17,7 +17,6 @@ import javafx.scene.shape.Circle;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.HashMap;
 
 public class UserListSubController implements Controller {
     @FXML
@@ -31,18 +30,16 @@ public class UserListSubController implements Controller {
     private final LobbyController lobbyController;
     private final User user;
     private final IDStorage idStorage;
-    private final HashMap<String, String> avatars;
 
     private Parent parent;
 
     private String id;
 
     @Inject
-    public UserListSubController(LobbyController lobbyController, User user, IDStorage idStorage, HashMap<String, String> avatars) {
+    public UserListSubController(LobbyController lobbyController, User user, IDStorage idStorage) {
         this.lobbyController = lobbyController;
         this.user = user;
         this.idStorage = idStorage;
-        this.avatars = avatars;
     }
 
     @Override
@@ -73,16 +70,6 @@ public class UserListSubController implements Controller {
 
             if (this.user.status().equals("online")) {
                 this.userStatusCircle.setFill(Color.GREEN);
-                String avatar = this.user.avatar();
-                if (avatar != null) {
-                    if (avatars != null) {
-                        avatars.put(this.id, avatar);
-                    }
-                    // avatars == null when all saved avatars have been rendered
-                    else {
-                        this.userImageView.setImage(new Image(avatar));
-                    }
-                }
             } else if (this.user.status().equals("offline")) {
                 this.userStatusCircle.setFill(Color.RED);
             }
@@ -108,5 +95,12 @@ public class UserListSubController implements Controller {
 
     public String getId() {
         return id;
+    }
+
+    public void setAvatar() {
+        String avatar = this.user.avatar();
+        if (avatar != null) {
+            this.userImageView.setImage(new Image(avatar));
+        }
     }
 }

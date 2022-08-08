@@ -10,11 +10,9 @@ import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
-import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -24,10 +22,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -86,6 +82,8 @@ public class LobbyController implements Controller {
     public Button editUserButton;
     @FXML
     public Button createGameButton;
+    @FXML
+    public Button rejoinButton;
 
     private final App app;
     private final IDStorage idStorage;
@@ -112,16 +110,21 @@ public class LobbyController implements Controller {
     private final PioneersService pioneersService;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
-    public Button rejoinButton;
-    @FXML
-    public Label loadingLabel;
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
-    private HashMap<String, String> avatars;
-    private final EventHandler<ScrollEvent> userListScrollHandler = this::loadRemainingAvatars;
+
+    private final Thread renderAvatarsThread = new Thread(() -> {
+        List<UserListSubController> userSubConsCopy = new ArrayList<>(userSubCons.values());
+        for (UserListSubController controller : userSubConsCopy) {
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
+            controller.setAvatar();
+        }
+    });
 
     @Inject
     public LobbyController(App app,
@@ -168,8 +171,6 @@ public class LobbyController implements Controller {
                     .observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
         }
 
-        avatars = new HashMap<>();
-
         gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
         userService.findAllUsers().observeOn(FX_SCHEDULER).subscribe(this::loadUsers);
         groupService.getAll().observeOn(FX_SCHEDULER).subscribe(this::loadGroups);
@@ -202,12 +203,7 @@ public class LobbyController implements Controller {
         this.userSubCons.clear();
         this.gameSubCons.clear();
         this.directChatStorages.clear();
-
-        if (avatars != null) {
-            avatars.clear();
-            avatars = null;
-        }
-
+        renderAvatarsThread.interrupt();
         disposable.clear();
     }
 
@@ -257,6 +253,8 @@ public class LobbyController implements Controller {
             rejoinButton.disableProperty().set(true);
         }
 
+        this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
+
         this.games.addListener((ListChangeListener<? super Game>) c -> ((VBox) this.gamesScrollPane.getContent())
                 .getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList()));
 
@@ -267,39 +265,6 @@ public class LobbyController implements Controller {
         return parent;
     }
 
-    private void renderInitialAvatars() {
-        VBox content = (VBox) userScrollPane.getContent();
-        int max = Math.min(content.getChildren().size(), 7);
-        List<String> renderedAvatarIds = new ArrayList<>();
-        for (int i = 0; i < max; i++) {
-            String id = content.getChildren().get(i).getId();
-            if (avatars.containsKey(id)) {
-                renderAvatar(id, avatars.get(id));
-                renderedAvatarIds.add(id);
-            }
-        }
-        for (String id : renderedAvatarIds) {
-            avatars.remove(id);
-        }
-    }
-
-    private void loadRemainingAvatars(ScrollEvent scrollEvent) {
-        if (avatars != null) {
-            loadingLabel.setText("Loading remaining avatars...");
-            // use PauseTransition because otherwise the text in the loading label will not be displayed
-            PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
-            pause.setOnFinished(event -> {
-                avatars.forEach(this::renderAvatar);
-                avatars.clear();
-                avatars = null;
-                loadingLabel.setText("");
-            });
-            pause.play();
-        }
-        // remove filter again to prevent calling this method unnecessarily
-        userScrollPane.removeEventFilter(ScrollEvent.ANY, userListScrollHandler);
-    }
-
     //takes action when the application is forcefully closed
     //such as logging out
     private void actionOnclose() {
@@ -307,7 +272,6 @@ public class LobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(er -> System.exit(0));
     }
-
 
     private void handleTabSwitching(Tab oldValue, Tab newValue) {
 
@@ -430,13 +394,9 @@ public class LobbyController implements Controller {
         if (this.userSubCons.containsKey(user._id())) {
             return userSubCons.get(user._id()).getParent();
         }
-        UserListSubController userCon = new UserListSubController(this, user, idStorage, avatars);
+        UserListSubController userCon = new UserListSubController(this, user, idStorage);
         userSubCons.put(user._id(), userCon);
         return userCon.render();
-    }
-
-    private void renderAvatar(String id, String avatar) {
-        userSubCons.get(id).userImageView.setImage(new Image(avatar));
     }
 
     private Node renderGame(Game game) {
@@ -455,11 +415,11 @@ public class LobbyController implements Controller {
 
         if (userEvent.event().endsWith(CREATED)) {
             this.users.add(user);
+            userSubCons.get(user._id()).setAvatar();
         } else if (userEvent.event().endsWith(DELETED)) {
             removeUserSubCon(user);
             this.users.removeIf(u -> u._id().equals(user._id()));
         } else if (userEvent.event().endsWith(UPDATED)) {
-
             for (DirectChatStorage directChatStorage : directChatStorages) {
                 if (directChatStorage.getUser()._id().equals(user._id())) {
 
@@ -473,6 +433,7 @@ public class LobbyController implements Controller {
                     break;
                 }
             }
+            userSubCons.get(user._id()).setAvatar();
         }
     }
 
@@ -591,19 +552,12 @@ public class LobbyController implements Controller {
             memberHash.put(user._id(), user);
         }
 
-        // add listener here to be able to render the avatars directly
-        this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
-
         List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
         List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
         this.users.addAll(online);
         this.users.addAll(offline);
 
-        // render avatars for the first few visible list elements
-        // this works because the onUsersChanged listener is already triggered directly after adding the users
-        renderInitialAvatars();
-        // add scroll event handler which renders the rest of the avatars (only once)
-        userScrollPane.addEventFilter(ScrollEvent.ANY, userListScrollHandler);
+        renderAvatarsThread.start();
 
         //get all messages from the user that are in lobby
         messageService

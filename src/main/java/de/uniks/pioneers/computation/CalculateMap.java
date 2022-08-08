@@ -4,8 +4,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -16,7 +14,7 @@ public class CalculateMap {
 
 	private double center;
 
-	public Polygon buildHexagon(double xCoordinate, double yCoordinate, int x, int y, int z) {
+	public Polygon buildHexagon(double xCoordinate, double yCoordinate, int x, int y, int z, boolean isTemplate) {
 		//creates a Hexagon at the given coordinate
 		double hexPoint1 = 0.0;
 		double hexPoint2 = 30.0;
@@ -39,6 +37,11 @@ public class CalculateMap {
 		hexagon.setId(id);
 		hexagon.setLayoutX(xCoordinate);
 		hexagon.setLayoutY(yCoordinate);
+
+		if (isTemplate) {
+			hexagon.setFill(Color.TRANSPARENT);
+			hexagon.setStroke(Color.BLACK);
+		}
 
 		return hexagon;
 	}
@@ -338,7 +341,7 @@ public class CalculateMap {
 		double xCoordinate = getxCoordinate(center, x, z);
 		double yCoordinate = getyCoordinate(center, z);
 
-		map.getChildren().add(buildHexagon(xCoordinate, yCoordinate, x, y, z));
+		map.getChildren().add(buildHexagon(xCoordinate, yCoordinate, x, y, z, isTemplate));
 
 		// for the buildings
 		if (!isTemplate) {
@@ -364,8 +367,8 @@ public class CalculateMap {
 			//Place a Label for the number
 			map.getChildren().add(buildLabel(xCoordinate, yCoordinate, x, y, z));
 		} else {
-			buildButton(map, xCoordinate - 40, yCoordinate - 15, x, y, z, false);
-			buildButton(map, xCoordinate + 10, yCoordinate - 15, x, y, z, true);
+			buildButton(map, xCoordinate - 45, yCoordinate - 15, x, y, z, false);
+			buildButton(map, xCoordinate + 5, yCoordinate - 15, x, y, z, true);
 		}
 	}
 
@@ -374,15 +377,19 @@ public class CalculateMap {
 		button.setPrefWidth(30);
 		button.setPrefHeight(30);
 		map.getChildren().add(button);
+		// set position of button on hexagon
 		button.setLayoutX(xCoordinate);
 		button.setLayoutY(yCoordinate);
-		button.toFront();
 		button.setText("+");
-		button.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+		button.toFront();
+
+		// set id for either a harbor or tile button
 		if (harbor) {
 			button.setId(createId(x, y, z) + "_harborButton");
+			button.getStyleClass().add("harborButton");
 		} else {
 			button.setId(createId(x, y, z) + "_tileButton");
+			button.getStyleClass().add("tileButton");
 		}
 	}
 
