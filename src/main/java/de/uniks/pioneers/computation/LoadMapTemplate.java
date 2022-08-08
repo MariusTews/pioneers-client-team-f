@@ -3,7 +3,9 @@ package de.uniks.pioneers.computation;
 import de.uniks.pioneers.model.Harbor;
 import de.uniks.pioneers.model.Map;
 import de.uniks.pioneers.model.Tile;
+import de.uniks.pioneers.service.HexFillService;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
@@ -13,8 +15,8 @@ public class LoadMapTemplate {
 
 	private int maxRange;
 	private Pane pane;
-
 	private final CalculateMap calculateMap = new CalculateMap();
+	private final HexFillService hexFillService = new HexFillService();
 
 	public Pane loadMap(Map map, boolean loadForIngame) {
 
@@ -37,9 +39,8 @@ public class LoadMapTemplate {
 			double xCoordinate = calculateMap.getxCoordinate(center, x, z);
 			double yCoordinate = calculateMap.getyCoordinate(center, z);
 
-			this.pane.getChildren().add(calculateMap.buildHexagon(xCoordinate, yCoordinate, x, y, z, false));
-
 			if (loadForIngame) {
+				this.pane.getChildren().add(calculateMap.buildHexagon(xCoordinate, yCoordinate, x, y, z, false));
 				this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x, y, z, false));
 				this.pane.getChildren().add(calculateMap.buildLabel(xCoordinate, yCoordinate, x, y, z));
 
@@ -47,6 +48,14 @@ public class LoadMapTemplate {
 					buildBuildingCircle(i, xCoordinate, yCoordinate, x, y, z);
 					buildRoadCircle(i, xCoordinate, yCoordinate, x, y, z);
 				}
+			} else {
+				Polygon hexagon = calculateMap.buildHexagon(xCoordinate, yCoordinate, x, y, z, false);
+				hexFillService.fillHexagon(hexagon, tile.type());
+				this.pane.getChildren().add(hexagon);
+
+				Label label = calculateMap.buildLabel(xCoordinate, yCoordinate, x, y, z);
+				label.setText("" + tile.numberToken());
+				this.pane.getChildren().add(label);
 			}
 		}
 
@@ -55,51 +64,49 @@ public class LoadMapTemplate {
 			int y = harbor.y().intValue();
 			int z = harbor.z().intValue();
 
-			if (loadForIngame) {
-				int i = harbor.side().intValue();
-				switch (i) {
-					case 1 -> {
-						double xCoordinate = calculateMap.getxCoordinate(center, x + 1, z - 1);
-						double yCoordinate = calculateMap.getyCoordinate(center, z - 1);
-						this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x + 1, y, z - 1, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate, yCoordinate + 30, x + 1, y, z - 1, 180, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate - 26, yCoordinate + 16, x + 1, y, z - 1, 240, true));
-					}
-					case 3 -> {
-						double xCoordinate = calculateMap.getxCoordinate(center, x + 1, z);
-						double yCoordinate = calculateMap.getyCoordinate(center, z);
-						this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x + 1, y - 1, z, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate - 26, yCoordinate + 16, x + 1, y - 1, z, 240, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate - 26, yCoordinate - 16, x + 1, y - 1, z, 300, true));
-					}
-					case 5 -> {
-						double xCoordinate = calculateMap.getxCoordinate(center, x, z + 1);
-						double yCoordinate = calculateMap.getyCoordinate(center, z + 1);
-						this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x, y - 1, z + 1, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate - 26, yCoordinate - 16, x, y - 1, z + 1, 300, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate, yCoordinate - 30, x, y - 1, z + 1, 0, true));
-					}
-					case 7 -> {
-						double xCoordinate = calculateMap.getxCoordinate(center, x - 1, z + 1);
-						double yCoordinate = calculateMap.getyCoordinate(center, z + 1);
-						this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x - 1, y, z + 1, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate, yCoordinate - 30, x - 1, y, z + 1, 0, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate + 26, yCoordinate - 16, x - 1, y, z + 1, 60, true));
-					}
-					case 9 -> {
-						double xCoordinate = calculateMap.getxCoordinate(center, x - 1, z);
-						double yCoordinate = calculateMap.getyCoordinate(center, z);
-						this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x - 1, y + 1, z, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate + 26, yCoordinate - 16, x - 1, y + 1, z, 60, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate + 26, yCoordinate + 16, x - 1, y + 1, z, 120, true));
-					}
-					case 11 -> {
-						double xCoordinate = calculateMap.getxCoordinate(center, x, z - 1);
-						double yCoordinate = calculateMap.getyCoordinate(center, z - 1);
-						this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x, y + 1, z - 1, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate + 26, yCoordinate + 16, x, y + 1, z - 1, 120, true));
-						this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate, yCoordinate + 30, x, y + 1, z - 1, 180, true));
-					}
+			int i = harbor.side().intValue();
+			switch (i) {
+				case 1 -> {
+					double xCoordinate = calculateMap.getxCoordinate(center, x + 1, z - 1);
+					double yCoordinate = calculateMap.getyCoordinate(center, z - 1);
+					this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x + 1, y, z - 1, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate, yCoordinate + 30, x + 1, y, z - 1, 180, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate - 26, yCoordinate + 16, x + 1, y, z - 1, 240, true));
+				}
+				case 3 -> {
+					double xCoordinate = calculateMap.getxCoordinate(center, x + 1, z);
+					double yCoordinate = calculateMap.getyCoordinate(center, z);
+					this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x + 1, y - 1, z, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate - 26, yCoordinate + 16, x + 1, y - 1, z, 240, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate - 26, yCoordinate - 16, x + 1, y - 1, z, 300, true));
+				}
+				case 5 -> {
+					double xCoordinate = calculateMap.getxCoordinate(center, x, z + 1);
+					double yCoordinate = calculateMap.getyCoordinate(center, z + 1);
+					this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x, y - 1, z + 1, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate - 26, yCoordinate - 16, x, y - 1, z + 1, 300, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate, yCoordinate - 30, x, y - 1, z + 1, 0, true));
+				}
+				case 7 -> {
+					double xCoordinate = calculateMap.getxCoordinate(center, x - 1, z + 1);
+					double yCoordinate = calculateMap.getyCoordinate(center, z + 1);
+					this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x - 1, y, z + 1, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate, yCoordinate - 30, x - 1, y, z + 1, 0, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate + 26, yCoordinate - 16, x - 1, y, z + 1, 60, true));
+				}
+				case 9 -> {
+					double xCoordinate = calculateMap.getxCoordinate(center, x - 1, z);
+					double yCoordinate = calculateMap.getyCoordinate(center, z);
+					this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x - 1, y + 1, z, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate + 26, yCoordinate - 16, x - 1, y + 1, z, 60, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate + 26, yCoordinate + 16, x - 1, y + 1, z, 120, true));
+				}
+				case 11 -> {
+					double xCoordinate = calculateMap.getxCoordinate(center, x, z - 1);
+					double yCoordinate = calculateMap.getyCoordinate(center, z - 1);
+					this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x, y + 1, z - 1, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate + 26, yCoordinate + 16, x, y + 1, z - 1, 120, true));
+					this.pane.getChildren().add(calculateMap.buildRoad(xCoordinate, yCoordinate + 30, x, y + 1, z - 1, 180, true));
 				}
 			}
 		}
