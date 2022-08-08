@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AlertServiceTest {
-
-
     AlertService alertService = new AlertService();
 
     @Test
@@ -128,6 +126,4 @@ public class AlertServiceTest {
 
         Assertions.assertNotEquals(devCards.size(), devCards_2.size());
     }
-
-
 }

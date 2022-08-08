@@ -100,13 +100,13 @@ class GameScreenControllerTest extends ApplicationTest {
         when(idStorage.getID()).thenReturn("01");
 
         //findPlayer fo OneDev-card
-        List<DevelopmentCard> devCards_1 = new ArrayList<>();
+        List<DevelopmentCard> devCards1 = new ArrayList<>();
         DevelopmentCard d1 = new DevelopmentCard("knight", true, false);
-        devCards_1.add(d1);
+        devCards1.add(d1);
 
-        Player player_1 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards_1);
-        when(pioneersService.findOnePlayer("02", "01")).thenReturn(Observable.just(player_1));
+        Player player1 = new Player("id", "3", "#223", true, 2, null, null,
+                4, 5, null, devCards1);
+        when(pioneersService.findOnePlayer("02", "01")).thenReturn(Observable.just(player1));
 
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         List<Player> players = new ArrayList<>();
