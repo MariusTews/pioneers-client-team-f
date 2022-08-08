@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 
-import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +25,6 @@ import static org.testfx.assertions.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class AchievementsScreenControllerTest extends ApplicationTest {
-
-    @Mock
-    App app;
-
-    @Mock
-    Provider<LobbyController> lobbyController;
 
     @Mock
     AchievementsService achievementsService;

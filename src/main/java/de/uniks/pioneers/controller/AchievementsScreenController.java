@@ -5,7 +5,6 @@ import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Achievement;
 import de.uniks.pioneers.service.AchievementsService;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -141,11 +140,11 @@ public class AchievementsScreenController implements Controller {
         achievementNameLabel.setPrefWidth(380);
         achievementNameLabel.setAlignment(Pos.CENTER_LEFT);
 
-
         //needed label
         Label needed = new Label(ACHIEVEMENT_UNLOCK_VALUES.get(achievement.id()).toString());
         needed.setMinWidth(50);
         needed.setAlignment(Pos.CENTER);
+
         //current score label
         Label currentScore = new Label(achievement.progress().toString());
         currentScore.setMinWidth(50);

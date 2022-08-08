@@ -4,7 +4,6 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
-import io.reactivex.rxjava3.core.Observable;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
