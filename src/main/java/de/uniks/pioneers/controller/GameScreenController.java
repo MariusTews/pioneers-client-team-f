@@ -357,7 +357,9 @@ public class GameScreenController implements Controller {
         UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService, player, gameFieldSubController,
                 this.gameStorage.getVictoryPoints(), pioneersService);
         userSubView.init();
-        this.tradingSubController.setPlayer(player);
+        if(tradingSubController != null) {
+            this.tradingSubController.setPlayer(player);
+        }
         return userSubView.render();
     }
 
