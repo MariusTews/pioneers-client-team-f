@@ -1,0 +1,11 @@
+/***************** achievements specific styles *****************/
+
+.list-view.achievements {
+    -fx-border-width: 4px;
+    -fx-border-radius: 8px;
+    -fx-background-color: transparent;
+}
+
+.label.achievements {
+    -fx-font-size: 22;
+}

@@ -105,4 +105,8 @@ public class MainModule {
     MapsApiService mapsApiService(Retrofit retrofit) {
         return retrofit.create(MapsApiService.class);
     }
+
+    @Provides
+    @Singleton
+    AchievementsApiService achievementsApiService(Retrofit retrofit) {return retrofit.create(AchievementsApiService.class);}
 }

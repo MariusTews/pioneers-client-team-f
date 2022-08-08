@@ -62,6 +62,7 @@ public class App extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/IngameStyle.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapTemplatesScreenStyle.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapEditor.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AchievementsStyle.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapTemplateView.css")).toString());
 
         setAppIcon(stage);
