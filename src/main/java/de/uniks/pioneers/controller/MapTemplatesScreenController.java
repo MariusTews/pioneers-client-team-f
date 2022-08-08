@@ -40,6 +40,7 @@ import static de.uniks.pioneers.Constants.*;
 public class MapTemplatesScreenController implements Controller {
     private final App app;
     private final Provider<CreateGameController> createGameController;
+    private final Provider<MapEditorController> mapEditorController;
     private final MapsService mapsService;
     private final UserService userService;
     private final IDStorage idStorage;
@@ -67,10 +68,12 @@ public class MapTemplatesScreenController implements Controller {
 
     @Inject
     public MapTemplatesScreenController(App app, Provider<CreateGameController> createGameController,
+                                        Provider<MapEditorController> mapEditorController,
                                         MapsService mapsService, UserService userService, IDStorage idStorage,
                                         EventListener eventListener) {
         this.app = app;
         this.createGameController = createGameController;
+        this.mapEditorController = mapEditorController;
         this.mapsService = mapsService;
         this.userService = userService;
         this.idStorage = idStorage;
@@ -233,7 +236,8 @@ public class MapTemplatesScreenController implements Controller {
     }
 
     public void onCreateButtonPressed() {
-        //TODO
+        final MapEditorController controller = mapEditorController.get();
+        this.app.show(controller);
     }
 
     public void onSelectButtonPressed() {
