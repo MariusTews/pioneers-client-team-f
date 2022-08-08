@@ -4,13 +4,13 @@ package de.uniks.pioneers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dagger.Module;
 import dagger.Provides;
-import de.uniks.pioneers.template.MapTemplate;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.*;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.rest.*;
 import de.uniks.pioneers.service.SoundService;
 import de.uniks.pioneers.service.TokenStorage;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 
@@ -105,7 +105,6 @@ public class TestModule {
             }
         };
     }
-
 
     @Provides
     @Singleton
@@ -228,7 +227,6 @@ public class TestModule {
     @Singleton
     static GamesApiService gamesApiService(EventListener eventListener) {
         return new GamesApiService() {
-
             private final TestEventListener testEventListener = (TestEventListener) eventListener;
 
             @Override
@@ -248,7 +246,6 @@ public class TestModule {
 
             @Override
             public Observable<Game> patch(String id, UpdateGameDto dto) {
-
                 Game game = new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10, null, false, 0));
                 Message message = new Message("1", "2", "01", "me", null);
                 testEventListener.fireEvent("games.01.*.*", new Event<>("games.01.state.created", message));
@@ -282,7 +279,6 @@ public class TestModule {
                 tiles.add(new Tile(0, 1, -1, "forest", 5));
                 tiles.add(new Tile(1, 0, -1, "pasture", 6));
                 tiles.add(new Tile(0, -1, 1, "fields", 7));
-
 
                 List<Harbor> harbors = new ArrayList<>();
                 harbors.add(new Harbor(1, 0, -1, "lumber", 1));
@@ -504,13 +500,13 @@ public class TestModule {
         };
     }
 
-	@Provides
-	static MapsApiService mapsApiService() {
-		return new MapsApiService() {
-			@Override
-			public Observable<List<MapTemplate>> findAllMaps() {
-				return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of())));
-			}
+    @Provides
+    static MapsApiService mapsApiService() {
+        return new MapsApiService() {
+            @Override
+            public Observable<List<MapTemplate>> findAllMaps() {
+                return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, null, null)));
+            }
 
             @Override
             public Observable<List<Vote>> findVotesByMapId(String id) {
@@ -518,8 +514,29 @@ public class TestModule {
             }
 
             @Override
-			public Observable<MapTemplate> delete(String id) {
-				return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, List.of(), List.of()));
+            public Observable<MapTemplate> delete(String id) {
+                return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, null, null));
+            }
+        };
+    }
+
+    @Provides
+    @Singleton
+    static AchievementsApiService achievementsApiService() {
+        return new AchievementsApiService() {
+            @Override
+            public Observable<List<Achievement>> listUserAchievements(String id) {
+                return Observable.just(List.of(new Achievement("", "", "1", "first-road", null, 0)));
+            }
+
+            @Override
+            public Observable<Achievement> putAchievement(String userId, String id, CreateAchievementDto createAchievementDto) {
+                return Observable.just(new Achievement("", "", "1", "first-road", null, 0));
+            }
+
+            @Override
+            public Observable<Achievement> updateAchievement(String userId, String id, UpdateAchievementDto updateAchievementDto) {
+                return Observable.just(new Achievement("", "", "1", "first-road", null, 0));
 			}
 
             @Override

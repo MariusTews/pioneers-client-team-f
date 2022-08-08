@@ -59,3 +59,10 @@
     -fx-font-size: 18;
     -fx-text-fill: dimgrey;
 }
+
+.button.achievementsButton {
+    -fx-graphic: url("../assets/blue_button.png");
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+    -fx-font-size: 19;
+}
