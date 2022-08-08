@@ -363,7 +363,7 @@ public class GameScreenController implements Controller {
         UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService, player, gameFieldSubController,
                 this.gameStorage.getVictoryPoints(), pioneersService);
         userSubView.init();
-        if(tradingSubController != null) {
+        if (tradingSubController != null) {
             this.tradingSubController.setPlayer(player);
         }
         return userSubView.render();
@@ -782,7 +782,7 @@ public class GameScreenController implements Controller {
     }
 
     public void onClickTradeView() {
-        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener);
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, achievementsService, idStorage, eventListener);
         tradingSubController.init();
         this.tradingPane.getChildren().setAll(this.tradingSubController.render());
         imageTradingFoldInId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/up.png"))));
