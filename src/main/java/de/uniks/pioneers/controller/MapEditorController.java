@@ -181,7 +181,7 @@ public class MapEditorController implements Controller {
                 numberField.toFront();
                 numberField.setId(hexagon.getId() + "_numberField");
 
-                numberField.setOnKeyPressed(this::numberFieldEvent);
+                numberField.setOnKeyReleased(this::numberFieldEvent);
 
                 // choice box
                 choiceBox = new ChoiceBox<>(FXCollections.observableArrayList(
@@ -211,9 +211,11 @@ public class MapEditorController implements Controller {
         }
     }
 
-    // changing number token
+    // changing only number token
     private void numberFieldEvent(KeyEvent event) {
         String id = filterID(event.getSource().toString());
+        List<Integer> pos = hexFillService.parseID(id);
+        TileTemplate tmp = null;
 
         // ignore all keys, which are not digits
         if (event.getCode().isDigitKey()) {
@@ -221,10 +223,27 @@ public class MapEditorController implements Controller {
             for (Node node : map.getChildren()) {
                 if (node.getId().equals(id + "_numberField")) {
                     TextField textField = (TextField) node;
-                    System.out.println("text " + textField.getText());
+                    if (isNumeric(textField.getText())) {
+                        if (Integer.parseInt(textField.getText()) > 1 && Integer.parseInt(textField.getText()) < 13) {
+                            for (TileTemplate tile : tiles) {
+                                if (tile.x().intValue() == pos.get(0) &&
+                                        tile.y().intValue() == pos.get(1) &&
+                                        tile.z().intValue() == pos.get(2)) {
+                                    tmp = new TileTemplate(tile.x(), tile.y(), tile.z(), tile.type(), Integer.parseInt(textField.getText()));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+
+        if (tmp != null) {
+            tiles.removeIf(tile -> tile.x().intValue() == pos.get(0) && tile.y().intValue() == pos.get(1) && tile.z().intValue() == pos.get(2));
+            tiles.add(tmp);
+        }
+
+        System.out.println(tiles);
 
         System.out.println("Event type: " + event.getCode().isDigitKey());
         System.out.println("Source: " + event.getSource());
@@ -525,7 +544,7 @@ public class MapEditorController implements Controller {
     }
 
     public void saveButtonPressed(ActionEvent event) {
-        //TODO: pressing the save button creates a new map template
+
 
         // if someone decides to change a number token, it has to be checked at the end
         for (Node node : map.getChildren()) {
