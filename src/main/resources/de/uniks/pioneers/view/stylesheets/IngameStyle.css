@@ -108,7 +108,7 @@
     -fx-font-size: 24;
 }
 
-#gameScreenCountdown{
+#gameScreenCountdown {
     -fx-background-size: 150 70;
     -fx-border-width: 4;
     -fx-background-color: #F2F3F5;
@@ -161,19 +161,21 @@
     -fx-background-repeat: stretch;
     -fx-background-size: 120 100;
 }
-#zoomButton{
+
+#zoomButton {
     -fx-background-color: WHITE;
     -fx-text-fill: BLACK;
     -fx-font-weight: Bold;
     -fx-font-size: 18;
 }
-#iconFrame{
+
+#iconFrame {
     -fx-border-color: WHITE;
     -fx-border-radius: 5;
     -fx-border-width: 3;
 }
 
-#foldOutPaneId{
+#foldOutPaneId {
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-position: center;
     -fx-background-repeat: stretch;
@@ -181,22 +183,20 @@
 
 }
 
-
-#spectatorTitleId{
+#spectatorTitleId {
     -fx-background-color: transparent;
     -fx-text-fill: WHITE;
 }
 
-#paneTradingId{
+#paneTradingId {
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
     -fx-background-size: 220 180;
 }
 
-#tradingFoldOutId{
+#tradingFoldOutId {
     -fx-background-color: transparent;
     -fx-font-size: 18;
     -fx-text-fill: WHITE;
-
 }

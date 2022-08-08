@@ -116,8 +116,6 @@ public class GameScreenController implements Controller {
     private MessageViewSubController messageViewSubController;
     private TradingSubController tradingSubController;
     private TradeAcceptSubcontroller tradeAcceptSubcontroller;
-
-    //private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
@@ -318,15 +316,6 @@ public class GameScreenController implements Controller {
                 this.userViewPane.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
         imageTradingFoldoutId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/down.png"))));
-
-        /*
-         * Render trading sub view
-         * hand over own player to trading sub view
-         * */
-
-        //this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener);
-        ///tradingSubController.init();
-        ///this.tradingPane.getChildren().setAll(this.tradingSubController.render());
 
         //Action is performed when the platform is close
         this.app.getStage().setOnCloseRequest(e -> {

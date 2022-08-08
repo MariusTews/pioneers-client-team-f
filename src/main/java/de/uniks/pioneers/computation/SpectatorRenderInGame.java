@@ -21,11 +21,11 @@ public class SpectatorRenderInGame {
     private SpectatorViewController spectatorViewController;
 
     @Inject
-    public SpectatorRenderInGame(){
+    public SpectatorRenderInGame() {
 
     }
 
-    public  void renderSingleSpectator(List<User> allUser, String s, Label spectatorTitleId) {
+    public void renderSingleSpectator(List<User> allUser, String s, Label spectatorTitleId) {
         for (User user : allUser) {
             if (s.equals(user._id())) {
                 spectatorTitleId.setText(user.name());
@@ -35,7 +35,7 @@ public class SpectatorRenderInGame {
 
     public void checkMember(ObservableList<Member> spectatorMember, Pane spectatorPaneId, List<User> allUser, Label spectatorTitleId, ImageView arrowImageId) {
         this.allUsers = allUser;
-        if(spectatorTitleId.getText().equals("Spectator")) {
+        if (spectatorTitleId.getText().equals("Spectator")) {
             if (spectatorMember.size() == 1) {
                 arrowImageId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/left.png"))));
                 renderSingleSpectator(allUser, spectatorMember.get(0).userId(), spectatorTitleId);
@@ -45,9 +45,9 @@ public class SpectatorRenderInGame {
                 Member member = spectatorMember.get(0);
                 spectatorMember.remove(0);
                 spectatorPaneId.getChildren().setAll(spectatorMember.stream().map(this::renderSpectator).toList());
-                spectatorMember.add(0,member);
+                spectatorMember.add(0, member);
             }
-        }else {
+        } else {
             spectatorTitleId.setText("Spectator");
             arrowImageId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/right.png"))));
             spectatorPaneId.getChildren().clear();

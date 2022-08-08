@@ -11,89 +11,115 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane id="gameView" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
-    <ScrollPane fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER" vvalue="0.5">
+<!--suppress ALL -->
+<Pane id="gameView" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.GameScreenController">
+    <ScrollPane fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="900.0" prefWidth="1600.0"
+                style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER"
+                vvalue="0.5">
     </ScrollPane>
     <Pane prefHeight="900.0" prefWidth="520.0">
-        <ScrollPane hbarPolicy="NEVER" layoutX="10.0" layoutY="10.0" maxHeight="580.0" maxWidth="500.0" pannable="true" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
-            <VBox fx:id="opponentsView" alignment="TOP_CENTER" prefHeight="580.0" prefWidth="500.0" />
+        <ScrollPane hbarPolicy="NEVER" layoutX="10.0" layoutY="10.0" maxHeight="580.0" maxWidth="500.0" pannable="true"
+                    style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
+            <VBox fx:id="opponentsView" alignment="TOP_CENTER" prefHeight="580.0" prefWidth="500.0"/>
         </ScrollPane>
-        <Pane fx:id="userViewPane" layoutX="25.0" layoutY="590.0" prefHeight="300.0" prefWidth="420.0" />
+        <Pane fx:id="userViewPane" layoutX="25.0" layoutY="590.0" prefHeight="300.0" prefWidth="420.0"/>
     </Pane>
-    <ScrollPane hbarPolicy="NEVER" layoutX="657.0" pannable="true" prefHeight="150.0" prefWidth="493.0" style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
+    <ScrollPane hbarPolicy="NEVER" layoutX="657.0" pannable="true" prefHeight="150.0" prefWidth="493.0"
+                style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT; " vbarPolicy="NEVER">
         <HBox fx:id="spectatorPaneId" alignment="TOP_RIGHT" prefHeight="150.0" prefWidth="493.0">
             <padding>
-                <Insets right="300.0" />
-            </padding></HBox>
-      <padding>
-         <Insets right="300.0" />
-      </padding>
+                <Insets right="300.0"/>
+            </padding>
+        </HBox>
+        <padding>
+            <Insets right="300.0"/>
+        </padding>
     </ScrollPane>
     <Pane layoutX="500.0" layoutY="687.0" prefHeight="200.0" prefWidth="600.0">
         <Pane id="roll" layoutX="250.0" layoutY="125.0" onMouseClicked="#diceRoll" prefWidth="130.0">
-            <ImageView fx:id="diceOne" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fx:id="diceTwo" fitHeight="60.0" fitWidth="60.0" layoutX="70.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="diceOne" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true"/>
+            <ImageView fx:id="diceTwo" fitHeight="60.0" fitWidth="60.0" layoutX="70.0" pickOnBounds="true"
+                       preserveRatio="true"/>
         </Pane>
-        <VBox id="zoomContainer" alignment="CENTER" layoutX="10.0" layoutY="110.0" prefHeight="80.0" prefWidth="90.0" spacing="10.0">
+        <VBox id="zoomContainer" alignment="CENTER" layoutX="10.0" layoutY="110.0" prefHeight="80.0" prefWidth="90.0"
+              spacing="10.0">
             <Label alignment="CENTER" maxHeight="20.0" prefWidth="70.0" text="Zoom">
                 <font>
-                    <Font name="System Bold" size="18.0" />
+                    <Font name="System Bold" size="18.0"/>
                 </font>
             </Label>
             <HBox alignment="CENTER" maxHeight="40.0" maxWidth="90.0" prefHeight="25.0" prefWidth="60.0" spacing="10.0">
-                <Button id="zoomButton" fx:id="zoomOutButton" mnemonicParsing="false" onAction="#zoomOut" prefHeight="40.0" prefWidth="40.0" text="-" />
-                <Button id="zoomButton" fx:id="zoomInButton" mnemonicParsing="false" onAction="#zoomIn" prefHeight="40.0" prefWidth="40.0" text="+" />
+                <Button id="zoomButton" fx:id="zoomOutButton" mnemonicParsing="false" onAction="#zoomOut"
+                        prefHeight="40.0" prefWidth="40.0" text="-"/>
+                <Button id="zoomButton" fx:id="zoomInButton" mnemonicParsing="false" onAction="#zoomIn"
+                        prefHeight="40.0" prefWidth="40.0" text="+"/>
             </HBox>
         </VBox>
-        <Pane id="devCardsPane" layoutX="20.0" layoutY="-30.0" onMouseClicked="#onShowDevCard" prefHeight="120.0" prefWidth="60.0" style="-fx-background-color: ff3333;">
-            <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@assets/helmet.png" />
+        <Pane id="devCardsPane" layoutX="20.0" layoutY="-30.0" onMouseClicked="#onShowDevCard" prefHeight="120.0"
+              prefWidth="60.0" style="-fx-background-color: ff3333;">
+            <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true"
+                       preserveRatio="true">
+                <Image url="@assets/helmet.png"/>
             </ImageView>
-            <Label fx:id="devCardsAmountLabel" alignment="CENTER" layoutY="60.0" prefHeight="40.0" prefWidth="60.0" text="X" />
+            <Label fx:id="devCardsAmountLabel" alignment="CENTER" layoutY="60.0" prefHeight="40.0" prefWidth="60.0"
+                   text="X"/>
         </Pane>
     </Pane>
     <Pane layoutX="1100.0" prefHeight="900.0" prefWidth="500.0">
-         <Button id="bigButton" fx:id="leave" contentDisplay="CENTER" layoutX="285.0" layoutY="10.0" mnemonicParsing="false" onAction="#onLeave" prefHeight="50.0" prefWidth="200.0" styleClass="redButton" text="Leave">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Button>
-      <Pane id="tradeSubView" fx:id="tradingPane" layoutX="230.0" layoutY="83.0" prefHeight="212.0" prefWidth="250.0" />
+        <Button id="bigButton" fx:id="leave" contentDisplay="CENTER" layoutX="285.0" layoutY="10.0"
+                mnemonicParsing="false" onAction="#onLeave" prefHeight="50.0" prefWidth="200.0" styleClass="redButton"
+                text="Leave">
+            <font>
+                <Font size="24.0"/>
+            </font>
+        </Button>
+        <Pane id="tradeSubView" fx:id="tradingPane" layoutX="230.0" layoutY="83.0" prefHeight="212.0"
+              prefWidth="250.0"/>
         <Pane id="currentMove" layoutX="230.0" layoutY="420.0" prefHeight="60.0" prefWidth="250.0">
             <Label alignment="CENTER" contentDisplay="TOP" prefHeight="30.0" prefWidth="250.0" text="NEXT MOVE">
-         </Label>
-            <Label fx:id="nextMoveLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0" prefHeight="30.0" prefWidth="250.0">
-         </Label>
+            </Label>
+            <Label fx:id="nextMoveLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0" prefHeight="30.0"
+                   prefWidth="250.0">
+            </Label>
         </Pane>
         <Pane id="currentPlayer" layoutX="230.0" layoutY="360.0" prefHeight="60.0" prefWidth="250.0">
             <Label alignment="CENTER" contentDisplay="TOP" prefHeight="30.0" prefWidth="250.0" text="CURRENT PLAYER">
-         </Label>
-            <Label fx:id="currentPlayerLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0" prefHeight="30.0" prefWidth="250.0">
-         </Label>
+            </Label>
+            <Label fx:id="currentPlayerLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="30.0"
+                   prefHeight="30.0" prefWidth="250.0">
+            </Label>
         </Pane>
-      <Pane fx:id="chatPane" layoutX="50.0" layoutY="574.0" prefHeight="320.0" prefWidth="450.0" />
-         <Button fx:id="finishTurnButton" contentDisplay="CENTER" layoutX="285.0" layoutY="550.0" mnemonicParsing="false" onAction="#finishTurn" prefHeight="50.0" prefWidth="200.0" styleClass="greenButton" text="Move" />
-         <Pane id="timer" layoutX="330.0" layoutY="480.0" prefHeight="70.0" prefWidth="150.0">
-             <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="150.0" text="Remaining time">
-                </Label>
-         <VBox fx:id="remainingTimeView" layoutY="30.0" prefHeight="30.0" prefWidth="150.0" />
-         </Pane>
-      <VBox id="gameTimer" fx:id="gameTimeView" layoutX="62.0" layoutY="549.0" prefHeight="30.0" prefWidth="150.0" />
-      <ImageView fx:id="imageTradingFoldInId" fitHeight="25.0" fitWidth="90.0" layoutX="334.0" layoutY="340.0" onMouseClicked="#onClickUP" pickOnBounds="true" preserveRatio="true" />
-      <Pane fx:id="paneTradingId" layoutX="240.0" layoutY="74.0" onMouseClicked="#onClickTradeView" prefHeight="70.0" prefWidth="243.0">
-         <children>
-            <Label fx:id="tradingFoldOutId" alignment="CENTER" layoutX="4.0" layoutY="-1.0" prefHeight="47.0" prefWidth="243.0" text="Trading " />
-            <ImageView fx:id="imageTradingFoldoutId" fitHeight="21.0" fitWidth="50.0" layoutX="97.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true" />
-         </children>
-      </Pane>
+        <Pane fx:id="chatPane" layoutX="50.0" layoutY="574.0" prefHeight="320.0" prefWidth="450.0"/>
+        <Button fx:id="finishTurnButton" contentDisplay="CENTER" layoutX="285.0" layoutY="550.0" mnemonicParsing="false"
+                onAction="#finishTurn" prefHeight="50.0" prefWidth="200.0" styleClass="greenButton" text="Move"/>
+        <Pane id="timer" layoutX="330.0" layoutY="480.0" prefHeight="70.0" prefWidth="150.0">
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="150.0" text="Remaining time">
+            </Label>
+            <VBox fx:id="remainingTimeView" layoutY="30.0" prefHeight="30.0" prefWidth="150.0"/>
+        </Pane>
+        <VBox id="gameTimer" fx:id="gameTimeView" layoutX="62.0" layoutY="549.0" prefHeight="30.0" prefWidth="150.0"/>
+        <ImageView fx:id="imageTradingFoldInId" fitHeight="25.0" fitWidth="90.0" layoutX="334.0" layoutY="340.0"
+                   onMouseClicked="#onClickUP" pickOnBounds="true" preserveRatio="true"/>
+        <Pane fx:id="paneTradingId" layoutX="240.0" layoutY="74.0" onMouseClicked="#onClickTradeView" prefHeight="70.0"
+              prefWidth="243.0">
+            <children>
+                <Label fx:id="tradingFoldOutId" alignment="CENTER" layoutX="4.0" layoutY="-1.0" prefHeight="47.0"
+                       prefWidth="243.0" text="Trading "/>
+                <ImageView fx:id="imageTradingFoldoutId" fitHeight="21.0" fitWidth="50.0" layoutX="97.0" layoutY="40.0"
+                           pickOnBounds="true" preserveRatio="true"/>
+            </children>
+        </Pane>
     </Pane>
-   <Pane fx:id="foldOutPaneId" layoutX="450.0" onMouseClicked="#onShowSpectator" prefHeight="60.0" prefWidth="192.0">
-      <children>
-         <Label fx:id="spectatorTitleId" alignment="CENTER" layoutX="-1.0" layoutY="-2.0" prefHeight="40.0" prefWidth="164.0" text="Spectator" />
-         <ImageView fx:id="arrowImageId" fitHeight="60.0" fitWidth="40.0" layoutX="163.0" layoutY="-2.0" pickOnBounds="true" />
-      </children>
-      <padding>
-         <Insets left="200.0" />
-      </padding>
-   </Pane>
+    <Pane fx:id="foldOutPaneId" layoutX="450.0" onMouseClicked="#onShowSpectator" prefHeight="60.0" prefWidth="192.0">
+        <children>
+            <Label fx:id="spectatorTitleId" alignment="CENTER" layoutX="-1.0" layoutY="-2.0" prefHeight="40.0"
+                   prefWidth="164.0" text="Spectator"/>
+            <ImageView fx:id="arrowImageId" fitHeight="60.0" fitWidth="40.0" layoutX="163.0" layoutY="-2.0"
+                       pickOnBounds="true"/>
+        </children>
+        <padding>
+            <Insets left="200.0"/>
+        </padding>
+    </Pane>
 </Pane>
