@@ -12,7 +12,6 @@ import de.uniks.pioneers.template.TileTemplate;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 
@@ -25,8 +24,6 @@ public class MapTemplateViewController implements Controller {
 
 	@FXML
 	public Label mapNameLabel;
-	@FXML
-	public Button backButton;
 	@FXML
 	public ScrollPane mapPane;
 	private final App app;
