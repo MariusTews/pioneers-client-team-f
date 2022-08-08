@@ -1,0 +1,23 @@
+#mapScrollPane {
+    -fx-background-color: TRANSPARENT;
+    -fx-background: TRANSPARENT;
+}
+
+#mapTemplateViewBackground {
+    -fx-background-image: url("../assets/ingame_background.png");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 1100 700;
+}
+
+#controlBox {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 220 220;
+}
+
+#backButton {
+    -fx-background-image: url("../assets/red_button.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+}
