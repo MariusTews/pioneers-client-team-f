@@ -56,7 +56,7 @@ public class MapEditorController implements Controller {
 
     private final HexFillService hexFillService = new HexFillService();
     private final List<String> choices = new ArrayList<>();
-    private List<TileTemplate> tiles = new ArrayList<>();
+    private final List<TileTemplate> tiles = new ArrayList<>();
     private List<HarborTemplate> harbors = new ArrayList<>();
 
     @Inject
@@ -135,68 +135,100 @@ public class MapEditorController implements Controller {
         return cancelTileButton;
     }
 
-    private void tileButtonPressed(ActionEvent event) {
-        // regex to filter the substring with the id from the event
+    // regex to filter the substring with the id from the event
+    private String filterID(String raw) {
         Pattern pattern = Pattern.compile("=(.*?)_");
-        Matcher matcher = pattern.matcher(event.getSource().toString());
+        Matcher matcher = pattern.matcher(raw);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        return "";
+    }
+
+    private void tileButtonPressed(ActionEvent event) {
+        String id = filterID(event.getSource().toString());
         Button cancelTileButton = null;
         TextField numberField = null;
         ChoiceBox<String> choiceBox = null;
 
-        if (matcher.find()) {
-            for (Node node : map.getChildren()) {
-                // make harbor button invisible
-                if (node.getId().equals(matcher.group(1) + "_harborButton")) {
-                    Button harborButton = (Button) node;
-                    harborButton.setVisible(false);
-                }
+        for (Node node : map.getChildren()) {
+            // make harbor button invisible
+            if (node.getId().equals(id + "_harborButton")) {
+                Button harborButton = (Button) node;
+                harborButton.setVisible(false);
+            }
 
-                // look for the matching hexagon
-                if (node.getId().equals(matcher.group(1))) {
-                    Polygon hexagon = (Polygon) node;
-                    Button tileButton = (Button) event.getSource();
-                    tileButton.setVisible(false);
+            // look for the matching hexagon
+            if (node.getId().equals(id)) {
+                Polygon hexagon = (Polygon) node;
+                Button tileButton = (Button) event.getSource();
+                tileButton.setVisible(false);
 
-                    // cancel button
-                    cancelTileButton = initCancelButton(hexagon);
+                // cancel button
+                cancelTileButton = initCancelButton(hexagon);
 
-                    // number box
-                    numberField = new TextField();
-                    numberField.setPrefWidth(35);
-                    numberField.setPrefHeight(30);
-                    numberField.setAlignment(Pos.CENTER);
-                    numberField.setPromptText("-");
-                    numberField.getStyleClass().add("numberField");
-                    numberField.setLayoutX(hexagon.getLayoutX() - 18);
-                    numberField.setLayoutY(hexagon.getLayoutY() - 35);
-                    numberField.toFront();
-                    numberField.setId(hexagon.getId() + "_numberField");
+                // number box
+                numberField = new TextField();
+                numberField.setPrefWidth(35);
+                numberField.setPrefHeight(30);
+                numberField.setAlignment(Pos.CENTER);
+                numberField.setPromptText("-");
+                numberField.getStyleClass().add("numberField");
+                numberField.setLayoutX(hexagon.getLayoutX() - 18);
+                numberField.setLayoutY(hexagon.getLayoutY() - 35);
+                numberField.toFront();
+                numberField.setId(hexagon.getId() + "_numberField");
 
-                    // choice box
-                    choiceBox = new ChoiceBox<>(FXCollections.observableArrayList(
-                            "random", "desert", "venus", "moon", "mars", "earth", "neptune"
-                    ));
+                numberField.setOnKeyPressed(this::numberFieldEvent);
 
-                    choiceBox.getSelectionModel().selectedIndexProperty().addListener(
-                            (observable, oldValue, newValue) -> selectedChoice(hexagon, newValue.intValue())
-                    );
+                // choice box
+                choiceBox = new ChoiceBox<>(FXCollections.observableArrayList(
+                        "random", "desert", "venus", "moon", "mars", "earth", "neptune"
+                ));
 
-                    choiceBox.setPrefWidth(100);
-                    choiceBox.setPrefHeight(30);
-                    choiceBox.setLayoutX(hexagon.getLayoutX() - 50);
-                    choiceBox.setLayoutY(hexagon.getLayoutY());
-                    choiceBox.toFront();
-                    choiceBox.setId(hexagon.getId() + "_choiceBox");
-                    choiceBox.getSelectionModel().selectFirst();
-                }
+                choiceBox.getSelectionModel().selectedIndexProperty().addListener(
+                        (observable, oldValue, newValue) -> selectedChoice(hexagon, newValue.intValue())
+                );
+
+                choiceBox.setPrefWidth(100);
+                choiceBox.setPrefHeight(30);
+                choiceBox.setLayoutX(hexagon.getLayoutX() - 50);
+                choiceBox.setLayoutY(hexagon.getLayoutY());
+                choiceBox.toFront();
+                choiceBox.setId(hexagon.getId() + "_choiceBox");
+                choiceBox.getSelectionModel().selectFirst();
             }
         }
+
+
         // add the objects to the map
         if (cancelTileButton != null) {
             map.getChildren().add(cancelTileButton);
             map.getChildren().add(numberField);
             map.getChildren().add(choiceBox);
         }
+    }
+
+    // changing number token
+    private void numberFieldEvent(KeyEvent event) {
+        String id = filterID(event.getSource().toString());
+
+        // ignore all keys, which are not digits
+        if (event.getCode().isDigitKey()) {
+            // to prevent from typing in letters and after that digits
+            for (Node node : map.getChildren()) {
+                if (node.getId().equals(id + "_numberField")) {
+                    TextField textField = (TextField) node;
+                    System.out.println("text " + textField.getText());
+                }
+            }
+        }
+
+        System.out.println("Event type: " + event.getCode().isDigitKey());
+        System.out.println("Source: " + event.getSource());
+
     }
 
     // checks the number token
@@ -209,6 +241,7 @@ public class MapEditorController implements Controller {
         }
     }
 
+    // creates a tile and adds it to the list, after a terrain is selected
     private void selectedChoice(Polygon hexagon, int newValue) {
         TextField numberField = new TextField();
         TileTemplate tileTemplate;
@@ -255,7 +288,6 @@ public class MapEditorController implements Controller {
 
         // set tile template if it does not already exist
         tiles.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
-
         tiles.add(tileTemplate);
 
         System.out.println(tiles);
@@ -263,82 +295,79 @@ public class MapEditorController implements Controller {
 
     private void harborButtonPressed(ActionEvent event) {
         // regex to filter the substring with the id from the event
-        Pattern pattern = Pattern.compile("=(.*?)_");
-        Matcher matcher = pattern.matcher(event.getSource().toString());
+        //Pattern pattern = Pattern.compile("=(.*?)_");
+        //Matcher matcher = pattern.matcher(event.getSource().toString());
+        String id = filterID(event.getSource().toString());
+
         Button cancelTileButton = null;
         ChoiceBox<String> chooseResource = null;
         ChoiceBox<String> chooseSide = null;
         ImageView imageView = new ImageView();
         boolean flag = true;
 
-        if (matcher.find()) {
-            for (Node node : map.getChildren()) {
-                // make buttons invisible
-                if (node.getId().equals(matcher.group(1) + "_tileButton")) {
-                    Button tileButton = (Button) node;
-                    if (flag) {
-                        tileButton.setVisible(false);
-                        Button harborButton = (Button) event.getSource();
-                        harborButton.setVisible(false);
-
-                    }
+        for (Node node : map.getChildren()) {
+            // make buttons invisible
+            if (node.getId().equals(id + "_tileButton")) {
+                Button tileButton = (Button) node;
+                if (flag) {
+                    tileButton.setVisible(false);
+                    Button harborButton = (Button) event.getSource();
+                    harborButton.setVisible(false);
                 }
+            }
 
+            if (node.getId().equals(id)) {
+                assert node instanceof Polygon;
+                Polygon hexagon = (Polygon) node;
+                hexagon.setFill(Color.TRANSPARENT);
 
-                if (node.getId().equals(matcher.group(1))) {
-                    assert node instanceof Polygon;
-                    Polygon hexagon = (Polygon) node;
-                    hexagon.setFill(Color.TRANSPARENT);
+                imageView = new ImageView();
+                Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/harbor.png")).toString());
+                imageView.setImage(image);
+                imageView.setLayoutX(hexagon.getLayoutX() - 17);
+                imageView.setLayoutY(hexagon.getLayoutY() - 38);
+                imageView.toFront();
+                imageView.setFitWidth(25);
+                imageView.setFitHeight(25);
+                imageView.setId(hexagon.getId() + "_imageView");
 
-                    imageView = new ImageView();
-                    Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/harbor.png")).toString());
-                    imageView.setImage(image);
-                    imageView.setLayoutX(hexagon.getLayoutX() - 17);
-                    imageView.setLayoutY(hexagon.getLayoutY() - 38);
-                    imageView.toFront();
-                    imageView.setFitWidth(25);
-                    imageView.setFitHeight(25);
-                    imageView.setId(hexagon.getId() + "_imageView");
+                cancelTileButton = initCancelButton(hexagon);
 
-                    cancelTileButton = initCancelButton(hexagon);
+                chooseResource = new ChoiceBox<>(FXCollections.observableArrayList(
+                        "3:1", "mars_bar", "moon_rock", "earth_cactus", "venus_grain", "neptune_crystals"
+                ));
 
-                    chooseResource = new ChoiceBox<>(FXCollections.observableArrayList(
-                            "3:1", "mars_bar", "moon_rock", "earth_cactus", "venus_grain", "neptune_crystals"
-                    ));
+                chooseResource.getSelectionModel().selectedIndexProperty().addListener(
+                        (observable, oldValue, newValue) -> selectedResource(hexagon, newValue.intValue())
+                );
 
-                    chooseResource.getSelectionModel().selectedIndexProperty().addListener(
+                chooseResource.setPrefWidth(100);
+                chooseResource.setPrefHeight(20);
+                chooseResource.setLayoutX(hexagon.getLayoutX() - 50);
+                chooseResource.setLayoutY(hexagon.getLayoutY() - 16);
+                chooseResource.toFront();
+                chooseResource.setId(hexagon.getId() + "_chooseResource");
+                chooseResource.getSelectionModel().selectFirst();
+
+                chooseSide = new ChoiceBox<>(FXCollections.observableArrayList());
+
+                // check, if around the harbor is a normal tile and add option to choice box
+                if (!initSides(chooseSide, hexagon)) {
+                    flag = false;
+                    hexagon.setFill(Color.grayRgb(100, 0.5));
+                    new AlertService().showAlert("You can only place a harbor next to a tile with a terrain!");
+                } else {
+                    chooseSide.setPrefWidth(100);
+                    chooseSide.setPrefHeight(20);
+                    chooseSide.setLayoutX(hexagon.getLayoutX() - 50);
+                    chooseSide.setLayoutY(hexagon.getLayoutY() + 11);
+                    chooseSide.toFront();
+                    chooseSide.setId(hexagon.getId() + "_chooseSide");
+                    chooseSide.getSelectionModel().selectFirst();
+
+                    chooseSide.getSelectionModel().selectedIndexProperty().addListener(
                             (observable, oldValue, newValue) -> selectedResource(hexagon, newValue.intValue())
                     );
-
-                    chooseResource.setPrefWidth(100);
-                    chooseResource.setPrefHeight(20);
-                    chooseResource.setLayoutX(hexagon.getLayoutX() - 50);
-                    chooseResource.setLayoutY(hexagon.getLayoutY() - 16);
-                    chooseResource.toFront();
-                    chooseResource.setId(hexagon.getId() + "_chooseResource");
-                    chooseResource.getSelectionModel().selectFirst();
-
-                    chooseSide = new ChoiceBox<>(FXCollections.observableArrayList());
-
-
-                    // check, if around the harbor is a normal tile and add option to choice box
-                    if (!initSides(chooseSide, hexagon)) {
-                        flag = false;
-                        hexagon.setFill(Color.grayRgb(100, 0.5));
-                        new AlertService().showAlert("You can only place a harbor next to a tile with a terrain!");
-                    } else {
-                        chooseSide.setPrefWidth(100);
-                        chooseSide.setPrefHeight(20);
-                        chooseSide.setLayoutX(hexagon.getLayoutX() - 50);
-                        chooseSide.setLayoutY(hexagon.getLayoutY() + 11);
-                        chooseSide.toFront();
-                        chooseSide.setId(hexagon.getId() + "_chooseSide");
-                        chooseSide.getSelectionModel().selectFirst();
-
-                        chooseSide.getSelectionModel().selectedIndexProperty().addListener(
-                                (observable, oldValue, newValue) -> selectedResource(hexagon, newValue.intValue())
-                        );
-                    }
                 }
             }
         }
@@ -398,8 +427,9 @@ public class MapEditorController implements Controller {
     }
 
     private void cancelTileButtonPressed(ActionEvent event) {
-        Pattern pattern = Pattern.compile("=(.*?)_");
-        Matcher matcher = pattern.matcher(event.getSource().toString());
+        //Pattern pattern = Pattern.compile("=(.*?)_");
+        //Matcher matcher = pattern.matcher(event.getSource().toString());
+        String id = filterID(event.getSource().toString());
         List<Integer> pos;
         int x;
         int y;
@@ -414,63 +444,61 @@ public class MapEditorController implements Controller {
         ChoiceBox<String> chooseSide = null;
 
         // reset the tile
-        if (matcher.find()) {
-            // get id to remove from tile template list
-            pos = hexFillService.parseID(matcher.group(1));
-            x = pos.get(0);
-            y = pos.get(1);
-            z = pos.get(2);
 
-            for (Node node : map.getChildren()) {
-                if (node.getId().equals(matcher.group(1) + "_cancelButton")) {
-                    cancelTileButton = (Button) node;
-                }
-                if (node.getId().equals(matcher.group(1) + "_numberField")) {
-                    assert node instanceof TextField;
-                    number = (TextField) node;
-                }
-                if (node.getId().equals(matcher.group(1) + "_choiceBox")) {
-                    assert node instanceof ChoiceBox;
-                    choiceBox = (ChoiceBox) node;
-                }
-                if (node.getId().equals(matcher.group(1) + "_harborButton")) {
-                    assert node instanceof Button;
-                    Button harborButton = (Button) node;
-                    harborButton.setVisible(true);
-                }
-                if (node.getId().equals(matcher.group(1) + "_tileButton")) {
-                    assert node instanceof Button;
-                    Button tileButton = (Button) node;
-                    tileButton.setVisible(true);
-                }
-                if (node.getId().equals(matcher.group(1) + "_imageView")) {
-                    assert node instanceof ImageView;
-                    imageView = (ImageView) node;
-                }
-                if (node.getId().equals(matcher.group(1) + "_chooseResource")) {
-                    chooseResource = (ChoiceBox) node;
-                }
-                if (node.getId().equals(matcher.group(1) + "_chooseSide")) {
-                    chooseSide = (ChoiceBox) node;
-                }
-                if (node.getId().equals(matcher.group(1))) {
-                    assert node instanceof Polygon;
-                    Polygon hexagon = (Polygon) node;
-                    hexagon.setFill(Color.grayRgb(100, 0.5));
-                }
+        // get id to remove from tile template list
+        pos = hexFillService.parseID(id);
+        x = pos.get(0);
+        y = pos.get(1);
+        z = pos.get(2);
+
+        for (Node node : map.getChildren()) {
+            if (node.getId().equals(id + "_cancelButton")) {
+                cancelTileButton = (Button) node;
             }
-
-            map.getChildren().remove(cancelTileButton);
-            map.getChildren().remove(number);
-            map.getChildren().remove(choiceBox);
-            map.getChildren().remove(imageView);
-            map.getChildren().remove(chooseResource);
-            map.getChildren().remove(chooseSide);
-
-            // remove tile from list
-            tiles.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
+            if (node.getId().equals(id + "_numberField")) {
+                assert node instanceof TextField;
+                number = (TextField) node;
+            }
+            if (node.getId().equals(id + "_choiceBox")) {
+                assert node instanceof ChoiceBox;
+                choiceBox = (ChoiceBox) node;
+            }
+            if (node.getId().equals(id + "_harborButton")) {
+                assert node instanceof Button;
+                Button harborButton = (Button) node;
+                harborButton.setVisible(true);
+            }
+            if (node.getId().equals(id + "_tileButton")) {
+                assert node instanceof Button;
+                Button tileButton = (Button) node;
+                tileButton.setVisible(true);
+            }
+            if (node.getId().equals(id + "_imageView")) {
+                assert node instanceof ImageView;
+                imageView = (ImageView) node;
+            }
+            if (node.getId().equals(id + "_chooseResource")) {
+                chooseResource = (ChoiceBox) node;
+            }
+            if (node.getId().equals(id + "_chooseSide")) {
+                chooseSide = (ChoiceBox) node;
+            }
+            if (node.getId().equals(id)) {
+                assert node instanceof Polygon;
+                Polygon hexagon = (Polygon) node;
+                hexagon.setFill(Color.grayRgb(100, 0.5));
+            }
         }
 
+        map.getChildren().remove(cancelTileButton);
+        map.getChildren().remove(number);
+        map.getChildren().remove(choiceBox);
+        map.getChildren().remove(imageView);
+        map.getChildren().remove(chooseResource);
+        map.getChildren().remove(chooseSide);
+
+        // remove tile from list
+        tiles.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
     }
 
     /*
@@ -499,8 +527,16 @@ public class MapEditorController implements Controller {
     public void saveButtonPressed(ActionEvent event) {
         //TODO: pressing the save button creates a new map template
 
+        // if someone decides to change a number token, it has to be checked at the end
+        for (Node node : map.getChildren()) {
+            if (node.getId().endsWith("_numberField")) {
+                TextField textField = (TextField) node;
+                System.out.println(textField.getId() + textField.getText());
+            }
+        }
+
         // for temporary use, to get back
-        final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
-        this.app.show(controller);
+        //final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
+        //this.app.show(controller);
     }
 }
