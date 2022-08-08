@@ -6,7 +6,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateSubController">
+<HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateSubController">
     <Label fx:id="nameLabel" prefWidth="170.0" style="-fx-text-fill: white" text="NAME">
         <HBox.margin>
             <Insets left="18.0" />
@@ -27,7 +27,7 @@
             <Insets left="6.0" />
         </HBox.margin>
     </ImageView>
-    <Button id="showButton" fx:id="showButton" mnemonicParsing="false" text="Show">
+    <Button id="showButton" fx:id="showButton" mnemonicParsing="false" onAction="#onShowClicked" text="Show">
         <HBox.margin>
             <Insets left="60.0" />
         </HBox.margin>
