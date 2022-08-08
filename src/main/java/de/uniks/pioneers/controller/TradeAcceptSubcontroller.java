@@ -3,6 +3,7 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Move;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.AchievementsService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.TRADE_PLAYER;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class TradeAcceptSubcontroller implements Controller {
@@ -47,15 +49,18 @@ public class TradeAcceptSubcontroller implements Controller {
 
     private final UserService userService;
     final PioneersService pioneersService;
+    private final AchievementsService achievementsService;
     private final GameStorage gameStorage;
 
     private Move move;
 
     public TradeAcceptSubcontroller(UserService userService,
                                     PioneersService pioneersService,
+                                    AchievementsService achievementsService,
                                     GameStorage gameStorage) {
         this.userService = userService;
         this.pioneersService = pioneersService;
+        this.achievementsService = achievementsService;
         this.gameStorage = gameStorage;
     }
 
@@ -125,7 +130,7 @@ public class TradeAcceptSubcontroller implements Controller {
             pioneersService
                     .tradePlayer(gameStorage.getId(), "accept", tradePartner._id(), null)
                     .observeOn(FX_SCHEDULER)
-                    .subscribe();
+                    .subscribe(result -> achievementsService.putOrUpdateAchievement(TRADE_PLAYER, 1).blockingFirst());
             primaryStage.close();
         }
     }
