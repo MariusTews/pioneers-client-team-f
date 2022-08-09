@@ -153,13 +153,13 @@ public class App extends Application {
                 }
             } else {
                 stage.getScene().setRoot(controller.render());
-                if (controller.getClass().equals(LobbyController.class)) {
+                if (controller.getClass().equals(LobbyController.class) || controller.getClass().equals(MapTemplatesScreenController.class)) {
                     stage.setWidth(900);
                     stage.setHeight(600);
                 } else if (controller.getClass().equals(GameLobbyController.class)) {
                     stage.setWidth(1010);
                     stage.setHeight(600);
-                } else if (controller.getClass().equals(MapEditorController.class)) {
+                } else if (controller.getClass().equals(MapEditorController.class) || controller.getClass().equals(MapTemplateViewController.class)) {
                     stage.setWidth(1100);
                     stage.setHeight(700);
                 }
