@@ -5,7 +5,6 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-rem
 <Pane id="mapTemplateViewBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateViewController">
    <ScrollPane id="mapScrollPane" fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="700.0" prefWidth="1100.0" vbarPolicy="NEVER" vvalue="0.5" />
    <VBox id="controlBox" alignment="CENTER" layoutX="860.0" layoutY="20.0" prefHeight="220.0" prefWidth="220.0" spacing="120.0">
