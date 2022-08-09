@@ -64,6 +64,18 @@ public class PioneersService {
         }
     }
 
+    public Observable<Move> playDevCard(String gameId, String devCard) {
+        return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, null, null, devCard, null));
+    }
+
+    public Observable<Move> yearOfPlentyCard(String gameId, HashMap<String, Integer> resources) {
+        return this.pioneersApiService.create(gameId,new CreateMoveDto("year-of-plenty", null, resources, null, null, null));
+    }
+
+    public Observable<Move> monopolyCard(String gameId, HashMap<String, Integer> resources) {
+        return this.pioneersApiService.create(gameId, new CreateMoveDto("monopoly", null, resources, null, null, null));
+    }
+
     public Observable<Move> tradeBank(String gameId, HashMap<String, Integer> resources) {
 		return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, resources, BANK_ID, null, null));
 	}

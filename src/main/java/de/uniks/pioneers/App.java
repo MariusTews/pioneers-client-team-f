@@ -63,6 +63,7 @@ public class App extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapTemplatesScreenStyle.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapEditor.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AchievementsStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapTemplateView.css")).toString());
 
         setAppIcon(stage);
 
@@ -159,7 +160,7 @@ public class App extends Application {
                         || controller.getClass().equals(MapTemplatesScreenController.class)) {
                     stage.setWidth(1010);
                     stage.setHeight(600);
-                } else if (controller.getClass().equals(MapEditorController.class)) {
+                } else if (controller.getClass().equals(MapEditorController.class) || controller.getClass().equals(MapTemplateViewController.class)) {
                     stage.setWidth(1100);
                     stage.setHeight(700);
                 }

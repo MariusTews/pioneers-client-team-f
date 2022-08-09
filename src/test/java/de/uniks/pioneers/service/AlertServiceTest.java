@@ -23,16 +23,16 @@ public class AlertServiceTest {
         Player player = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards);
 
-        List<DevelopmentCard> devCards_2 = new ArrayList<>();
+        List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
-        devCards_2.add(d11);
+        devCards2.add(d11);
 
-        Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards_2);
+        Player player2 = new Player("id", "3", "#223", true, 2, null, null,
+                4, 5, null, devCards2);
 
-        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
-        Assertions.assertNotEquals(devCards.size(), devCards_2.size());
+        Assertions.assertNotEquals(devCards.size(), devCards2.size());
     }
 
     @Test
@@ -46,16 +46,16 @@ public class AlertServiceTest {
         Player player = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards);
 
-        List<DevelopmentCard> devCards_2 = new ArrayList<>();
+        List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
-        devCards_2.add(d11);
+        devCards2.add(d11);
 
-        Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards_2);
+        Player player2 = new Player("id", "3", "#223", true, 2, null, null,
+                4, 5, null, devCards2);
 
-        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
-        Assertions.assertNotEquals(devCards.size(), devCards_2.size());
+        Assertions.assertNotEquals(devCards.size(), devCards2.size());
     }
 
     @Test
@@ -69,16 +69,16 @@ public class AlertServiceTest {
         Player player = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards);
 
-        List<DevelopmentCard> devCards_2 = new ArrayList<>();
+        List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
-        devCards_2.add(d11);
+        devCards2.add(d11);
 
-        Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards_2);
+        Player player2 = new Player("id", "3", "#223", true, 2, null, null,
+                4, 5, null, devCards2);
 
-        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
-        Assertions.assertNotEquals(devCards.size(), devCards_2.size());
+        Assertions.assertNotEquals(devCards.size(), devCards2.size());
     }
 
     @Test
@@ -92,16 +92,16 @@ public class AlertServiceTest {
         Player player = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards);
 
-        List<DevelopmentCard> devCards_2 = new ArrayList<>();
+        List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
-        devCards_2.add(d11);
+        devCards2.add(d11);
 
-        Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards_2);
+        Player player2 = new Player("id", "3", "#223", true, 2, null, null,
+                4, 5, null, devCards2);
 
-        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
-        Assertions.assertNotEquals(devCards.size(), devCards_2.size());
+        Assertions.assertNotEquals(devCards.size(), devCards2.size());
     }
 
     @Test
@@ -115,15 +115,15 @@ public class AlertServiceTest {
         Player player = new Player("id", "3", "#223", true, 2, null, null,
                 4, 5, null, devCards);
 
-        List<DevelopmentCard> devCards_2 = new ArrayList<>();
+        List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
-        devCards_2.add(d11);
+        devCards2.add(d11);
 
-        Player player_2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards_2);
+        Player player2 = new Player("id", "3", "#223", true, 2, null, null,
+                4, 5, null, devCards2);
 
-        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player_2));
+        PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
-        Assertions.assertNotEquals(devCards.size(), devCards_2.size());
+        Assertions.assertNotEquals(devCards.size(), devCards2.size());
     }
 }
