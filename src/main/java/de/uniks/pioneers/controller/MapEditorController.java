@@ -2,10 +2,8 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.service.AchievementsService;
-import de.uniks.pioneers.template.HarborTemplate;
-import de.uniks.pioneers.template.TileTemplate;
 import de.uniks.pioneers.computation.CalculateMap;
+import de.uniks.pioneers.service.AchievementsService;
 import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.service.HexFillService;
 import de.uniks.pioneers.template.HarborTemplate;
@@ -626,7 +624,6 @@ public class MapEditorController implements Controller {
         // check length of name
         // check if harbor is alone
         // check if max items
-
 
         //achievement
         achievementsService.init();
