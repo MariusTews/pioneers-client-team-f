@@ -571,7 +571,11 @@ public class MapEditorController implements Controller {
     }
 
     public void mapSizePlusButtonPressed(ActionEvent event) {
-        checkMap(1);
+        if (Integer.parseInt(this.mapSizeLabel.getText()) < 11) {
+            checkMap(1);
+        } else {
+            new AlertService().showAlert("The map can only be extended to a maximum of 10!");
+        }
     }
 
     private void checkMap(int i) {
