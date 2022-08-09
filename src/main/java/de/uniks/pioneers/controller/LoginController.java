@@ -94,9 +94,9 @@ public class LoginController implements Controller {
         loginButton.disableProperty().bind(length.or(usernameLengthMin.or(usernameLengthMax.not())));
 
         //this makes sure enter key works while logging in
-        parent.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
-            if(event.getCode() == KeyCode.ENTER){
-                if(!(length.or(usernameLengthMin.or(usernameLengthMax.not())).get())){
+        parent.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                if (!(length.or(usernameLengthMin.or(usernameLengthMax.not())).get())) {
                     loginButtonPressed();
                 }
             }
@@ -108,11 +108,6 @@ public class LoginController implements Controller {
     public void login(String username, String password) {
         authService.login(username, password)
                 .observeOn(FX_SCHEDULER)
-                .doOnError(error -> {
-                    if ("HTTP 401 ".equals(error.getMessage())) {
-                        errorLabel.setText("Invalid username or password");
-                    }
-                })
                 .subscribe(result -> {
                     if (rememberMeCheckBox.isSelected()) {
                         ResourceManager.saveConfig(JsonUtil.createRememberMeConfig(usernameTextField.getText(), result.refreshToken()));
@@ -120,6 +115,10 @@ public class LoginController implements Controller {
                         ResourceManager.saveConfig(JsonUtil.createDefaultConfig());
                     }
                     onSuccessfulLogin(result._id());
+                }, error -> {
+                    if ("HTTP 401 ".equals(error.getMessage())) {
+                        errorLabel.setText("Invalid username or password");
+                    }
                 });
     }
 
