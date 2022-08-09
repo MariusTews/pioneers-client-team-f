@@ -13,6 +13,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -106,7 +108,9 @@ public class LobbyController implements Controller {
     private final Provider<GameLobbyController> gameLobbyController;
     private final Provider<EditUserController> editUserController;
     private final Provider<GameScreenController> gameScreenController;
+    public Button achievementsButton;
 
+    private final Provider<AchievementsScreenController> achievementsScreenController;
     private final PioneersService pioneersService;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -142,6 +146,7 @@ public class LobbyController implements Controller {
                            Provider<GameLobbyController> gameLobbyController,
                            Provider<EditUserController> editUserController,
                            Provider<GameScreenController> gameScreenController,
+                           Provider<AchievementsScreenController> achievementsScreenController,
                            PioneersService pioneersService) {
 
         this.app = app;
@@ -161,6 +166,7 @@ public class LobbyController implements Controller {
         this.gameLobbyController = gameLobbyController;
         this.editUserController = editUserController;
         this.gameScreenController = gameScreenController;
+        this.achievementsScreenController = achievementsScreenController;
         this.pioneersService = pioneersService;
     }
 
@@ -762,5 +768,9 @@ public class LobbyController implements Controller {
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
         ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
+    }
+
+    public void OnAchievementsPressed(ActionEvent actionEvent) {
+        this.app.show(achievementsScreenController.get());
     }
 }

@@ -2,11 +2,15 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.service.AchievementsService;
+import de.uniks.pioneers.template.HarborTemplate;
+import de.uniks.pioneers.template.TileTemplate;
 import de.uniks.pioneers.computation.CalculateMap;
 import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.service.HexFillService;
 import de.uniks.pioneers.template.HarborTemplate;
 import de.uniks.pioneers.template.TileTemplate;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,6 +40,7 @@ import static de.uniks.pioneers.Constants.*;
 public class MapEditorController implements Controller {
     private final App app;
     private final Provider<MapTemplatesScreenController> mapTemplatesScreenController;
+    private final AchievementsService achievementsService;
     @FXML
     public TextField nameTextField;
     @FXML
@@ -54,6 +59,9 @@ public class MapEditorController implements Controller {
     private Pane map;
 
     private final HexFillService hexFillService = new HexFillService();
+
+    CompositeDisposable disposables;
+
     private final List<String> choices = new ArrayList<>();
     private final List<TileTemplate> tiles = new ArrayList<>();
     private final List<HarborTemplate> harbors = new ArrayList<>();
@@ -62,9 +70,11 @@ public class MapEditorController implements Controller {
 
     @Inject
     public MapEditorController(App app,
-                               Provider<MapTemplatesScreenController> mapTemplatesScreenController) {
+                               Provider<MapTemplatesScreenController> mapTemplatesScreenController,
+                               AchievementsService achievementsService) {
         this.app = app;
         this.mapTemplatesScreenController = mapTemplatesScreenController;
+        this.achievementsService = achievementsService;
     }
 
     @Override
@@ -92,10 +102,15 @@ public class MapEditorController implements Controller {
         resources.put("earth_cactus", EARTH_CACTUS);
         resources.put("venus_grain", VENUS_GRAIN);
         resources.put("neptune_crystals", NEPTUNE_CRYSTAL);
+
+        disposables = new CompositeDisposable();
     }
 
     @Override
     public void destroy() {
+        if (disposables != null) {
+            disposables.clear();
+        }
 
     }
 
@@ -611,6 +626,13 @@ public class MapEditorController implements Controller {
         // check length of name
         // check if harbor is alone
         // check if max items
+
+
+        //achievement
+        achievementsService.init();
+        disposables.add(achievementsService.initUserAchievements().observeOn(FX_SCHEDULER).subscribe());
+        disposables.add(achievementsService.putOrUpdateAchievement(CREATE_MAP, 1).observeOn(FX_SCHEDULER).subscribe());
+
 
         // for temporary use, to get back
         final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
