@@ -32,8 +32,7 @@ public class App extends Application {
 
     public App() {
         final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
-        //controller = mainComponent.loginController();
-        controller = mainComponent.mapEditorController();
+        controller = mainComponent.loginController();
     }
 
     public App(Controller controller) {
