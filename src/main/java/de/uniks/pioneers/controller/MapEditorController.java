@@ -606,15 +606,14 @@ public class MapEditorController implements Controller {
             }
         }
 
-
-
+        //TODO
         // check name
         // check length of name
         // check if harbor is alone
         // check if max items
 
         // for temporary use, to get back
-        //final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
-        //this.app.show(controller);
+        final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
+        this.app.show(controller);
     }
 }
