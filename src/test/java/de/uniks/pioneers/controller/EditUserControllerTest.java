@@ -67,12 +67,6 @@ class EditUserControllerTest extends ApplicationTest {
     }
 
     @Test
-    void openFileChooser(){
-        clickOn("Edit");
-        clickOn("change");
-    }
-
-    @Test
     void deleteUser() {
         when(userService.delete(any())).thenReturn(Observable.just(new User("1234", "12345", "01", "Alice", "offline", null, new ArrayList<>())));
 
