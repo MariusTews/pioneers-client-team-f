@@ -24,7 +24,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-import javax.inject.Provider;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +40,6 @@ public class MapTemplateSubController implements Controller {
     private final String userId;
     private final MapTemplatesScreenController parentController;
     private MapsService mapsService;
-    private MapTemplatesScreenController mapTemplatesScreenController;
-    private Provider<MapTemplateViewController> mapTemplateViewController;
     private Image leftActionImage;
     private Image rightActionImage;
     private Image selectedMapIcon;
@@ -68,14 +65,13 @@ public class MapTemplateSubController implements Controller {
     private final ColorAdjust brightColorAdjust = new ColorAdjust();
     private HashMap<String, String> userNames;
 
-    public MapTemplateSubController(App app, MapTemplate template, boolean ownMap, String createdBy, MapsService mapsService, MapTemplatesScreenController mapTemplatesScreenControllerString, String userId, MapTemplatesScreenController parentController) {
+    public MapTemplateSubController(App app, MapTemplate template, boolean ownMap, String createdBy, MapsService mapsService, String userId, MapTemplatesScreenController parentController) {
         this.app = app;
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
         this.userId = userId;
         this.parentController = parentController;
-        this.mapTemplatesScreenController = mapTemplatesScreenController;
     }
 
     @Override
@@ -329,7 +325,7 @@ public class MapTemplateSubController implements Controller {
     }
 
 	public void onShowClicked() {
-        final MapTemplateViewController controller = new MapTemplateViewController(this.app, this.template, this.mapTemplatesScreenController);
+        final MapTemplateViewController controller = new MapTemplateViewController(this.app, this.template, this.parentController);
         app.show(controller);
 	}
 
