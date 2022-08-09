@@ -21,3 +21,17 @@
     -fx-background-repeat: stretch;
     -fx-background-position: center;
 }
+
+#zoomBox {
+    -fx-background-image: url("../assets/yellow_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 160 40;
+}
+
+#zoomButton {
+    -fx-background-color: WHITE;
+    -fx-text-fill: BLACK;
+    -fx-font-weight: Bold;
+    -fx-font-size: 18;
+}

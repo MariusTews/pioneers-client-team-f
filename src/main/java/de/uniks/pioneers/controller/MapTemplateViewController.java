@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class MapTemplateViewController implements Controller {
 	@FXML
 	public ScrollPane mapPane;
 	private final App app;
+
+	private Pane mapTemplatePane;
 	private final MapTemplatesScreenController mapTemplatesScreenController;
 	private final MapTemplate mapTemplate;
 
@@ -72,7 +75,8 @@ public class MapTemplateViewController implements Controller {
 			return null;
 		}
 
-		this.mapPane.setContent(this.loadMapTemplate.loadMap(map, false));
+		this.mapTemplatePane = this.loadMapTemplate.loadMap(map, false);
+		this.mapPane.setContent(this.mapTemplatePane);
 		this.mapNameLabel.setText(this.mapTemplate.name());
 
 		return parent;
@@ -80,5 +84,19 @@ public class MapTemplateViewController implements Controller {
 
 	public void backButtonPressed() {
 		this.app.show(mapTemplatesScreenController);
+	}
+
+	public void decreaseZoom() {
+		if (this.mapTemplatePane.getScaleX() > 0.5) {
+			this.mapTemplatePane.setScaleX(this.mapTemplatePane.getScaleX() - 0.1);
+			this.mapTemplatePane.setScaleY(this.mapTemplatePane.getScaleY() - 0.1);
+		}
+	}
+
+	public void increaseZoom() {
+		if (this.mapTemplatePane.getScaleX() < 2.0) {
+			this.mapTemplatePane.setScaleX(this.mapTemplatePane.getScaleX() + 0.1);
+			this.mapTemplatePane.setScaleY(this.mapTemplatePane.getScaleY() + 0.1);
+		}
 	}
 }
