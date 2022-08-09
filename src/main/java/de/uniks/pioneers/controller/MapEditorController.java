@@ -6,6 +6,7 @@ import de.uniks.pioneers.computation.CalculateMap;
 import de.uniks.pioneers.service.AchievementsService;
 import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.service.HexFillService;
+import de.uniks.pioneers.service.MapsService;
 import de.uniks.pioneers.template.HarborTemplate;
 import de.uniks.pioneers.template.TileTemplate;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -39,6 +40,7 @@ public class MapEditorController implements Controller {
     private final App app;
     private final Provider<MapTemplatesScreenController> mapTemplatesScreenController;
     private final AchievementsService achievementsService;
+    private final MapsService mapsService;
     @FXML
     public TextField nameTextField;
     @FXML
@@ -63,16 +65,19 @@ public class MapEditorController implements Controller {
     private final List<String> choices = new ArrayList<>();
     private final List<TileTemplate> tiles = new ArrayList<>();
     private final List<HarborTemplate> harbors = new ArrayList<>();
+    private final List<HarborTemplate> harborsRepositioned = new ArrayList<>();
     private final HashMap<String, Integer> harborSides = new HashMap<>();
     private final HashMap<String, String> resources = new HashMap<>();
 
     @Inject
     public MapEditorController(App app,
                                Provider<MapTemplatesScreenController> mapTemplatesScreenController,
-                               AchievementsService achievementsService) {
+                               AchievementsService achievementsService,
+                               MapsService mapsService) {
         this.app = app;
         this.mapTemplatesScreenController = mapTemplatesScreenController;
         this.achievementsService = achievementsService;
+        this.mapsService = mapsService;
     }
 
     @Override
@@ -109,7 +114,6 @@ public class MapEditorController implements Controller {
         if (disposables != null) {
             disposables.clear();
         }
-
     }
 
     @Override
@@ -252,7 +256,9 @@ public class MapEditorController implements Controller {
                 if (node.getId().equals(id + "_numberField")) {
                     TextField textField = (TextField) node;
                     if (isNumeric(textField.getText())) {
-                        if (Integer.parseInt(textField.getText()) > 1 && Integer.parseInt(textField.getText()) < 13) {
+                        if (Integer.parseInt(textField.getText()) > 1 &&
+                                Integer.parseInt(textField.getText()) < 13 &&
+                                Integer.parseInt(textField.getText()) != 7) {
                             for (TileTemplate tile : tiles) {
                                 if (tile.x().intValue() == pos.get(0) &&
                                         tile.y().intValue() == pos.get(1) &&
@@ -299,7 +305,9 @@ public class MapEditorController implements Controller {
             if (node.getId().equals(hexagon.getId() + "_numberField")) {
                 numberField = (TextField) node;
                 if (isNumeric(numberField.getText())) {
-                    if (Integer.parseInt(numberField.getText()) > 1 && Integer.parseInt(numberField.getText()) < 13) {
+                    if (Integer.parseInt(numberField.getText()) > 1 &&
+                            Integer.parseInt(numberField.getText()) < 13 &&
+                            Integer.parseInt(numberField.getText()) != 7) {
                         numberValidFlag = true;
                     }
                 }
@@ -400,11 +408,12 @@ public class MapEditorController implements Controller {
                     chooseSide.setLayoutY(hexagon.getLayoutY() + 11);
                     chooseSide.toFront();
                     chooseSide.setId(hexagon.getId() + "_chooseSide");
-                    chooseSide.getSelectionModel().selectFirst();
 
                     chooseSide.getSelectionModel().selectedItemProperty().addListener(
                             (observable, oldValue, newValue) -> selectedResourceOrType(pos.get(0), pos.get(1), pos.get(2), newValue, false)
                     );
+
+                    chooseSide.getSelectionModel().selectFirst();
 
                     // create harbor template
                     HarborTemplate harborTemplate = new HarborTemplate(pos.get(0), pos.get(1), pos.get(2),
@@ -613,6 +622,26 @@ public class MapEditorController implements Controller {
         harbors.clear();
     }
 
+    // the harbor coordinates need to be repositioned, because of some checks
+    private HarborTemplate repositionHarbor(HarborTemplate harbor) {
+        HarborTemplate tmp = null;
+        int x = harbor.x().intValue();
+        int y = harbor.y().intValue();
+        int z = harbor.z().intValue();
+
+        switch (harbor.side().intValue()) {
+            case 1 -> tmp = new HarborTemplate(x - 1, y, z + 1, harbor.type(), harbor.side());
+            case 3 -> tmp = new HarborTemplate(x - 1, y + 1, z, harbor.type(), harbor.side());
+            case 5 -> tmp = new HarborTemplate(x, y + 1, z - 1, harbor.type(), harbor.side());
+            case 7 -> tmp = new HarborTemplate(x + 1, y, z - 1, harbor.type(), harbor.side());
+            case 9 -> tmp = new HarborTemplate(x + 1, y - 1, z, harbor.type(), harbor.side());
+            case 11 -> tmp = new HarborTemplate(x, y - 1, z + 1, harbor.type(), harbor.side());
+            default -> {
+            }
+        }
+        return tmp;
+    }
+
     public void saveButtonPressed(ActionEvent event) {
         // check if harbor is alone
         for (HarborTemplate harbor : harbors) {
@@ -622,11 +651,30 @@ public class MapEditorController implements Controller {
             }
         }
 
-        //TODO
-        // check name
-        // check length of name
-        // check if harbor is alone
-        // check if max items
+        // positions have to be changed for loading of the map
+        for (HarborTemplate harbor : harbors) {
+            harborsRepositioned.add(repositionHarbor(harbor));
+        }
+
+        // check max items
+        if (tiles.size() > 100 || harbors.size() > 100) {
+            new AlertService().showAlert("Maximum of 100 tiles or harbors is overreached!");
+            return;
+        }
+
+        // check name structure and create template
+        if (nameTextField.getText().isEmpty()) {
+            new AlertService().showAlert("A map template name must be typed!");
+            return;
+        } else if (nameTextField.getText().length() > 32) {
+            new AlertService().showAlert("Maximum name length is 32 characters!");
+            return;
+        } else {
+            disposables.add(mapsService
+                    .createMapTemplate(nameTextField.getText(), tiles, harborsRepositioned)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe());
+        }
 
         //achievement
         achievementsService.init();

@@ -12,14 +12,14 @@
 
 <Pane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapEditorController">
    <children>
-      <Label layoutX="422.0" layoutY="14.0" text="Map Editor">
+      <Label id="headline" layoutX="422.0" layoutY="14.0" text="Map Editor">
          <font>
             <Font size="32.0" />
          </font>
       </Label>
       <VBox id="templateMenu" fx:id="menu" alignment="TOP_CENTER" layoutX="765.0" layoutY="38.0" prefHeight="220.0" prefWidth="220.0">
          <children>
-            <Label text="map name" />
+            <Label id="mapName" text="map name" />
             <TextField fx:id="nameTextField" maxWidth="200.0" promptText="type name">
                <VBox.margin>
                   <Insets />
