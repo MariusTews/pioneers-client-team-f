@@ -33,6 +33,7 @@ public class AlertService {
             showAlert("Congratulations, you acquired Knight card");
         } else if (player.developmentCards().get(player.developmentCards().size() - 1).type().equals("road-building")
                 && player.developmentCards().size() != p.developmentCards().size()) {
+
             showAlert("Congratulations, you acquired Road-building card");
         } else if (player.developmentCards().get(player.developmentCards().size() - 1).type().equals("year-of-plenty")
                 && player.developmentCards().size() != p.developmentCards().size()) {
