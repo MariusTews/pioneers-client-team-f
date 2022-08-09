@@ -509,6 +509,7 @@ public class GameScreenController implements Controller {
             if (s.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                         , gameStorage, idStorage, userService, achievementsService, gameService, app, lobbyController);
+                winnerController.init();
                 winnerController.render();
             }
         }

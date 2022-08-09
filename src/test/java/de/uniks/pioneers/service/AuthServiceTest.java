@@ -1,5 +1,6 @@
 package de.uniks.pioneers.service;
 
+import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.dto.LoginDto;
 import de.uniks.pioneers.dto.LoginResult;
 import de.uniks.pioneers.rest.AuthApiService;
@@ -55,5 +56,15 @@ class AuthServiceTest {
         assertEquals("avatar", result.avatar());
         assertThat(result.friends()).isNotNull();
         verify(authApiService).login(new LoginDto("username", "password"));
+    }
+
+    @Test
+    void logoutErrorTest() {
+        when(authApiService.logout()).thenReturn(Observable.just(new ErrorResponse(123, "NO", "You are not allowed to log out!")));
+        final ErrorResponse response = authService.logout().blockingFirst();
+        assertEquals(response.statusCode(), 123);
+        assertEquals(response.error(), "NO");
+        assertEquals(response.message(), "You are not allowed to log out!");
+        verify(authApiService).logout();
     }
 }
