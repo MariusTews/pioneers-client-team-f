@@ -376,7 +376,7 @@ public class MapEditorController implements Controller {
                 chooseSide = new ChoiceBox<>(FXCollections.observableArrayList());
 
                 // check, if around the harbor is a normal tile and add option to choice box
-                if (!initSides(chooseSide, hexagon.getId())) {
+                if (initSides(chooseSide, pos.get(0), pos.get(1), pos.get(2))) {
                     flag = false;
                     hexagon.setFill(Color.grayRgb(100, 0.5));
                     new AlertService().showAlert("You can only place a harbor next to a tile with a terrain!");
@@ -410,12 +410,8 @@ public class MapEditorController implements Controller {
         }
     }
 
-    private boolean initSides(ChoiceBox<String> chooseSide, String id) {
+    private boolean initSides(ChoiceBox<String> chooseSide, int x, int y, int z) {
         HashMap<Integer, Boolean> sideHash = new HashMap<>();
-        List<Integer> pos = hexFillService.parseID(id);
-        int x = pos.get(0);
-        int y = pos.get(1);
-        int z = pos.get(2);
 
         // change the coordinates of the harbor to the neighbor tile and check, if such exists
         sideHash.put(1, checkSides(x + 1, y, z - 1));
@@ -440,7 +436,7 @@ public class MapEditorController implements Controller {
             }
         }
 
-        return !chooseSide.getItems().isEmpty();
+        return chooseSide.getItems().isEmpty();
     }
 
     private boolean checkSides(int x, int y, int z) {
@@ -602,8 +598,23 @@ public class MapEditorController implements Controller {
 
     public void saveButtonPressed(ActionEvent event) {
 
+        // check if harbor is alone
+        for (HarborTemplate harbor : harbors) {
+            if (initSides(new ChoiceBox<>(), harbor.x().intValue(), harbor.y().intValue(), harbor.z().intValue())) {
+                new AlertService().showAlert("A harbor cannot float by itself!");
+                return;
+            }
+        }
+
+
+
+        // check name
+        // check length of name
+        // check if harbor is alone
+        // check if max items
+
         // for temporary use, to get back
-        final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
-        this.app.show(controller);
+        //final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
+        //this.app.show(controller);
     }
 }
