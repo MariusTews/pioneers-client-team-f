@@ -2,13 +2,14 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.template.MapTemplate;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MapsService;
 import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,6 +23,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 
@@ -53,9 +55,12 @@ public class MapTemplatesScreenController implements Controller {
     public Button selectButton;
     @FXML
     public ListView<Parent> mapTemplatesListView;
+    @FXML
+    public Pane mainPane;
     private final ObservableList<Parent> mapTemplates = FXCollections.observableArrayList();
     private final HashMap<String, MapTemplateSubController> mapTemplateSubCons = new HashMap<>();
     private final HashMap<String, String> userNames = new HashMap<>();
+    private final HashMap<String, Integer> userVotes = new HashMap<>();
     private final HashMap<String, Boolean> sortOrderFlags = new HashMap<>();
     private Polygon currentSortArrow;
     private MapTemplateSubController selectedMapTemplateSubController;
@@ -115,6 +120,12 @@ public class MapTemplatesScreenController implements Controller {
 
         for (User user : users) {
             userNames.put(user._id(), user.name());
+        }
+
+        List<Vote> votes = userService.findVotes(idStorage.getID()).blockingFirst();
+
+        for (Vote vote : votes) {
+            userVotes.put(vote.mapId(), vote.score().intValue());
         }
 
         mapsService
@@ -178,11 +189,14 @@ public class MapTemplatesScreenController implements Controller {
     private void addMapTemplateItem(MapTemplate template, int position) {
         boolean ownMap = idStorage.getID().equals(template.createdBy());
         String userName = userNames.getOrDefault(template.createdBy(), "");
-        MapTemplateSubController controller = new MapTemplateSubController(template, ownMap, userName, this.mapsService);
+        MapTemplateSubController controller = new MapTemplateSubController(template, ownMap, userName, idStorage.getID(), this);
         mapTemplateSubCons.put(template._id(), controller);
         controller.init();
         Parent item = controller.render();
         item.setOnMouseClicked(this::selectMapTemplateItem);
+        if (!ownMap && userVotes.containsKey(template._id())) {
+            controller.setVoted(userVotes.get(template._id()));
+        }
         //if position is -1 then the item should be added at the end of the list
         if (position == -1) {
             mapTemplates.add(item);
@@ -310,6 +324,18 @@ public class MapTemplatesScreenController implements Controller {
 
     public ObservableList<Parent> getMapTemplates() {
         return mapTemplates;
+    }
+
+    public MapsService getMapsService() {
+        return this.mapsService;
+    }
+
+    public Pane getMainPane() {
+        return this.mainPane;
+    }
+
+    public HashMap<String, String> getUserNames() {
+        return userNames;
     }
 
 }
