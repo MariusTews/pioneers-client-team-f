@@ -614,7 +614,6 @@ public class MapEditorController implements Controller {
     }
 
     public void saveButtonPressed(ActionEvent event) {
-
         // check if harbor is alone
         for (HarborTemplate harbor : harbors) {
             if (initSides(new ChoiceBox<>(), harbor.x().intValue(), harbor.y().intValue(), harbor.z().intValue())) {
