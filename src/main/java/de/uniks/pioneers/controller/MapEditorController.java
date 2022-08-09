@@ -2,11 +2,11 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
+import de.uniks.pioneers.computation.CalculateMap;
 import de.uniks.pioneers.service.AlertService;
+import de.uniks.pioneers.service.HexFillService;
 import de.uniks.pioneers.template.HarborTemplate;
 import de.uniks.pioneers.template.TileTemplate;
-import de.uniks.pioneers.computation.CalculateMap;
-import de.uniks.pioneers.service.HexFillService;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,7 +17,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -33,6 +32,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static de.uniks.pioneers.Constants.*;
 
 public class MapEditorController implements Controller {
     private final App app;
@@ -58,6 +59,8 @@ public class MapEditorController implements Controller {
     private final List<String> choices = new ArrayList<>();
     private final List<TileTemplate> tiles = new ArrayList<>();
     private List<HarborTemplate> harbors = new ArrayList<>();
+    private final HashMap<String, Integer> harborSides = new HashMap<>();
+    private final HashMap<String, String> resources = new HashMap<>();
 
     @Inject
     public MapEditorController(App app,
@@ -68,7 +71,7 @@ public class MapEditorController implements Controller {
 
     @Override
     public void init() {
-        // init
+        // init terrain
         choices.add(0, "random");
         choices.add(1, "desert");
         choices.add(2, "fields");
@@ -76,6 +79,21 @@ public class MapEditorController implements Controller {
         choices.add(4, "hills");
         choices.add(5, "forest");
         choices.add(6, "pasture");
+
+        // init sides
+        harborSides.put("Top_left", 5);
+        harborSides.put("Top_right", 7);
+        harborSides.put("Middle_left", 3);
+        harborSides.put("Middle_right", 9);
+        harborSides.put("Bottom_left", 1);
+        harborSides.put("Bottom_right", 11);
+
+        // init resources
+        resources.put("mars_bar", MARS_BAR);
+        resources.put("moon_rock", MOON_ROCK);
+        resources.put("earth_cactus", EARTH_CACTUS);
+        resources.put("venus_grain", VENUS_GRAIN);
+        resources.put("neptune_crystals", NEPTUNE_CRYSTAL);
     }
 
     @Override
@@ -202,7 +220,6 @@ public class MapEditorController implements Controller {
             }
         }
 
-
         // add the objects to the map
         if (cancelTileButton != null) {
             map.getChildren().add(cancelTileButton);
@@ -242,12 +259,6 @@ public class MapEditorController implements Controller {
             tiles.removeIf(tile -> tile.x().intValue() == pos.get(0) && tile.y().intValue() == pos.get(1) && tile.z().intValue() == pos.get(2));
             tiles.add(tmp);
         }
-
-        System.out.println(tiles);
-
-        System.out.println("Event type: " + event.getCode().isDigitKey());
-        System.out.println("Source: " + event.getSource());
-
     }
 
     // checks the number token
@@ -313,16 +324,13 @@ public class MapEditorController implements Controller {
     }
 
     private void harborButtonPressed(ActionEvent event) {
-        // regex to filter the substring with the id from the event
-        //Pattern pattern = Pattern.compile("=(.*?)_");
-        //Matcher matcher = pattern.matcher(event.getSource().toString());
         String id = filterID(event.getSource().toString());
-
         Button cancelTileButton = null;
         ChoiceBox<String> chooseResource = null;
         ChoiceBox<String> chooseSide = null;
         ImageView imageView = new ImageView();
         boolean flag = true;
+        List<Integer> pos = hexFillService.parseID(id);
 
         for (Node node : map.getChildren()) {
             // make buttons invisible
@@ -335,6 +343,7 @@ public class MapEditorController implements Controller {
                 }
             }
 
+            // look for hexagon
             if (node.getId().equals(id)) {
                 assert node instanceof Polygon;
                 Polygon hexagon = (Polygon) node;
@@ -353,11 +362,11 @@ public class MapEditorController implements Controller {
                 cancelTileButton = initCancelButton(hexagon);
 
                 chooseResource = new ChoiceBox<>(FXCollections.observableArrayList(
-                        "3:1", "mars_bar", "moon_rock", "earth_cactus", "venus_grain", "neptune_crystals"
+                        "3:1", "mars_bar", "moon_rock", "earth_cactus", "venus_grain", "neptune_crystals", "random"
                 ));
 
-                chooseResource.getSelectionModel().selectedIndexProperty().addListener(
-                        (observable, oldValue, newValue) -> selectedResource(hexagon, newValue.intValue())
+                chooseResource.getSelectionModel().selectedItemProperty().addListener(
+                        (observable, oldValue, newValue) -> selectedResourceOrType(pos.get(0), pos.get(1), pos.get(2), newValue, true)
                 );
 
                 chooseResource.setPrefWidth(100);
@@ -371,7 +380,7 @@ public class MapEditorController implements Controller {
                 chooseSide = new ChoiceBox<>(FXCollections.observableArrayList());
 
                 // check, if around the harbor is a normal tile and add option to choice box
-                if (!initSides(chooseSide, hexagon)) {
+                if (!initSides(chooseSide, hexagon.getId())) {
                     flag = false;
                     hexagon.setFill(Color.grayRgb(100, 0.5));
                     new AlertService().showAlert("You can only place a harbor next to a tile with a terrain!");
@@ -384,9 +393,15 @@ public class MapEditorController implements Controller {
                     chooseSide.setId(hexagon.getId() + "_chooseSide");
                     chooseSide.getSelectionModel().selectFirst();
 
-                    chooseSide.getSelectionModel().selectedIndexProperty().addListener(
-                            (observable, oldValue, newValue) -> selectedResource(hexagon, newValue.intValue())
+                    chooseSide.getSelectionModel().selectedItemProperty().addListener(
+                            (observable, oldValue, newValue) -> selectedResourceOrType(pos.get(0), pos.get(1), pos.get(2), newValue, false)
                     );
+
+                    // create harbor template
+                    HarborTemplate harborTemplate = new HarborTemplate(pos.get(0), pos.get(1), pos.get(2),
+                            resources.get(chooseResource.getItems().get(0)), harborSides.get(chooseSide.getItems().get(0)));
+
+                    harbors.add(harborTemplate);
                 }
             }
         }
@@ -397,11 +412,12 @@ public class MapEditorController implements Controller {
             map.getChildren().add(chooseResource);
             map.getChildren().add(chooseSide);
         }
+        System.out.println(harbors.toString());
     }
 
-    private boolean initSides(ChoiceBox<String> chooseSide, Polygon hexagon) {
+    private boolean initSides(ChoiceBox<String> chooseSide, String id) {
         HashMap<Integer, Boolean> sideHash = new HashMap<>();
-        List<Integer> pos = hexFillService.parseID(hexagon.getId());
+        List<Integer> pos = hexFillService.parseID(id);
         int x = pos.get(0);
         int y = pos.get(1);
         int z = pos.get(2);
@@ -441,13 +457,33 @@ public class MapEditorController implements Controller {
         return false;
     }
 
-    private void selectedResource(Polygon hexagon, int newValue) {
+    // choose between selected resource or side
+    private void selectedResourceOrType(int x, int y, int z, String newValue, boolean isResource) {
+        HarborTemplate harborTemplate = null;
 
+        for (HarborTemplate harbor : harbors) {
+            if (harbor.x().intValue() == x && harbor.y().intValue() == y && harbor.z().intValue() == z) {
+                if (isResource) {
+                    String type;
+                    if (newValue.equals("random")) {
+                        type = "random";
+                    } else {
+                        type = resources.get(newValue);
+                    }
+                    harborTemplate = new HarborTemplate(harbor.x(), harbor.y(), harbor.z(), type, harbor.side());
+                } else {
+                    harborTemplate = new HarborTemplate(harbor.x(), harbor.y(), harbor.z(), harbor.type(), harborSides.get(newValue));
+                }
+            }
+        }
+
+        if (harborTemplate != null) {
+            harbors.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
+            harbors.add(harborTemplate);
+        }
     }
 
     private void cancelTileButtonPressed(ActionEvent event) {
-        //Pattern pattern = Pattern.compile("=(.*?)_");
-        //Matcher matcher = pattern.matcher(event.getSource().toString());
         String id = filterID(event.getSource().toString());
         List<Integer> pos;
         int x;
@@ -516,8 +552,9 @@ public class MapEditorController implements Controller {
         map.getChildren().remove(chooseResource);
         map.getChildren().remove(chooseSide);
 
-        // remove tile from list
+        // remove tile or harbor from list
         tiles.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
+        harbors.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
     }
 
     /*
@@ -544,15 +581,6 @@ public class MapEditorController implements Controller {
     }
 
     public void saveButtonPressed(ActionEvent event) {
-
-
-        // if someone decides to change a number token, it has to be checked at the end
-        for (Node node : map.getChildren()) {
-            if (node.getId().endsWith("_numberField")) {
-                TextField textField = (TextField) node;
-                System.out.println(textField.getId() + textField.getText());
-            }
-        }
 
         // for temporary use, to get back
         //final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
