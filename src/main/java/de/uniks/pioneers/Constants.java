@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 import java.util.Comparator;
+import java.util.HashMap;
 
 public class Constants {
     public static final String VERSION_PREFIX = "/v4";
@@ -36,6 +37,91 @@ public class Constants {
     //Messages
     public static final String GROUPS = "groups";
     public static final String GAMES = "games";
+
+    //Achievements Api Service
+    public static final String ACHIEVEMENTS_URL = "achievements";
+    public static final String USER_ACHIEVEMENTS_URL = "users/{userId}/" + ACHIEVEMENTS_URL;
+
+    public static final String USER_ACHIEVEMENTS_BY_ID_URL = USER_ACHIEVEMENTS_URL + "/{id}";
+
+    //Achievements
+    public static final String FIRST_ROAD = "first-road";
+
+    public static final String ROAD_BUILDER = "road-builder";
+
+    public static final String WIN_GAME = "win-game";
+
+    public static final String CREATE_MAP = "create-map";
+
+    public static final String SETTLEMENT_BUILDER = "settlement-builder";
+
+    public static final String CITY_BUILDER = "city-builder";
+
+    public static final String TRADE_BANK = "trade-bank";
+
+    public static final String TRADE_PLAYER = "trade-player";
+
+    public static final String VENUS_GRAIN_PICKER = "venus-grain-picker";
+
+    public static final String MARS_BAR_PICKER = "mars-bar-picker";
+
+    public static final String MOON_ROCK_PICKER = "moon-rock-picker";
+
+    public static final String EARTH_CACTUS_PICKER = "earth-cactus-picker";
+
+    public static final String NEPTUNE_CRYSTAL_PICKER = "neptune-crystal-picker";
+
+    public static final HashMap<String, Integer> ACHIEVEMENT_UNLOCK_VALUES = new HashMap<>();
+
+    static {
+        ACHIEVEMENT_UNLOCK_VALUES.put(FIRST_ROAD, 1);
+        ACHIEVEMENT_UNLOCK_VALUES.put(ROAD_BUILDER, 100);
+        ACHIEVEMENT_UNLOCK_VALUES.put(WIN_GAME, 1);
+        ACHIEVEMENT_UNLOCK_VALUES.put(CREATE_MAP, 1);
+        ACHIEVEMENT_UNLOCK_VALUES.put(SETTLEMENT_BUILDER, 20);
+        ACHIEVEMENT_UNLOCK_VALUES.put(CITY_BUILDER, 20);
+        ACHIEVEMENT_UNLOCK_VALUES.put(TRADE_BANK, 30);
+        ACHIEVEMENT_UNLOCK_VALUES.put(TRADE_PLAYER, 30);
+        ACHIEVEMENT_UNLOCK_VALUES.put(VENUS_GRAIN_PICKER, 50);
+        ACHIEVEMENT_UNLOCK_VALUES.put(MARS_BAR_PICKER, 50);
+        ACHIEVEMENT_UNLOCK_VALUES.put(MOON_ROCK_PICKER, 50);
+        ACHIEVEMENT_UNLOCK_VALUES.put(EARTH_CACTUS_PICKER, 50);
+        ACHIEVEMENT_UNLOCK_VALUES.put(NEPTUNE_CRYSTAL_PICKER, 50);
+    }
+
+    public static final HashMap<String, String> ACHIEVEMENT_NAMES = new HashMap<>();
+    static {
+        ACHIEVEMENT_NAMES.put(FIRST_ROAD, "build your first road");
+        ACHIEVEMENT_NAMES.put(ROAD_BUILDER, "road builder");
+        ACHIEVEMENT_NAMES.put(SETTLEMENT_BUILDER, "settlement builder");
+        ACHIEVEMENT_NAMES.put(CITY_BUILDER, "city builder");
+        ACHIEVEMENT_NAMES.put(WIN_GAME, "win your first game");
+        ACHIEVEMENT_NAMES.put(CREATE_MAP, "create your own map");
+        ACHIEVEMENT_NAMES.put(TRADE_BANK, "trade with the bank");
+        ACHIEVEMENT_NAMES.put(TRADE_PLAYER, "trade with a player");
+        ACHIEVEMENT_NAMES.put(VENUS_GRAIN_PICKER, "venus grain picker");
+        ACHIEVEMENT_NAMES.put(MARS_BAR_PICKER, "mars bar picker");
+        ACHIEVEMENT_NAMES.put(MOON_ROCK_PICKER, "moon rock picker");
+        ACHIEVEMENT_NAMES.put(EARTH_CACTUS_PICKER, "earth cactus picker");
+        ACHIEVEMENT_NAMES.put(NEPTUNE_CRYSTAL_PICKER, "neptune crystal picker");
+    }
+
+    public static final HashMap<String, String> ACHIEVEMENT_PATHS = new HashMap<>();
+    static {
+        ACHIEVEMENT_PATHS.put(FIRST_ROAD, "first_road");
+        ACHIEVEMENT_PATHS.put(ROAD_BUILDER, "100_roads");
+        ACHIEVEMENT_PATHS.put(SETTLEMENT_BUILDER, "settlement_builder");
+        ACHIEVEMENT_PATHS.put(CITY_BUILDER, "city_builder");
+        ACHIEVEMENT_PATHS.put(WIN_GAME, "win_game");
+        ACHIEVEMENT_PATHS.put(CREATE_MAP, "create_map");
+        ACHIEVEMENT_PATHS.put(TRADE_BANK, "trade_bank");
+        ACHIEVEMENT_PATHS.put(TRADE_PLAYER, "trade_player");
+        ACHIEVEMENT_PATHS.put(VENUS_GRAIN_PICKER, "venus_grain");
+        ACHIEVEMENT_PATHS.put(MARS_BAR_PICKER, "mars_bar");
+        ACHIEVEMENT_PATHS.put(MOON_ROCK_PICKER, "moon_rock");
+        ACHIEVEMENT_PATHS.put(EARTH_CACTUS_PICKER, "earth_kaktus");
+        ACHIEVEMENT_PATHS.put(NEPTUNE_CRYSTAL_PICKER, "neptune_crystal");
+    }
 
     //Sorting
     public static final Comparator<User> userComparator = Comparator.comparing(User::status).reversed().thenComparing(User::name);
@@ -101,5 +187,5 @@ public class Constants {
             Color.YELLOW, Color.ROSYBROWN, Color.OLIVE, Color.MAGENTA, Color.AQUA};
 
     //Array of resources
-    public static final String[] RESOURCES = {"lumber","brick","ore","wool","grain"};
+    public static final String[] RESOURCES = {"lumber", "brick", "ore", "wool", "grain"};
 }

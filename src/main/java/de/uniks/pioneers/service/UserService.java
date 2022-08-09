@@ -4,6 +4,7 @@ import de.uniks.pioneers.dto.CreateUserDto;
 import de.uniks.pioneers.dto.StatusUpdateDto;
 import de.uniks.pioneers.dto.UpdateUserDto;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.rest.UserApiService;
 import io.reactivex.rxjava3.core.Observable;
 
@@ -38,6 +39,10 @@ public class UserService {
 
     public Observable<List<User>> findAllUsers() {
         return this.userApiService.findAllUsers();
+    }
+
+    public Observable<List<Vote>> findVotes(String id) {
+        return this.userApiService.findVotes(id);
     }
 
     public Observable<User> delete(String id) {

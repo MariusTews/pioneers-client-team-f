@@ -55,6 +55,9 @@ class GameScreenControllerTest extends ApplicationTest {
     @Mock
     App app;
 
+    @Mock
+    AchievementsService achievementsService;
+
     @Spy
     GameStorage gameStorage;
     @Spy
@@ -116,6 +119,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
         when(app.getStage()).thenReturn(new Stage());
         when(userStorage.getUserList()).thenReturn(users);
+        when(achievementsService.initUserAchievements()).thenReturn(Observable.just(List.of(new Achievement("", "", "1", "first-road", null, 0))));
 
         App app = new App(gameScreenController);
         app.start(stage);
