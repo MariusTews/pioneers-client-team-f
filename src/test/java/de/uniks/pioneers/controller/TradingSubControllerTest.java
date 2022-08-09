@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.model.*;
+import de.uniks.pioneers.service.AchievementsService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
@@ -41,6 +42,9 @@ public class TradingSubControllerTest extends ApplicationTest {
 
     @Mock
     PioneersService pioneersService;
+
+    @Mock
+    AchievementsService achievementsService;
 
     @Mock
     EventListener eventListener;
@@ -152,6 +156,7 @@ public class TradingSubControllerTest extends ApplicationTest {
 
     @Test
     public void testOfferBank4to1() {
+        when(achievementsService.putOrUpdateAchievement(TRADE_BANK, 1)).thenReturn(Observable.just(new Achievement("", "", "1", "first-road", null, 0)));
         when(pioneersService.tradeBank(any(), any())).thenReturn(Observable.just(new Move("0", "m1", "g1", "u1", "build", 1, null, null, resources, "b1", null)));
         Label giveCactusLabel = lookup("#giveCactusLabel").query();
         Label receiveMarsLabel = lookup("#receiveMarsLabel").query();

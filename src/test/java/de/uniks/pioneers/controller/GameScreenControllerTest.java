@@ -10,7 +10,9 @@ import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -52,6 +54,9 @@ class GameScreenControllerTest extends ApplicationTest {
 
     @Mock
     App app;
+
+    @Mock
+    AchievementsService achievementsService;
 
     @Spy
     GameStorage gameStorage;
@@ -96,7 +101,16 @@ class GameScreenControllerTest extends ApplicationTest {
         when(gameStorage.getId()).thenReturn("02");
         when(gameStorage.getSize()).thenReturn(1);
         when(idStorage.getID()).thenReturn("01");
-        when(pioneersService.findOnePlayer(any(), any())).thenReturn(Observable.empty());
+
+        //findPlayer fo OneDev-card
+        List<DevelopmentCard> devCards1 = new ArrayList<>();
+        DevelopmentCard d1 = new DevelopmentCard("knight", true, false);
+        devCards1.add(d1);
+
+        Player player1 = new Player("id", "3", "#223", true, 2, null, null,
+                4, 5, null, devCards1);
+        when(pioneersService.findOnePlayer("02", "01")).thenReturn(Observable.just(player1));
+
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         List<Player> players = new ArrayList<>();
         players.add(new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null, null));
@@ -105,6 +119,7 @@ class GameScreenControllerTest extends ApplicationTest {
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
         when(app.getStage()).thenReturn(new Stage());
         when(userStorage.getUserList()).thenReturn(users);
+        when(achievementsService.initUserAchievements()).thenReturn(Observable.just(List.of(new Achievement("", "", "1", "first-road", null, 0))));
 
         App app = new App(gameScreenController);
         app.start(stage);
@@ -237,6 +252,15 @@ class GameScreenControllerTest extends ApplicationTest {
         stateSubject.onNext(new Event<>(".updated", new State("0", "02", Collections.singletonList(ex), null)));
         moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "rob", 8, null, new RobDto(0, 0, 0, null), null, null, null)));
         waitForFxEvents();
+    }
+
+    @Test
+    void onClickDevLabel() {
+        Pane showCards = lookup("#devCardsPane").query();
+        clickOn(showCards);
+
+        Label devCardsAmountLabel = lookup("#devCardsAmountLabel").query();
+        org.testfx.assertions.api.Assertions.assertThat(devCardsAmountLabel.getText()).isEqualTo("1");
     }
 
     /*
