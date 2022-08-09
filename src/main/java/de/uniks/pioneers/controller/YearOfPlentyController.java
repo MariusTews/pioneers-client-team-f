@@ -32,26 +32,6 @@ public class YearOfPlentyController implements Controller {
     @FXML
     public Pane discardView;
     @FXML
-    public Button increment_lumber;
-    @FXML
-    public Button increment_brick;
-    @FXML
-    public Button increment_ore;
-    @FXML
-    public Button increment_wool;
-    @FXML
-    public Button increment_grain;
-    @FXML
-    public Button decrement_lumber;
-    @FXML
-    public Button decrement_brick;
-    @FXML
-    public Button decrement_ore;
-    @FXML
-    public Button decrement_wool;
-    @FXML
-    public Button decrement_grain;
-    @FXML
     public Button discardButton;
     @FXML
     public Label lumber;
@@ -95,7 +75,7 @@ public class YearOfPlentyController implements Controller {
 
     @Override
     public Parent render() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/YearOfPlentyView.fxml"));
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/DiscardResourcesView.fxml"));
         loader.setControllerFactory(c -> this);
         Parent root;
         try {
