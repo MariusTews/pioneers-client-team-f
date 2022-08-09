@@ -22,14 +22,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.stage.Window;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +56,7 @@ public class MapEditorController implements Controller {
     private final HexFillService hexFillService = new HexFillService();
     private final List<String> choices = new ArrayList<>();
     private final List<TileTemplate> tiles = new ArrayList<>();
-    private List<HarborTemplate> harbors = new ArrayList<>();
+    private final List<HarborTemplate> harbors = new ArrayList<>();
     private final HashMap<String, Integer> harborSides = new HashMap<>();
     private final HashMap<String, String> resources = new HashMap<>();
 
@@ -319,8 +317,6 @@ public class MapEditorController implements Controller {
         // set tile template if it does not already exist
         tiles.removeIf(tile -> tile.x().intValue() == x && tile.y().intValue() == y && tile.z().intValue() == z);
         tiles.add(tileTemplate);
-
-        System.out.println(tiles);
     }
 
     private void harborButtonPressed(ActionEvent event) {
@@ -412,7 +408,6 @@ public class MapEditorController implements Controller {
             map.getChildren().add(chooseResource);
             map.getChildren().add(chooseSide);
         }
-        System.out.println(harbors.toString());
     }
 
     private boolean initSides(ChoiceBox<String> chooseSide, String id) {
@@ -562,28 +557,53 @@ public class MapEditorController implements Controller {
      * */
     public void mapSizeMinusButtonPressed(ActionEvent event) {
         if (Integer.parseInt(this.mapSizeLabel.getText()) > 0) {
-            map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) - 1, true);
-            int mapSize = Integer.parseInt(this.mapSizeLabel.getText()) - 1;
-            this.mapSizeLabel.setText(String.valueOf(mapSize));
-            this.mapPane.setContent(map);
-            addButtonsOnTiles();
-            tiles.clear();
+            checkMap(-1);
         }
     }
 
     public void mapSizePlusButtonPressed(ActionEvent event) {
-        map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) + 1, true);
-        int mapSize = Integer.parseInt(this.mapSizeLabel.getText()) + 1;
+        checkMap(1);
+    }
+
+    private void checkMap(int i) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeaderText("Your map is not empty.\nAre your sure, you want to clear the map?");
+        alert.getButtonTypes().set(0, new ButtonType("Yes"));
+        alert.getButtonTypes().set(1, new ButtonType("No"));
+
+        // Stylesheet
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+        Window window = alert.getDialogPane().getScene().getWindow();
+        window.setOnCloseRequest(e -> alert.close());
+
+        // look if tiles are already placed
+        if (!tiles.isEmpty() || !harbors.isEmpty()) {
+            Optional<ButtonType> pressed = alert.showAndWait();
+            pressed.ifPresent(c -> {
+                if (c.getText().equals("Yes")) {
+                    setMapSize(i);
+                }
+            });
+        } else {
+            setMapSize(i);
+        }
+    }
+
+    private void setMapSize(int i) {
+        map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) + i, true);
+        int mapSize = Integer.parseInt(this.mapSizeLabel.getText()) + i;
         this.mapSizeLabel.setText(String.valueOf(mapSize));
         this.mapPane.setContent(map);
         addButtonsOnTiles();
         tiles.clear();
+        harbors.clear();
     }
 
     public void saveButtonPressed(ActionEvent event) {
 
         // for temporary use, to get back
-        //final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
-        //this.app.show(controller);
+        final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
+        this.app.show(controller);
     }
 }
