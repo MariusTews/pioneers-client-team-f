@@ -1,17 +1,21 @@
+/*noinspection ALL*/
 .tileButton {
     -fx-background-color: #d2dcde;
     -fx-text-fill: green;
 }
 
+/*noinspection ALL*/
 .harborButton {
     -fx-background-color: #d2dcde;
     -fx-text-fill: orange;
 }
 
+/*noinspection ALL*/
 .cancelTileButton {
     -fx-text-fill: #450606;
 }
 
+/*noinspection ALL*/
 .numberField {
     -fx-text-fill: green;
 }
