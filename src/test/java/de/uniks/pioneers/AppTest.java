@@ -32,7 +32,13 @@ public class AppTest extends ApplicationTest {
         write("00000000\t");
         write("00000000\t");
 
+
+        //test back button in SignUp
         type(KeyCode.SPACE);
+        type(KeyCode.SPACE);
+        write("\t\t\t");
+        type(KeyCode.SPACE);
+        write("\t\t\t");
         type(KeyCode.SPACE);
 
         //test Login
@@ -51,6 +57,9 @@ public class AppTest extends ApplicationTest {
         write("123456789\t");
         write("123456789\t\t\t");
         type(KeyCode.SPACE);
+
+
+
         write("\t\t\t\t\t\t\t");
         type(KeyCode.SPACE);
 
@@ -59,10 +68,10 @@ public class AppTest extends ApplicationTest {
         write("12\t");
         type(KeyCode.SPACE);
         write("\t\t");
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 6; i++) {
             type(KeyCode.SPACE);
         }
-        write("\t\t\t");
+        write("\t\t\t\t");
 
         type(KeyCode.SPACE);
 
@@ -105,18 +114,17 @@ public class AppTest extends ApplicationTest {
         //finish turn
         clickOn("#finishTurnButton");
         clickOn("#roll");
-        sleep(5000);
         //discard resources
         clickOn("#increment_lumber");
         clickOn("#increment_lumber");
         clickOn("#increment_lumber");
         clickOn("#increment_lumber");
         clickOn("#increment_lumber");
-        clickOn("increment_brick");
-        clickOn("increment_brick");
-        clickOn("increment_brick");
-        clickOn("increment_brick");
-        clickOn("increment_brick");
+        clickOn("#increment_brick");
+        clickOn("#increment_brick");
+        clickOn("#increment_brick");
+        clickOn("#increment_brick");
+        clickOn("#increment_brick");
         clickOn("#increment_ore");
         clickOn("#increment_ore");
         clickOn("#increment_ore");
@@ -133,6 +141,10 @@ public class AppTest extends ApplicationTest {
         clickOn("#increment_grain");
         clickOn("#increment_grain");
         clickOn("#discardButton");
+        WaitForAsyncUtils.waitForFxEvents();
+        sleep(5000);
+        clickOn("OK");
+        clickOn("#x1y0zM1");
         //TODO rob action
 
         //build road
@@ -140,6 +152,9 @@ public class AppTest extends ApplicationTest {
         clickOn("#x1yM1z0_11");
         //build settlement
         clickOn("#sett");
+        clickOn("#x1yM1z0_0");
+        //build city
+        clickOn("#city");
         clickOn("#x1yM1z0_0");
         WaitForAsyncUtils.waitForFxEvents();
         //back to lobby

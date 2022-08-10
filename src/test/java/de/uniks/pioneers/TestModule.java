@@ -236,18 +236,18 @@ public class TestModule {
 
             @Override
             public Observable<Game> create(CreateGameDto dto) {
-                return Observable.just(new Game("0", "0", "01", "testGame", "01", 1, false, new GameSettings(2, 10, null, false, 0)));
+                return Observable.just(new Game("0", "0", "01", "testGame", "01", 1, false, new GameSettings(2, 4, null, false, 0)));
             }
 
             @Override
             public Observable<Game> findOne(String id) {
-                return Observable.just(new Game("0", "1", "01", "TestGame", "7", 1, false, new GameSettings(1, 3, null, false, 0)));
+                return Observable.just(new Game("0", "1", "01", "TestGame", "7", 1, false, new GameSettings(1, 4, null, false, 0)));
             }
 
             @Override
             public Observable<Game> patch(String id, UpdateGameDto dto) {
 
-                Game game = new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10, null, false, 0));
+                Game game = new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 4, null, false, 0));
                 Message message = new Message("1", "2", "01", "me", null);
                 testEventListener.fireEvent("games.01.*.*", new Event<>("games.01.state.created", message));
                 return Observable.just(game);
@@ -422,7 +422,15 @@ public class TestModule {
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1238", createBuildingDto.side(), "settlement", gameId, "01");
                                 player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 3, 0, null, null);
 
-                            } else {
+                            }
+                            else if (dto.building().type().equals("city")) {
+                                remainingBuildings.put("settlement", 2);
+                                remainingBuildings.put("city", 3);
+                                remainingBuildings.put("road", 12);
+                                building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1212", createBuildingDto.side(), "city", gameId, "01");
+                                player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 4, 0, null, null);
+                            }
+                            else {
                                 remainingBuildings.put("settlement", 3);
                                 remainingBuildings.put("city", 4);
                                 remainingBuildings.put("road", 12);
@@ -555,10 +563,21 @@ public class TestModule {
                     dropResources.put("grain", -5);
                     testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
                             new Move("1", "2", gameId, "01", "drop", 3, null, null, dropResources, null, null)));
-                    //new state with exptected move rob
+                    //new state with expected move rob
                     State state = new State("", gameId, List.of(
                             new ExpectedMove("rob", List.of("01"))
                     ), null);
+                    expectedMoves = state.expectedMoves();
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                    return Observable.just(new Move("1", "2", gameId, "01", "drop", 3, null, null, dropResources, null, null));
+                }
+                else if (Objects.equals(dto.action(), "rob")) {
+                    testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                            new Move("1", "2", gameId, "01", "drop", 3, null, dto.rob(), null, null, null)));
+                    //new state with expected move build
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("build", List.of("01"))
+                    ), new Point3D(1, 0, -1));
                     expectedMoves = state.expectedMoves();
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
                 }
