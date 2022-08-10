@@ -4,6 +4,8 @@ import de.uniks.pioneers.dto.CreateMemberDto;
 import de.uniks.pioneers.dto.UpdateMemberDto;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.rest.GameMembersApiService;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import io.reactivex.rxjava3.core.Observable;
 
 import javax.inject.Inject;
@@ -35,6 +37,8 @@ public class MemberService {
 				.doOnNext(result -> {
 					this.gameStorage.setId(result.gameId());
 					this.memberIDStorage.setId(result.userId());
+					//save game id in config file to check for rejoin ability even when app was closed before
+					ResourceManager.saveConfig(JsonUtil.updateConfigWithGameId(result.gameId()));
 				});
 	}
 

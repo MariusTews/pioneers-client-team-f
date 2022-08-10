@@ -19,6 +19,25 @@ public class JsonUtil {
                 .toString();
     }
 
+    public static String updateConfigWithGameId(String gameId) {
+        JSONObject loadConfig = ResourceManager.loadConfig();
+        return new JSONObject()
+                .put(JSON_REMEMBER_ME, loadConfig.get(JSON_REMEMBER_ME))
+                .put(JSON_NAME, loadConfig.get(JSON_NAME))
+                .put(JSON_TOKEN, loadConfig.get(JSON_TOKEN))
+                .put(JSON_GAME_ID, gameId)
+                .toString();
+    }
+
+    public static String removeGameIdFromConfig() {
+        JSONObject loadConfig = ResourceManager.loadConfig();
+        return new JSONObject()
+                .put(JSON_REMEMBER_ME, loadConfig.get(JSON_REMEMBER_ME))
+                .put(JSON_NAME, loadConfig.get(JSON_NAME))
+                .put(JSON_TOKEN, loadConfig.get(JSON_TOKEN))
+                .toString();
+    }
+
     public static String createDefaultConfig() {
         return new JSONObject()
                 .put(JSON_REMEMBER_ME, false)

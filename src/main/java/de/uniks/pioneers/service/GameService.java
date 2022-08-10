@@ -5,10 +5,16 @@ import de.uniks.pioneers.dto.UpdateGameDto;
 import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.GameSettings;
 import de.uniks.pioneers.rest.GamesApiService;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import io.reactivex.rxjava3.core.Observable;
+import kong.unirest.json.JSONObject;
 
 import javax.inject.Inject;
 import java.util.List;
+
+import static de.uniks.pioneers.Constants.JSON_NAME;
+import static de.uniks.pioneers.Constants.JSON_TOKEN;
 
 @SuppressWarnings("ClassCanBeRecord")
 public class GameService {
@@ -29,8 +35,9 @@ public class GameService {
                 .create(new CreateGameDto(gameName, false, new GameSettings(mapSize, victoryPoints, mapTemplate, roll7, startingResources), password))
                 .doOnNext(result -> {
                     this.gameStorage.setId(result._id());
-
                     this.memberIDStorage.setId(result.owner());
+                    //save game id in config file to check for rejoin ability even when app was closed before
+                    ResourceManager.saveConfig(JsonUtil.updateConfigWithGameId(result._id()));
                 });
     }
 

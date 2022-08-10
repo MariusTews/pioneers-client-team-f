@@ -4,6 +4,8 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -136,6 +138,7 @@ public class WinnerController implements Controller {
         gameService.findOneGame(this.gameStorage.getId()).observeOn(FX_SCHEDULER).
                 doOnError(e -> {
                     this.gameStorage.setId(null);
+                    ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
                     this.app.show(lobbyController.get());
                 }).
                 subscribe(c -> {
@@ -147,10 +150,12 @@ public class WinnerController implements Controller {
                                     //setting gameStorage to null will make sure
                                     //user cannot join the game
                                     this.gameStorage.setId(null);
+                                    ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
                                     this.app.show(lobbyController.get());
                                 });
                     } else {
                         this.gameStorage.setId(null);
+                        ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
                         this.app.show(lobbyController.get());
                     }
                 });

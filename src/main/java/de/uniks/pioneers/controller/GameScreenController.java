@@ -8,6 +8,8 @@ import de.uniks.pioneers.computation.SpectatorRenderInGame;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -530,6 +532,8 @@ public class GameScreenController implements Controller {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                         , gameStorage, idStorage, userService, achievementsService, gameService, app, lobbyController);
                 winnerController.render();
+                this.gameStorage.setId("");
+                ResourceManager.saveConfig(JsonUtil.updateConfigWithGameId(""));
             }
         }
     }
