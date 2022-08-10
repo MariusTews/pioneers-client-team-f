@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<Pane id="mapTemplateViewBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapTemplateViewController">
+   <ScrollPane id="mapScrollPane" fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="700.0" prefWidth="1100.0" vbarPolicy="NEVER" vvalue="0.5" />
+   <VBox id="controlBox" alignment="CENTER" layoutX="860.0" layoutY="20.0" prefHeight="220.0" prefWidth="220.0" spacing="40.0">
+      <VBox alignment="TOP_CENTER">
+         <Label text="map name" />
+         <Label fx:id="mapNameLabel" alignment="CENTER" prefHeight="25.0" prefWidth="200.0" />
+      </VBox>
+      <HBox id="zoomBox" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="160.0" spacing="10.0">
+         <Button id="zoomButton" alignment="CENTER" mnemonicParsing="false" onAction="#decreaseZoom" prefHeight="40.0" prefWidth="40.0" text="-" />
+         <Label alignment="CENTER" prefWidth="60.0" text="Zoom" />
+         <Button id="zoomButton" alignment="CENTER" mnemonicParsing="false" onAction="#increaseZoom" prefHeight="40.0" prefWidth="40.0" text="+" />
+      </HBox>
+      <Button id="backButton" mnemonicParsing="false" onAction="#backButtonPressed" text="back" />
+   </VBox>
+</Pane>

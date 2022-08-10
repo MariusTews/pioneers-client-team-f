@@ -61,7 +61,7 @@
 }
 
 .scroll-bar:horizontal .track,
-.scroll-bar:vertical .track{
+.scroll-bar:vertical .track {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-background-radius: 4em;
@@ -78,8 +78,9 @@
 .scroll-bar .decrement-arrow {
     -fx-padding: -2;
 }
-.scroll-bar:horizontal, .scroll-bar:vertical{
-    -fx-background-color:transparent;
+
+.scroll-bar:horizontal, .scroll-bar:vertical {
+    -fx-background-color: transparent;
 }
 
 /************** Definitions for specific style classes **************/

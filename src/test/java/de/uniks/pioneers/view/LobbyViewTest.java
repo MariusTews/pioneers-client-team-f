@@ -117,9 +117,9 @@ public class LobbyViewTest extends ApplicationTest {
 		ScrollPane scrollPane = lookup("#userScrollPane").query();
 		VBox vBox = (VBox) scrollPane.getContent();
 
-		Assertions.assertThat(vBox.getChildren().size()).isEqualTo(3);
+		Assertions.assertThat(vBox.getChildren().size()).isEqualTo(5);
 
-		HBox hBox = (HBox) vBox.getChildren().get(0);
+		HBox hBox = (HBox) vBox.getChildren().get(2);
 
 		ImageView imageView = (ImageView) hBox.getChildren().get(0);
 		Circle circle = (Circle) hBox.getChildren().get(1);
@@ -132,7 +132,7 @@ public class LobbyViewTest extends ApplicationTest {
 		// There is an icon for the chat button, therefore no text
 		Assertions.assertThat(chat.getText()).isEqualTo("");
 
-		HBox hBox2 = (HBox) vBox.getChildren().get(2);
+		HBox hBox2 = (HBox) vBox.getChildren().get(4);
 
 		ImageView imageView2 = (ImageView) hBox2.getChildren().get(0);
 		Circle circle2 = (Circle) hBox2.getChildren().get(1);

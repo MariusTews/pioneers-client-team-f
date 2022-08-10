@@ -1,13 +1,14 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.template.MapTemplate;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.MapsService;
 import de.uniks.pioneers.service.UserService;
+import de.uniks.pioneers.template.MapTemplate;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -73,6 +75,7 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         user1Map = new MapTemplate("", "", user1._id(), "bert map", null, user1._id(), 0, List.of(), List.of());
         user2Map = new MapTemplate("", "", user2._id(), "kuno map", null, user2._id(), 0, List.of(), List.of());
         when(userService.findAllUsers()).thenReturn(Observable.just(List.of(user1, user2, user3, user4, user5, user6)));
+        when(userService.findVotes(user1._id())).thenReturn(Observable.just(List.of()));
         when(idStorage.getID()).thenReturn(user1._id());
         when(mapsService.findAllMaps()).thenReturn(Observable.just(new ArrayList<>(List.of(user2Map, user1Map))));
         when(eventListener.listen("maps.*.*", MapTemplate.class)).thenReturn(mapTemplateSubject);
@@ -307,6 +310,81 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         Assertions.assertThat(mapTemplates.get(0).getId()).isEqualTo(user1Map._id());
         Assertions.assertThat(mapTemplates.get(2).getId()).isEqualTo(user2NewMap._id());
         Assertions.assertThat(mapTemplates.get(3).getId()).isEqualTo(user2Map._id());
+    }
+
+    @Test
+    void upvoteThenDeleteVote() {
+        Vote vote = new Vote("", "", user2Map._id(), user1._id(), 1);
+        when(mapsService.voteMap(anyString(), anyInt())).thenReturn(Observable.just(vote));
+        when(mapsService.deleteVote(anyString(), anyString())).thenReturn(Observable.just(vote));
+
+        WaitForAsyncUtils.waitForFxEvents();
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.get(user2Map._id());
+
+        // up-vote
+        clickOn(controller.leftActionImageView);
+
+        MapTemplate user2MapUpdate = new MapTemplate("", "", user2Map._id(), user2Map.name(), null, user2._id(), 1, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(UPDATED, user2MapUpdate));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(controller.votesLabel).hasText("| +1");
+
+        // delete vote
+        clickOn(controller.leftActionImageView);
+
+        user2MapUpdate = new MapTemplate("", "", user2Map._id(), user2Map.name(), null, user2._id(), 0, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(UPDATED, user2MapUpdate));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(controller.votesLabel).hasText("|  0");
+        Assertions.assertThat(controller.leftActionImageView.getEffect()).isNull();
+        Assertions.assertThat(controller.rightActionImageView.getEffect()).isNull();
+    }
+
+    @Test
+    void downVote() {
+        Vote vote = new Vote("", "", user2Map._id(), user1._id(), -1);
+        when(mapsService.voteMap(anyString(), anyInt())).thenReturn(Observable.just(vote));
+
+        WaitForAsyncUtils.waitForFxEvents();
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.get(user2Map._id());
+
+        // down-vote
+        clickOn(controller.rightActionImageView);
+
+        MapTemplate user2MapUpdate = new MapTemplate("", "", user2Map._id(), user2Map.name(), null, user2._id(), -1, List.of(), List.of());
+        mapTemplateSubject.onNext(new Event<>(UPDATED, user2MapUpdate));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(controller.votesLabel).hasText("| -1");
+        Assertions.assertThat(controller.leftActionImageView.getEffect()).isNotNull();
+        Assertions.assertThat(controller.rightActionImageView.getEffect()).isNotNull();
+    }
+
+    @Test
+    void showVotes() {
+        Vote vote1 = new Vote("", "", user2Map._id(), user1._id(), -1);
+        Vote vote2 = new Vote("", "", user2Map._id(), user3._id(), 1);
+        Vote vote3 = new Vote("", "", user2Map._id(), user4._id(), 1);
+        Vote vote4 = new Vote("", "", user2Map._id(), user5._id(), -1);
+        when(mapsService.findVotesByMapId(user2Map._id())).thenReturn(Observable.just(List.of(vote1, vote2, vote3, vote4)));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        HashMap<String, MapTemplateSubController> mapTemplateSubCons = mapTemplatesScreenController.getMapTemplateSubCons();
+        MapTemplateSubController controller = mapTemplateSubCons.get(user2Map._id());
+
+        clickOn(controller.votesLabel);
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(mapTemplatesScreenController.getMainPane().getChildren().size()).isEqualTo(2);
+
+        clickOn("X");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        Assertions.assertThat(mapTemplatesScreenController.getMainPane().getChildren().size()).isEqualTo(1);
     }
 
 }

@@ -183,7 +183,6 @@
 
 }
 
-
 #spectatorTitleId {
     -fx-background-color: transparent;
     -fx-text-fill: WHITE;
@@ -200,5 +199,4 @@
     -fx-background-color: transparent;
     -fx-font-size: 18;
     -fx-text-fill: WHITE;
-
 }

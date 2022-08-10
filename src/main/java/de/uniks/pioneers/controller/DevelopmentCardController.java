@@ -2,13 +2,17 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.DevelopmentCard;
+import de.uniks.pioneers.model.ExpectedMove;
+import de.uniks.pioneers.model.User;
+import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,10 +26,12 @@ import javafx.stage.Window;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DevelopmentCardController implements Controller {
 
     public HBox mainHBoxId;
@@ -51,14 +57,21 @@ public class DevelopmentCardController implements Controller {
     private final IDStorage idStorage;
     private final PioneersService pioneersService;
 
+    private final GameScreenController gameScreenController;
     private final Window owner;
+    private final ExpectedMove nextMove;
+    private final HashMap<String, User> userHash;
+
 
     @Inject
-    public DevelopmentCardController(Window owner, GameStorage gameStorage, IDStorage idStorage, PioneersService pioneersService) {
+    public DevelopmentCardController(GameScreenController gameScreenController, Window owner, GameStorage gameStorage, IDStorage idStorage, PioneersService pioneersService, ExpectedMove nextMove, HashMap<String, User> userHash) {
+        this.gameScreenController = gameScreenController;
         this.owner = owner;
         this.gameStorage = gameStorage;
         this.idStorage = idStorage;
         this.pioneersService = pioneersService;
+        this.nextMove = nextMove;
+        this.userHash = userHash;
     }
 
     @Override
@@ -141,20 +154,108 @@ public class DevelopmentCardController implements Controller {
         primaryStage.close();
     }
 
-    public void onYearOfPlentyClick(ActionEvent event) {
-        //TODO:implement action when year of plenty card is clicked
+    public void onYearOfPlentyClick() {
+        if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
+                !nextMove.action().equals("build") || yearOfPlentyCard.getText().equals("0")) {
+            AlertService alertService = new AlertService();
+            alertService.showAlert("Playing not possible!");
+        } else {
+            pioneersService
+                    .playDevCard(gameStorage.getId(), "year-of-plenty")
+                    .observeOn(FX_SCHEDULER)
+                    .doOnError(error -> {
+                        AlertService alertService = new AlertService();
+                        alertService.showAlert("You just bought the card this round!");
+                    })
+                    .subscribe(onSuccess -> {
+                        primaryStage.close();
+                        YearOfPlentyController yearOfPlentyController = new YearOfPlentyController(gameStorage.getId(), pioneersService, owner);
+                        yearOfPlentyController.render();
+                    });
+        }
     }
 
-    public void onRoadBuildingClick(ActionEvent event) {
-        //TODO:implement action when roadBuilding card is played
+    public void onRoadBuildingClick() {
+        if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
+                !nextMove.action().equals("build") || roadBuildingCard.getText().equals("0")) {
+            AlertService alertService = new AlertService();
+            alertService.showAlert("Playing not possible!");
+        } else {
+            pioneersService
+                    .playDevCard(gameStorage.getId(), "road-building")
+                    .observeOn(FX_SCHEDULER)
+                    .doOnError(error -> {
+                        AlertService alertService = new AlertService();
+                        alertService.showAlert("You just bought the card this round!");
+                    })
+                    .subscribe(onSuccess -> primaryStage.close());
+
+        }
     }
 
-    public void onKnightClick(ActionEvent event) {
-        //TODO :implement action Knight card is played
+    public void onKnightClick() {
+        if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
+                !nextMove.action().equals("build") || knightCard.getText().equals("0")) {
+            AlertService alertService = new AlertService();
+            alertService.showAlert("Playing not possible!");
+        } else {
+            pioneersService
+                    .playDevCard(gameStorage.getId(), "knight")
+                    .observeOn(FX_SCHEDULER)
+                    .doOnError(error -> {
+                        AlertService alertService = new AlertService();
+                        alertService.showAlert("You just bought the card this round!");
+                    })
+                    .subscribe(onSuccess -> primaryStage.close());
+        }
     }
 
-    public void onMonopolyClick(ActionEvent event) {
-        //TODO : implement action when Monopoly card is played
+    public void onMonopolyClick() {
+        //if it's not your turn
+        if (!gameScreenController.currentPlayerLabel.getText().equals(userHash.get(idStorage.getID()).name()) ||
+                !nextMove.action().equals("build") || monoPolyCard.getText().equals("0")) {
+            AlertService alertService = new AlertService();
+            alertService.showAlert("Playing not possible!");
+        } else {
+            pioneersService
+                    .playDevCard(gameStorage.getId(), "monopoly")
+                    .observeOn(FX_SCHEDULER)
+                    .doOnError(error -> {
+                        AlertService alertService = new AlertService();
+                        alertService.showAlert("You just bought the card this round!");
+                    })
+                    .subscribe(onSuccess -> {
+                        primaryStage.close();
+                        String[] types = {"VENUS_GRAIN", "MARS_BAR", "MOON_ROCK", "EARTH_CACTUS", "NEPTUNE_CRYSTAL"};
+                        ChoiceDialog<String> choosingResource = new ChoiceDialog<>(types[1], types);
+                        choosingResource.getDialogPane().lookupButton(ButtonType.CANCEL).setVisible(false);
+                        // set stylesheet
+                        choosingResource.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
+                                .getResource("view/stylesheets/ChoiceDialogRob.css")).toExternalForm());
+                        choosingResource.setHeaderText("Rob resource");
+                        // remove close/maximize/minimize button
+                        choosingResource.initStyle(StageStyle.UNDECORATED);
+                        // Get the chosen target and make a server request with this target
+                        choosingResource.showAndWait();
+                        String resource = choosingResource.getSelectedItem();
+                        HashMap<String, String> ResourceMap = new HashMap<>() {{
+                            put("VENUS_GRAIN", VENUS_GRAIN);
+                            put("MARS_BAR", MARS_BAR);
+                            put("MOON_ROCK", MOON_ROCK);
+                            put("EARTH_CACTUS", EARTH_CACTUS);
+                            put("NEPTUNE_CRYSTAL", NEPTUNE_CRYSTAL);
+                        }};
+                        String selectedResource = ResourceMap.get(resource);
+                        HashMap<String, Integer> resourcesMap = new HashMap<>() {{
+                            put(selectedResource, 0);
+                        }};
+
+                        pioneersService
+                                .monopolyCard(gameStorage.getId(), resourcesMap)
+                                .observeOn(FX_SCHEDULER)
+                                .subscribe();
+                    });
+        }
     }
 }
 
