@@ -2,12 +2,13 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.computation.DiceRoll;
 import de.uniks.pioneers.computation.RandomAction;
+import de.uniks.pioneers.computation.SpectatorRenderInGame;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -38,7 +39,13 @@ import static de.uniks.pioneers.computation.CalculateMap.createId;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class GameScreenController implements Controller {
 
+    private final AchievementsService achievementsService;
     private final UserStorage userStorage;
+    public Label spectatorTitleId;
+    public ImageView arrowImageId;
+    public ImageView imageTradingFoldoutId;
+    public ImageView imageTradingFoldInId;
+    public Pane paneTradingId;
 
     private List<CircleSubController> circleSubControllers = new ArrayList<>();
 
@@ -110,8 +117,6 @@ public class GameScreenController implements Controller {
     private MessageViewSubController messageViewSubController;
     private TradingSubController tradingSubController;
     private TradeAcceptSubcontroller tradeAcceptSubcontroller;
-
-    private SpectatorViewController spectatorViewController;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private final List<OpponentSubController> opponentSubCons = new ArrayList<>();
@@ -122,6 +127,7 @@ public class GameScreenController implements Controller {
     private TimerController moveTimer;
     private DiscardResourcesController discard;
     private boolean acceptRenderFlag = false;
+    private ExpectedMove nextMove;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -136,6 +142,7 @@ public class GameScreenController implements Controller {
                                 MessageService messageService,
                                 MemberService memberService,
                                 SoundService soundService,
+                                AchievementsService achievementsService,
                                 UserStorage userStorage) {
         this.lobbyController = lobbyController;
         this.app = app;
@@ -148,6 +155,7 @@ public class GameScreenController implements Controller {
         this.messageService = messageService;
         this.memberIDStorage = memberIDStorage;
         this.memberService = memberService;
+        this.achievementsService = achievementsService;
         this.userStorage = userStorage;
         this.soundService = soundService;
     }
@@ -245,9 +253,12 @@ public class GameScreenController implements Controller {
 
         this.calculateMove = new RandomAction(this.gameStorage, this.pioneersService);
 
-        this.tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, gameStorage);
+        this.tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, achievementsService, gameStorage);
         this.tradeAcceptSubcontroller.init();
 
+        // init AchievementsService
+        achievementsService.init();
+        disposable.add(achievementsService.initUserAchievements().observeOn(FX_SCHEDULER).subscribe());
     }
 
     @Override
@@ -295,7 +306,7 @@ public class GameScreenController implements Controller {
             }
         });
 
-        this.gameFieldSubController = new GameFieldSubController(gameStorage, pioneersService, userService, idStorage, eventListener);
+        this.gameFieldSubController = new GameFieldSubController(gameStorage, pioneersService, userService, idStorage, eventListener, achievementsService);
         gameFieldSubController.init();
         mapPane.setContent(gameFieldSubController.render());
 
@@ -311,24 +322,16 @@ public class GameScreenController implements Controller {
         this.playerOwnView.addListener((ListChangeListener<? super Player>) c ->
                 this.userViewPane.getChildren().setAll(c.getList().stream().map(this::renderSingleUser).toList()));
 
-        /*
-         * Render trading sub view
-         * hand over own player to trading sub view
-         * */
-
-        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, idStorage, eventListener);
-        tradingSubController.init();
-        this.tradingPane.getChildren().setAll(this.tradingSubController.render());
-
-        //spectator
-        this.spectatorMember.addListener((ListChangeListener<? super Member>) c ->
-                this.spectatorPaneId.getChildren().setAll(c.getList().stream().map(this::renderSpectator).toList()));
+        imageTradingFoldoutId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/down.png"))));
 
         //Action is performed when the platform is close
         this.app.getStage().setOnCloseRequest(e -> {
             actionOnCloseScreen();
             e.consume();
         });
+
+        //arrow image
+        arrowImageId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/right.png"))));
 
         //calculate all the owned cards
         allTheCards();
@@ -357,21 +360,13 @@ public class GameScreenController implements Controller {
         }
     }
 
-    private Node renderSpectator(Member member) {
-        for (User user : allUser) {
-            if (member.userId().equals(user._id())) {
-                this.spectatorViewController = new SpectatorViewController(user);
-                break;
-            }
-        }
-        return spectatorViewController.render();
-    }
-
     private Node renderSingleUser(Player player) {
         UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService, player, gameFieldSubController,
                 this.gameStorage.getVictoryPoints(), pioneersService);
         userSubView.init();
-        this.tradingSubController.setPlayer(player);
+        if (tradingSubController != null) {
+            this.tradingSubController.setPlayer(player);
+        }
         return userSubView.render();
     }
 
@@ -391,6 +386,10 @@ public class GameScreenController implements Controller {
             TradeOfferSubcontroller tradeOfferSubcontroller = new TradeOfferSubcontroller(move, pioneersService, gameStorage, idStorage);
             tradeOfferSubcontroller.init();
             tradeOfferSubcontroller.render();
+        }
+
+        if (move.action().equals("accept") && Objects.equals(move.partner(), idStorage.getID())) {
+            achievementsService.putOrUpdateAchievement(TRADE_PLAYER, 1).blockingFirst();
         }
 
         // set flag to true, so accept window only renders once
@@ -442,6 +441,21 @@ public class GameScreenController implements Controller {
                         amountNewResources += resource;
                     }
                     if (amountNewResources > amountResources) {
+                        if (p.resources().getOrDefault("lumber", 0) < player.resources().getOrDefault("lumber", 0)) {
+                            achievementsService.putOrUpdateAchievement(EARTH_CACTUS_PICKER, player.resources().get("lumber") - p.resources().getOrDefault("lumber", 0)).blockingFirst();
+                        }
+                        if (p.resources().getOrDefault("brick", 0) < player.resources().getOrDefault("brick", 0)) {
+                            achievementsService.putOrUpdateAchievement(MARS_BAR_PICKER, player.resources().get("brick") - p.resources().getOrDefault("brick", 0)).blockingFirst();
+                        }
+                        if (p.resources().getOrDefault("ore", 0) < player.resources().getOrDefault("ore", 0)) {
+                            achievementsService.putOrUpdateAchievement(MOON_ROCK_PICKER, player.resources().get("ore") - p.resources().getOrDefault("ore", 0)).blockingFirst();
+                        }
+                        if (p.resources().getOrDefault("wool", 0) < player.resources().getOrDefault("wool", 0)) {
+                            achievementsService.putOrUpdateAchievement(NEPTUNE_CRYSTAL_PICKER, player.resources().get("wool") - p.resources().getOrDefault("wool", 0)).blockingFirst();
+                        }
+                        if (p.resources().getOrDefault("grain", 0) < player.resources().getOrDefault("grain", 0)) {
+                            achievementsService.putOrUpdateAchievement(VENUS_GRAIN_PICKER, player.resources().get("grain") - p.resources().getOrDefault("grain", 0)).blockingFirst();
+                        }
                         this.soundService.playSound("receive");
                     } else if (amountNewResources < amountResources) {
                         this.soundService.playSound("drop");
@@ -483,7 +497,7 @@ public class GameScreenController implements Controller {
         for (List<String> s : userNumberPoints.values()) {
             if (s.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
-                        , gameStorage, idStorage, gameService, app, lobbyController);
+                        , gameStorage, idStorage, userService, achievementsService, gameService, app, lobbyController);
                 winnerController.render();
             }
         }
@@ -509,6 +523,7 @@ public class GameScreenController implements Controller {
             for (CircleSubController subController : this.circleSubControllers) {
                 subController.setNextMove(state.expectedMoves().get(0));
             }
+            this.nextMove = state.expectedMoves().get(0);
         }
 
         if (stateEvent.event().endsWith(UPDATED)) {
@@ -756,8 +771,33 @@ public class GameScreenController implements Controller {
     }
 
     public void onShowDevCard() {
-        DevelopmentCardController developmentCardController = new DevelopmentCardController(this.currentPlayerLabel.getScene().getWindow(), gameStorage,
-                idStorage, pioneersService);
+        DevelopmentCardController developmentCardController = new DevelopmentCardController(this, this.currentPlayerLabel.getScene().getWindow(), gameStorage,
+                idStorage, pioneersService, nextMove, userHash);
         developmentCardController.render();
+    }
+
+    public void onShowSpectator() {
+        if (spectatorMember.size() >= 1) {
+            SpectatorRenderInGame spectatorRenderInGame = new SpectatorRenderInGame();
+            spectatorRenderInGame.checkMember(spectatorMember, spectatorPaneId, allUser, spectatorTitleId, arrowImageId);
+        }
+    }
+
+    public void onClickTradeView() {
+        this.tradingSubController = new TradingSubController(gameStorage, pioneersService, achievementsService, idStorage, eventListener);
+        tradingSubController.init();
+        this.tradingPane.getChildren().setAll(this.tradingSubController.render());
+        imageTradingFoldInId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/up.png"))));
+        imageTradingFoldInId.disableProperty().set(false);
+        paneTradingId.visibleProperty().set(false);
+        paneTradingId.disableProperty().set(true);
+    }
+
+    public void onClickUP() {
+        this.tradingPane.getChildren().clear();
+        imageTradingFoldInId.setImage(null);
+        imageTradingFoldInId.disableProperty().set(true);
+        paneTradingId.disableProperty().set(false);
+        paneTradingId.visibleProperty().set(true);
     }
 }

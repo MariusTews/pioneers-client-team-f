@@ -2,19 +2,22 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -28,10 +31,7 @@ import javafx.scene.layout.VBox;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -43,6 +43,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class LobbyController implements Controller {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
+
+    private final ObservableList<User> friendsUserList = FXCollections.observableArrayList();
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Game> games = FXCollections.observableArrayList();
@@ -99,6 +101,7 @@ public class LobbyController implements Controller {
     private final AuthService authService;
     private final MemberService memberService;
     private final EventListener eventListener;
+    private final AlertService alertService;
     private final Provider<LoginController> loginController;
     private final Provider<RulesScreenController> rulesScreenController;
     private final Provider<CreateGameController> createGameController;
@@ -106,7 +109,9 @@ public class LobbyController implements Controller {
     private final Provider<GameLobbyController> gameLobbyController;
     private final Provider<EditUserController> editUserController;
     private final Provider<GameScreenController> gameScreenController;
+    public Button achievementsButton;
 
+    private final Provider<AchievementsScreenController> achievementsScreenController;
     private final PioneersService pioneersService;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -136,12 +141,14 @@ public class LobbyController implements Controller {
                            AuthService authService,
                            MemberService memberService,
                            EventListener eventListener,
+                           AlertService alertService,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
                            Provider<GameLobbyController> gameLobbyController,
                            Provider<EditUserController> editUserController,
                            Provider<GameScreenController> gameScreenController,
+                           Provider<AchievementsScreenController> achievementsScreenController,
                            PioneersService pioneersService) {
 
         this.app = app;
@@ -155,12 +162,14 @@ public class LobbyController implements Controller {
         this.authService = authService;
         this.memberService = memberService;
         this.eventListener = eventListener;
+        this.alertService = alertService;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
         this.createGameController = createGameController;
         this.gameLobbyController = gameLobbyController;
         this.editUserController = editUserController;
         this.gameScreenController = gameScreenController;
+        this.achievementsScreenController = achievementsScreenController;
         this.pioneersService = pioneersService;
     }
 
@@ -254,6 +263,8 @@ public class LobbyController implements Controller {
         }
 
         this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
+        this.friendsUserList.addListener((ListChangeListener<? super User>) this::onUsersChanged);
+
 
         this.games.addListener((ListChangeListener<? super Game>) c -> ((VBox) this.gamesScrollPane.getContent())
                 .getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList()));
@@ -419,6 +430,7 @@ public class LobbyController implements Controller {
         } else if (userEvent.event().endsWith(DELETED)) {
             removeUserSubCon(user);
             this.users.removeIf(u -> u._id().equals(user._id()));
+            this.friendsUserList.removeIf(u -> u._id().equals(user._id()));
         } else if (userEvent.event().endsWith(UPDATED)) {
             for (DirectChatStorage directChatStorage : directChatStorages) {
                 if (directChatStorage.getUser()._id().equals(user._id())) {
@@ -426,6 +438,7 @@ public class LobbyController implements Controller {
                     directChatStorage.setUser(user);
                 }
             }
+
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
                     removeUserSubCon(user);
@@ -434,6 +447,30 @@ public class LobbyController implements Controller {
                 }
             }
             userSubCons.get(user._id()).setAvatar();
+
+            //check for new/removed friends
+            if (user._id().equals(idStorage.getID())) {
+                //new friend
+                if (friendsUserList.size() < user.friends().size()) {
+                    for (Iterator<User> iterator = users.iterator(); iterator.hasNext(); ) {
+                        User newFriend = iterator.next();
+                        if (!friendsUserList.contains(newFriend) && user.friends().contains(newFriend._id())) {
+                            iterator.remove();
+                            friendsUserList.add(newFriend);
+                        }
+                    }
+                }
+                //removed friend
+                else if (friendsUserList.size() > user.friends().size()) {
+                    for (Iterator<User> iterator = friendsUserList.iterator(); iterator.hasNext(); ) {
+                        User removedFriend = iterator.next();
+                        if (!user.friends().contains(removedFriend._id())) {
+                            iterator.remove();
+                            users.add(removedFriend);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -548,14 +585,40 @@ public class LobbyController implements Controller {
     }
 
     private void loadUsers(List<User> users) {
+        List<String> friends = new ArrayList<>();
         for (User user : users) {
             memberHash.put(user._id(), user);
+            if (user._id().equals(idStorage.getID())) {
+                friends = user.friends();
+            }
+        }
+        this.friendsUserList.addListener((ListChangeListener<? super User>) this::onUsersChanged);
+
+        List<User> onlineFriends = new ArrayList<>();
+        List<User> offlineFriends = new ArrayList<>();
+        List<User> onlineUser = new ArrayList<>();
+        List<User> offlineUser = new ArrayList<>();
+        for (User user : users) {
+            if (friends != null && friends.contains(user._id())) {
+                if (user.status().equals("online")) {
+                    onlineFriends.add(user);
+                } else {
+                    offlineFriends.add(user);
+                }
+            } else {
+                if (user.status().equals("online")) {
+                    onlineUser.add(user);
+                } else {
+                    offlineUser.add(user);
+                }
+            }
         }
 
-        List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
-        List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
-        this.users.addAll(online);
-        this.users.addAll(offline);
+        this.friendsUserList.addAll(onlineFriends);
+        this.friendsUserList.addAll(offlineFriends);
+        this.users.addAll(onlineUser);
+        this.users.addAll(offlineUser);
+
 
         renderAvatarsThread.start();
 
@@ -761,6 +824,62 @@ public class LobbyController implements Controller {
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
-        ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
+        //clear scrollpane
+        ((VBox) this.userScrollPane.getContent()).getChildren().clear();
+
+        //add header for friends
+        this.createHeader("Friends:");
+
+        //add friends
+        ((VBox) this.userScrollPane.getContent()).getChildren().addAll(friendsUserList.stream().sorted(userComparator).map(this::renderUser).toList());
+
+        //add header for rest of Users
+        this.createHeader("All Users:");
+
+        //add rest of users
+        ((VBox) this.userScrollPane.getContent()).getChildren().addAll(users.stream().sorted(userComparator).map(this::renderUser).toList());
+    }
+
+    private void createHeader(String headerText) {
+        Label header = new Label(headerText);
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        header.setStyle("-fx-font-size: 20");
+        hBox.getChildren().add(header);
+        ((VBox) this.userScrollPane.getContent()).getChildren().add(hBox);
+    }
+
+    public void showFriendsMenu(User user) {
+        boolean addFriend = alertService.showFriendsMenu("Do you want to add " + user.name() + " as a friend?");
+        if (addFriend) {
+            List<String> updatedFriends = new ArrayList<>();
+            for (User oldFriends : friendsUserList) {
+                updatedFriends.add(oldFriends._id());
+            }
+            updatedFriends.add(user._id());
+            userService.userUpdate(idStorage.getID(), null, null, updatedFriends, null, null).blockingFirst();
+        }
+    }
+
+    public void showRemoveFriendMenu(User user) {
+        boolean removeFriend = alertService.showFriendsMenu("Do you want to remove " + user.name() + " as a friend?");
+        if (removeFriend) {
+            List<String> updatedFriends = new ArrayList<>();
+            for (User oldFriends : friendsUserList) {
+                if (!Objects.equals(oldFriends._id(), user._id())) {
+                    updatedFriends.add(oldFriends._id());
+                }
+            }
+            userService.userUpdate(idStorage.getID(), null, null, updatedFriends, null, null).blockingFirst();
+        }
+
+    }
+
+    public boolean isNotAFriend(User user) {
+        return !friendsUserList.contains(user);
+    }
+
+    public void OnAchievementsPressed(ActionEvent actionEvent) {
+        this.app.show(achievementsScreenController.get());
     }
 }

@@ -83,10 +83,8 @@ public class AppTest extends ApplicationTest {
         type(KeyCode.SPACE);
         WaitForAsyncUtils.waitForFxEvents();
         sleep(5000);
-
-        //test ingame
+        //test ingameScreen
         WaitForAsyncUtils.waitForFxEvents();
-        sleep(5000);
         // founding-settlement-1
         clickOn("#x0y0z0_6");
         //founding-road-1
@@ -157,9 +155,9 @@ public class AppTest extends ApplicationTest {
         clickOn("#city");
         clickOn("#x1yM1z0_0");
         WaitForAsyncUtils.waitForFxEvents();
-        //back to lobby
+        //back to lobbyScreen
         clickOn("#CloseGameButton");
-        //back to login
+        //back to loginScreen
         clickOn("#logoutButton");
         WaitForAsyncUtils.waitForFxEvents();
         //screenAssert login

@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.ExpectedMove;
+import de.uniks.pioneers.service.AchievementsService;
 import de.uniks.pioneers.service.GameStorage;
 import de.uniks.pioneers.service.IDStorage;
 import de.uniks.pioneers.service.PioneersService;
@@ -21,8 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static de.uniks.pioneers.Constants.COLORARRAY;
-import static de.uniks.pioneers.Constants.FX_SCHEDULER;
+import static de.uniks.pioneers.Constants.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class CircleSubController implements Controller {
@@ -34,6 +34,7 @@ public class CircleSubController implements Controller {
     private final IDStorage idStorage;
     private final List<Node> buildingCircles;
     private final GameFieldSubController gameFieldSubController;
+    private final AchievementsService achievementsService;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     private int x;
@@ -46,7 +47,8 @@ public class CircleSubController implements Controller {
     @Inject
     public CircleSubController(Circle view, Polygon road, PioneersService pioneersService,
                                GameStorage gameStorage, IDStorage idStorage,
-                               List<Node> buildingCircles, GameFieldSubController gameFieldSubController) {
+                               List<Node> buildingCircles, GameFieldSubController gameFieldSubController,
+                               AchievementsService achievementsService) {
         this.view = view;
         this.road = road;
         this.pioneersService = pioneersService;
@@ -54,6 +56,7 @@ public class CircleSubController implements Controller {
         this.idStorage = idStorage;
         this.buildingCircles = buildingCircles;
         this.gameFieldSubController = gameFieldSubController;
+        this.achievementsService = achievementsService;
     }
 
     @Override
@@ -76,7 +79,6 @@ public class CircleSubController implements Controller {
         this.side = Integer.parseInt(split2[1]);
 
         this.nextMove = new ExpectedMove("", Collections.singletonList(idStorage.getID()));
-
     }
 
 
@@ -99,14 +101,15 @@ public class CircleSubController implements Controller {
                             this.pioneersService.move(gameStorage.getId(), action, x, y, z, side, "settlement", null, null)
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> notAllowedToPlace())
-                                    .subscribe(onSuc -> {
-                                    }, onError -> {
+                                    .subscribe(onSuc -> this.achievementsService.putOrUpdateAchievement(SETTLEMENT_BUILDER, 1).blockingFirst(), onError -> {
                                     });
                         } else {
                             this.pioneersService.move(gameStorage.getId(), action, x, y, z, side, "road", null, null)
                                     .observeOn(FX_SCHEDULER)
                                     .doOnError(error -> notAllowedToPlace())
                                     .subscribe(onSuc -> {
+                                        this.achievementsService.putOrUpdateAchievement(FIRST_ROAD, 1).blockingFirst();
+                                        this.achievementsService.putOrUpdateAchievement(ROAD_BUILDER, 1).blockingFirst();
                                     }, onError -> {
                                     });
                         }
@@ -116,7 +119,16 @@ public class CircleSubController implements Controller {
 
                 this.pioneersService.move(gameStorage.getId(), "build", x, y, z, side, build, null, null)
                         .observeOn(FX_SCHEDULER)
-                        .subscribe();
+                        .subscribe(move -> {
+                            if (Objects.equals(build, "settlment")) {
+                                this.achievementsService.putOrUpdateAchievement(SETTLEMENT_BUILDER, 1).blockingFirst();
+                            } else if (Objects.equals(build, "city")) {
+                                this.achievementsService.putOrUpdateAchievement(CITY_BUILDER, 1).blockingFirst();
+                            } else {
+                                this.achievementsService.putOrUpdateAchievement(ROAD_BUILDER, 1).blockingFirst();
+                                this.achievementsService.putOrUpdateAchievement(FIRST_ROAD, 1).blockingFirst();
+                            }
+                        });
 
                 this.gameFieldSubController.build(null);
             }
