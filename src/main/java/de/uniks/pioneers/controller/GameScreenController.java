@@ -338,6 +338,19 @@ public class GameScreenController implements Controller {
 
         //reload on rejoin
         if (rejoin) {
+            this.pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(
+                            p -> this.pioneersService
+                                    .findOneState(this.gameStorage.getId())
+                                    .observeOn(FX_SCHEDULER)
+                                    .subscribe(
+                                            state -> {
+                                                Event<State> event = new Event<>(UPDATED, state);
+                                                this.handleStateEvents(event);
+                                            }
+                                    )
+                    );
             this.pioneersService
                     .findAllBuildings(this.gameStorage.getId())
                     .observeOn(FX_SCHEDULER)
@@ -349,6 +362,9 @@ public class GameScreenController implements Controller {
                                 }
                             }
                     );
+            //display the dices to be able to click on them (if there is no founding move, they are not displayed automatically)
+            displayDice(2);
+            rejoin = false;
         }
 
         return parent;
@@ -692,9 +708,9 @@ public class GameScreenController implements Controller {
                 break;
             }
         }
-        //this distinguishes between player and spectator
+        //this distinguishes between player and spectator TODO active
         if (!changeToPlayer) {
-            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false)
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
                     .observeOn(FX_SCHEDULER).subscribe(onSuccess -> this.app.show(lobbyController.get()));
         }
 

@@ -13,8 +13,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -828,7 +826,7 @@ public class LobbyController implements Controller {
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
-        //clear scrollpane
+        //clear scroll pane
         ((VBox) this.userScrollPane.getContent()).getChildren().clear();
 
         //add header for friends
@@ -883,7 +881,7 @@ public class LobbyController implements Controller {
         return !friendsUserList.contains(user);
     }
 
-    public void OnAchievementsPressed(ActionEvent actionEvent) {
+    public void OnAchievementsPressed() {
         this.app.show(achievementsScreenController.get());
     }
 }
