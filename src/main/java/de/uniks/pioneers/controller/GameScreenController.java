@@ -128,6 +128,7 @@ public class GameScreenController implements Controller {
     private DiscardResourcesController discard;
     private boolean acceptRenderFlag = false;
     private ExpectedMove nextMove;
+    private boolean rejoin = false;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -271,7 +272,6 @@ public class GameScreenController implements Controller {
 
         this.opponentSubCons.forEach(OpponentSubController::destroy);
         this.opponentSubCons.clear();
-
     }
 
     @Override
@@ -296,7 +296,7 @@ public class GameScreenController implements Controller {
         this.remainingTimeView.getChildren().setAll(this.moveTimer.render());
 
         // add listener on nextMoveLabel to reset the timer if the next action is expected, else the automatic
-        // move stops after founding phase with the "roll" move where the curren player does not change
+        // move stops after founding phase with the "roll" move where the current player does not change
         nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> this.moveTimer.startTime());
 
         //add listener on nextMoveLabel to reset the timer if founding-settlement-2 (Placing-UFO-2)
@@ -335,6 +335,21 @@ public class GameScreenController implements Controller {
 
         //calculate all the owned cards
         allTheCards();
+
+        //reload on rejoin
+        if (rejoin) {
+            this.pioneersService
+                    .findAllBuildings(this.gameStorage.getId())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(
+                            buildings -> {
+                                for (Building b : buildings) {
+                                    this.gameFieldSubController.updateBuildings(b.x().intValue(), b.y().intValue(),
+                                            b.z().intValue(), b.side().intValue(), b.owner(), b.type());
+                                }
+                            }
+                    );
+        }
 
         return parent;
     }
@@ -799,5 +814,9 @@ public class GameScreenController implements Controller {
         imageTradingFoldInId.disableProperty().set(true);
         paneTradingId.disableProperty().set(false);
         paneTradingId.visibleProperty().set(true);
+    }
+
+    public void setRejoin(boolean rejoin) {
+        this.rejoin = rejoin;
     }
 }

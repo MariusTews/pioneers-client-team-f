@@ -810,7 +810,9 @@ public class LobbyController implements Controller {
         for (Member m : this.members) {
             if (m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())
                     && m.spectator()) {
-                this.app.show(gameScreenController.get());
+                GameScreenController controller = gameScreenController.get();
+                controller.setRejoin(true);
+                this.app.show(controller);
                 changeToPlayer = true;
                 break;
             }
@@ -819,7 +821,9 @@ public class LobbyController implements Controller {
             pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
                     .observeOn(FX_SCHEDULER)
                     .subscribe();
-            this.app.show(gameScreenController.get());
+            GameScreenController controller = gameScreenController.get();
+            controller.setRejoin(true);
+            this.app.show(controller);
         }
     }
 
