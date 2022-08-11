@@ -90,6 +90,7 @@ public class Constants {
     }
 
     public static final HashMap<String, String> ACHIEVEMENT_NAMES = new HashMap<>();
+
     static {
         ACHIEVEMENT_NAMES.put(FIRST_ROAD, "build your first road");
         ACHIEVEMENT_NAMES.put(ROAD_BUILDER, "road builder");
@@ -107,6 +108,7 @@ public class Constants {
     }
 
     public static final HashMap<String, String> ACHIEVEMENT_PATHS = new HashMap<>();
+
     static {
         ACHIEVEMENT_PATHS.put(FIRST_ROAD, "first_road");
         ACHIEVEMENT_PATHS.put(ROAD_BUILDER, "100_roads");
@@ -135,6 +137,7 @@ public class Constants {
     public static final String JSON_REMEMBER_ME = "rememberMe";
     public static final String JSON_NAME = "name";
     public static final String JSON_TOKEN = "token";
+    public static final String JSON_GAME_ID = "gameId";
 
     //Lobby ID for listening and sending Messages
     public static final String LOBBY_ID = "627cf3c93496bc00158f3859";
