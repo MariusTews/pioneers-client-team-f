@@ -114,6 +114,14 @@ public class CircleSubController implements Controller {
                                     });
                         }
                     });
+        } else if (nextMove.action().equals("build-road")) {
+            this.pioneersService.move(gameStorage.getId(), "build-road", x, y, z, side, "road", null, null)
+                    .observeOn(FX_SCHEDULER)
+                    .doOnError(error -> notAllowedToPlace())
+                    .subscribe(move -> {
+                        this.achievementsService.putOrUpdateAchievement(ROAD_BUILDER, 1).blockingFirst();
+                        this.achievementsService.putOrUpdateAchievement(FIRST_ROAD, 1).blockingFirst();
+                    });
         } else {//if you build a new building in round-loop
             if (build != null) {
 
