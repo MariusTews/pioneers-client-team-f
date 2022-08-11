@@ -76,12 +76,6 @@ public class GameLobbyController implements Controller {
     public Label spectatorLabelId;
 
     private MessageViewSubController messageViewSubController;
-
-    @SuppressWarnings("unused")
-    private MemberListSubcontroller memberListSubcontroller;
-
-    @SuppressWarnings("unused")
-    private MemberListSubcontroller memberListSpectatorSubcontroller;
     private final EventListener eventListener;
     private final GameStorage gameStorage;
     private final MemberIDStorage memberIDStorage;
@@ -168,11 +162,10 @@ public class GameLobbyController implements Controller {
                 .subscribe(event -> {
                     if (event.event().endsWith("state" + CREATED)) {
                         this.userStorage.setUserList(playerList);
-                        // Flag needed, otherwise the gameScreenController is initialized twice
+                        // flag needed, otherwise the gameScreenController is initialized twice
                         if (!started) {
                             started = true;
                             gameLobbyInformation.changeView(gameScreenController, idStartGameButton, app);
-                            //changeView();
                         }
                     }
                 }));
@@ -220,13 +213,9 @@ public class GameLobbyController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                     this.game = result;
+                    this.gameStorage.setGameOptions(result.settings());
                     int victoryPoints = result.settings().victoryPoints();
                     int mapRadius = result.settings().mapRadius();
-                    this.gameStorage.setSize(mapRadius);
-                    this.gameStorage.setMapTemplate(result.settings().mapTemplate());
-                    this.gameStorage.setVictoryPoints(victoryPoints);
-                    this.gameStorage.setRollSeven(result.settings().roll7());
-                    this.gameStorage.setStartingResources(result.settings().startingResources());
                     this.settingsLabel.setText("Settings: Map Size = " + mapRadius + "  Required VP = " + victoryPoints);
                     this.idTitleLabel.setText("Welcome to " + this.game.name());
                 });
@@ -234,18 +223,16 @@ public class GameLobbyController implements Controller {
         // load game members
 
         this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members, memberListSubcontroller)).toList());
+                playersNumberId, members)).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(
                 members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                        playersNumberId, members, memberListSubcontroller)).toList()));
+                        playersNumberId, members)).toList()));
 
         gameLobbyInformation.addColourOnComboBox(colorPicker);
 
-        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList,
-                memberListSpectatorSubcontroller)).toList());
+        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorViewId.getChildren().setAll(
-                spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList
-                        , memberListSpectatorSubcontroller)).toList()));
+                spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList()));
 
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
@@ -309,10 +296,9 @@ public class GameLobbyController implements Controller {
     private void clearAll() {
         this.idUserList.getChildren().clear();
         this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members, memberListSubcontroller)).toList());
+                playersNumberId, members)).toList());
         this.spectatorViewId.getChildren().clear();
-        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList,
-                memberListSpectatorSubcontroller)).toList());
+        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList());
     }
 
     private void updateMember(Member member) {

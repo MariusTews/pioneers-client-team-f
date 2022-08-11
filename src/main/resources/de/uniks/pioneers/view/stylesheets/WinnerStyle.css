@@ -5,7 +5,7 @@
     -fx-background-size: 220 289;
 }
 
-#winnerTitel{
+#winnerTitle{
     -fx-font-size: 18;
     -fx-text-fill: #000000;
 }
@@ -14,7 +14,7 @@
     -fx-font-size: 22;
 }
 
-#loserTitel{
+#loserTitle{
     -fx-font-size: 18;
     -fx-text-fill: #000000;
 }

@@ -21,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import javax.inject.Provider;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -208,13 +209,31 @@ public class LobbyTabsAndMessage {
                         }));
     }
 
-    public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController, IDStorage idStorage,
-                       GameStorage gameStorage, Provider<GameScreenController> gameScreenController, PioneersService pioneersService) {
+    public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController,
+                       IDStorage idStorage, GameStorage gameStorage, Provider<GameScreenController> gameScreenController,
+                       PioneersService pioneersService, GameService gameService, UserService userService, UserStorage userStorage) {
+        //set game options (if app was closed before, they are now longer saved)
+        Game game = gameService.findOneGame(gameStorage.getId()).blockingFirst();
+        gameStorage.setGameOptions(game.settings());
+
+        List<User> allUsers = userService.findAllUsers().blockingFirst();
+        List<User> usersFromGame = new ArrayList<>();
+        for (User user : allUsers) {
+            for (Member member : members) {
+                if (user._id().equals(member.userId())) {
+                    usersFromGame.add(user);
+                }
+            }
+        }
+        userStorage.setUserList(usersFromGame);
+
         boolean changeToPlayer = false;
         for (Member m : members) {
             if (m.gameId().equals(gameStorage.getId()) && m.userId().equals(idStorage.getID())
                     && m.spectator()) {
-                app.show(gameScreenController.get());
+                GameScreenController controller = gameScreenController.get();
+                controller.setRejoin(true);
+                app.show(controller);
                 changeToPlayer = true;
                 break;
             }
@@ -223,7 +242,9 @@ public class LobbyTabsAndMessage {
             pioneersService.updatePlayer(gameStorage.getId(), idStorage.getID(), true)
                     .observeOn(FX_SCHEDULER)
                     .subscribe();
-            app.show(gameScreenController.get());
+            GameScreenController controller = gameScreenController.get();
+            controller.setRejoin(true);
+            app.show(controller);
         }
     }
 
@@ -263,20 +284,26 @@ public class LobbyTabsAndMessage {
         if (gameStorage.getId() != null) {
             memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
-                        boolean trace = true;
-                        for (Member member : result) {
-                            if (member.userId().equals(idStorage.getID())) {
-                                rejoinButton.disableProperty().set(false);
-                                trace = false;
-                                break;
+                                boolean trace = true;
+                                for (Member member : result) {
+                                    if (member.userId().equals(idStorage.getID())) {
+                                        rejoinButton.disableProperty().set(false);
+                                        trace = false;
+                                        break;
+                                    }
+                                }
+                                if (trace) {
+                                    rejoinButton.disableProperty().set(true);
+                                    gameStorage.setId(null);
+                                    ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
+                                }
+                            }, error -> {
                             }
-                        }
-                        if (trace) {
-                            rejoinButton.disableProperty().set(true);
-                        }
-                    });
+                    );
         } else {
             rejoinButton.disableProperty().set(true);
+            gameStorage.setId(null);
+            ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
         }
     }
 
