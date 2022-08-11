@@ -48,7 +48,7 @@ class GameLobbyControllerTest extends ApplicationTest {
     App app;
 
     @Spy
-	GameStorage gameStorage;
+    GameStorage gameStorage;
 
     @Spy
     IDStorage idStorage;
@@ -64,23 +64,24 @@ class GameLobbyControllerTest extends ApplicationTest {
         messageSubject = PublishSubject.create();
 
         List<Member> members = new ArrayList<>();
-        members.add(new Member("2022-11-30T18:35:24.00Z","1:00","87","7",true,"ffa500",false));
+        members.add(new Member("2022-11-30T18:35:24.00Z", "1:00", "id", "7", true, "#ffa510", false));
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.just(members));
         List<User> userList = new ArrayList<>();
-        userList.add(new User("2022-11-30T18:35:24.00Z","1:00","7","Bob","online",null,null));
+        userList.add(new User("2022-11-30T18:35:24.00Z", "1:00", "7", "Bob", "online", null, null));
 
         List<Message> messages = new ArrayList<>();
-        messages.add(new Message("2022-11-30T18:35:24.00Z","1:00","78","7","first message"));
-        when(messageService.getAllMessages(any(),any())).thenReturn(Observable.just(messages));
+        messages.add(new Message("2022-11-30T18:35:24.00Z", "1:00", "78", "7", "first message"));
+        when(messageService.getAllMessages(any(), any())).thenReturn(Observable.just(messages));
 
         when(userService.findAllUsers()).thenReturn(Observable.just(userList));
+
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("2022-11-30T18:35:24.00Z", "00:30",
-                "id", "name", "owner", 2, false,new GameSettings(2,10, null, false, 0))));
+                "id", "name", "owner", 2, false, new GameSettings(2, 10, null, false, 0))));
         when(gameStorage.getId()).thenReturn("id");
 
-        when(eventListener.listen("games.id.*.*",Message.class)).thenReturn(messageSubject);
-        when(eventListener.listen("games.id.members.*.*",Member.class)).thenReturn(memberSubject);
-        when(eventListener.listen("games.id.messages.*.*",Message.class)).thenReturn(messageSubject);
+        when(eventListener.listen("games.id.*.*", Message.class)).thenReturn(messageSubject);
+        when(eventListener.listen("games.id.members.*.*", Member.class)).thenReturn(memberSubject);
+        when(eventListener.listen("games.id.messages.*.*", Message.class)).thenReturn(messageSubject);
         when(app.getStage()).thenReturn(new Stage());
 
         // start application
@@ -92,7 +93,7 @@ class GameLobbyControllerTest extends ApplicationTest {
     void leave() {
         when(idStorage.getID()).thenReturn("4");
         when(memberService.leave("id", "4")).thenReturn(Observable.just(new Member("0:00",
-                "0:30", "id", "4", false, "#000000",false)));
+                "0:30", "id", "4", false, "#000000", false)));
 
         write("\t\t\t\t\t\t");
         type(KeyCode.SPACE);
@@ -103,9 +104,9 @@ class GameLobbyControllerTest extends ApplicationTest {
     @Test
     void leaveLastMember() {
         when(gameService.findOneGame(any())).thenReturn(Observable.just(new Game("0:00", "0:30",
-                                                    "id", "name", "owner", 1, false,new GameSettings(2,10, null, false, 0))));
+                "id", "name", "owner", 1, false, new GameSettings(2, 10, null, false, 0))));
         when(gameService.deleteGame("id")).thenReturn(Observable.just(new Game("0:00", "0:30",
-                                                        "id", "name", "owner", 1, false,new GameSettings(2,10, null,false, 0))));
+                "id", "name", "owner", 1, false, new GameSettings(2, 10, null, false, 0))));
 
         write("\t\t\t\t\t\t");
         type(KeyCode.SPACE);
@@ -115,14 +116,15 @@ class GameLobbyControllerTest extends ApplicationTest {
 
     @Test
     void eventListenerTest() {
-        when(userService.findOne("8")).thenReturn(Observable.just(new User("2022-11-30T18:35:24.00Z","1:00","7","Bob","online",null,null)));
-        messageSubject.onNext(new Event<>(".created",new Message("2022-11-30T18:35:24.00Z","1","14","7","test")));
-        messageSubject.onNext(new Event<>(".created",new Message("2022-11-30T18:35:24.00Z","1","14","7","test 123")));
+        when(userService.findOne("8")).thenReturn(Observable.just(new User("2022-11-30T18:35:24.00Z", "1:00", "7", "Bob", "online", null, null)));
+        messageSubject.onNext(new Event<>(".created", new Message("2022-11-30T18:35:24.00Z", "1", "14", "7", "test")));
+        messageSubject.onNext(new Event<>(".created", new Message("2022-11-30T18:35:24.00Z", "1", "14", "7", "test 123")));
 
         waitForFxEvents();
 
-        memberSubject.onNext(new Event<>(".created",new Member("02022-11-30T19:35:24.00Z","7","01","8",false,null,false)));
-        memberSubject.onNext(new Event<>(".updated",new Member("2022-11-30T19:35:24.00Z","7","01","8",true,"#ff0000",false)));
+        memberSubject.onNext(new Event<>(".created", new Member("02022-11-30T19:35:24.00Z", "7", "01", "8", false, null, false)));
+        memberSubject.onNext(new Event<>(".updated", new Member("2022-11-30T19:35:24.00Z", "7", "01", "8", true, "#ff0000", false)));
+        memberSubject.onNext(new Event<>(".deleted", new Member("2022-11-30T19:35:24.00Z", "7", "01", "8", true, "#ff0000", false)));
         waitForFxEvents();
     }
 
