@@ -13,10 +13,6 @@ import kong.unirest.json.JSONObject;
 import javax.inject.Inject;
 import java.util.List;
 
-import static de.uniks.pioneers.Constants.JSON_NAME;
-import static de.uniks.pioneers.Constants.JSON_TOKEN;
-
-@SuppressWarnings("ClassCanBeRecord")
 public class GameService {
 
     private final GamesApiService gamesApiService;
