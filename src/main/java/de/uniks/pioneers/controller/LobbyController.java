@@ -175,6 +175,12 @@ public class LobbyController implements Controller {
 
     @Override
     public void init() {
+        //refreshed Token and runs for an hour
+        if (this.gameStorage.getId() == null) {
+            //call this method every 30 minutes to refresh refreshToken and ActiveToken
+            lb.beepForAnHour(refreshTokenStorage, authService, scheduler);
+        }
+
         //set game id to enable rejoin if it was saved in the config file before
         JSONObject loadConfig = ResourceManager.loadConfig();
         if (loadConfig.has(JSON_GAME_ID)) {
@@ -199,13 +205,6 @@ public class LobbyController implements Controller {
                 .listen("global." + LOBBY_ID + ".messages.*.*", Message.class)
                 .observeOn(FX_SCHEDULER)
                 .subscribe(this::handleAllTabMessages));
-
-        //refreshed Token and runs for an hour
-        //TODO id is almost never null with rejoin
-        if (this.gameStorage.getId() == null) {
-            //call this method every 30 minutes to refresh refreshToken and ActiveToken
-            lb.beepForAnHour(refreshTokenStorage, authService, scheduler);
-        }
 
         this.app.getStage().setOnCloseRequest(e -> {
             actionOnclose();
