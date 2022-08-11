@@ -90,7 +90,9 @@ public class GameLobbyController implements Controller {
     private Game game;
     private boolean started = false;
 
-    private final GameLobbyInformation gameLobbyInformation = new GameLobbyInformation();@Inject
+    private final GameLobbyInformation gameLobbyInformation = new GameLobbyInformation();
+
+    @Inject
     public GameLobbyController(App app,
                                MemberService memberService,
                                UserService userService,
@@ -213,7 +215,7 @@ public class GameLobbyController implements Controller {
             return null;
         }
 
-        //gameLobbyInformation.getMapInformation(gameService,gameStorage,game,settingsLabel,idTitleLabel);gameService
+        gameService
                 .findOneGame(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
