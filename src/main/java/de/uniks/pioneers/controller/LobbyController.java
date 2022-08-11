@@ -596,7 +596,7 @@ public class LobbyController implements Controller {
 
     //reactivate for the possibility of joining the game
     public void onRejoin() {
-        lb.onJoin(members, app, gameLobbyController, idStorage, gameStorage, gameScreenController, pioneersService);
+        lb.onJoin(members, app, idStorage, gameStorage, gameScreenController, pioneersService);
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {

@@ -30,7 +30,8 @@ import java.util.concurrent.ScheduledFuture;
 import static de.uniks.pioneers.Constants.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-@SuppressWarnings("ALL")
+
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class LobbyTabsAndMessage {
 
     public LobbyTabsAndMessage() {
@@ -208,7 +209,7 @@ public class LobbyTabsAndMessage {
                         }));
     }
 
-    public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController, IDStorage idStorage,
+    public void onJoin(ObservableList<Member> members, App app, IDStorage idStorage,
                        GameStorage gameStorage, Provider<GameScreenController> gameScreenController, PioneersService pioneersService) {
         boolean changeToPlayer = false;
         for (Member m : members) {
