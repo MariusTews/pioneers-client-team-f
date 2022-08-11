@@ -19,7 +19,7 @@ public class AchievementsService {
 
     private final AchievementsApiService achievementsApiService;
 
-    IDStorage idStorage;
+    final IDStorage idStorage;
 
     private final HashMap<String, Integer> achievementsProgress = new HashMap<>();
 

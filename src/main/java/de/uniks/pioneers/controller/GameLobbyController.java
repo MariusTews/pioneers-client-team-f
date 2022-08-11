@@ -82,7 +82,6 @@ public class GameLobbyController implements Controller {
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
     private final UserStorage userStorage;
-
     private Game game;
     private boolean started = false;
 
@@ -149,7 +148,6 @@ public class GameLobbyController implements Controller {
                                     .subscribe(this.playerList::add);
 
                         }
-
                     } else if (event.event().endsWith(DELETED)) {
                         this.deleteMember(member);
                     } else if (event.event().endsWith(UPDATED)) {
@@ -287,17 +285,20 @@ public class GameLobbyController implements Controller {
         if (member.userId().equals(idStorage.getID())) {
             app.show(lobbyController.get());
         }
-        this.idUserList.getChildren().clear();
-        this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members)).toList());
-        this.spectatorViewId.getChildren().clear();
-        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList());
+        clearAll();
 
         //make sure if members are less than max number, checkbox is visible
         if (members.size() < MAX_MEMBERS) {
             checkBoxId.disableProperty().set(false);
         }
+    }
 
+    private void clearAll() {
+        this.idUserList.getChildren().clear();
+        this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
+                playersNumberId, members)).toList());
+        this.spectatorViewId.getChildren().clear();
+        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList());
     }
 
     private void updateMember(Member member) {
@@ -347,11 +348,7 @@ public class GameLobbyController implements Controller {
         //deactivate checkbox if maximum member has been reached
         checkBoxId.disableProperty().set(members.size() == MAX_MEMBERS);
 
-        this.idUserList.getChildren().clear();
-        this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members)).toList());
-        this.spectatorViewId.getChildren().clear();
-        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList());
+        clearAll();
     }
 
     //This makes sure the user is offline
