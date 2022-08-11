@@ -79,9 +79,7 @@ public class LobbyController implements Controller {
 
 	private final App app;
 	private final IDStorage idStorage;
-
 	private final GameStorage gameStorage;
-
 	private final UserService userService;
 	private final GameService gameService;
 	private final GroupService groupService;
@@ -93,22 +91,16 @@ public class LobbyController implements Controller {
 	private final Provider<LoginController> loginController;
 	private final Provider<RulesScreenController> rulesScreenController;
 	private final Provider<CreateGameController> createGameController;
-
 	private final Provider<GameLobbyController> gameLobbyController;
 	private final Provider<EditUserController> editUserController;
 	private final Provider<GameScreenController> gameScreenController;
 	public Button achievementsButton;
-
 	private final Provider<AchievementsScreenController> achievementsScreenController;
-
 	private final CompositeDisposable disposable = new CompositeDisposable();
 	private Disposable tabDisposable;
 	private DirectChatStorage currentDirectStorage;
-
 	private final LobbyTabsAndMessage lb;
-
-	private final ScheduledExecutorService scheduler =
-			Executors.newScheduledThreadPool(1);
+	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 	private final Thread renderAvatarsThread = new Thread(() -> {
 		List<UserListSubController> userSubConsCopy = new ArrayList<>(userSubCons.values());
@@ -290,7 +282,6 @@ public class LobbyController implements Controller {
 	public void createGameButtonPressed() {
 		//makes sure if user in game or not , and depending on that allows user to create the game
 		lb.createGame(createGameController);
-
 	}
 
 	public void enterKeyPressed(KeyEvent event) {
@@ -528,7 +519,6 @@ public class LobbyController implements Controller {
 
 		renderAvatarsThread.start();
 
-		//get all messages from the user that are in lobby
 		messageService
 				.getAllMessages(GLOBAL, LOBBY_ID)
 				.observeOn(FX_SCHEDULER)
@@ -550,7 +540,6 @@ public class LobbyController implements Controller {
 	private void loadGroups(List<Group> groups) {
 		this.groups.addAll(groups);
 	}
-
 
 	private void loadMessages(String groupId, Tab tab) {
 		lb.loadMessages(allTab, tab, groupId, lobby_messages, deletedAllMessages, deletedMessages, messages, memberHash);
@@ -582,9 +571,7 @@ public class LobbyController implements Controller {
 	}
 
 	//reactivate for the possibility of joining the game
-	public void onRejoin() {
-		lb.onJoin(members, gameScreenController, userStorage);
-	}
+	public void onRejoin() { lb.onJoin(members, gameScreenController, userStorage); }
 
 	private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
 		//clear scroll pane
@@ -635,14 +622,9 @@ public class LobbyController implements Controller {
 			}
 			userService.userUpdate(idStorage.getID(), null, null, updatedFriends, null, null).blockingFirst();
 		}
-
 	}
 
-	public boolean isNotAFriend(User user) {
-		return !friendsUserList.contains(user);
-	}
+	public boolean isNotAFriend(User user) { return !friendsUserList.contains(user); }
 
-	public void OnAchievementsPressed() {
-		this.app.show(achievementsScreenController.get());
-	}
+	public void OnAchievementsPressed() { this.app.show(achievementsScreenController.get()); }
 }
