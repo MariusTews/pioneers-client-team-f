@@ -6,6 +6,7 @@ import de.uniks.pioneers.computation.LobbyTabsAndMessage;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.util.ResourceManager;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -22,6 +23,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import kong.unirest.json.JSONObject;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -95,6 +97,7 @@ public class LobbyController implements Controller {
     private final MemberService memberService;
     private final EventListener eventListener;
     private final AlertService alertService;
+    private final UserStorage userStorage;
     private final Provider<LoginController> loginController;
     private final Provider<RulesScreenController> rulesScreenController;
     private final Provider<CreateGameController> createGameController;
@@ -137,6 +140,7 @@ public class LobbyController implements Controller {
                            MemberService memberService,
                            EventListener eventListener,
                            AlertService alertService,
+                           UserStorage userStorage,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
@@ -158,6 +162,7 @@ public class LobbyController implements Controller {
         this.memberService = memberService;
         this.eventListener = eventListener;
         this.alertService = alertService;
+        this.userStorage = userStorage;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
         this.createGameController = createGameController;
@@ -172,6 +177,18 @@ public class LobbyController implements Controller {
 
     @Override
     public void init() {
+        //refreshed Token and runs for an hour
+        if (this.gameStorage.getId() == null) {
+            //call this method every 30 minutes to refresh refreshToken and ActiveToken
+            lb.beepForAnHour(refreshTokenStorage, authService, scheduler);
+        }
+
+        //set game id to enable rejoin if it was saved in the config file before
+        JSONObject loadConfig = ResourceManager.loadConfig();
+        if (loadConfig.has(JSON_GAME_ID)) {
+            gameStorage.setId((String) loadConfig.get(JSON_GAME_ID));
+        }
+
         if (this.gameStorage.getId() != null) {
             memberService.getAllGameMembers(this.gameStorage.getId())
                     .observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
@@ -226,7 +243,6 @@ public class LobbyController implements Controller {
             return null;
         }
         // create instance of LobbyTabs andMessage
-        //lb = new LobbyTabsAndMessage();
         lb.rejoinButton(rejoinButton);
 
         this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
@@ -350,7 +366,6 @@ public class LobbyController implements Controller {
         } else if (userEvent.event().endsWith(UPDATED)) {
             for (DirectChatStorage directChatStorage : directChatStorages) {
                 if (directChatStorage.getUser()._id().equals(user._id())) {
-
                     directChatStorage.setUser(user);
                 }
             }
@@ -362,7 +377,10 @@ public class LobbyController implements Controller {
                     break;
                 }
             }
-            userSubCons.get(user._id()).setAvatar();
+
+            if (userSubCons.containsKey(user._id())) {
+                userSubCons.get(user._id()).setAvatar();
+            }
 
             //check for new/removed friends
             if (user._id().equals(idStorage.getID())) {
@@ -602,7 +620,7 @@ public class LobbyController implements Controller {
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
-        //clear scrollpane
+        //clear scroll pane
         ((VBox) this.userScrollPane.getContent()).getChildren().clear();
 
         //add header for friends

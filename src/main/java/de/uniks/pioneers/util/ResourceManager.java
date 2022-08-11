@@ -12,13 +12,14 @@ public class ResourceManager {
         if (!Files.exists(configFilePath)) {
             try {
                 Files.createFile(configFilePath);
-                Files.writeString(configFilePath, JsonUtil.createDefaultConfig() );
+                Files.writeString(configFilePath, JsonUtil.createDefaultConfig());
             } catch (Exception e) {
                 System.err.println("config file does not exist");
                 e.printStackTrace();
             }
         }
     }
+
     public static JSONObject loadConfig() {
         try {
             return JsonUtil.parse(Files.readString(configFilePath)).getObject();
