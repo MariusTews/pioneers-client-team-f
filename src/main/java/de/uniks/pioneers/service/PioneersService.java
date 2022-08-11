@@ -14,7 +14,6 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
-@SuppressWarnings("ClassCanBeRecord")
 public class PioneersService {
 
     private final PioneersApiService pioneersApiService;
