@@ -57,6 +57,17 @@ public class CalculateMap {
 		return circle;
 	}
 
+	public Circle buildColorCircle(double xCoordinate, double yCoordinate, int x, int y, int z, int side) {
+		//creates a Circle at the given coordinate
+		Circle colorCircle = new Circle(15);
+		String colorId = createId(x, y, z) + "_" + side + "#color";
+		colorCircle.setId(colorId);
+		colorCircle.setFill(Color.TRANSPARENT);
+		colorCircle.setLayoutX(xCoordinate);
+		colorCircle.setLayoutY(yCoordinate);
+		return colorCircle;
+	}
+
 	public ImageView buildImage(double xCoordinate, double yCoordinate, int x, int y, int z, boolean Harbour) {
 		//creates an ImageView at the given coordinate
 		ImageView imageView = new ImageView();
@@ -153,6 +164,7 @@ public class CalculateMap {
 			case 1, 2, 10 -> {
 				// for the building
 				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+				pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
 
 				//for the road
 				pane.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate + 45, x, y, z, 7));
@@ -175,6 +187,7 @@ public class CalculateMap {
 			case 4, 5, 8 -> {
 				// for the building
 				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+				pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
 
 				//for the road
 				pane.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate - 45, x, y, z, 11));
@@ -193,6 +206,7 @@ public class CalculateMap {
 			case 6 -> {
 				// for the building
 				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 6));
+				pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 6));
 
 				//for the harbour
 				pane.getChildren().add(buildRoad(xCoordinate, yCoordinate - 30, x, y, z, 0.0, true));
@@ -201,6 +215,7 @@ public class CalculateMap {
 			case 7 -> {
 				// for the building
 				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+				pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
 
 				//for the road
 				pane.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
@@ -223,6 +238,7 @@ public class CalculateMap {
 			case 11 -> {
 				// for the building
 				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+				pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
 
 				//for the road
 				pane.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
@@ -237,6 +253,7 @@ public class CalculateMap {
 			case 12 -> {
 				// for the building
 				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+				pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
 
 				//for the harbour
 				pane.getChildren().add(buildRoad(xCoordinate, yCoordinate + 30, x, y, z, 180.0, true));
@@ -347,7 +364,9 @@ public class CalculateMap {
 		if (!isTemplate) {
 			// for the buildings
 			map.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+			map.getChildren().add(buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
 			map.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+			map.getChildren().add(buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
 
 			//for the roads
 			map.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));

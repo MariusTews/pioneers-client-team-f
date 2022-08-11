@@ -18,6 +18,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -28,11 +29,13 @@ import static de.uniks.pioneers.Constants.*;
 public class CircleSubController implements Controller {
 
     private final Circle view;
+    private Circle color;
     private final Polygon road;
     private final PioneersService pioneersService;
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
     private final List<Node> buildingCircles;
+    private final Collection<Node> colorCircles;
     private final GameFieldSubController gameFieldSubController;
     private final AchievementsService achievementsService;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -47,7 +50,7 @@ public class CircleSubController implements Controller {
     @Inject
     public CircleSubController(Circle view, Polygon road, PioneersService pioneersService,
                                GameStorage gameStorage, IDStorage idStorage,
-                               List<Node> buildingCircles, GameFieldSubController gameFieldSubController,
+                               List<Node> buildingCircles, Collection<Node> colorCircles, GameFieldSubController gameFieldSubController,
                                AchievementsService achievementsService) {
         this.view = view;
         this.road = road;
@@ -55,6 +58,7 @@ public class CircleSubController implements Controller {
         this.gameStorage = gameStorage;
         this.idStorage = idStorage;
         this.buildingCircles = buildingCircles;
+        this.colorCircles = colorCircles;
         this.gameFieldSubController = gameFieldSubController;
         this.achievementsService = achievementsService;
     }
@@ -174,6 +178,7 @@ public class CircleSubController implements Controller {
             this.view.setFill(Color.TRANSPARENT);
             this.view.setStroke(Color.TRANSPARENT);
             this.view.setOnMouseClicked(null);
+            colorCircles.forEach(Node::toFront);
             buildingCircles.forEach(Node::toFront);
         }
     }
@@ -181,13 +186,16 @@ public class CircleSubController implements Controller {
     public void setSettlement(int x, int y, int z, int side, String color) {
         if (this.x == x && this.y == y && this.z == z && this.side == side) {
             // Set style and image on the coordinates
-            this.view.setRadius(20);
+            //this.color.setRadius(this.color.getRadius());
+            this.color.setFill(Color.web(color));
+            this.color.toFront();
+            this.view.setRadius(22.4);
             this.view.toFront();
             this.view.setStroke(Color.TRANSPARENT);
             // check if the given color from the server is available in the application
             for (Color colorAvailable : COLORARRAY) {
                 if (colorAvailable.equals(Color.web(color))) {
-                    Image settlement = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/settlement_" + color + ".png")).toExternalForm());
+                    Image settlement = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/settlement_transparent.png")).toExternalForm());
                     ImagePattern settlementPattern = new ImagePattern(settlement);
                     this.view.setFill(settlementPattern);
                     return;
@@ -266,5 +274,9 @@ public class CircleSubController implements Controller {
 
     public void setNextMove(ExpectedMove expectedMove) {
         this.nextMove = expectedMove;
+    }
+
+    public void setColor(Circle color) {
+        this.color = color;
     }
 }
