@@ -19,6 +19,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import kong.unirest.json.JSONObject;
 
 import javax.inject.Provider;
 import java.util.HashMap;
@@ -208,13 +209,20 @@ public class LobbyTabsAndMessage {
                         }));
     }
 
-    public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController, IDStorage idStorage,
-                       GameStorage gameStorage, Provider<GameScreenController> gameScreenController, PioneersService pioneersService) {
+    public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController,
+                       IDStorage idStorage, GameStorage gameStorage, Provider<GameScreenController> gameScreenController,
+                       PioneersService pioneersService, GameService gameService) {
+        //set game options (if app was closed before, they are now longer saved)
+        Game game = gameService.findOneGame(gameStorage.getId()).blockingFirst();
+        gameStorage.setGameOptions(game.settings());
+
         boolean changeToPlayer = false;
         for (Member m : members) {
             if (m.gameId().equals(gameStorage.getId()) && m.userId().equals(idStorage.getID())
                     && m.spectator()) {
-                app.show(gameScreenController.get());
+                GameScreenController controller = gameScreenController.get();
+                controller.setRejoin(true);
+                app.show(controller);
                 changeToPlayer = true;
                 break;
             }
@@ -223,7 +231,9 @@ public class LobbyTabsAndMessage {
             pioneersService.updatePlayer(gameStorage.getId(), idStorage.getID(), true)
                     .observeOn(FX_SCHEDULER)
                     .subscribe();
-            app.show(gameScreenController.get());
+            GameScreenController controller = gameScreenController.get();
+            controller.setRejoin(true);
+            app.show(controller);
         }
     }
 
@@ -258,25 +268,37 @@ public class LobbyTabsAndMessage {
     }
 
     public void rejoinButton(GameStorage gameStorage, MemberService memberService, Button rejoinButton, IDStorage idStorage) {
+        //set game id to enable rejoin if it was saved in the config file before
+        JSONObject loadConfig = ResourceManager.loadConfig();
+        if (loadConfig.has(JSON_GAME_ID)) {
+            gameStorage.setId((String) loadConfig.get(JSON_GAME_ID));
+        }
+
         //make the rejoin button visible
         //based upon if a user is in game or not
         if (gameStorage.getId() != null) {
             memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
-                        boolean trace = true;
-                        for (Member member : result) {
-                            if (member.userId().equals(idStorage.getID())) {
-                                rejoinButton.disableProperty().set(false);
-                                trace = false;
-                                break;
+                                boolean trace = true;
+                                for (Member member : result) {
+                                    if (member.userId().equals(idStorage.getID())) {
+                                        rejoinButton.disableProperty().set(false);
+                                        trace = false;
+                                        break;
+                                    }
+                                }
+                                if (trace) {
+                                    rejoinButton.disableProperty().set(true);
+                                    gameStorage.setId(null);
+                                    ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
+                                }
+                            }, error -> {
                             }
-                        }
-                        if (trace) {
-                            rejoinButton.disableProperty().set(true);
-                        }
-                    });
+                    );
         } else {
             rejoinButton.disableProperty().set(true);
+            gameStorage.setId(null);
+            ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
         }
     }
 

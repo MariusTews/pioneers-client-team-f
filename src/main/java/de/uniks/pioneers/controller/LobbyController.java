@@ -22,7 +22,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import kong.unirest.json.JSONObject;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -112,7 +111,7 @@ public class LobbyController implements Controller {
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
-    private LobbyTabsAndMessage lb = new LobbyTabsAndMessage();
+    private final LobbyTabsAndMessage lb = new LobbyTabsAndMessage();
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
@@ -224,41 +223,7 @@ public class LobbyController implements Controller {
             e.printStackTrace();
             return null;
         }
-
-        //set game id to enable rejoin if it was saved in the config file before
-        JSONObject loadConfig = ResourceManager.loadConfig();
-        if (loadConfig.has(JSON_GAME_ID)) {
-            this.gameStorage.setId((String) loadConfig.get(JSON_GAME_ID));
-        }
-
-        //make the rejoin button visible
-        //based upon if a user is in game or not
-        if (this.gameStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                                boolean trace = true;
-                                for (Member member : result) {
-                                    if (member.userId().equals(this.idStorage.getID())) {
-                                        rejoinButton.disableProperty().set(false);
-                                        trace = false;
-                                        break;
-                                    }
-                                }
-                                if (trace) {
-                                    rejoinButton.disableProperty().set(true);
-                                    this.gameStorage.setId(null);
-                                    ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
-                                }
-                            }, error -> {
-                            }
-                    );
-        } else {
-            rejoinButton.disableProperty().set(true);
-            this.gameStorage.setId(null);
-            ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
-        }
         // create instance of LobbyTabs andMessage
-        //lb = new LobbyTabsAndMessage();
         lb.rejoinButton(gameStorage, memberService, rejoinButton, idStorage);
 
         this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
@@ -630,30 +595,7 @@ public class LobbyController implements Controller {
 
     //reactivate for the possibility of joining the game
     public void onRejoin() {
-        //set game options (if app was closed before, they are now longer saved)
-        Game game = this.gameService.findOneGame(this.gameStorage.getId()).blockingFirst();
-        this.gameStorage.setGameOptions(game.settings());
-
-        boolean changeToPlayer = false;
-        for (Member m : this.members) {
-            if (m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())
-                    && m.spectator()) {
-                GameScreenController controller = gameScreenController.get();
-                controller.setRejoin(true);
-                this.app.show(controller);
-                changeToPlayer = true;
-                break;
-            }
-        }
-        if (!changeToPlayer) {
-            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe();
-            GameScreenController controller = gameScreenController.get();
-            controller.setRejoin(true);
-            this.app.show(controller);
-        }
-        lb.onJoin(members, app, gameLobbyController, idStorage, gameStorage, gameScreenController, pioneersService);
+        lb.onJoin(members, app, gameLobbyController, idStorage, gameStorage, gameScreenController, pioneersService, gameService);
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
