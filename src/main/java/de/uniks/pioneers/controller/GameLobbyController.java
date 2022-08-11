@@ -334,14 +334,13 @@ public class GameLobbyController implements Controller {
             }
         }
         this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
-                + spectatorMember.size());// || members.size() == 0);
+                + spectatorMember.size());
 
         //checks if combobox has been clicked,if not
         //then automatically picks color for the user.
         if (colorPicker.getSelectionModel().isEmpty()) {
             if (readyMembers == members.size() + spectatorMember.size()) {
                 gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
-                //giveYourselfColor();
             }
         }
 
