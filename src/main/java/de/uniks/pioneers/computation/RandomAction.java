@@ -13,7 +13,7 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
-@SuppressWarnings({"ResultOfMethodCallIgnored", "ClassCanBeRecord"})
+@SuppressWarnings({"ResultOfMethodCallIgnored"})
 public class RandomAction {
 
     private final GameStorage gameStorage;
