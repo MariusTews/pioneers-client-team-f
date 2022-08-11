@@ -528,8 +528,6 @@ public class GameScreenController implements Controller {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                         , gameStorage, idStorage, userService, achievementsService, gameService, app, lobbyController);
                 winnerController.render();
-                this.gameStorage.setId("");
-                ResourceManager.saveConfig(JsonUtil.updateConfigWithGameId(""));
             }
         }
     }

@@ -168,11 +168,10 @@ public class GameLobbyController implements Controller {
                 .subscribe(event -> {
                     if (event.event().endsWith("state" + CREATED)) {
                         this.userStorage.setUserList(playerList);
-                        // Flag needed, otherwise the gameScreenController is initialized twice
+                        // flag needed, otherwise the gameScreenController is initialized twice
                         if (!started) {
                             started = true;
                             gameLobbyInformation.changeView(gameScreenController, idStartGameButton, app);
-                            //changeView();
                         }
                     }
                 }));

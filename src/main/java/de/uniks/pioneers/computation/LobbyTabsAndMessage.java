@@ -19,9 +19,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import kong.unirest.json.JSONObject;
 
 import javax.inject.Provider;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -211,10 +211,21 @@ public class LobbyTabsAndMessage {
 
     public void onJoin(ObservableList<Member> members, App app, Provider<GameLobbyController> gameLobbyController,
                        IDStorage idStorage, GameStorage gameStorage, Provider<GameScreenController> gameScreenController,
-                       PioneersService pioneersService, GameService gameService) {
+                       PioneersService pioneersService, GameService gameService, UserService userService, UserStorage userStorage) {
         //set game options (if app was closed before, they are now longer saved)
         Game game = gameService.findOneGame(gameStorage.getId()).blockingFirst();
         gameStorage.setGameOptions(game.settings());
+
+        List<User> allUsers = userService.findAllUsers().blockingFirst();
+        List<User> usersFromGame = new ArrayList<>();
+        for (User user : allUsers) {
+            for (Member member : members) {
+                if (user._id().equals(member.userId())) {
+                    usersFromGame.add(user);
+                }
+            }
+        }
+        userStorage.setUserList(usersFromGame);
 
         boolean changeToPlayer = false;
         for (Member m : members) {
@@ -268,12 +279,6 @@ public class LobbyTabsAndMessage {
     }
 
     public void rejoinButton(GameStorage gameStorage, MemberService memberService, Button rejoinButton, IDStorage idStorage) {
-        //set game id to enable rejoin if it was saved in the config file before
-        JSONObject loadConfig = ResourceManager.loadConfig();
-        if (loadConfig.has(JSON_GAME_ID)) {
-            gameStorage.setId((String) loadConfig.get(JSON_GAME_ID));
-        }
-
         //make the rejoin button visible
         //based upon if a user is in game or not
         if (gameStorage.getId() != null) {
