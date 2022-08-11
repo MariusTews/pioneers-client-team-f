@@ -1,9 +1,11 @@
 /******************* gamelobby and ingame chat ********************/
 
+/*noinspection ALL*/
 .scroll-bar.gameChat:horizontal, .scroll-bar.gameChat:vertical {
     -fx-background-color:dodgerblue;
 }
 
+/*noinspection ALL*/
 .scroll-pane.gameChat {
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-repeat: stretch;
@@ -11,10 +13,12 @@
     -fx-background-size: 410 220;
 }
 
+/*noinspection ALL*/
 .scroll-pane.gameChat > .text-area {
     -fx-border-radius: 20;
 }
 
+/*noinspection ALL*/
 .scroll-pane.gameChat > .viewport {
     -fx-background-color: transparent;
     -fx-background-radius: 30;

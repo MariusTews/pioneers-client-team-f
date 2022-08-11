@@ -2,26 +2,23 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.websocket.EventListener;
+import de.uniks.pioneers.computation.LobbyTabsAndMessage;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.util.JsonUtil;
-import de.uniks.pioneers.util.ResourceManager;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -30,21 +27,18 @@ import javafx.scene.layout.VBox;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 
 import static de.uniks.pioneers.Constants.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class LobbyController implements Controller {
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
+
+    private final ObservableList<User> friendsUserList = FXCollections.observableArrayList();
 
     private final ObservableList<Member> members = FXCollections.observableArrayList();
     private final ObservableList<Game> games = FXCollections.observableArrayList();
@@ -101,6 +95,7 @@ public class LobbyController implements Controller {
     private final AuthService authService;
     private final MemberService memberService;
     private final EventListener eventListener;
+    private final AlertService alertService;
     private final Provider<LoginController> loginController;
     private final Provider<RulesScreenController> rulesScreenController;
     private final Provider<CreateGameController> createGameController;
@@ -116,6 +111,8 @@ public class LobbyController implements Controller {
     private final CompositeDisposable disposable = new CompositeDisposable();
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
+
+    private LobbyTabsAndMessage lb = new LobbyTabsAndMessage();
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
@@ -140,6 +137,7 @@ public class LobbyController implements Controller {
                            AuthService authService,
                            MemberService memberService,
                            EventListener eventListener,
+                           AlertService alertService,
                            Provider<LoginController> loginController,
                            Provider<RulesScreenController> rulesScreenController,
                            Provider<CreateGameController> createGameController,
@@ -160,6 +158,7 @@ public class LobbyController implements Controller {
         this.authService = authService;
         this.memberService = memberService;
         this.eventListener = eventListener;
+        this.alertService = alertService;
         this.loginController = loginController;
         this.rulesScreenController = rulesScreenController;
         this.createGameController = createGameController;
@@ -193,7 +192,8 @@ public class LobbyController implements Controller {
 
         //refreshed Token and runs for an hour
         if (this.gameStorage.getId() == null) {
-            beepForAHour();
+            //call this method every 30 minutes to refresh refreshToken and ActiveToken
+            lb.beepForAnHour(refreshTokenStorage, authService, scheduler);
         }
 
         this.app.getStage().setOnCloseRequest(e -> {
@@ -213,19 +213,6 @@ public class LobbyController implements Controller {
         disposable.clear();
     }
 
-    //call this method every 30 minutes to refresh refreshToken and ActiveToken
-    public void beepForAHour() {
-        String refreshToken = this.refreshTokenStorage.getRefreshToken();
-        final Runnable beeper = () -> authService.refreshToken(refreshToken).
-                observeOn(FX_SCHEDULER).subscribe();
-
-        final ScheduledFuture<?> beeperHandle =
-                scheduler.scheduleAtFixedRate(beeper, 10, 30 * 60, SECONDS);
-        scheduler.schedule(() -> beeperHandle.cancel(true)
-                , 60 * 60, SECONDS);
-    }
-
-
     @Override
     public Parent render() {
         final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/LobbyScreen.fxml"));
@@ -237,29 +224,13 @@ public class LobbyController implements Controller {
             e.printStackTrace();
             return null;
         }
-
-        //make the rejoin button visible
-        //based upon if a user is in game or not
-        if (this.gameStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                        boolean trace = true;
-                        for (Member member : result) {
-                            if (member.userId().equals(this.idStorage.getID())) {
-                                rejoinButton.disableProperty().set(false);
-                                trace = false;
-                                break;
-                            }
-                        }
-                        if (trace) {
-                            rejoinButton.disableProperty().set(true);
-                        }
-                    });
-        } else {
-            rejoinButton.disableProperty().set(true);
-        }
+        // create instance of LobbyTabs andMessage
+        //lb = new LobbyTabsAndMessage();
+        lb.rejoinButton(gameStorage, memberService, rejoinButton, idStorage);
 
         this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
+        this.friendsUserList.addListener((ListChangeListener<? super User>) this::onUsersChanged);
+
 
         this.games.addListener((ListChangeListener<? super Game>) c -> ((VBox) this.gamesScrollPane.getContent())
                 .getChildren().setAll(c.getList().stream().sorted(gameComparator).map(this::renderGame).toList()));
@@ -271,8 +242,7 @@ public class LobbyController implements Controller {
         return parent;
     }
 
-    //takes action when the application is forcefully closed
-    //such as logging out
+    //takes action when the application is forcefully closed such as logging out
     private void actionOnclose() {
         userService.statusUpdate(idStorage.getID(), "offline")
                 .observeOn(FX_SCHEDULER)
@@ -314,22 +284,7 @@ public class LobbyController implements Controller {
     }
 
     public void logout() {
-        userService.statusUpdate(idStorage.getID(), "offline")
-                .observeOn(FX_SCHEDULER)
-                .subscribe(
-                        result -> authService.logout()
-                                .subscribeOn(FX_SCHEDULER)
-                                .subscribe(
-                                        onSuccess -> {
-                                            ResourceManager.saveConfig(JsonUtil.createDefaultConfig());
-                                            app.show(loginController.get());
-                                        },
-                                        onError -> {
-                                        }
-                                ),
-                        error -> {
-                        }
-                );
+        lb.logout(userService, idStorage, authService, loginController, app);
 
     }
 
@@ -343,33 +298,9 @@ public class LobbyController implements Controller {
     }
 
     public void createGameButtonPressed() {
-        //makes sure if user in game or not , and depending on that
-        //allows user to create the game
-        if (this.gameStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                        boolean trace = true;
-                        for (Member member : result) {
-                            if (member.userId().equals(this.idStorage.getID())) {
-                                Alert alert = new Alert(Alert.AlertType.ERROR, "You cannot create Game while being part of another Game");
-                                // Change style of error alert
-                                DialogPane dialogPane = alert.getDialogPane();
-                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                                alert.showAndWait();
-                                trace = false;
-                                break;
-                            }
-                        }
-                        if (trace) {
-                            final CreateGameController controller = createGameController.get();
-                            app.show(controller);
-                        }
-                    });
-        } else {
-            final CreateGameController controller = createGameController.get();
-            app.show(controller);
-        }
+        //makes sure if user in game or not , and depending on that allows user to create the game
+        lb.createGame(gameStorage, memberService, idStorage, createGameController, app);
+
     }
 
     public void enterKeyPressed(KeyEvent event) {
@@ -379,18 +310,7 @@ public class LobbyController implements Controller {
     }
 
     private void checkMessageField() {
-        if (!chatMessageField.getText().isEmpty()) {
-            if (currentDirectStorage != null) {
-                this.messageService.send(GROUPS, currentDirectStorage.getGroupId(), chatMessageField.getText())
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe(result -> this.chatMessageField.setText(""));
-            } else {
-                this.messageService.send(GLOBAL, LOBBY_ID, chatMessageField.getText())
-                        .observeOn(FX_SCHEDULER)
-                        .subscribe();
-                this.chatMessageField.clear();
-            }
-        }
+        lb.checkMessageField(chatMessageField, currentDirectStorage, messageService);
     }
 
     private Node renderUser(User user) {
@@ -425,6 +345,7 @@ public class LobbyController implements Controller {
         } else if (userEvent.event().endsWith(DELETED)) {
             removeUserSubCon(user);
             this.users.removeIf(u -> u._id().equals(user._id()));
+            this.friendsUserList.removeIf(u -> u._id().equals(user._id()));
         } else if (userEvent.event().endsWith(UPDATED)) {
             for (DirectChatStorage directChatStorage : directChatStorages) {
                 if (directChatStorage.getUser()._id().equals(user._id())) {
@@ -432,6 +353,7 @@ public class LobbyController implements Controller {
                     directChatStorage.setUser(user);
                 }
             }
+
             for (User updatedUser : this.users) {
                 if (updatedUser._id().equals(user._id())) {
                     removeUserSubCon(user);
@@ -440,6 +362,30 @@ public class LobbyController implements Controller {
                 }
             }
             userSubCons.get(user._id()).setAvatar();
+
+            //check for new/removed friends
+            if (user._id().equals(idStorage.getID())) {
+                //new friend
+                if (friendsUserList.size() < user.friends().size()) {
+                    for (Iterator<User> iterator = users.iterator(); iterator.hasNext(); ) {
+                        User newFriend = iterator.next();
+                        if (!friendsUserList.contains(newFriend) && user.friends().contains(newFriend._id())) {
+                            iterator.remove();
+                            friendsUserList.add(newFriend);
+                        }
+                    }
+                }
+                //removed friend
+                else if (friendsUserList.size() > user.friends().size()) {
+                    for (Iterator<User> iterator = friendsUserList.iterator(); iterator.hasNext(); ) {
+                        User removedFriend = iterator.next();
+                        if (!user.friends().contains(removedFriend._id())) {
+                            iterator.remove();
+                            users.add(removedFriend);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -554,14 +500,40 @@ public class LobbyController implements Controller {
     }
 
     private void loadUsers(List<User> users) {
+        List<String> friends = new ArrayList<>();
         for (User user : users) {
             memberHash.put(user._id(), user);
+            if (user._id().equals(idStorage.getID())) {
+                friends = user.friends();
+            }
+        }
+        this.friendsUserList.addListener((ListChangeListener<? super User>) this::onUsersChanged);
+
+        List<User> onlineFriends = new ArrayList<>();
+        List<User> offlineFriends = new ArrayList<>();
+        List<User> onlineUser = new ArrayList<>();
+        List<User> offlineUser = new ArrayList<>();
+        for (User user : users) {
+            if (friends != null && friends.contains(user._id())) {
+                if (user.status().equals("online")) {
+                    onlineFriends.add(user);
+                } else {
+                    offlineFriends.add(user);
+                }
+            } else {
+                if (user.status().equals("online")) {
+                    onlineUser.add(user);
+                } else {
+                    offlineUser.add(user);
+                }
+            }
         }
 
-        List<User> online = users.stream().filter(user -> user.status().equals("online")).toList();
-        List<User> offline = users.stream().filter(user -> user.status().equals("offline")).toList();
-        this.users.addAll(online);
-        this.users.addAll(offline);
+        this.friendsUserList.addAll(onlineFriends);
+        this.friendsUserList.addAll(offlineFriends);
+        this.users.addAll(onlineUser);
+        this.users.addAll(offlineUser);
+
 
         renderAvatarsThread.start();
 
@@ -593,39 +565,12 @@ public class LobbyController implements Controller {
 
 
     private void loadMessages(String groupId, Tab tab) {
-        if (tab.equals(allTab)) {
-            this.messageService.getAllMessages(GLOBAL, LOBBY_ID).observeOn(FX_SCHEDULER).subscribe(messages -> {
-                this.lobby_messages.clear();
-                this.lobby_messages.addAll(messages);
-                ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
-
-                for (Message message : this.lobby_messages) {
-                    if (!this.deletedAllMessages.contains(message._id())) {
-                        renderSingleMessage(null, allTab, message);
-                    }
-                }
-            });
-        } else {
-            this.messageService.getAllMessages(GROUPS, groupId).observeOn(FX_SCHEDULER).subscribe(messages -> {
-                this.messages.clear();
-                this.messages.addAll(messages);
-                ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().clear();
-
-                for (Message message : this.messages) {
-                    if (!this.deletedMessages.contains(message._id())) {
-                        renderSingleMessage(groupId, tab, message);
-                    }
-                }
-            });
-        }
+        lb.loadMessages(allTab, tab, groupId, messageService, lobby_messages,
+                deletedAllMessages, deletedMessages, messages, memberHash, idStorage);
     }
 
     private void addToDirectChatStorage(String groupId, User user, Tab tab) {
-        DirectChatStorage directChatStorage = new DirectChatStorage();
-        directChatStorage.setGroupId(groupId);
-        directChatStorage.setUser(user);
-        directChatStorage.setTab(tab);
-        this.directChatStorages.add(directChatStorage);
+        this.directChatStorages.add(lb.addToDirectChatStorage(groupId, user, tab));
     }
 
     private void handleAllTabMessages(Event<Message> event) {
@@ -641,133 +586,74 @@ public class LobbyController implements Controller {
     }
 
     private void renderSingleMessage(String groupID, Tab tab, Message message) {
-
-        HBox box = new HBox(3);
-        Label label = new Label();
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(20);
-        imageView.setFitHeight(20);
-        if (this.memberHash.get(message.sender()).avatar() != null) {
-            imageView.setImage(new Image(this.memberHash.get(message.sender()).avatar()));
-        }
-        box.getChildren().add(imageView);
-        label.setMinWidth(100);
-        initRightClick(label, message._id(), message.sender(), groupID);
-        label.setText(memberHash.get(message.sender()).name() + ": " + message.body());
-        box.getChildren().add(label);
-
-        ((VBox) ((ScrollPane) tab.getContent()).getContent()).getChildren().add(box);
-
-        ((ScrollPane) tab.getContent()).vvalueProperty().bind(((VBox) ((ScrollPane) tab.getContent()).getContent()).heightProperty());
+        lb.renderSingleMessage(groupID, tab, message, memberHash, idStorage, messageService);
     }
 
     public void joinGame(Game game) {
         //allows to join a game, if the user does not belong to another game
         //otherwise user cannot join the game
-        if (this.gameStorage.getId() != null) {
-            memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
-                    .subscribe(result -> {
-                        boolean trace = true;
-                        for (Member member : result) {
-                            if (member.userId().equals(this.idStorage.getID())) {
-                                Alert alert = new Alert(Alert.AlertType.ERROR, "You can't join a game while \nbeing part of another game");
-                                // Change style of error alert
-                                DialogPane dialogPane = alert.getDialogPane();
-                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                                alert.showAndWait();
-                                trace = false;
-                                break;
-                            }
-                        }
-                        if (trace) {
-                            joinMessage(game);
-                        }
-                    });
-        } else {
-            joinMessage(game);
-        }
-    }
-
-    private void joinMessage(Game game) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Enter the password");
-        dialog.setHeaderText("password");
-        // Change style of password input dialog
-        DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-        dialog.showAndWait()
-                .ifPresent(password -> this.memberService.join(game._id(), password)
-                        .observeOn(FX_SCHEDULER)
-                        .doOnError(error -> {
-                            if ("HTTP 403 ".equals(error.getMessage())) {
-                                Alert alert = new Alert(Alert.AlertType.ERROR, "wrong password");
-                                // Change style of error alert
-                                DialogPane errorPane = alert.getDialogPane();
-                                errorPane.getStylesheets().add(Objects.requireNonNull(Main.class.
-                                        getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                                alert.showAndWait();
-                            }
-                        })
-                        .subscribe(result -> app.show(gameLobbyController.get()), onError -> {
-                        }));
-    }
-
-    private void initRightClick(Label label, String messageId, String sender, String groupId) {
-        final ContextMenu contextMenu = new ContextMenu();
-        final MenuItem menuItem = new MenuItem("delete");
-
-        contextMenu.getItems().add(menuItem);
-        label.setOnMouseEntered(event -> label.setStyle("-fx-background-color: LIGHTGREY"));
-        label.setOnMouseExited(event -> label.setStyle("-fx-background-color: TRANSPARENT"));
-        label.setContextMenu(contextMenu);
-
-        menuItem.setOnAction(event -> {
-            if (sender.equals(this.idStorage.getID())) {
-                if (groupId != null) {
-                    messageService
-                            .delete(GROUPS, groupId, messageId)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe();
-                } else {
-                    messageService
-                            .delete(GLOBAL, LOBBY_ID, messageId)
-                            .observeOn(FX_SCHEDULER)
-                            .subscribe();
-                }
-            } else {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Deleting other members messages is not possible.");
-                // set style of warning
-                DialogPane dialogPane = alert.getDialogPane();
-                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                alert.showAndWait();
-            }
-        });
+        lb.joinGame(gameStorage, memberService, idStorage, game, gameLobbyController, app);
     }
 
     //reactivate for the possibility of joining the game
     public void onRejoin() {
-        boolean changeToPlayer = false;
-        for (Member m : this.members) {
-            if (m.gameId().equals(this.gameStorage.getId()) && m.userId().equals(this.idStorage.getID())
-                    && m.spectator()) {
-                this.app.show(gameScreenController.get());
-                changeToPlayer = true;
-                break;
-            }
-        }
-        if (!changeToPlayer) {
-            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe();
-            this.app.show(gameScreenController.get());
-        }
+        lb.onJoin(members, app, gameLobbyController, idStorage, gameStorage, gameScreenController, pioneersService);
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
-        ((VBox) this.userScrollPane.getContent()).getChildren().setAll(c.getList().stream().sorted(userComparator).map(this::renderUser).toList());
+        //clear scrollpane
+        ((VBox) this.userScrollPane.getContent()).getChildren().clear();
+
+        //add header for friends
+        this.createHeader("Friends:");
+
+        //add friends
+        ((VBox) this.userScrollPane.getContent()).getChildren().addAll(friendsUserList.stream().sorted(userComparator).map(this::renderUser).toList());
+
+        //add header for rest of Users
+        this.createHeader("All Users:");
+
+        //add rest of users
+        ((VBox) this.userScrollPane.getContent()).getChildren().addAll(users.stream().sorted(userComparator).map(this::renderUser).toList());
+    }
+
+    private void createHeader(String headerText) {
+        Label header = new Label(headerText);
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        header.setStyle("-fx-font-size: 20");
+        hBox.getChildren().add(header);
+        ((VBox) this.userScrollPane.getContent()).getChildren().add(hBox);
+    }
+
+    public void showFriendsMenu(User user) {
+        boolean addFriend = alertService.showFriendsMenu("Do you want to add " + user.name() + " as a friend?");
+        if (addFriend) {
+            List<String> updatedFriends = new ArrayList<>();
+            for (User oldFriends : friendsUserList) {
+                updatedFriends.add(oldFriends._id());
+            }
+            updatedFriends.add(user._id());
+            userService.userUpdate(idStorage.getID(), null, null, updatedFriends, null, null).blockingFirst();
+        }
+    }
+
+    public void showRemoveFriendMenu(User user) {
+        boolean removeFriend = alertService.showFriendsMenu("Do you want to remove " + user.name() + " as a friend?");
+        if (removeFriend) {
+            List<String> updatedFriends = new ArrayList<>();
+            for (User oldFriends : friendsUserList) {
+                if (!Objects.equals(oldFriends._id(), user._id())) {
+                    updatedFriends.add(oldFriends._id());
+                }
+            }
+            userService.userUpdate(idStorage.getID(), null, null, updatedFriends, null, null).blockingFirst();
+        }
+
+    }
+
+    public boolean isNotAFriend(User user) {
+        return !friendsUserList.contains(user);
     }
 
     public void OnAchievementsPressed(ActionEvent actionEvent) {
