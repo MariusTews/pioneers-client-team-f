@@ -106,10 +106,6 @@ public class GameScreenController implements Controller {
     public ImageView imageChatFoldInId;
     @FXML
     public ImageView imageChatNotification;
-
-
-
-
     private final App app;
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
