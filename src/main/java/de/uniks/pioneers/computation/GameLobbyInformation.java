@@ -183,11 +183,12 @@ public class GameLobbyInformation {
         timeline.playFromStart();
     }
 
-    public Node renderMember(Member member, ObservableList<User> playerList, Label playersNumberId, ObservableList<Member> members, MemberListSubController memberListSubcontroller) {
+    public Node renderMember(Member member, ObservableList<User> playerList, Label playersNumberId, ObservableList<Member> members) {
         //sets the size of player
         //This flag will make sure,
         //Null Pointer exception will not be thrown
         //,if there are more Players
+        MemberListSubcontroller memberListSubcontroller = null;
         boolean ch = false;
         playersNumberId.setText("Players " + members.size() + "/6");
         for (User user : playerList) {
@@ -204,9 +205,9 @@ public class GameLobbyInformation {
 
     }
 
-    public Node renderSpectatorMember(Member member, ObservableList<User> playerList,
-                                      MemberListSubController memberListSpectatorSubController) {
+    public Node renderSpectatorMember(Member member, ObservableList<User> playerList) {
         boolean ch = false;
+        MemberListSubcontroller memberListSpectatorSubController = null;
         for (User user : playerList) {
             if (user._id().equals(member.userId()) && member.spectator()) {
                 ch = true;

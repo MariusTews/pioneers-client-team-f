@@ -2,12 +2,12 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.*;
+import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.service.HexFillService;
 import de.uniks.pioneers.service.PioneersService;
 import de.uniks.pioneers.service.UserService;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.paint.Color;
@@ -111,21 +111,11 @@ public class HexSubController implements Controller {
                                             });
                                 } else if (move.robber() != null && move.robber().equals(tileCoordinates)) {
                                     // Show alert if not the current player clicked while "rob" action
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, """
+                                    AlertService alert = new AlertService();
+                                    alert.showAlert("""
                                             You are not able\s
                                             to place the robber\s
                                             on the same tile again!""");
-                                    // set style
-                                    alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
-                                            .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                                    alert.showAndWait();
-                                } else {
-                                    // Show alert if not the current player clicked while "rob" action
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not your turn or wrong move!");
-                                    // set style
-                                    alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(Main.class
-                                            .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                                    alert.showAndWait();
                                 }
                             });
                 });

@@ -76,19 +76,12 @@ public class GameLobbyController implements Controller {
     public Label spectatorLabelId;
 
     private MessageViewSubController messageViewSubController;
-
-    @SuppressWarnings("unused")
-    private MemberListSubController memberListSubController;
-
-    @SuppressWarnings("unused")
-    private MemberListSubController memberListSpectatorSubcontroller;
     private final EventListener eventListener;
     private final GameStorage gameStorage;
     private final MemberIDStorage memberIDStorage;
     private final IDStorage idStorage;
     private final CompositeDisposable disposable = new CompositeDisposable();
     private final UserStorage userStorage;
-
     private Game game;
     private boolean started = false;
 
@@ -155,7 +148,6 @@ public class GameLobbyController implements Controller {
                                     .subscribe(this.playerList::add);
 
                         }
-
                     } else if (event.event().endsWith(DELETED)) {
                         this.deleteMember(member);
                     } else if (event.event().endsWith(UPDATED)) {
@@ -170,18 +162,17 @@ public class GameLobbyController implements Controller {
                 .subscribe(event -> {
                     if (event.event().endsWith("state" + CREATED)) {
                         this.userStorage.setUserList(playerList);
-                        // Flag needed, otherwise the gameScreenController is initialized twice
+                        // flag needed, otherwise the gameScreenController is initialized twice
                         if (!started) {
                             started = true;
                             gameLobbyInformation.changeView(gameScreenController, idStartGameButton, app);
-                            //changeView();
                         }
                     }
                 }));
 
         // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
-                userService, messageService, memberIDStorage, memberService);
+                userService, messageService, memberIDStorage, memberService, null);
         messageViewSubController.init();
         //action when the screen is closed
         this.app.getStage().setOnCloseRequest(e -> {
@@ -217,20 +208,14 @@ public class GameLobbyController implements Controller {
             return null;
         }
 
-        //gameLobbyInformation.getMapInformation(gameService,gameStorage,game,settingsLabel,idTitleLabel);
-
         gameService
                 .findOneGame(this.gameStorage.getId())
                 .observeOn(FX_SCHEDULER)
                 .subscribe(result -> {
                     this.game = result;
+                    this.gameStorage.setGameOptions(result.settings());
                     int victoryPoints = result.settings().victoryPoints();
                     int mapRadius = result.settings().mapRadius();
-                    this.gameStorage.setSize(mapRadius);
-                    this.gameStorage.setMapTemplate(result.settings().mapTemplate());
-                    this.gameStorage.setVictoryPoints(victoryPoints);
-                    this.gameStorage.setRollSeven(result.settings().roll7());
-                    this.gameStorage.setStartingResources(result.settings().startingResources());
                     this.settingsLabel.setText("Settings: Map Size = " + mapRadius + "  Required VP = " + victoryPoints);
                     this.idTitleLabel.setText("Welcome to " + this.game.name());
                 });
@@ -238,18 +223,16 @@ public class GameLobbyController implements Controller {
         // load game members
 
         this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members, memberListSubController)).toList());
+                playersNumberId, members)).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(
                 members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                        playersNumberId, members, memberListSubController)).toList()));
+                        playersNumberId, members)).toList()));
 
         gameLobbyInformation.addColourOnComboBox(colorPicker);
 
-        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList,
-                memberListSpectatorSubcontroller)).toList());
+        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.spectatorViewId.getChildren().setAll(
-                spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList
-                        , memberListSpectatorSubcontroller)).toList()));
+                spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList()));
 
         // disable start button when entering game lobby
         idStartGameButton.disableProperty().set(true);
@@ -302,18 +285,20 @@ public class GameLobbyController implements Controller {
         if (member.userId().equals(idStorage.getID())) {
             app.show(lobbyController.get());
         }
-        this.idUserList.getChildren().clear();
-        this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members, memberListSubController)).toList());
-        this.spectatorViewId.getChildren().clear();
-        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList,
-                memberListSpectatorSubcontroller)).toList());
+        clearAll();
 
         //make sure if members are less than max number, checkbox is visible
         if (members.size() < MAX_MEMBERS) {
             checkBoxId.disableProperty().set(false);
         }
+    }
 
+    private void clearAll() {
+        this.idUserList.getChildren().clear();
+        this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
+                playersNumberId, members)).toList());
+        this.spectatorViewId.getChildren().clear();
+        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList)).toList());
     }
 
     private void updateMember(Member member) {
@@ -349,26 +334,20 @@ public class GameLobbyController implements Controller {
             }
         }
         this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
-                + spectatorMember.size());// || members.size() == 0);
+                + spectatorMember.size());
 
         //checks if combobox has been clicked,if not
         //then automatically picks color for the user.
         if (colorPicker.getSelectionModel().isEmpty()) {
             if (readyMembers == members.size() + spectatorMember.size()) {
                 gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
-                //giveYourselfColor();
             }
         }
 
         //deactivate checkbox if maximum member has been reached
         checkBoxId.disableProperty().set(members.size() == MAX_MEMBERS);
 
-        this.idUserList.getChildren().clear();
-        this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members, memberListSubController)).toList());
-        this.spectatorViewId.getChildren().clear();
-        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList
-                , memberListSpectatorSubcontroller)).toList());
+        clearAll();
     }
 
     //This makes sure the user is offline
