@@ -174,7 +174,6 @@ public class GameLobbyController implements Controller {
                         if (!started) {
                             started = true;
                             gameLobbyInformation.changeView(gameScreenController, idStartGameButton, app);
-                            //changeView();
                         }
                     }
                 }));
@@ -216,8 +215,6 @@ public class GameLobbyController implements Controller {
             e.printStackTrace();
             return null;
         }
-
-        //gameLobbyInformation.getMapInformation(gameService,gameStorage,game,settingsLabel,idTitleLabel);
 
         gameService
                 .findOneGame(this.gameStorage.getId())
@@ -349,14 +346,13 @@ public class GameLobbyController implements Controller {
             }
         }
         this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
-                + spectatorMember.size());// || members.size() == 0);
+                + spectatorMember.size());
 
         //checks if combobox has been clicked,if not
         //then automatically picks color for the user.
         if (colorPicker.getSelectionModel().isEmpty()) {
             if (readyMembers == members.size() + spectatorMember.size()) {
                 gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
-                //giveYourselfColor();
             }
         }
 
@@ -367,8 +363,8 @@ public class GameLobbyController implements Controller {
         this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
                 playersNumberId, members, memberListSubcontroller)).toList());
         this.spectatorViewId.getChildren().clear();
-        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList
-                , memberListSpectatorSubcontroller)).toList());
+        this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m ->
+                gameLobbyInformation.renderSpectatorMember(m, playerList, memberListSpectatorSubcontroller)).toList());
     }
 
     //This makes sure the user is offline
