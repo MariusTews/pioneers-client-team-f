@@ -189,7 +189,7 @@ public class MapTemplatesScreenController implements Controller {
     private void addMapTemplateItem(MapTemplate template, int position) {
         boolean ownMap = idStorage.getID().equals(template.createdBy());
         String userName = userNames.getOrDefault(template.createdBy(), "");
-        MapTemplateSubController controller = new MapTemplateSubController(template, ownMap, userName, idStorage.getID(), this);
+        MapTemplateSubController controller = new MapTemplateSubController(this.app, template, ownMap, userName, idStorage.getID(), this);
         mapTemplateSubCons.put(template._id(), controller);
         controller.init();
         Parent item = controller.render();
@@ -305,7 +305,6 @@ public class MapTemplatesScreenController implements Controller {
                 _mapTemplates.add(mapTemplateSubCons.get(id).getParent());
             }
         }
-
         return _mapTemplates;
     }
 
@@ -337,5 +336,4 @@ public class MapTemplatesScreenController implements Controller {
     public HashMap<String, String> getUserNames() {
         return userNames;
     }
-
 }

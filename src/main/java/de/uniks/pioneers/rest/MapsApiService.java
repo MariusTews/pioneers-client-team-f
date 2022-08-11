@@ -9,6 +9,7 @@ import retrofit2.http.*;
 
 import java.util.List;
 
+@SuppressWarnings({"unused", "SameReturnValue"})
 public interface MapsApiService {
     @POST("maps")
     Observable<MapTemplate> createMapTemplate(@Body CreateMapTemplateDto dto);

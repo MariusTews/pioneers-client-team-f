@@ -1,9 +1,11 @@
 /**************** game lobby screen specific styles ****************/
 
+/*noinspection ALL*/
 .scroll-pane.gameChat, .scroll-pane.memberList {
     -fx-background-color: transparent;
 }
 
+/*noinspection ALL*/
 .scroll-pane.memberList > .viewport {
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-position: center;
@@ -16,20 +18,24 @@
    -fx-text-fill: #ffff;
 }
 
+/*noinspection ALL*/
 .combo-box:hover {
     -fx-background-color: darkgrey;
 }
 
+/*noinspection ALL*/
 .combo-box {
     -fx-background-image: url("../assets/grey_blue_textfield.png");
     -fx-background-size: 190 25;
     -fx-background-repeat: stretch;
 }
 
+/*noinspection ALL*/
 .combo-box .list-cell:hover {
     -fx-background-color: lightgrey;
 }
 
+/*noinspection ALL*/
 .check-box.checkboxStyle:selected > .box > .mark {
     -fx-shape: "M2,0L5,4L8,0L10,0L10,2L6,5L10,8L10,10L8,10L5,6L2,10L0,10L0,8L4,5L0,2L0,0Z";
     -fx-background-color: black;

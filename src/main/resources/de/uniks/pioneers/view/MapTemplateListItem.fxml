@@ -27,7 +27,7 @@
             <Insets left="6.0"/>
         </HBox.margin>
     </ImageView>
-    <Button id="showButton" fx:id="showButton" mnemonicParsing="false" text="Show">
+    <Button id="showButton" fx:id="showButton" mnemonicParsing="false" onAction="#onShowClicked" text="Show">
         <HBox.margin>
             <Insets left="60.0"/>
         </HBox.margin>

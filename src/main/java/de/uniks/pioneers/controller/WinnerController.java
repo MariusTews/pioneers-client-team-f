@@ -4,6 +4,8 @@ import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -30,9 +32,9 @@ import static de.uniks.pioneers.Constants.WIN_GAME;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class WinnerController implements Controller {
-    public Label winnerTitel;
+    public Label winnerTitle;
     public Label winnerName;
-    public Label loserTitel;
+    public Label loserTitle;
     public VBox loserBoxId;
 
     private final HashMap<String, List<String>> userNumberPoints;
@@ -99,9 +101,9 @@ public class WinnerController implements Controller {
             e.printStackTrace();
             return null;
         }
-        winnerTitel.setText("Winner");
+        winnerTitle.setText("Winner");
 
-        loserTitel.setText("Loser");
+        loserTitle.setText("Loser");
 
         //This updates VBox with respective points
         for (Map.Entry<String, List<String>> entry : userNumberPoints.entrySet()) {
@@ -133,27 +135,23 @@ public class WinnerController implements Controller {
 
     //this close the winner screen and the whole game Screen
     public void onClickCloseGame() {
-        gameService.findOneGame(this.gameStorage.getId()).observeOn(FX_SCHEDULER).
-                doOnError(e -> {
-                    this.gameStorage.setId(null);
-                    this.app.show(lobbyController.get());
-                }).
-                subscribe(c -> {
-                    if (c.owner().equals(this.idStorage.getID())) {
-                        gameService.
-                                deleteGame(this.gameStorage.getId()).
-                                observeOn(FX_SCHEDULER).
-                                subscribe(onSuccess -> {
-                                    //setting gameStorage to null will make sure
-                                    //user cannot join the game
-                                    this.gameStorage.setId(null);
-                                    this.app.show(lobbyController.get());
-                                });
-                    } else {
-                        this.gameStorage.setId(null);
-                        this.app.show(lobbyController.get());
-                    }
-                });
+        gameService.findOneGame(this.gameStorage.getId()).observeOn(FX_SCHEDULER)
+                .subscribe(game -> {
+                            if (game.owner().equals(this.idStorage.getID())) {
+                                gameService.deleteGame(this.gameStorage.getId())
+                                        .observeOn(FX_SCHEDULER)
+                                        .subscribe();
+                            }
+                        }, error -> {}
+                );
+        this.close();
+    }
+
+    private void close() {
+        this.gameStorage.setId(null);
+        ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
         primaryStage.close();
+        this.app.show(lobbyController.get());
+        this.destroy();
     }
 }

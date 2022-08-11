@@ -2,15 +2,18 @@
     -fx-font-family: "A-Space Black Demo";
 }
 
+/*noinspection ALL*/
 .dialog-pane {
     -fx-background-color: #e86a17;
 }
 
+/*noinspection ALL*/
 .dialog-pane .header-panel {
     -fx-background-color: #e86a17;
     -fx-mark-color: grey;
 }
 
+/*noinspection ALL*/
 .dialog-pane > .content.label {
     -fx-background-color: #e86a17;
     -fx-text-fill: white;

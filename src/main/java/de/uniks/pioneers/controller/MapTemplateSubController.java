@@ -1,5 +1,6 @@
 package de.uniks.pioneers.controller;
 
+import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.service.MapsService;
@@ -32,6 +33,7 @@ import java.util.Optional;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class MapTemplateSubController implements Controller {
+    private final App app;
     private MapTemplate template;
     private final boolean ownMap;
     private final String createdBy;
@@ -63,7 +65,8 @@ public class MapTemplateSubController implements Controller {
     private final ColorAdjust brightColorAdjust = new ColorAdjust();
     private HashMap<String, String> userNames;
 
-    public MapTemplateSubController(MapTemplate template, boolean ownMap, String createdBy, String userId, MapTemplatesScreenController parentController) {
+    public MapTemplateSubController(App app, MapTemplate template, boolean ownMap, String createdBy, String userId, MapTemplatesScreenController parentController) {
+        this.app = app;
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
@@ -320,6 +323,11 @@ public class MapTemplateSubController implements Controller {
     public void setTemplate(MapTemplate template) {
         this.template = template;
     }
+
+	public void onShowClicked() {
+        final MapTemplateViewController controller = new MapTemplateViewController(this.app, this.template, this.parentController);
+        app.show(controller);
+	}
 
     public void setVoted(int score) {
         this.voted.set(score);
