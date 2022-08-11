@@ -1,4 +1,4 @@
-package de.uniks.pioneers.computation;
+package de.uniks.pioneers.service;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
@@ -10,7 +10,6 @@ import de.uniks.pioneers.model.Game;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.Message;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
 import javafx.collections.ObservableList;
@@ -33,7 +32,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class LobbyTabsAndMessage {
+public class LobbyComService {
 
 	private final App app;
 	private final GameStorage gameStorage;
@@ -46,7 +45,7 @@ public class LobbyTabsAndMessage {
 	private final UserService userService;
 	private final RefreshTokenStorage refreshTokenStorage;
 
-	public LobbyTabsAndMessage(App app, GameStorage gameStorage, GameService gameService, MemberService memberService, IDStorage idStorage, AuthService authService, MessageService messageService, PioneersService pioneersService, UserService userService, RefreshTokenStorage refreshTokenStorage) {
+	public LobbyComService(App app, GameStorage gameStorage, GameService gameService, MemberService memberService, IDStorage idStorage, AuthService authService, MessageService messageService, PioneersService pioneersService, UserService userService, RefreshTokenStorage refreshTokenStorage) {
 
 		this.app = app;
 		this.gameStorage = gameStorage;

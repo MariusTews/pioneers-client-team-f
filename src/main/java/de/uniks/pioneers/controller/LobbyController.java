@@ -2,7 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.computation.LobbyTabsAndMessage;
+import de.uniks.pioneers.service.LobbyComService;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
@@ -99,7 +99,7 @@ public class LobbyController implements Controller {
 	private final CompositeDisposable disposable = new CompositeDisposable();
 	private Disposable tabDisposable;
 	private DirectChatStorage currentDirectStorage;
-	private final LobbyTabsAndMessage lb;
+	private final LobbyComService lobbyComService;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 	private final Thread renderAvatarsThread = new Thread(() -> {
@@ -152,7 +152,7 @@ public class LobbyController implements Controller {
 		this.gameScreenController = gameScreenController;
 		this.achievementsScreenController = achievementsScreenController;
 
-		this.lb = new LobbyTabsAndMessage(this.app, this.gameStorage, this.gameService, this.memberService, this.idStorage, authService, this.messageService, pioneersService, this.userService, refreshTokenStorage);
+		this.lobbyComService = new LobbyComService(this.app, this.gameStorage, this.gameService, this.memberService, this.idStorage, authService, this.messageService, pioneersService, this.userService, refreshTokenStorage);
 	}
 
 	@Override
@@ -160,7 +160,7 @@ public class LobbyController implements Controller {
 		//refreshed Token and runs for an hour
 		if (this.gameStorage.getId() == null) {
 			//call this method every 30 minutes to refresh refreshToken and ActiveToken
-			lb.beepForAnHour(scheduler);
+			lobbyComService.beepForAnHour(scheduler);
 		}
 
 		//set game id to enable rejoin if it was saved in the config file before
@@ -214,7 +214,7 @@ public class LobbyController implements Controller {
 			return null;
 		}
 		// create instance of LobbyTabs andMessage
-		lb.rejoinButton(rejoinButton);
+		lobbyComService.rejoinButton(rejoinButton);
 
 		this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
 		this.friendsUserList.addListener((ListChangeListener<? super User>) this::onUsersChanged);
@@ -268,7 +268,7 @@ public class LobbyController implements Controller {
 		logout();
 	}
 
-	public void logout() { lb.logout(loginController); }
+	public void logout() { lobbyComService.logout(loginController); }
 
 	public void sendButtonPressed() {
 		checkMessageField();
@@ -281,7 +281,7 @@ public class LobbyController implements Controller {
 
 	public void createGameButtonPressed() {
 		//makes sure if user in game or not , and depending on that allows user to create the game
-		lb.createGame(createGameController);
+		lobbyComService.createGame(createGameController);
 	}
 
 	public void enterKeyPressed(KeyEvent event) {
@@ -291,7 +291,7 @@ public class LobbyController implements Controller {
 	}
 
 	private void checkMessageField() {
-		lb.checkMessageField(chatMessageField, currentDirectStorage);
+		lobbyComService.checkMessageField(chatMessageField, currentDirectStorage);
 	}
 
 	private Node renderUser(User user) {
@@ -542,11 +542,11 @@ public class LobbyController implements Controller {
 	}
 
 	private void loadMessages(String groupId, Tab tab) {
-		lb.loadMessages(allTab, tab, groupId, lobby_messages, deletedAllMessages, deletedMessages, messages, memberHash);
+		lobbyComService.loadMessages(allTab, tab, groupId, lobby_messages, deletedAllMessages, deletedMessages, messages, memberHash);
 	}
 
 	private void addToDirectChatStorage(String groupId, User user, Tab tab) {
-		this.directChatStorages.add(lb.addToDirectChatStorage(groupId, user, tab));
+		this.directChatStorages.add(lobbyComService.addToDirectChatStorage(groupId, user, tab));
 	}
 
 	private void handleAllTabMessages(Event<Message> event) {
@@ -562,16 +562,16 @@ public class LobbyController implements Controller {
 	}
 
 	private void renderSingleMessage(String groupID, Tab tab, Message message) {
-		lb.renderSingleMessage(groupID, tab, message, memberHash);
+		lobbyComService.renderSingleMessage(groupID, tab, message, memberHash);
 	}
 
 	public void joinGame(Game game) {
 		//allows to join a game, if the user does not belong to another game
-		lb.joinGame(game, gameLobbyController);
+		lobbyComService.joinGame(game, gameLobbyController);
 	}
 
 	//reactivate for the possibility of joining the game
-	public void onRejoin() { lb.onJoin(members, gameScreenController, userStorage); }
+	public void onRejoin() { lobbyComService.onJoin(members, gameScreenController, userStorage); }
 
 	private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
 		//clear scroll pane
