@@ -200,3 +200,15 @@
     -fx-font-size: 18;
     -fx-text-fill: WHITE;
 }
+
+
+#chatPaneFoldOut {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 200 60;
+}
+
+#imageChatNotification {
+    -fx-background-color: transparent;
+}

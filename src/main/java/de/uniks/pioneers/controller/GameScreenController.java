@@ -96,6 +96,18 @@ public class GameScreenController implements Controller {
     @FXML
     public Label devCardsAmountLabel;
 
+    @FXML
+    public ImageView imageChatFoldoutId;
+    @FXML
+    public Pane chatPaneFoldOut;
+    @FXML
+    public ImageView imageChatFoldInId;
+    @FXML
+    public ImageView imageChatNotification;
+
+
+
+
     private final App app;
     private final GameStorage gameStorage;
     private final IDStorage idStorage;
@@ -248,7 +260,7 @@ public class GameScreenController implements Controller {
 
         // Initialize sub controller for inGame chat, add listener and load all messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
-                userService, messageService, memberIDStorage, memberService);
+                userService, messageService, memberIDStorage, memberService, this);
         messageViewSubController.init();
 
         this.calculateMove = new RandomAction(this.gameStorage, this.pioneersService);
@@ -332,6 +344,10 @@ public class GameScreenController implements Controller {
 
         //arrow image
         arrowImageId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/right.png"))));
+
+        imageChatFoldoutId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/up.png"))));
+        chatPane.disableProperty().set(true);
+        chatPane.visibleProperty().set(false);
 
         //calculate all the owned cards
         allTheCards();
@@ -799,5 +815,32 @@ public class GameScreenController implements Controller {
         imageTradingFoldInId.disableProperty().set(true);
         paneTradingId.disableProperty().set(false);
         paneTradingId.visibleProperty().set(true);
+    }
+
+    // open chat
+    public void onClickFoldOutChat() {
+        imageChatFoldInId.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/down.png"))));
+        imageChatFoldInId.toFront();
+        imageChatFoldInId.disableProperty().set(false);
+        chatPane.visibleProperty().set(true);
+        chatPane.disableProperty().set(false);
+        chatPaneFoldOut.visibleProperty().set(false);
+        chatPaneFoldOut.disableProperty().set(true);
+        imageChatNotification.setImage(null);
+    }
+
+    // close chat
+    public void onClickFoldInChat() {
+        imageChatFoldInId.setImage(null);
+        chatPane.visibleProperty().set(false);
+        chatPaneFoldOut.visibleProperty().set(true);
+        chatPaneFoldOut.disableProperty().set(false);
+    }
+
+    //set red notification circle
+    public void setNotificationCircle() {
+        if (chatPaneFoldOut.visibleProperty().getValue().equals(true)) {
+            this.imageChatNotification.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/circleRed.png"))));
+        }
     }
 }
