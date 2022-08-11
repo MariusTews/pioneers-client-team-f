@@ -263,17 +263,6 @@ class GameScreenControllerTest extends ApplicationTest {
         org.testfx.assertions.api.Assertions.assertThat(devCardsAmountLabel.getText()).isEqualTo("1");
     }
 
-    /*
-    @Test
-    void zoomMap() {
-        Button zoomIn = lookup("#zoomInButton").query();
-        Button zoomOut = lookup("#zoomOutButton").query();
-        clickOn(zoomIn);
-        clickOn(zoomOut);
-
-    }
-    */
-
     @Override
     public void stop() throws Exception {
         super.stop();

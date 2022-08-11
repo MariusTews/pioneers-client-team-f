@@ -35,6 +35,7 @@
     -fx-font-size: 14;
 }
 
+/*noinspection ALL*/
 .hyperlink {
     -fx-font-size: 16;
 }
@@ -56,10 +57,12 @@
     -fx-background-repeat: no-repeat;
 }
 
+/*noinspection ALL*/
 .scroll-pane > .corner {
     -fx-background-color: transparent;
 }
 
+/*noinspection ALL*/
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track {
     -fx-background-color: transparent;
@@ -67,6 +70,7 @@
     -fx-background-radius: 4em;
 }
 
+/*noinspection ALL*/
 .scroll-bar:horizontal .thumb,
 .scroll-bar:vertical .thumb {
     -fx-background-color: dimgrey;
@@ -74,11 +78,13 @@
     -fx-border-radius: 15;
 }
 
+/*noinspection ALL*/
 .scroll-bar .increment-arrow,
 .scroll-bar .decrement-arrow {
     -fx-padding: -2;
 }
 
+/*noinspection ALL*/
 .scroll-bar:horizontal, .scroll-bar:vertical {
     -fx-background-color: transparent;
 }

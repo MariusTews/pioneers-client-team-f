@@ -56,8 +56,8 @@ public class MapEditorController implements Controller {
 
     // TODO: needed for later use
     private final List<String> choices = new ArrayList<>();
-    private List<TileTemplate> tiles = new ArrayList<>();
-    private List<HarborTemplate> harbors = new ArrayList<>();
+    private final List<TileTemplate> tiles = new ArrayList<>();
+    private final List<HarborTemplate> harbors = new ArrayList<>();
 
     @Inject
     public MapEditorController(App app,
