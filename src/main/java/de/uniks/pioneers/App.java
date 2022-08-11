@@ -135,9 +135,9 @@ public class App extends Application {
                     group.getTransforms().add(scale);
                     stage.getScene().setRoot(group);
                     stage.setWidth(scaleFactor * 1600);
-                    stage.setHeight(bounds.getHeight());
+                    // reduce height by 7 otherwise there is a white bar at the bottom of the screen
+                    stage.setHeight(bounds.getHeight() - 7);
                     stage.centerOnScreen();
-
                 }
                 // "higher" screens
                 else {
@@ -148,7 +148,8 @@ public class App extends Application {
                     group.getTransforms().add(scale);
                     stage.getScene().setRoot(group);
                     stage.setWidth(bounds.getWidth());
-                    stage.setHeight(scaleFactor * 950);
+                    // reduce height by 7 otherwise there is a white bar at the bottom of the screen
+                    stage.setHeight((scaleFactor * 950) - 7);
                     stage.centerOnScreen();
                 }
             } else {
