@@ -38,17 +38,12 @@ import static de.uniks.pioneers.Constants.*;
 public class LobbyController implements Controller {
 
 	private final ObservableList<User> users = FXCollections.observableArrayList();
-
 	private final ObservableList<User> friendsUserList = FXCollections.observableArrayList();
-
 	private final ObservableList<Member> members = FXCollections.observableArrayList();
 	private final ObservableList<Game> games = FXCollections.observableArrayList();
 	private final ObservableList<Group> groups = FXCollections.observableArrayList();
 	private final ObservableList<Message> messages = FXCollections.observableArrayList();
-
-	//message for Lobby
 	private final ObservableList<Message> lobby_messages = FXCollections.observableArrayList();
-
 	private final List<String> deletedMessages = new ArrayList<>();
 	private final List<String> deletedAllMessages = new ArrayList<>();
 	private final HashMap<String, UserListSubController> userSubCons = new HashMap<>();
@@ -183,8 +178,7 @@ public class LobbyController implements Controller {
 		}
 
 		if (this.gameStorage.getId() != null) {
-			memberService.getAllGameMembers(this.gameStorage.getId())
-					.observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
+			memberService.getAllGameMembers(this.gameStorage.getId()).observeOn(FX_SCHEDULER).subscribe(this.members::setAll);
 		}
 
 		gameService.findAllGames().observeOn(FX_SCHEDULER).subscribe(this::loadGames);
@@ -196,16 +190,8 @@ public class LobbyController implements Controller {
 		disposable.add(eventListener.listen("group.*.*", Group.class).observeOn(FX_SCHEDULER).subscribe(this::handleGroupEvents));
 
 		//listen to messages on lobby on Global channel
-		disposable.add(eventListener
-				.listen("global." + LOBBY_ID + ".messages.*.*", Message.class)
-				.observeOn(FX_SCHEDULER)
-				.subscribe(this::handleAllTabMessages));
-
-		//refreshed Token and runs for an hour
-		if (this.gameStorage.getId() == null) {
-			//call this method every 30 minutes to refresh refreshToken and ActiveToken
-			lb.beepForAnHour(scheduler);
-		}
+		disposable.add(eventListener.listen("global." + LOBBY_ID + ".messages.*.*", Message.class)
+				.observeOn(FX_SCHEDULER).subscribe(this::handleAllTabMessages));
 
 		this.app.getStage().setOnCloseRequest(e -> {
 			actionOnclose();
@@ -284,19 +270,13 @@ public class LobbyController implements Controller {
 		}
 	}
 
-	public void rulesButtonPressed() {
-		final RulesScreenController controller = rulesScreenController.get();
-		app.show(controller);
-	}
+	public void rulesButtonPressed() { app.show(rulesScreenController.get()); }
 
 	public void logoutButtonPressed() {
 		logout();
 	}
 
-	public void logout() {
-		lb.logout(loginController);
-
-	}
+	public void logout() { lb.logout(loginController); }
 
 	public void sendButtonPressed() {
 		checkMessageField();
@@ -546,7 +526,6 @@ public class LobbyController implements Controller {
 		this.users.addAll(onlineUser);
 		this.users.addAll(offlineUser);
 
-
 		renderAvatarsThread.start();
 
 		//get all messages from the user that are in lobby
@@ -564,11 +543,8 @@ public class LobbyController implements Controller {
 	}
 
 	private void loadGames(List<Game> games) {
-		List<Game> accessible = games.stream().filter(game -> !(game.started())).toList();
-		List<Game> notAccessible = games.stream().filter(Game::started).toList();
-
-		this.games.addAll(accessible);
-		this.games.addAll(notAccessible);
+		this.games.addAll(games.stream().filter(game -> !(game.started())).toList());
+		this.games.addAll(games.stream().filter(Game::started).toList());
 	}
 
 	private void loadGroups(List<Group> groups) {
@@ -577,8 +553,7 @@ public class LobbyController implements Controller {
 
 
 	private void loadMessages(String groupId, Tab tab) {
-		lb.loadMessages(allTab, tab, groupId, lobby_messages,
-				deletedAllMessages, deletedMessages, messages, memberHash);
+		lb.loadMessages(allTab, tab, groupId, lobby_messages, deletedAllMessages, deletedMessages, messages, memberHash);
 	}
 
 	private void addToDirectChatStorage(String groupId, User user, Tab tab) {
@@ -603,7 +578,6 @@ public class LobbyController implements Controller {
 
 	public void joinGame(Game game) {
 		//allows to join a game, if the user does not belong to another game
-		//otherwise user cannot join the game
 		lb.joinGame(game, gameLobbyController);
 	}
 
