@@ -51,7 +51,7 @@ public class LoadMapTemplate {
 				this.pane.getChildren().add(calculateMap.buildImage(xCoordinate, yCoordinate, x, y, z, false));
 				this.pane.getChildren().add(calculateMap.buildLabel(xCoordinate, yCoordinate, x, y, z));
 
-				for (int i = 0; i < 6; i++) {
+				for (int i = 1; i <= 6; i++) {
 					buildBuildingCircle(i, xCoordinate, yCoordinate, x, y, z);
 					buildRoadCircle(i, xCoordinate, yCoordinate, x, y, z);
 				}
