@@ -491,8 +491,8 @@ public class TradingSubController implements Controller {
 
     private void resetButtonsAndLabels() {
         // clear hashes
-        this.giveResources.replaceAll((k, v) -> v = 0);
-        this.receiveResources.replaceAll((k, v) -> v = 0);
+        this.giveResources.replaceAll((k, v) -> 0);
+        this.receiveResources.replaceAll((k, v) -> 0);
 
         // set labels to zero
         this.giveCactusLabel.setText("0");
