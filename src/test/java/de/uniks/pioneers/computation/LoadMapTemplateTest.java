@@ -29,6 +29,18 @@ class LoadMapTemplateTest extends ApplicationTest {
 		return tiles;
 	}
 
+	List<Tile> maxXList() {
+		List<Tile> tiles = new ArrayList<>();
+		tiles.add(new Tile(1, 0, 0, "desert", 7));
+		return tiles;
+	}
+
+	List<Tile> maxZList() {
+		List<Tile> tiles = new ArrayList<>();
+		tiles.add(new Tile(0, 0, 1, "desert", 7));
+		return tiles;
+	}
+
 	List<Harbor> createHarbors() {
 		List<Harbor> harbors = new ArrayList<>();
 		harbors.add(new Harbor(1, 0, -1, "grain", 1));
@@ -38,6 +50,10 @@ class LoadMapTemplateTest extends ApplicationTest {
 		harbors.add(new Harbor(-1, 1, 0, "wool", 9));
 		harbors.add(new Harbor(0, 1, -1, null, 11));
 		return harbors;
+	}
+
+	List<Harbor> noHarbors() {
+		return new ArrayList<>();
 	}
 
 	@Test
@@ -114,5 +130,21 @@ class LoadMapTemplateTest extends ApplicationTest {
 		Assertions.assertEquals(numberLabels.size(), 7);
 		Assertions.assertEquals(harborImages.size(), 6);
 		Assertions.assertEquals(hexagons.size(), 7);
+	}
+
+	@Test
+	public void testXMax() {
+		Map map = new Map("testMap", this.maxXList(), this.noHarbors());
+		Pane mapPane = loadMapTemplate.loadMap(map, true);
+
+		Assertions.assertEquals(mapPane.getChildren().size(),21);
+	}
+
+	@Test
+	public void testZMax() {
+		Map map = new Map("testMap", this.maxZList(), this.noHarbors());
+		Pane mapPane = loadMapTemplate.loadMap(map, true);
+
+		Assertions.assertEquals(mapPane.getChildren().size(),21);
 	}
 }
