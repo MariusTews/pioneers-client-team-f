@@ -172,7 +172,7 @@ public class GameLobbyController implements Controller {
 
         // initialize sub-controller, so the disposable in sub-controller listens to incoming/outgoing messages
         this.messageViewSubController = new MessageViewSubController(eventListener, gameStorage,
-                userService, messageService, memberIDStorage, memberService);
+                userService, messageService, memberIDStorage, memberService, null);
         messageViewSubController.init();
         //action when the screen is closed
         this.app.getStage().setOnCloseRequest(e -> {
