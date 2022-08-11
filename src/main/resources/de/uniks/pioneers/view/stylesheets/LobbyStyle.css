@@ -30,6 +30,7 @@
     -fx-font-size: 12;
 }
 
+/*noinspection ALL*/
 .scroll-pane.lobby {
     -fx-border-color: dodgerblue;
     -fx-background-color: transparent;
@@ -37,6 +38,7 @@
     -fx-border-radius: 8px;
 }
 
+/*noinspection ALL*/
 .tab-pane.lobby {
     -fx-border-color: dimgrey;
     -fx-background-color: transparent;
@@ -44,6 +46,7 @@
     -fx-border-radius: 8px;
 }
 
+/*noinspection ALL*/
 .scroll-pane.gamelist {
     -fx-border-color: limegreen;
     -fx-border-width: 4px;
