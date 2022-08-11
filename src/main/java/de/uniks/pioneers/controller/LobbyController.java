@@ -264,7 +264,8 @@ public class LobbyController implements Controller {
                                     this.gameStorage.setId(null);
                                     ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
                                 }
-                            }, error -> {}
+                            }, error -> {
+                            }
                     );
         } else {
             rejoinButton.disableProperty().set(true);

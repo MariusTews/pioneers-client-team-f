@@ -90,6 +90,7 @@ public class Constants {
     }
 
     public static final HashMap<String, String> ACHIEVEMENT_NAMES = new HashMap<>();
+
     static {
         ACHIEVEMENT_NAMES.put(FIRST_ROAD, "build your first road");
         ACHIEVEMENT_NAMES.put(ROAD_BUILDER, "road builder");
@@ -107,6 +108,7 @@ public class Constants {
     }
 
     public static final HashMap<String, String> ACHIEVEMENT_PATHS = new HashMap<>();
+
     static {
         ACHIEVEMENT_PATHS.put(FIRST_ROAD, "first_road");
         ACHIEVEMENT_PATHS.put(ROAD_BUILDER, "100_roads");
