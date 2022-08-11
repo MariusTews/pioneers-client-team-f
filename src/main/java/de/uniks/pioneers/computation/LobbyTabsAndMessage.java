@@ -313,8 +313,7 @@ public class LobbyTabsAndMessage {
 									gameStorage.setId(null);
 									ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
 								}
-							}, error -> {
-							}
+							}, error -> {}
 					);
 		} else {
 			rejoinButton.disableProperty().set(true);
@@ -330,8 +329,7 @@ public class LobbyTabsAndMessage {
 
 		final ScheduledFuture<?> beeperHandle =
 				scheduler.scheduleAtFixedRate(beeper, 10, 30 * 60, SECONDS);
-		scheduler.schedule(() -> beeperHandle.cancel(true)
-				, 60 * 60, SECONDS);
+		scheduler.schedule(() -> beeperHandle.cancel(true), 60 * 60, SECONDS);
 	}
 
 	public DirectChatStorage addToDirectChatStorage(String groupId, User user, Tab tab) {
