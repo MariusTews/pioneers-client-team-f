@@ -74,16 +74,16 @@
       </VBox.margin>
    </Label>
    <HBox prefHeight="52.0" prefWidth="393.0">
-      <Pane fx:id="settlementPane">
+      <Pane >
          <HBox.margin>
             <Insets right="10.0" />
          </HBox.margin>
          <Button fx:id="sett" layoutX="-7.0" mnemonicParsing="false" onAction="#onSett" prefHeight="40.0" prefWidth="88.0" styleClass="move" text="SETT." />
       </Pane>
-      <Pane fx:id="roadPane">
+      <Pane>
          <Button fx:id="road" layoutX="-8.0" mnemonicParsing="false" onAction="#onRoad" prefHeight="41.0" prefWidth="88.0" styleClass="move" text="Road" />
       </Pane>
-      <Pane fx:id="cityPane" prefHeight="52.0" prefWidth="124.0">
+      <Pane prefHeight="52.0" prefWidth="124.0">
          <HBox.margin>
             <Insets left="10.0" />
          </HBox.margin>
