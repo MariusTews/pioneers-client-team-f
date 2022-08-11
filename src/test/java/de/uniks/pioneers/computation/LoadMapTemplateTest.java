@@ -45,7 +45,7 @@ class LoadMapTemplateTest extends ApplicationTest {
 		Map map = new Map("testMap", this.createTiles(), this.createHarbors());
 		Pane mapPane = loadMapTemplate.loadMap(map, true);
 
-		Assertions.assertEquals(mapPane.getChildren().size(), 107);
+		Assertions.assertEquals(mapPane.getChildren().size(), 115);
 
 		List<Node> hexagons = new ArrayList<>();
 		List<Node> roadCircles = new ArrayList<>();
@@ -77,9 +77,9 @@ class LoadMapTemplateTest extends ApplicationTest {
 		}
 
 		Assertions.assertEquals(harborRoads.size(), 12);
-		Assertions.assertEquals(roads.size(), 24);
-		Assertions.assertEquals(roadCircles.size(), 24);
-		Assertions.assertEquals(buildingCircles.size(), 20);
+		Assertions.assertEquals(roads.size(), 27);
+		Assertions.assertEquals(roadCircles.size(), 27);
+		Assertions.assertEquals(buildingCircles.size(), 22);
 		Assertions.assertEquals(numberLabels.size(), 7);
 		Assertions.assertEquals(harborImages.size(), 6);
 		Assertions.assertEquals(robberImages.size(), 7);
