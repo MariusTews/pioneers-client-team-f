@@ -34,13 +34,31 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class LobbyTabsAndMessage {
 
-    public LobbyTabsAndMessage() {
+    private final App app;
+    private final GameStorage gameStorage;
+    private final MemberService memberService;
+    private final IDStorage idStorage;
+    private final AuthService authService;
+    private final MessageService messageService;
+    private  final PioneersService pioneersService;
+    private final UserService userService;
+    private final RefreshTokenStorage refreshTokenStorage;
 
+    public LobbyTabsAndMessage(App app, GameStorage gameStorage, MemberService memberService, IDStorage idStorage, AuthService authService, MessageService messageService, PioneersService pioneersService, UserService userService, RefreshTokenStorage refreshTokenStorage) {
+
+        this.app = app;
+        this.gameStorage = gameStorage;
+        this.memberService = memberService;
+        this.idStorage = idStorage;
+        this.authService = authService;
+        this.messageService = messageService;
+        this.pioneersService = pioneersService;
+        this.userService = userService;
+        this.refreshTokenStorage = refreshTokenStorage;
     }
 
 
-    public void logout(UserService userService, IDStorage idStorage, AuthService authService,
-                       Provider<LoginController> loginController, App app) {
+    public void logout(Provider<LoginController> loginController) {
         userService.statusUpdate(idStorage.getID(), "offline")
                 .observeOn(FX_SCHEDULER)
                 .subscribe(
@@ -59,8 +77,7 @@ public class LobbyTabsAndMessage {
                 );
     }
 
-    public void createGame(GameStorage gameStorage, MemberService memberService, IDStorage idStorage,
-                           Provider<CreateGameController> createGameController, App app) {
+    public void createGame(Provider<CreateGameController> createGameController) {
         if (gameStorage.getId() != null) {
             memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
@@ -88,7 +105,7 @@ public class LobbyTabsAndMessage {
         }
     }
 
-    public void checkMessageField(TextField chatMessageField, DirectChatStorage currentDirectStorage, MessageService messageService) {
+    public void checkMessageField(TextField chatMessageField, DirectChatStorage currentDirectStorage) {
         if (!chatMessageField.getText().isEmpty()) {
             if (currentDirectStorage != null) {
                 messageService.send(GROUPS, currentDirectStorage.getGroupId(), chatMessageField.getText())
@@ -103,8 +120,7 @@ public class LobbyTabsAndMessage {
         }
     }
 
-    public void renderSingleMessage(String groupID, Tab tab, Message message, HashMap<String, User> memberHash,
-                                    IDStorage idStorage, MessageService messageService) {
+    public void renderSingleMessage(String groupID, Tab tab, Message message, HashMap<String, User> memberHash) {
         HBox box = new HBox(3);
         Label label = new Label();
         ImageView imageView = new ImageView();
@@ -115,7 +131,7 @@ public class LobbyTabsAndMessage {
         }
         box.getChildren().add(imageView);
         label.setMinWidth(100);
-        initRightClick(label, message._id(), message.sender(), groupID, idStorage, messageService);
+        initRightClick(label, message._id(), message.sender(), groupID);
         label.setText(memberHash.get(message.sender()).name() + ": " + message.body());
         box.getChildren().add(label);
 
@@ -124,7 +140,7 @@ public class LobbyTabsAndMessage {
         ((ScrollPane) tab.getContent()).vvalueProperty().bind(((VBox) ((ScrollPane) tab.getContent()).getContent()).heightProperty());
     }
 
-    private void initRightClick(Label label, String messageId, String sender, String groupId, IDStorage idStorage, MessageService messageService) {
+    private void initRightClick(Label label, String messageId, String sender, String groupId) {
         final ContextMenu contextMenu = new ContextMenu();
         final MenuItem menuItem = new MenuItem("delete");
 
@@ -157,8 +173,7 @@ public class LobbyTabsAndMessage {
         });
     }
 
-    public void joinGame(GameStorage gameStorage, MemberService memberService, IDStorage idStorage, Game game,
-                         Provider<GameLobbyController> gameLobbyController, App app) {
+    public void joinGame(Game game, Provider<GameLobbyController> gameLobbyController) {
         if (gameStorage.getId() != null) {
             memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
                     .subscribe(result -> {
@@ -176,15 +191,15 @@ public class LobbyTabsAndMessage {
                             }
                         }
                         if (trace) {
-                            joinMessage(game, memberService, gameLobbyController, app);
+                            joinMessage(game, gameLobbyController);
                         }
                     });
         } else {
-            joinMessage(game, memberService, gameLobbyController, app);
+            joinMessage(game, gameLobbyController);
         }
     }
 
-    private void joinMessage(Game game, MemberService memberService, Provider<GameLobbyController> gameLobbyController, App app) {
+    private void joinMessage(Game game, Provider<GameLobbyController> gameLobbyController) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Enter the password");
         dialog.setHeaderText("password");
@@ -209,8 +224,7 @@ public class LobbyTabsAndMessage {
                         }));
     }
 
-    public void onJoin(ObservableList<Member> members, App app, IDStorage idStorage,
-                       GameStorage gameStorage, Provider<GameScreenController> gameScreenController, PioneersService pioneersService) {
+    public void onJoin(ObservableList<Member> members, Provider<GameScreenController> gameScreenController) {
         boolean changeToPlayer = false;
         for (Member m : members) {
             if (m.gameId().equals(gameStorage.getId()) && m.userId().equals(idStorage.getID())
@@ -228,9 +242,9 @@ public class LobbyTabsAndMessage {
         }
     }
 
-    public void loadMessages(Tab allTab, Tab tab, String groupId, MessageService messageService, ObservableList<Message> lobby_messages,
+    public void loadMessages(Tab allTab, Tab tab, String groupId, ObservableList<Message> lobby_messages,
                              List<String> deletedAllMessages, List<String> deletedMessages, ObservableList<Message> messages,
-                             HashMap<String, User> memberHash, IDStorage idStorage) {
+                             HashMap<String, User> memberHash) {
         if (tab.equals(allTab)) {
             messageService.getAllMessages(GLOBAL, LOBBY_ID).observeOn(FX_SCHEDULER).subscribe(m -> {
                 lobby_messages.clear();
@@ -239,7 +253,7 @@ public class LobbyTabsAndMessage {
 
                 for (Message message : lobby_messages) {
                     if (!deletedAllMessages.contains(message._id())) {
-                        renderSingleMessage(null, allTab, message, memberHash, idStorage, messageService);
+                        renderSingleMessage(null, allTab, message, memberHash);
                     }
                 }
             });
@@ -251,14 +265,14 @@ public class LobbyTabsAndMessage {
 
                 for (Message message : messages) {
                     if (!deletedMessages.contains(message._id())) {
-                        renderSingleMessage(groupId, tab, message, memberHash, idStorage, messageService);
+                        renderSingleMessage(groupId, tab, message, memberHash);
                     }
                 }
             });
         }
     }
 
-    public void rejoinButton(GameStorage gameStorage, MemberService memberService, Button rejoinButton, IDStorage idStorage) {
+    public void rejoinButton( Button rejoinButton) {
         //make the rejoin button visible
         //based upon if a user is in game or not
         if (gameStorage.getId() != null) {
@@ -281,7 +295,7 @@ public class LobbyTabsAndMessage {
         }
     }
 
-    public void beepForAnHour(RefreshTokenStorage refreshTokenStorage, AuthService authService, ScheduledExecutorService scheduler) {
+    public void beepForAnHour(ScheduledExecutorService scheduler) {
         String refreshToken = refreshTokenStorage.getRefreshToken();
         final Runnable beeper = () -> authService.refreshToken(refreshToken).
                 observeOn(FX_SCHEDULER).subscribe();

@@ -111,7 +111,7 @@ public class LobbyController implements Controller {
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
-    private final LobbyTabsAndMessage lb = new LobbyTabsAndMessage();
+    private final LobbyTabsAndMessage lb;
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
@@ -166,6 +166,8 @@ public class LobbyController implements Controller {
         this.gameScreenController = gameScreenController;
         this.achievementsScreenController = achievementsScreenController;
         this.pioneersService = pioneersService;
+
+        this.lb = new LobbyTabsAndMessage(this.app, this.gameStorage, this.memberService, this.idStorage, this.authService, this.messageService, this.pioneersService, this.userService, this.refreshTokenStorage);
     }
 
     @Override
@@ -192,7 +194,7 @@ public class LobbyController implements Controller {
         //refreshed Token and runs for an hour
         if (this.gameStorage.getId() == null) {
             //call this method every 30 minutes to refresh refreshToken and ActiveToken
-            lb.beepForAnHour(refreshTokenStorage, authService, scheduler);
+            lb.beepForAnHour(scheduler);
         }
 
         this.app.getStage().setOnCloseRequest(e -> {
@@ -225,7 +227,7 @@ public class LobbyController implements Controller {
         }
         // create instance of LobbyTabs andMessage
         //lb = new LobbyTabsAndMessage();
-        lb.rejoinButton(gameStorage, memberService, rejoinButton, idStorage);
+        lb.rejoinButton(rejoinButton);
 
         this.users.addListener((ListChangeListener<? super User>) this::onUsersChanged);
         this.friendsUserList.addListener((ListChangeListener<? super User>) this::onUsersChanged);
@@ -283,7 +285,7 @@ public class LobbyController implements Controller {
     }
 
     public void logout() {
-        lb.logout(userService, idStorage, authService, loginController, app);
+        lb.logout(loginController);
 
     }
 
@@ -298,7 +300,7 @@ public class LobbyController implements Controller {
 
     public void createGameButtonPressed() {
         //makes sure if user in game or not , and depending on that allows user to create the game
-        lb.createGame(gameStorage, memberService, idStorage, createGameController, app);
+        lb.createGame(createGameController);
 
     }
 
@@ -309,7 +311,7 @@ public class LobbyController implements Controller {
     }
 
     private void checkMessageField() {
-        lb.checkMessageField(chatMessageField, currentDirectStorage, messageService);
+        lb.checkMessageField(chatMessageField, currentDirectStorage);
     }
 
     private Node renderUser(User user) {
@@ -564,8 +566,8 @@ public class LobbyController implements Controller {
 
 
     private void loadMessages(String groupId, Tab tab) {
-        lb.loadMessages(allTab, tab, groupId, messageService, lobby_messages,
-                deletedAllMessages, deletedMessages, messages, memberHash, idStorage);
+        lb.loadMessages(allTab, tab, groupId, lobby_messages,
+                deletedAllMessages, deletedMessages, messages, memberHash);
     }
 
     private void addToDirectChatStorage(String groupId, User user, Tab tab) {
@@ -585,18 +587,18 @@ public class LobbyController implements Controller {
     }
 
     private void renderSingleMessage(String groupID, Tab tab, Message message) {
-        lb.renderSingleMessage(groupID, tab, message, memberHash, idStorage, messageService);
+        lb.renderSingleMessage(groupID, tab, message, memberHash);
     }
 
     public void joinGame(Game game) {
         //allows to join a game, if the user does not belong to another game
         //otherwise user cannot join the game
-        lb.joinGame(gameStorage, memberService, idStorage, game, gameLobbyController, app);
+        lb.joinGame(game, gameLobbyController);
     }
 
     //reactivate for the possibility of joining the game
     public void onRejoin() {
-        lb.onJoin(members, app, idStorage, gameStorage, gameScreenController, pioneersService);
+        lb.onJoin(members, gameScreenController);
     }
 
     private void onUsersChanged(ListChangeListener.Change<? extends User> c) {
