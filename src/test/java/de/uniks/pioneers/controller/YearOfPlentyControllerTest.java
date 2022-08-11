@@ -40,7 +40,6 @@ public class YearOfPlentyControllerTest extends ApplicationTest {
     }};
 
 
-
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
         YearOfPlentyController yearOfPlentyController = new YearOfPlentyController(gameStorage.getId(), pioneersService, null);
@@ -139,7 +138,7 @@ public class YearOfPlentyControllerTest extends ApplicationTest {
         this.resources.put(VENUS_GRAIN, 0);
         this.resources.put(MARS_BAR, 0);
 
-        when(pioneersService.yearOfPlentyCard(any(),any()))
+        when(pioneersService.yearOfPlentyCard(any(), any()))
                 .thenReturn(Observable.just(new Move("createdAt", "_id", "gameId",
                         "userId", "action", 5, null, null, this.resources, null, null)));
 
