@@ -275,7 +275,7 @@ public class MapEditorController implements Controller {
     /*
      * increase or decrease the map size and place the buttons
      * */
-    public void mapSizeMinusButtonPressed(ActionEvent event) {
+    public void mapSizeMinusButtonPressed() {
         if (Integer.parseInt(this.mapSizeLabel.getText()) > 0) {
             map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) - 1, true);
             int mapSize = Integer.parseInt(this.mapSizeLabel.getText()) - 1;
@@ -285,7 +285,7 @@ public class MapEditorController implements Controller {
         }
     }
 
-    public void mapSizePlusButtonPressed(ActionEvent event) {
+    public void mapSizePlusButtonPressed() {
         map = new CalculateMap().buildMap(Integer.parseInt(this.mapSizeLabel.getText()) + 1, true);
         int mapSize = Integer.parseInt(this.mapSizeLabel.getText()) + 1;
         this.mapSizeLabel.setText(String.valueOf(mapSize));
@@ -293,7 +293,7 @@ public class MapEditorController implements Controller {
         addButtonsOnTiles();
     }
 
-    public void saveButtonPressed(ActionEvent event) {
+    public void saveButtonPressed() {
         //TODO: pressing the save button creates a new map template
 
 

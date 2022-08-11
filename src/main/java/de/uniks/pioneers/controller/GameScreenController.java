@@ -8,6 +8,8 @@ import de.uniks.pioneers.computation.SpectatorRenderInGame;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.util.JsonUtil;
+import de.uniks.pioneers.util.ResourceManager;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -128,6 +130,7 @@ public class GameScreenController implements Controller {
     private DiscardResourcesController discard;
     private boolean acceptRenderFlag = false;
     private ExpectedMove nextMove;
+    private boolean rejoin = false;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -271,7 +274,6 @@ public class GameScreenController implements Controller {
 
         this.opponentSubCons.forEach(OpponentSubController::destroy);
         this.opponentSubCons.clear();
-
     }
 
     @Override
@@ -296,7 +298,7 @@ public class GameScreenController implements Controller {
         this.remainingTimeView.getChildren().setAll(this.moveTimer.render());
 
         // add listener on nextMoveLabel to reset the timer if the next action is expected, else the automatic
-        // move stops after founding phase with the "roll" move where the curren player does not change
+        // move stops after founding phase with the "roll" move where the current player does not change
         nextMoveLabel.textProperty().addListener((observable, oldValue, newValue) -> this.moveTimer.startTime());
 
         //add listener on nextMoveLabel to reset the timer if founding-settlement-2 (Placing-UFO-2)
@@ -335,6 +337,33 @@ public class GameScreenController implements Controller {
 
         //calculate all the owned cards
         allTheCards();
+
+        //reload on rejoin
+        if (rejoin) {
+            this.pioneersService
+                    .findAllBuildings(this.gameStorage.getId())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(
+                            buildings -> {
+                                for (Building b : buildings) {
+                                    this.gameFieldSubController.updateBuildings(b.x().intValue(), b.y().intValue(),
+                                            b.z().intValue(), b.side().intValue(), b.owner(), b.type());
+                                }
+                            }
+                    );
+            this.pioneersService
+                    .findOneState(this.gameStorage.getId())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(
+                            state -> {
+                                Event<State> event = new Event<>(UPDATED, state);
+                                this.handleStateEvents(event);
+                            }
+                    );
+            //display the dices to be able to click on them (if there is no founding move, they are not displayed automatically)
+            displayDice(2);
+            rejoin = false;
+        }
 
         return parent;
     }
@@ -679,7 +708,9 @@ public class GameScreenController implements Controller {
         }
         //this distinguishes between player and spectator
         if (!changeToPlayer) {
-            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), false)
+            // set active to false only when there is more than one game member
+            boolean active = this.members.size() == 1;
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), active)
                     .observeOn(FX_SCHEDULER).subscribe(onSuccess -> this.app.show(lobbyController.get()));
         }
 
@@ -799,5 +830,9 @@ public class GameScreenController implements Controller {
         imageTradingFoldInId.disableProperty().set(true);
         paneTradingId.disableProperty().set(false);
         paneTradingId.visibleProperty().set(true);
+    }
+
+    public void setRejoin(boolean rejoin) {
+        this.rejoin = rejoin;
     }
 }

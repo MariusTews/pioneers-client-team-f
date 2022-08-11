@@ -8,6 +8,7 @@ import retrofit2.http.*;
 
 import java.util.List;
 
+@SuppressWarnings({"unused", "SameReturnValue"})
 public interface MapsApiService {
     @GET("maps")
     Observable<List<MapTemplate>> findAllMaps();
