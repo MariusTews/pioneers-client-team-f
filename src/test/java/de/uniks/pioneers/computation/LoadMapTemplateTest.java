@@ -25,7 +25,7 @@ class LoadMapTemplateTest extends ApplicationTest {
 		tiles.add(new Tile(-1, 1, 0, "mountains", 8));
 		tiles.add(new Tile(1, 0, -1, "forest", 10));
 		tiles.add(new Tile(-1, 0, 1, "pasture", 5));
-		tiles.add(new Tile(0, -1, 1, "fields", 2));
+		tiles.add(new Tile(0, -1, 1, "random", 2));
 		return tiles;
 	}
 
