@@ -13,6 +13,7 @@ import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
+import retrofit2.http.Body;
 
 import javax.inject.Singleton;
 import java.util.ArrayList;
@@ -504,6 +505,10 @@ public class TestModule {
     @Provides
     static MapsApiService mapsApiService() {
         return new MapsApiService() {
+            @Override
+            public Observable<MapTemplate> createMapTemplate(@Body CreateMapTemplateDto dto) {
+                return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, null, null));
+            }
             @Override
             public Observable<List<MapTemplate>> findAllMaps() {
                 return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, null, null)));
