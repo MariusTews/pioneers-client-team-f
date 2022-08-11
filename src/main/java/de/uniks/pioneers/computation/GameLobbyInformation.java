@@ -3,7 +3,7 @@ package de.uniks.pioneers.computation;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.controller.ColorController;
 import de.uniks.pioneers.controller.GameScreenController;
-import de.uniks.pioneers.controller.MemberListSubcontroller;
+import de.uniks.pioneers.controller.MemberListSubController;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameStorage;
@@ -183,7 +183,7 @@ public class GameLobbyInformation {
         timeline.playFromStart();
     }
 
-    public Node renderMember(Member member, ObservableList<User> playerList, Label playersNumberId, ObservableList<Member> members, MemberListSubcontroller memberListSubcontroller) {
+    public Node renderMember(Member member, ObservableList<User> playerList, Label playersNumberId, ObservableList<Member> members, MemberListSubController memberListSubcontroller) {
         //sets the size of player
         //This flag will make sure,
         //Null Pointer exception will not be thrown
@@ -193,29 +193,29 @@ public class GameLobbyInformation {
         for (User user : playerList) {
             if (user._id().equals(member.userId()) && !member.spectator()) {
                 ch = true;
-                memberListSubcontroller = new MemberListSubcontroller(member, user);
+                memberListSubcontroller = new MemberListSubController(member, user);
                 break;
             }
         }
         if (!ch) {
-            memberListSubcontroller = new MemberListSubcontroller(null, null);
+            memberListSubcontroller = new MemberListSubController(null, null);
         }
         return memberListSubcontroller.render();
 
     }
 
     public Node renderSpectatorMember(Member member, ObservableList<User> playerList,
-                                      MemberListSubcontroller memberListSpectatorSubController) {
+                                      MemberListSubController memberListSpectatorSubController) {
         boolean ch = false;
         for (User user : playerList) {
             if (user._id().equals(member.userId()) && member.spectator()) {
                 ch = true;
-                memberListSpectatorSubController = new MemberListSubcontroller(member, user);
+                memberListSpectatorSubController = new MemberListSubController(member, user);
                 break;
             }
         }
         if (!ch) {
-            memberListSpectatorSubController = new MemberListSubcontroller(null, null);
+            memberListSpectatorSubController = new MemberListSubController(null, null);
         }
         return memberListSpectatorSubController.render();
     }

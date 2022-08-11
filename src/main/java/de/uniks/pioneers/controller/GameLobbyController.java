@@ -78,7 +78,7 @@ public class GameLobbyController implements Controller {
     private MessageViewSubController messageViewSubController;
 
     @SuppressWarnings("unused")
-    private MemberListSubController memberListSubcontroller;
+    private MemberListSubController memberListSubController;
 
     @SuppressWarnings("unused")
     private MemberListSubController memberListSpectatorSubcontroller;
@@ -238,10 +238,10 @@ public class GameLobbyController implements Controller {
         // load game members
 
         this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members, memberListSubcontroller)).toList());
+                playersNumberId, members, memberListSubController)).toList());
         playerList.addListener((ListChangeListener<? super User>) c -> this.idUserList.getChildren().setAll(
                 members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                        playersNumberId, members, memberListSubcontroller)).toList()));
+                        playersNumberId, members, memberListSubController)).toList()));
 
         gameLobbyInformation.addColourOnComboBox(colorPicker);
 
@@ -304,7 +304,7 @@ public class GameLobbyController implements Controller {
         }
         this.idUserList.getChildren().clear();
         this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members, memberListSubcontroller)).toList());
+                playersNumberId, members, memberListSubController)).toList());
         this.spectatorViewId.getChildren().clear();
         this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList,
                 memberListSpectatorSubcontroller)).toList());
@@ -365,7 +365,7 @@ public class GameLobbyController implements Controller {
 
         this.idUserList.getChildren().clear();
         this.idUserList.getChildren().setAll(members.stream().map(m -> gameLobbyInformation.renderMember(m, playerList,
-                playersNumberId, members, memberListSubcontroller)).toList());
+                playersNumberId, members, memberListSubController)).toList());
         this.spectatorViewId.getChildren().clear();
         this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList
                 , memberListSpectatorSubcontroller)).toList());
