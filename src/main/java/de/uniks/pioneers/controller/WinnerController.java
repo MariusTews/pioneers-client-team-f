@@ -151,6 +151,7 @@ public class WinnerController implements Controller {
     private void close() {
         this.gameStorage.setId(null);
         ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
+        this.destroy();
         this.app.show(lobbyController.get());
     }
 }
