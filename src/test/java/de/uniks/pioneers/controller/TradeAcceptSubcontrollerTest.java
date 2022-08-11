@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TradeAcceptSubcontrollerTest extends ApplicationTest {
-    User user = new User("0", "0", "u1", "Bob", "s", "a", null);
+    final User user = new User("0", "0", "u1", "Bob", "s", "a", null);
 
     @Mock
     UserService userService;

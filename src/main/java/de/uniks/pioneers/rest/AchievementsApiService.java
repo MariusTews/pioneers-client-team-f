@@ -11,6 +11,7 @@ import java.util.List;
 import static de.uniks.pioneers.Constants.USER_ACHIEVEMENTS_BY_ID_URL;
 import static de.uniks.pioneers.Constants.USER_ACHIEVEMENTS_URL;
 
+@SuppressWarnings("ALL")
 public interface AchievementsApiService {
 
     @GET(USER_ACHIEVEMENTS_URL)

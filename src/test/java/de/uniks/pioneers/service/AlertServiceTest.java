@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AlertServiceTest {
-    AlertService alertService = new AlertService();
+    final AlertService alertService = new AlertService();
 
     @Test
     public void hasKnightCardTest() {

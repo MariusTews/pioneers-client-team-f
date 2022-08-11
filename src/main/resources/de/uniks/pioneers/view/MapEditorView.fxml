@@ -10,39 +10,38 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.MapEditorController">
-   <children>
-      <Label layoutX="422.0" layoutY="14.0" text="Map Editor">
-         <font>
-            <Font size="32.0" />
-         </font>
-      </Label>
-      <VBox fx:id="menu" alignment="TOP_CENTER" layoutX="765.0" layoutY="38.0" prefHeight="220.0" prefWidth="220.0">
-         <children>
-            <Label text="map name" />
-            <TextField fx:id="nameTextField" maxWidth="200.0" promptText="type name">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </TextField>
-            <Label text="editing area" />
-            <HBox alignment="CENTER" prefHeight="48.0" prefWidth="220.0">
-               <children>
-                  <Button fx:id="mapSizeMinusButton" mnemonicParsing="false" onAction="#mapSizeMinusButtonPressed" prefHeight="25.0" prefWidth="40.0" text="-" />
-                  <Label fx:id="mapSizeLabel" text="0">
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-                  </Label>
-                  <Button fx:id="mapSizePlusButton" mnemonicParsing="false" onAction="#mapSizePlusButtonPressed" prefHeight="25.0" prefWidth="40.0" text="+" />
-               </children>
-            </HBox>
-            <Label text="+ : add tile" />
-            <Label text="+ : add harbor" />
-            <Label text="x : delete" />
-            <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonPressed" text="Save" />
-         </children>
-      </VBox>
-      <ScrollPane id="map" fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="700.0" prefWidth="1100.0" vbarPolicy="NEVER" vvalue="0.5" />
-   </children>
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0"
+      prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.uniks.pioneers.controller.MapEditorController">
+   <Label layoutX="422.0" layoutY="14.0" text="Map Editor">
+      <font>
+         <Font size="32.0"/>
+      </font>
+   </Label>
+   <VBox fx:id="menu" alignment="TOP_CENTER" layoutX="765.0" layoutY="38.0" prefHeight="220.0" prefWidth="220.0">
+      <Label text="map name"/>
+      <TextField fx:id="nameTextField" maxWidth="200.0" promptText="type name">
+         <VBox.margin>
+            <Insets/>
+         </VBox.margin>
+      </TextField>
+      <Label text="editing area"/>
+      <HBox alignment="CENTER" prefHeight="48.0" prefWidth="220.0">
+         <Button fx:id="mapSizeMinusButton" mnemonicParsing="false" onAction="#mapSizeMinusButtonPressed"
+                 prefHeight="25.0" prefWidth="40.0" text="-"/>
+         <Label fx:id="mapSizeLabel" text="0">
+            <font>
+               <Font size="20.0"/>
+            </font>
+         </Label>
+         <Button fx:id="mapSizePlusButton" mnemonicParsing="false" onAction="#mapSizePlusButtonPressed"
+                 prefHeight="25.0" prefWidth="40.0" text="+"/>
+      </HBox>
+      <Label text="+ : add tile"/>
+      <Label text="+ : add harbor"/>
+      <Label text="x : delete"/>
+      <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonPressed" text="Save"/>
+   </VBox>
+   <ScrollPane id="map" fx:id="mapPane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="700.0"
+               prefWidth="1100.0" vbarPolicy="NEVER" vvalue="0.5"/>
 </Pane>

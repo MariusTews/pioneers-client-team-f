@@ -12,7 +12,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -112,7 +111,7 @@ public class LobbyController implements Controller {
     private Disposable tabDisposable;
     private DirectChatStorage currentDirectStorage;
 
-    private LobbyTabsAndMessage lb = new LobbyTabsAndMessage();
+    private final LobbyTabsAndMessage lb = new LobbyTabsAndMessage();
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
@@ -656,7 +655,7 @@ public class LobbyController implements Controller {
         return !friendsUserList.contains(user);
     }
 
-    public void OnAchievementsPressed(ActionEvent actionEvent) {
+    public void OnAchievementsPressed() {
         this.app.show(achievementsScreenController.get());
     }
 }

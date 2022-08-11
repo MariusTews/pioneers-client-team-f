@@ -15,7 +15,7 @@ import java.util.List;
 
 class LoadMapTemplateTest extends ApplicationTest {
 
-	LoadMapTemplate loadMapTemplate = new LoadMapTemplate();
+	final LoadMapTemplate loadMapTemplate = new LoadMapTemplate();
 
 	List<Tile> createTiles() {
 		List<Tile> tiles = new ArrayList<>();
