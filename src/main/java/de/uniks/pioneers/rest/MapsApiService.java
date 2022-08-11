@@ -1,5 +1,6 @@
 package de.uniks.pioneers.rest;
 
+import de.uniks.pioneers.dto.CreateMapTemplateDto;
 import de.uniks.pioneers.dto.CreateVoteDto;
 import de.uniks.pioneers.model.Vote;
 import de.uniks.pioneers.template.MapTemplate;
@@ -10,6 +11,9 @@ import java.util.List;
 
 @SuppressWarnings({"unused", "SameReturnValue"})
 public interface MapsApiService {
+    @POST("maps")
+    Observable<MapTemplate> createMapTemplate(@Body CreateMapTemplateDto dto);
+
     @GET("maps")
     Observable<List<MapTemplate>> findAllMaps();
 
