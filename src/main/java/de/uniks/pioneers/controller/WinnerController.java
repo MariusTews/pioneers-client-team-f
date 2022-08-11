@@ -144,14 +144,14 @@ public class WinnerController implements Controller {
                             }
                         }, error -> {}
                 );
-        primaryStage.close();
         this.close();
     }
 
     private void close() {
         this.gameStorage.setId(null);
         ResourceManager.saveConfig(JsonUtil.removeGameIdFromConfig());
-        this.destroy();
+        primaryStage.close();
         this.app.show(lobbyController.get());
+        this.destroy();
     }
 }
