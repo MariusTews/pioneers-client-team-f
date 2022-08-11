@@ -222,13 +222,9 @@ public class GameLobbyController implements Controller {
 				.observeOn(FX_SCHEDULER)
 				.subscribe(result -> {
 					this.game = result;
+					this.gameStorage.setGameOptions(result.settings());
 					int victoryPoints = result.settings().victoryPoints();
 					int mapRadius = result.settings().mapRadius();
-					this.gameStorage.setSize(mapRadius);
-					this.gameStorage.setMapTemplate(result.settings().mapTemplate());
-					this.gameStorage.setVictoryPoints(victoryPoints);
-					this.gameStorage.setRollSeven(result.settings().roll7());
-					this.gameStorage.setStartingResources(result.settings().startingResources());
 					this.settingsLabel.setText("Settings: Map Size = " + mapRadius + "  Required VP = " + victoryPoints);
 					this.idTitleLabel.setText("Welcome to " + this.game.name());
 				});

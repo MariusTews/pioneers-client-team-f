@@ -340,19 +340,6 @@ public class GameScreenController implements Controller {
 
         //reload on rejoin
         if (rejoin) {
-            this.pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
-                    .observeOn(FX_SCHEDULER)
-                    .subscribe(
-                            p -> this.pioneersService
-                                    .findOneState(this.gameStorage.getId())
-                                    .observeOn(FX_SCHEDULER)
-                                    .subscribe(
-                                            state -> {
-                                                Event<State> event = new Event<>(UPDATED, state);
-                                                this.handleStateEvents(event);
-                                            }
-                                    )
-                    );
             this.pioneersService
                     .findAllBuildings(this.gameStorage.getId())
                     .observeOn(FX_SCHEDULER)
@@ -362,6 +349,15 @@ public class GameScreenController implements Controller {
                                     this.gameFieldSubController.updateBuildings(b.x().intValue(), b.y().intValue(),
                                             b.z().intValue(), b.side().intValue(), b.owner(), b.type());
                                 }
+                            }
+                    );
+            this.pioneersService
+                    .findOneState(this.gameStorage.getId())
+                    .observeOn(FX_SCHEDULER)
+                    .subscribe(
+                            state -> {
+                                Event<State> event = new Event<>(UPDATED, state);
+                                this.handleStateEvents(event);
                             }
                     );
             //display the dices to be able to click on them (if there is no founding move, they are not displayed automatically)
@@ -712,9 +708,11 @@ public class GameScreenController implements Controller {
                 break;
             }
         }
-        //this distinguishes between player and spectator TODO active
+        //this distinguishes between player and spectator
         if (!changeToPlayer) {
-            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), true)
+            // set active to false only when there is more than one game member
+            boolean active = this.members.size() == 1;
+            pioneersService.updatePlayer(this.gameStorage.getId(), this.idStorage.getID(), active)
                     .observeOn(FX_SCHEDULER).subscribe(onSuccess -> this.app.show(lobbyController.get()));
         }
 

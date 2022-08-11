@@ -818,13 +818,7 @@ public class LobbyController implements Controller {
     public void onRejoin() {
         //set game options (if app was closed before, they are now longer saved)
         Game game = this.gameService.findOneGame(this.gameStorage.getId()).blockingFirst();
-        int victoryPoints = game.settings().victoryPoints();
-        int mapRadius = game.settings().mapRadius();
-        this.gameStorage.setSize(mapRadius);
-        this.gameStorage.setMapTemplate(game.settings().mapTemplate());
-        this.gameStorage.setVictoryPoints(victoryPoints);
-        this.gameStorage.setRollSeven(game.settings().roll7());
-        this.gameStorage.setStartingResources(game.settings().startingResources());
+        this.gameStorage.setGameOptions(game.settings());
 
         boolean changeToPlayer = false;
         for (Member m : this.members) {

@@ -21,21 +21,14 @@ public class JsonUtil {
 
     public static String updateConfigWithGameId(String gameId) {
         JSONObject loadConfig = ResourceManager.loadConfig();
-        return new JSONObject()
-                .put(JSON_REMEMBER_ME, loadConfig.get(JSON_REMEMBER_ME))
-                .put(JSON_NAME, loadConfig.get(JSON_NAME))
-                .put(JSON_TOKEN, loadConfig.get(JSON_TOKEN))
-                .put(JSON_GAME_ID, gameId)
-                .toString();
+        loadConfig.put(JSON_GAME_ID, gameId);
+        return loadConfig.toString();
     }
 
     public static String removeGameIdFromConfig() {
         JSONObject loadConfig = ResourceManager.loadConfig();
-        return new JSONObject()
-                .put(JSON_REMEMBER_ME, loadConfig.get(JSON_REMEMBER_ME))
-                .put(JSON_NAME, loadConfig.get(JSON_NAME))
-                .put(JSON_TOKEN, loadConfig.get(JSON_TOKEN))
-                .toString();
+        loadConfig.remove(JSON_GAME_ID);
+        return loadConfig.toString();
     }
 
     public static String createDefaultConfig() {
