@@ -17,11 +17,6 @@
     -fx-background-color: transparent;
 }
 
-.list-cell {
-    -fx-background-color: transparent;
-}
-
-
 #showButton {
     -fx-background-color: #fcfcfc;
     -fx-text-fill: grey;

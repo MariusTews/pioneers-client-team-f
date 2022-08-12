@@ -57,6 +57,10 @@
     -fx-background-repeat: no-repeat;
 }
 
+.list-cell {
+    -fx-background-color: transparent;
+}
+
 /*noinspection ALL*/
 .scroll-pane > .corner {
     -fx-background-color: transparent;
