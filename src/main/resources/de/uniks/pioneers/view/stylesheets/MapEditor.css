@@ -1,3 +1,9 @@
+#background {
+    -fx-background-image: url("../assets/ingame_background.png");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 1100 700;
+}
+
 /*noinspection ALL*/
 .tileButton {
     -fx-background-color: #d2dcde;
@@ -17,10 +23,28 @@
 
 /*noinspection ALL*/
 .numberField {
+    -fx-background-image: url("../assets/grey_blue_textfield.png");
+    -fx-background-size: cover;
     -fx-text-fill: green;
 }
 
 #map {
     -fx-background-color: TRANSPARENT;
     -fx-background: TRANSPARENT;
+}
+
+#templateMenu {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center;
+    -fx-background-size: 220 220;
+}
+
+#headline {
+    -fx-text-fill: white;
+    -fx-font-size: 40;
+}
+
+#mapName {
+    -fx-text-fill: white;
 }

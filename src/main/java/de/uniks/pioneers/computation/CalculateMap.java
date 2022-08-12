@@ -12,435 +12,454 @@ import javafx.scene.text.Font;
 
 public class CalculateMap {
 
-	private double center;
-
-	public Polygon buildHexagon(double xCoordinate, double yCoordinate, int x, int y, int z, boolean isTemplate) {
-		//creates a Hexagon at the given coordinate
-		double hexPoint1 = 0.0;
-		double hexPoint2 = 30.0;
-		double hexPoint3 = 52.0;
-		double hexPoint4 = 60.0;
-		double hexPoint5 = -30.0;
-		double hexPoint6 = -52.0;
-		double hexPoint7 = -60.0;
-
-		Polygon hexagon = new Polygon(
-				hexPoint6, hexPoint2,
-				hexPoint1, hexPoint4,
-				hexPoint3, hexPoint2,
-				hexPoint3, hexPoint5,
-				hexPoint1, hexPoint7,
-				hexPoint6, hexPoint5
-		);
-
-		String id = createId(x, y, z);
-		hexagon.setId(id);
-		hexagon.setLayoutX(xCoordinate);
-		hexagon.setLayoutY(yCoordinate);
-
-		if (isTemplate) {
-			hexagon.setFill(Color.TRANSPARENT);
-			hexagon.setStroke(Color.BLACK);
-		}
-
-		return hexagon;
-	}
-
-	public Circle buildCircle(double xCoordinate, double yCoordinate, int x, int y, int z, int side) {
-		//creates a Circle at the given coordinate
-		Circle circle = new Circle(15);
-		String id = createId(x, y, z) + "_" + side;
-		circle.setId(id);
-		circle.setFill(Color.TRANSPARENT);
-		circle.setLayoutX(xCoordinate);
-		circle.setLayoutY(yCoordinate);
-		return circle;
-	}
-
-	public ImageView buildImage(double xCoordinate, double yCoordinate, int x, int y, int z, boolean Harbour) {
-		//creates an ImageView at the given coordinate
-		ImageView imageView = new ImageView();
-		imageView.setFitHeight(40);
-		imageView.setFitWidth(40);
-		String id;
-		if (Harbour) {
-			id = createId(x, y, z) + "_HarbourImage";
-			imageView.setLayoutX(xCoordinate - 30);
-			imageView.setLayoutY(yCoordinate - 30);
-			imageView.setFitHeight(60);
-			imageView.setFitWidth(60);
-		} else {
-			id = createId(x, y, z) + "_RobberImage";
-			imageView.setLayoutX(xCoordinate - 20);
-			imageView.setLayoutY(yCoordinate - 50);
-		}
-		imageView.setId(id);
-		return imageView;
-	}
-
-	public Polygon buildRoad(double xCoordinate, double yCoordinate, int x, int y, int z, double rotation, boolean harbour) {
-		//creates a road at the given coordinate
-		double roadPos1 = -20.0;
-		double roadPos2 = -5.0;
-		double roadPos3 = 5.0;
-		double roadPos4 = 20.0;
-		double roadPos5 = 25.0;
-		double roadPos6 = -25.0;
-		double roadPos7 = 0.0;
-
-		Polygon road = new Polygon(
-				roadPos2, roadPos1,
-				roadPos7, roadPos6,
-				roadPos3, roadPos1,
-				roadPos3, roadPos4,
-				roadPos7, roadPos5,
-				roadPos2, roadPos4
-		);
-
-		if (!harbour) {
-			if (rotation == 0.0) {
-				String id = createId(x, y, z) + "_" + 3 + "_Road";
-				road.setId(id);
-			} else if (rotation == 60.0) {
-				String id = createId(x, y, z) + "_" + 11 + "_Road";
-				road.setId(id);
-			} else if (rotation == 120.0) {
-				String id = createId(x, y, z) + "_" + 7 + "_Road";
-				road.setId(id);
-			}
-		}
-
-		// For easier Harbour placement Ids are corresponding to the harbour location id +1 and -1
-		// example harbour at pos 9 has roads 8 and 10 visible
-		if (harbour) {
-			road.setFill(Color.SILVER);
-			if (rotation == 0.0) {
-				String id = createId(x, y, z) + "_" + 6 + "_HarbourRoad";
-				road.setId(id);
-			} else if (rotation == 60.0) {
-				String id = createId(x, y, z) + "_" + 8 + "_HarbourRoad";
-				road.setId(id);
-			} else if (rotation == 120.0) {
-				String id = createId(x, y, z) + "_" + 10 + "_HarbourRoad";
-				road.setId(id);
-			} else if (rotation == 180.0) {
-				String id = createId(x, y, z) + "_" + 0 + "_HarbourRoad";
-				road.setId(id);
-			} else if (rotation == 240.0) {
-				String id = createId(x, y, z) + "_" + 2 + "_HarbourRoad";
-				road.setId(id);
-			} else if (rotation == 300.0) {
-				String id = createId(x, y, z) + "_" + 4 + "_HarbourRoad";
-				road.setId(id);
-			}
-		}
-
-		road.setVisible(false);
-		road.setStroke(Color.BLACK);
-		road.setStrokeWidth(1.0);
-		road.setLayoutX(xCoordinate);
-		road.setLayoutY(yCoordinate);
-		road.setRotate(rotation);
-		return road;
-	}
-
-	private void buildWaterTile(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, int position) {
-
-		//all cases need the image
-		pane.getChildren().add(buildImage(xCoordinate, yCoordinate, x, y, z, true));
-
-		switch (position) {
-			case 1, 2, 10 -> {
-				// for the building
-				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
-
-				//for the road
-				pane.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate + 45, x, y, z, 7));
-				pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 45, x, y, z, 120.0, false));
-
-				//for the harbour
-				pane.getChildren().add(buildRoad(xCoordinate, yCoordinate + 30, x, y, z, 180.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 16, x, y, z, 240.0, true));
-
-				if (position == 1) {
-					pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 16, x, y, z, 300.0, true));
-				} else if (position == 2) {
-					pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
-				}
-			}
-			case 3 -> {
-				pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 16, x, y, z, 240.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 16, x, y, z, 300.0, true));
-			}
-			case 4, 5, 8 -> {
-				// for the building
-				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
-
-				//for the road
-				pane.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate - 45, x, y, z, 11));
-				pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 45, x, y, z, 60.0, false));
-
-				//for the harbour
-				pane.getChildren().add(buildRoad(xCoordinate, yCoordinate - 30, x, y, z, 0.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 16, x, y, z, 300.0, true));
-
-				if (position == 4) {
-					pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 16, x, y, z, 240.0, true));
-				} else if (position == 5) {
-					pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
-				}
-			}
-			case 6 -> {
-				// for the building
-				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 6));
-
-				//for the harbour
-				pane.getChildren().add(buildRoad(xCoordinate, yCoordinate - 30, x, y, z, 0.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
-			}
-			case 7 -> {
-				// for the building
-				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
-
-				//for the road
-				pane.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
-				pane.getChildren().add(buildRoad(xCoordinate + 52, yCoordinate, x, y, z, 0.0, false));
-
-				//for the harbour
-				pane.getChildren().add(buildRoad(xCoordinate, yCoordinate - 30, x, y, z, 0.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
-			}
-			case 9 -> {
-				//for the road
-				pane.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
-				pane.getChildren().add(buildRoad(xCoordinate + 52, yCoordinate, x, y, z, 0.0, false));
-
-				//for the harbour
-				pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
-			}
-			case 11 -> {
-				// for the building
-				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
-
-				//for the road
-				pane.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
-				pane.getChildren().add(buildRoad(xCoordinate + 52, yCoordinate, x, y, z, 0.0, false));
-
-				//for the harbour
-				pane.getChildren().add(buildRoad(xCoordinate, yCoordinate + 30, x, y, z, 180.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
-
-			}
-			case 12 -> {
-				// for the building
-				pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
-
-				//for the harbour
-				pane.getChildren().add(buildRoad(xCoordinate, yCoordinate + 30, x, y, z, 180.0, true));
-				pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
-			}
-		}
-	}
-
-	public Pane buildMap(int size, boolean isTemplate) {
-
-		Pane map = buildPane(size);
-		int z = size * (-1);
-
-		while (z <= size) {
-			int x = size * (-1);
-			while (x <= size) {
-
-				int y = -x - z;
-
-				if ((z == 0) || (!(y > size) && !(y < (-size)))) {
-					buildAtPosition(map, center, x, y, z, isTemplate);
-				}
-				x++;
-			}
-			z++;
-		}
-
-		if (!isTemplate) {
-			int waterMin = (size + 1) * -1;
-			int waterMax = (size + 1);
-
-			//Build the 6 Constant WaterTileCorners
-			//top right
-			buildWaterTile(map, getxCoordinate(center, waterMax, waterMin), getyCoordinate(center, waterMin), waterMax, 0, waterMin, 10);
-
-			//top left
-			buildWaterTile(map, getxCoordinate(center, 0, waterMin), getyCoordinate(center, waterMin), 0, waterMax, waterMin, 12);
-
-			//mid left
-			buildWaterTile(map, getxCoordinate(center, waterMin, 0), getyCoordinate(center, 0), waterMin, waterMax, 0, 9);
-
-			//bottom left
-			buildWaterTile(map, getxCoordinate(center, waterMin, waterMax), getyCoordinate(center, waterMax), waterMin, 0, waterMax, 6);
-
-			//bottom right
-			buildWaterTile(map, getxCoordinate(center, 0, waterMax), getyCoordinate(center, waterMax), 0, waterMin, waterMax, 8);
-
-			//mid right
-			buildWaterTile(map, getxCoordinate(center, waterMax, 0), getyCoordinate(center, 0), waterMax, waterMin, 0, 3);
-
-			if (size > 0) {
-				// Build the dynamic WaterTiles
-				for (int i = 1; i <= size; i++) {
-					//bottom left
-					buildWaterTile(map, getxCoordinate(center, waterMin, i), getyCoordinate(center, i), waterMin, waterMax - i, i, 7);
-
-					//bottom right
-					buildWaterTile(map, getxCoordinate(center, waterMax - i, i), getyCoordinate(center, i), waterMax - i, waterMin, i, 4);
-
-					//top center
-					buildWaterTile(map, getxCoordinate(center, i, waterMin), getyCoordinate(center, waterMin), i, waterMax - i, waterMin, 2);
-
-					//top right
-					buildWaterTile(map, getxCoordinate(center, waterMax, -i), getyCoordinate(center, -i), waterMax, waterMin + i, -i, 1);
-
-					//top left
-					buildWaterTile(map, getxCoordinate(center, waterMin + i, -i), getyCoordinate(center, -i), waterMin + i, waterMax, -i, 11);
-
-					//bottom center
-					buildWaterTile(map, getxCoordinate(center, -i, waterMax), getyCoordinate(center, waterMax), -i, waterMin + i, waterMax, 5);
-				}
-			}
-		}
-		return map;
-	}
-
-	public Pane buildPane(int size) {
-		Pane map = new Pane();
-		double paneBaseSize = 350;
-		double paneVariableSize = 216;
-
-		//create a map with double the needed size
-		double mapSize = (paneBaseSize + paneVariableSize * size) * 2;
-
-		//make small maps appear in the center of the scroll pane
-		if (mapSize < 1600) {
-			map.setMinWidth(1600);
-			map.setMinHeight(1600);
-			center = 800;
-
-		} else {
-			map.setMinWidth(mapSize);
-			map.setMinHeight(mapSize);
-
-			center = mapSize / 2;
-		}
-		map.setStyle("-fx-background: transparent; -fx-background-color: transparent; ");
-		return map;
-	}
-
-	private void buildAtPosition(Pane map, double center, int x, int y, int z, boolean isTemplate) {
-		double xCoordinate = getxCoordinate(center, x, z);
-		double yCoordinate = getyCoordinate(center, z);
-
-		map.getChildren().add(buildHexagon(xCoordinate, yCoordinate, x, y, z, isTemplate));
-
-		// for the buildings
-		if (!isTemplate) {
-			// for the buildings
-			map.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
-			map.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
-
-			//for the roads
-			map.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
-			map.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate + 45, x, y, z, 7));
-			map.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate - 45, x, y, z, 11));
-
-			//Create Polygons required for the roads
-			map.getChildren().add(buildRoad(xCoordinate + 52, yCoordinate, x, y, z, 0.0, false));
-			map.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 45, x, y, z, 120.0, false));
-			map.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 45, x, y, z, 60.0, false));
-
-			//Place the image view for robber
-			map.getChildren().add(buildImage(xCoordinate, yCoordinate, x, y, z, false));
-
-			//Place a Label fot the number
-			map.getChildren().add(buildLabel(xCoordinate, yCoordinate, x, y, z));
-			//Place a Label for the number
-			map.getChildren().add(buildLabel(xCoordinate, yCoordinate, x, y, z));
-		} else {
-			buildButton(map, xCoordinate - 45, yCoordinate - 15, x, y, z, false);
-			buildButton(map, xCoordinate + 5, yCoordinate - 15, x, y, z, true);
-		}
-	}
-
-	private void buildButton(Pane map, double xCoordinate, double yCoordinate, int x, int y, int z, boolean harbor) {
-		Button button = new Button();
-		button.setPrefWidth(30);
-		button.setPrefHeight(30);
-		map.getChildren().add(button);
-		// set position of button on hexagon
-		button.setLayoutX(xCoordinate);
-		button.setLayoutY(yCoordinate);
-		button.setText("+");
-		button.toFront();
-
-		// set id for either a harbor or tile button
-		if (harbor) {
-			button.setId(createId(x, y, z) + "_harborButton");
-			button.getStyleClass().add("harborButton");
-		} else {
-			button.setId(createId(x, y, z) + "_tileButton");
-			button.getStyleClass().add("tileButton");
-		}
-	}
-
-	public Label buildLabel(double xCoordinate, double yCoordinate, int x, int y, int z) {
-		//creates a label at the given coordinate
-		Label label = new Label();
-		label.setPrefHeight(24.0);
-		label.setPrefWidth(24.0);
-		label.setLayoutX(xCoordinate - 12);
-		label.setLayoutY(yCoordinate - 12);
-		label.setAlignment(Pos.CENTER);
-		label.setFont(Font.font(12));
-		label.setTextFill(Color.BLACK);
-		label.setId(createId(x, y, z) + "_label");
-		return label;
-	}
-
-	public double getxCoordinate(double center, int x, int z) {
-		int xOffset = 104;
-		int halfXOffset = 52;
-		return center + (xOffset * x) + (halfXOffset * z);
-	}
-
-	public double getyCoordinate(double center, int z) {
-		int yOffset = 90;
-		return center + (yOffset * z);
-	}
-
-	public static String createId(int x, int y, int z) {
-
-		String id = "";
-		// parse coordinates to ID
-		if ((x < 0) && (y < 0) && (z >= 0)) {
-			id = "xM" + x * (-1) + "yM" + y * (-1) + "z" + z;
-		} else if ((x < 0) && (y >= 0) && (z < 0)) {
-			id = "xM" + x * (-1) + "y" + y + "zM" + z * (-1);
-		} else if ((x >= 0) && (y < 0) && (z < 0)) {
-			id = "x" + x + "yM" + y * (-1) + "zM" + z * (-1);
-		} else if (x < 0 && y >= 0) {
-			id = "xM" + x * (-1) + "y" + y + "z" + z;
-		} else if (x >= 0 && y < 0) {
-			id = "x" + x + "yM" + y * (-1) + "z" + z;
-		} else if (x >= 0 && z < 0) {
-			id = "x" + x + "y" + y + "zM" + z * (-1);
-		} else if (x >= 0) {
-			id = "x" + x + "y" + y + "z" + z;
-		}
-		return id;
-	}
-
-	public double getCenter() {
-		return this.center;
-	}
+    private double center;
+
+    public Polygon buildHexagon(double xCoordinate, double yCoordinate, int x, int y, int z, boolean isTemplate) {
+        //creates a Hexagon at the given coordinate
+        double hexPoint1 = 0.0;
+        double hexPoint2 = 30.0;
+        double hexPoint3 = 52.0;
+        double hexPoint4 = 60.0;
+        double hexPoint5 = -30.0;
+        double hexPoint6 = -52.0;
+        double hexPoint7 = -60.0;
+
+        Polygon hexagon = new Polygon(
+                hexPoint6, hexPoint2,
+                hexPoint1, hexPoint4,
+                hexPoint3, hexPoint2,
+                hexPoint3, hexPoint5,
+                hexPoint1, hexPoint7,
+                hexPoint6, hexPoint5
+        );
+
+        String id = createId(x, y, z);
+        hexagon.setId(id);
+        hexagon.setLayoutX(xCoordinate);
+        hexagon.setLayoutY(yCoordinate);
+
+        if (isTemplate) {
+            hexagon.setFill(Color.grayRgb(100, 0.5));
+            hexagon.setStroke(Color.BLACK);
+        }
+
+        return hexagon;
+    }
+
+    public Circle buildCircle(double xCoordinate, double yCoordinate, int x, int y, int z, int side) {
+        //creates a Circle at the given coordinate
+        Circle circle = new Circle(15);
+        String id = createId(x, y, z) + "_" + side;
+        circle.setId(id);
+        circle.setFill(Color.TRANSPARENT);
+        circle.setLayoutX(xCoordinate);
+        circle.setLayoutY(yCoordinate);
+        return circle;
+    }
+
+    public Circle buildColorCircle(double xCoordinate, double yCoordinate, int x, int y, int z, int side) {
+        //creates a Circle at the given coordinate
+        Circle colorCircle = new Circle(15);
+        String colorId = createId(x, y, z) + "_" + side + "#color";
+        colorCircle.setId(colorId);
+        colorCircle.setFill(Color.TRANSPARENT);
+        colorCircle.setLayoutX(xCoordinate);
+        colorCircle.setLayoutY(yCoordinate);
+        return colorCircle;
+    }
+
+    public ImageView buildImage(double xCoordinate, double yCoordinate, int x, int y, int z, boolean Harbour) {
+        //creates an ImageView at the given coordinate
+        ImageView imageView = new ImageView();
+        imageView.setFitHeight(40);
+        imageView.setFitWidth(40);
+        String id;
+        if (Harbour) {
+            id = createId(x, y, z) + "_HarbourImage";
+            imageView.setLayoutX(xCoordinate - 30);
+            imageView.setLayoutY(yCoordinate - 30);
+            imageView.setFitHeight(60);
+            imageView.setFitWidth(60);
+        } else {
+            id = createId(x, y, z) + "_RobberImage";
+            imageView.setLayoutX(xCoordinate - 20);
+            imageView.setLayoutY(yCoordinate - 50);
+        }
+        imageView.setId(id);
+        return imageView;
+    }
+
+    public Polygon buildRoad(double xCoordinate, double yCoordinate, int x, int y, int z, double rotation, boolean harbour) {
+        //creates a road at the given coordinate
+        double roadPos1 = -20.0;
+        double roadPos2 = -5.0;
+        double roadPos3 = 5.0;
+        double roadPos4 = 20.0;
+        double roadPos5 = 25.0;
+        double roadPos6 = -25.0;
+        double roadPos7 = 0.0;
+
+        Polygon road = new Polygon(
+                roadPos2, roadPos1,
+                roadPos7, roadPos6,
+                roadPos3, roadPos1,
+                roadPos3, roadPos4,
+                roadPos7, roadPos5,
+                roadPos2, roadPos4
+        );
+
+        if (!harbour) {
+            if (rotation == 0.0) {
+                String id = createId(x, y, z) + "_" + 3 + "_Road";
+                road.setId(id);
+            } else if (rotation == 60.0) {
+                String id = createId(x, y, z) + "_" + 11 + "_Road";
+                road.setId(id);
+            } else if (rotation == 120.0) {
+                String id = createId(x, y, z) + "_" + 7 + "_Road";
+                road.setId(id);
+            }
+        }
+
+        // For easier Harbour placement Ids are corresponding to the harbour location id +1 and -1
+        // example harbour at pos 9 has roads 8 and 10 visible
+        if (harbour) {
+            road.setFill(Color.SILVER);
+            if (rotation == 0.0) {
+                String id = createId(x, y, z) + "_" + 6 + "_HarbourRoad";
+                road.setId(id);
+            } else if (rotation == 60.0) {
+                String id = createId(x, y, z) + "_" + 8 + "_HarbourRoad";
+                road.setId(id);
+            } else if (rotation == 120.0) {
+                String id = createId(x, y, z) + "_" + 10 + "_HarbourRoad";
+                road.setId(id);
+            } else if (rotation == 180.0) {
+                String id = createId(x, y, z) + "_" + 0 + "_HarbourRoad";
+                road.setId(id);
+            } else if (rotation == 240.0) {
+                String id = createId(x, y, z) + "_" + 2 + "_HarbourRoad";
+                road.setId(id);
+            } else if (rotation == 300.0) {
+                String id = createId(x, y, z) + "_" + 4 + "_HarbourRoad";
+                road.setId(id);
+            }
+        }
+
+        road.setVisible(false);
+        road.setStroke(Color.BLACK);
+        road.setStrokeWidth(1.0);
+        road.setLayoutX(xCoordinate);
+        road.setLayoutY(yCoordinate);
+        road.setRotate(rotation);
+        return road;
+    }
+
+    private void buildWaterTile(Pane pane, double xCoordinate, double yCoordinate, int x, int y, int z, int position) {
+
+        //all cases need the image
+        pane.getChildren().add(buildImage(xCoordinate, yCoordinate, x, y, z, true));
+
+        switch (position) {
+            case 1, 2, 10 -> {
+                // for the building
+                pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+                pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+
+                //for the road
+                pane.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate + 45, x, y, z, 7));
+                pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 45, x, y, z, 120.0, false));
+
+                //for the harbour
+                pane.getChildren().add(buildRoad(xCoordinate, yCoordinate + 30, x, y, z, 180.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 16, x, y, z, 240.0, true));
+
+                if (position == 1) {
+                    pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 16, x, y, z, 300.0, true));
+                } else if (position == 2) {
+                    pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
+                }
+            }
+            case 3 -> {
+                pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 16, x, y, z, 240.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 16, x, y, z, 300.0, true));
+            }
+            case 4, 5, 8 -> {
+                // for the building
+                pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+                pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+
+                //for the road
+                pane.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate - 45, x, y, z, 11));
+                pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 45, x, y, z, 60.0, false));
+
+                //for the harbour
+                pane.getChildren().add(buildRoad(xCoordinate, yCoordinate - 30, x, y, z, 0.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 16, x, y, z, 300.0, true));
+
+                if (position == 4) {
+                    pane.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 16, x, y, z, 240.0, true));
+                } else if (position == 5) {
+                    pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
+                }
+            }
+            case 6 -> {
+                // for the building
+                pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 6));
+                pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 6));
+
+                //for the harbour
+                pane.getChildren().add(buildRoad(xCoordinate, yCoordinate - 30, x, y, z, 0.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
+            }
+            case 7 -> {
+                // for the building
+                pane.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+                pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+
+                //for the road
+                pane.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
+                pane.getChildren().add(buildRoad(xCoordinate + 52, yCoordinate, x, y, z, 0.0, false));
+
+                //for the harbour
+                pane.getChildren().add(buildRoad(xCoordinate, yCoordinate - 30, x, y, z, 0.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
+            }
+            case 9 -> {
+                //for the road
+                pane.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
+                pane.getChildren().add(buildRoad(xCoordinate + 52, yCoordinate, x, y, z, 0.0, false));
+
+                //for the harbour
+                pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
+            }
+            case 11 -> {
+                // for the building
+                pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+                pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+
+                //for the road
+                pane.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
+                pane.getChildren().add(buildRoad(xCoordinate + 52, yCoordinate, x, y, z, 0.0, false));
+
+                //for the harbour
+                pane.getChildren().add(buildRoad(xCoordinate, yCoordinate + 30, x, y, z, 180.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate - 16, x, y, z, 60.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
+
+            }
+            case 12 -> {
+                // for the building
+                pane.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+                pane.getChildren().add(buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+
+                //for the harbour
+                pane.getChildren().add(buildRoad(xCoordinate, yCoordinate + 30, x, y, z, 180.0, true));
+                pane.getChildren().add(buildRoad(xCoordinate + 26, yCoordinate + 16, x, y, z, 120.0, true));
+            }
+        }
+    }
+
+    public Pane buildMap(int size, boolean isTemplate) {
+
+        Pane map = buildPane(size);
+        int z = size * (-1);
+
+        while (z <= size) {
+            int x = size * (-1);
+            while (x <= size) {
+
+                int y = -x - z;
+
+                if ((z == 0) || (!(y > size) && !(y < (-size)))) {
+                    buildAtPosition(map, center, x, y, z, isTemplate);
+                }
+                x++;
+            }
+            z++;
+        }
+
+        if (!isTemplate) {
+            int waterMin = (size + 1) * -1;
+            int waterMax = (size + 1);
+
+            //Build the 6 Constant WaterTileCorners
+            //top right
+            buildWaterTile(map, getxCoordinate(center, waterMax, waterMin), getyCoordinate(center, waterMin), waterMax, 0, waterMin, 10);
+
+            //top left
+            buildWaterTile(map, getxCoordinate(center, 0, waterMin), getyCoordinate(center, waterMin), 0, waterMax, waterMin, 12);
+
+            //mid left
+            buildWaterTile(map, getxCoordinate(center, waterMin, 0), getyCoordinate(center, 0), waterMin, waterMax, 0, 9);
+
+            //bottom left
+            buildWaterTile(map, getxCoordinate(center, waterMin, waterMax), getyCoordinate(center, waterMax), waterMin, 0, waterMax, 6);
+
+            //bottom right
+            buildWaterTile(map, getxCoordinate(center, 0, waterMax), getyCoordinate(center, waterMax), 0, waterMin, waterMax, 8);
+
+            //mid right
+            buildWaterTile(map, getxCoordinate(center, waterMax, 0), getyCoordinate(center, 0), waterMax, waterMin, 0, 3);
+
+            if (size > 0) {
+                // Build the dynamic WaterTiles
+                for (int i = 1; i <= size; i++) {
+                    //bottom left
+                    buildWaterTile(map, getxCoordinate(center, waterMin, i), getyCoordinate(center, i), waterMin, waterMax - i, i, 7);
+
+                    //bottom right
+                    buildWaterTile(map, getxCoordinate(center, waterMax - i, i), getyCoordinate(center, i), waterMax - i, waterMin, i, 4);
+
+                    //top center
+                    buildWaterTile(map, getxCoordinate(center, i, waterMin), getyCoordinate(center, waterMin), i, waterMax - i, waterMin, 2);
+
+                    //top right
+                    buildWaterTile(map, getxCoordinate(center, waterMax, -i), getyCoordinate(center, -i), waterMax, waterMin + i, -i, 1);
+
+                    //top left
+                    buildWaterTile(map, getxCoordinate(center, waterMin + i, -i), getyCoordinate(center, -i), waterMin + i, waterMax, -i, 11);
+
+                    //bottom center
+                    buildWaterTile(map, getxCoordinate(center, -i, waterMax), getyCoordinate(center, waterMax), -i, waterMin + i, waterMax, 5);
+                }
+            }
+        }
+        return map;
+    }
+
+    public Pane buildPane(int size) {
+        Pane map = new Pane();
+        double paneBaseSize = 350;
+        double paneVariableSize = 216;
+
+        //create a map with double the needed size
+        double mapSize = (paneBaseSize + paneVariableSize * size) * 2;
+
+        //make small maps appear in the center of the scroll pane
+        if (mapSize < 1600) {
+            map.setMinWidth(1600);
+            map.setMinHeight(1600);
+            center = 800;
+
+        } else {
+            map.setMinWidth(mapSize);
+            map.setMinHeight(mapSize);
+
+            center = mapSize / 2;
+        }
+        map.setStyle("-fx-background: transparent; -fx-background-color: transparent; ");
+        return map;
+    }
+
+    private void buildAtPosition(Pane map, double center, int x, int y, int z, boolean isTemplate) {
+        double xCoordinate = getxCoordinate(center, x, z);
+        double yCoordinate = getyCoordinate(center, z);
+
+        map.getChildren().add(buildHexagon(xCoordinate, yCoordinate, x, y, z, isTemplate));
+
+        // for the buildings
+        if (!isTemplate) {
+            // for the buildings
+            map.getChildren().add(buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+            map.getChildren().add(buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 0));
+            map.getChildren().add(buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+            map.getChildren().add(buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6));
+
+            //for the roads
+            map.getChildren().add(buildCircle(xCoordinate + 52, yCoordinate, x, y, z, 3));
+            map.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate + 45, x, y, z, 7));
+            map.getChildren().add(buildCircle(xCoordinate - 26, yCoordinate - 45, x, y, z, 11));
+
+            //Create Polygons required for the roads
+            map.getChildren().add(buildRoad(xCoordinate + 52, yCoordinate, x, y, z, 0.0, false));
+            map.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate + 45, x, y, z, 120.0, false));
+            map.getChildren().add(buildRoad(xCoordinate - 26, yCoordinate - 45, x, y, z, 60.0, false));
+
+            //Place the image view for robber
+            map.getChildren().add(buildImage(xCoordinate, yCoordinate, x, y, z, false));
+
+            //Place a Label fot the number
+            map.getChildren().add(buildLabel(xCoordinate, yCoordinate, x, y, z));
+            //Place a Label for the number
+            map.getChildren().add(buildLabel(xCoordinate, yCoordinate, x, y, z));
+        } else {
+            buildButton(map, xCoordinate - 45, yCoordinate - 15, x, y, z, false);
+            buildButton(map, xCoordinate + 5, yCoordinate - 15, x, y, z, true);
+        }
+    }
+
+    private void buildButton(Pane map, double xCoordinate, double yCoordinate, int x, int y, int z, boolean harbor) {
+        Button button = new Button();
+        button.setPrefWidth(30);
+        button.setPrefHeight(30);
+        map.getChildren().add(button);
+        // set position of button on hexagon
+        button.setLayoutX(xCoordinate);
+        button.setLayoutY(yCoordinate);
+        button.setText("+");
+        button.toFront();
+
+        // set id for either a harbor or tile button
+        if (harbor) {
+            button.setId(createId(x, y, z) + "_harborButton");
+            button.getStyleClass().add("harborButton");
+        } else {
+            button.setId(createId(x, y, z) + "_tileButton");
+            button.getStyleClass().add("tileButton");
+        }
+    }
+
+    public Label buildLabel(double xCoordinate, double yCoordinate, int x, int y, int z) {
+        //creates a label at the given coordinate
+        Label label = new Label();
+        label.setPrefHeight(24.0);
+        label.setPrefWidth(24.0);
+        label.setLayoutX(xCoordinate - 12);
+        label.setLayoutY(yCoordinate - 12);
+        label.setAlignment(Pos.CENTER);
+        label.setFont(Font.font(12));
+        label.setTextFill(Color.BLACK);
+        label.setId(createId(x, y, z) + "_label");
+        return label;
+    }
+
+    public double getxCoordinate(double center, int x, int z) {
+        int xOffset = 104;
+        int halfXOffset = 52;
+        return center + (xOffset * x) + (halfXOffset * z);
+    }
+
+    public double getyCoordinate(double center, int z) {
+        int yOffset = 90;
+        return center + (yOffset * z);
+    }
+
+    public static String createId(int x, int y, int z) {
+
+        String id = "";
+        // parse coordinates to ID
+        if ((x < 0) && (y < 0) && (z >= 0)) {
+            id = "xM" + x * (-1) + "yM" + y * (-1) + "z" + z;
+        } else if ((x < 0) && (y >= 0) && (z < 0)) {
+            id = "xM" + x * (-1) + "y" + y + "zM" + z * (-1);
+        } else if ((x >= 0) && (y < 0) && (z < 0)) {
+            id = "x" + x + "yM" + y * (-1) + "zM" + z * (-1);
+        } else if (x < 0 && y >= 0) {
+            id = "xM" + x * (-1) + "y" + y + "z" + z;
+        } else if (x >= 0 && y < 0) {
+            id = "x" + x + "yM" + y * (-1) + "z" + z;
+        } else if (x >= 0 && z < 0) {
+            id = "x" + x + "y" + y + "zM" + z * (-1);
+        } else if (x >= 0) {
+            id = "x" + x + "y" + y + "z" + z;
+        }
+        return id;
+    }
+
+    public double getCenter() {
+        return this.center;
+    }
 }
