@@ -243,31 +243,43 @@ public class LoadMapTemplate {
 			// Circle top middle
 			case 1 -> {
 				Circle circle = calculateMap.buildCircle(xCoordinate, yCoordinate - 60, x, y, z, 0);
+				Circle colorCircle = calculateMap.buildColorCircle(xCoordinate, yCoordinate - 60, x, y, z, 0);
+				addToPane(colorCircle);
 				addToPane(circle);
 			}
 			// Circle bottom middle
 			case 2 -> {
 				Circle circle = calculateMap.buildCircle(xCoordinate, yCoordinate + 60, x, y, z, 6);
+				Circle colorCircle = calculateMap.buildColorCircle(xCoordinate, yCoordinate + 60, x, y, z, 6);
+				addToPane(colorCircle);
 				addToPane(circle);
 			}
 			// Circle top right
 			case 3 -> {
 				Circle circle = calculateMap.buildCircle(xCoordinate + 52, yCoordinate - 30, x + 1, y, z - 1, 6);
+				Circle colorCircle = calculateMap.buildColorCircle(xCoordinate + 52, yCoordinate - 30, x + 1, y, z - 1, 6);
+				addToPane(colorCircle);
 				addToPane(circle);
 			}
 			// Circle top left
 			case 4 -> {
 				Circle circle = calculateMap.buildCircle(xCoordinate - 52, yCoordinate - 30, x, y + 1, z - 1, 6);
+				Circle colorCircle = calculateMap.buildColorCircle(xCoordinate - 52, yCoordinate - 30, x, y + 1, z - 1, 6);
+				addToPane(colorCircle);
 				addToPane(circle);
 			}
 			// Circle bottom right
 			case 5 -> {
 				Circle circle = calculateMap.buildCircle(xCoordinate + 52, yCoordinate + 30, x, y - 1, z + 1, 0);
+				Circle colorCircle = calculateMap.buildColorCircle(xCoordinate + 52, yCoordinate + 30, x, y - 1, z + 1, 0);
+				addToPane(colorCircle);
 				addToPane(circle);
 			}
 			// Circle bottom left
 			case 6 -> {
 				Circle circle = calculateMap.buildCircle(xCoordinate - 52, yCoordinate + 30, x - 1, y, z + 1, 0);
+				Circle colorCircle = calculateMap.buildColorCircle(xCoordinate - 52, yCoordinate + 30, x - 1, y, z + 1, 0);
+				addToPane(colorCircle);
 				addToPane(circle);
 			}
 		}

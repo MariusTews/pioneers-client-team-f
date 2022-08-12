@@ -203,8 +203,7 @@ public class CircleSubController implements Controller {
             Image settlement = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/settlement_transparent.png")).toExternalForm());
             ImagePattern settlementPattern = new ImagePattern(settlement);
             this.view.setFill(settlementPattern);
-            this.color.setTranslateY(-3);
-            this.color.setRadius(17);
+            this.color.setRadius(13.5);
             this.color.setFill(Color.web(color));
         }
     }
@@ -228,7 +227,7 @@ public class CircleSubController implements Controller {
             ImagePattern settlementPattern = new ImagePattern(settlement);
             this.view.setFill(settlementPattern);
             this.color.setTranslateY(-8);
-            this.color.setRadius(8);
+            this.color.setRadius(7.7);
             this.color.setFill(Color.web(color));
         }
     }
