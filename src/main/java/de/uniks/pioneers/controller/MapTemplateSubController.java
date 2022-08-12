@@ -24,6 +24,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,7 @@ public class MapTemplateSubController implements Controller {
     private final String createdBy;
     private final String userId;
     private final MapTemplatesScreenController parentController;
+    private Provider<MapEditorController> mapEditorController;
     private MapsService mapsService;
     private Image leftActionImage;
     private Image rightActionImage;
@@ -65,13 +67,14 @@ public class MapTemplateSubController implements Controller {
     private final ColorAdjust brightColorAdjust = new ColorAdjust();
     private HashMap<String, String> userNames;
 
-    public MapTemplateSubController(App app, MapTemplate template, boolean ownMap, String createdBy, String userId, MapTemplatesScreenController parentController) {
+    public MapTemplateSubController(App app, MapTemplate template, boolean ownMap, String createdBy, String userId, MapTemplatesScreenController parentController, Provider<MapEditorController> mapEditorController) {
         this.app = app;
         this.template = template;
         this.ownMap = ownMap;
         this.createdBy = createdBy;
         this.userId = userId;
         this.parentController = parentController;
+        this.mapEditorController = mapEditorController;
     }
 
     @Override
@@ -150,6 +153,9 @@ public class MapTemplateSubController implements Controller {
         if (ownMap) {
             // edit map
             //TODO
+            final MapEditorController controller = mapEditorController.get();
+            controller.setMapTemplate(this.template);
+            this.app.show(controller);
         } else {
             updateVote(1);
         }

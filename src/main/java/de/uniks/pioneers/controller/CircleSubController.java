@@ -39,7 +39,6 @@ public class CircleSubController implements Controller {
     private final GameFieldSubController gameFieldSubController;
     private final AchievementsService achievementsService;
     private final CompositeDisposable disposable = new CompositeDisposable();
-
     private int x;
     private int y;
     private int z;

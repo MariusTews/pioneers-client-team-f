@@ -3,15 +3,18 @@ package de.uniks.pioneers.controller;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.CalculateMap;
+import de.uniks.pioneers.computation.LoadMapTemplate;
 import de.uniks.pioneers.service.AchievementsService;
 import de.uniks.pioneers.service.AlertService;
 import de.uniks.pioneers.service.HexFillService;
 import de.uniks.pioneers.service.MapsService;
 import de.uniks.pioneers.template.HarborTemplate;
+import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.template.TileTemplate;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -35,12 +38,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static de.uniks.pioneers.Constants.*;
+import static de.uniks.pioneers.computation.CalculateMap.createId;
 
 public class MapEditorController implements Controller {
     private final App app;
     private final Provider<MapTemplatesScreenController> mapTemplatesScreenController;
     private final AchievementsService achievementsService;
     private final MapsService mapsService;
+    private MapTemplate mapTemplate;
     @FXML
     public TextField nameTextField;
     @FXML
@@ -78,6 +83,7 @@ public class MapEditorController implements Controller {
         this.mapTemplatesScreenController = mapTemplatesScreenController;
         this.achievementsService = achievementsService;
         this.mapsService = mapsService;
+        this.mapTemplate = null;
     }
 
     @Override
@@ -128,11 +134,57 @@ public class MapEditorController implements Controller {
             e.printStackTrace();
             return null;
         }
-
+        CalculateMap calculateMap = new CalculateMap();
         // load initial transparent map with size zero
-        map = new CalculateMap().buildMap(0, true);
+        if (this.mapTemplate == null) {
+            map = calculateMap.buildMap(0, true);
+        } else {
+            LoadMapTemplate loadMapTemplate = new LoadMapTemplate();
+
+            int maxRange = 0;
+
+            for (TileTemplate tileTemplate: this.mapTemplate.tiles())
+            {
+                maxRange = loadMapTemplate.checkRange(tileTemplate.x(),tileTemplate.y(),tileTemplate.z(), maxRange);
+            }
+
+            for (HarborTemplate harborTemplate: this.mapTemplate.harbors())
+            {
+                maxRange = loadMapTemplate.checkRange(harborTemplate.x(),harborTemplate.y(),harborTemplate.z(), maxRange);
+            }
+
+            map = calculateMap.buildMap(maxRange, true);
+            this.mapSizeLabel.setText(String.valueOf(maxRange));
+            this.nameTextField.setText(this.mapTemplate.name());
+        }
         this.mapPane.setContent(map);
         addButtonsOnTiles();
+
+
+        if (this.mapTemplate != null) {
+            for (TileTemplate tileTemplate: this.mapTemplate.tiles())
+            {
+                String id = createId((Integer) tileTemplate.x(), (Integer) tileTemplate.y(), (Integer) tileTemplate.z());
+                addTile(id);
+            }
+
+            for (HarborTemplate harborTemplate: this.mapTemplate.harbors())
+            {
+                int i = harborTemplate.side().intValue();
+                String id = null;
+                switch (i) {
+                    case 1 -> id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() - 1);
+                    case 3 -> id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z());
+                    case 5 -> id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z() + 1);
+                    case 7 -> id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() + 1);
+                    case 9 -> id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z());
+                    case 11 -> id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z() - 1);
+                }
+                if (id != null) {
+                    addHarbor(id);
+                }
+            }
+        }
 
         // place the menu to front, so the hexagons don't overlay the buttons
         menu.toFront();
@@ -182,22 +234,25 @@ public class MapEditorController implements Controller {
 
     private void tileButtonPressed(ActionEvent event) {
         String id = filterID(event.getSource().toString());
+        addTile(id);
+    }
+
+    private void addTile(String id) {
         Button cancelTileButton = null;
         TextField numberField = null;
         ChoiceBox<String> choiceBox = null;
 
+
         for (Node node : map.getChildren()) {
             // make harbor button invisible
-            if (node.getId().equals(id + "_harborButton")) {
-                Button harborButton = (Button) node;
-                harborButton.setVisible(false);
+            if (node.getId().equals(id + "_harborButton") || node.getId().equals(id + "_tileButton")) {
+                Button button = (Button) node;
+                button.setVisible(false);
             }
 
             // look for the matching hexagon
             if (node.getId().equals(id)) {
                 Polygon hexagon = (Polygon) node;
-                Button tileButton = (Button) event.getSource();
-                tileButton.setVisible(false);
 
                 // cancel button
                 cancelTileButton = initCancelButton(hexagon);
@@ -342,6 +397,10 @@ public class MapEditorController implements Controller {
 
     private void harborButtonPressed(ActionEvent event) {
         String id = filterID(event.getSource().toString());
+        addHarbor(id);
+    }
+
+    private void addHarbor(String id) {
         Button cancelTileButton = null;
         ChoiceBox<String> chooseResource = null;
         ChoiceBox<String> chooseSide = null;
@@ -351,12 +410,10 @@ public class MapEditorController implements Controller {
 
         for (Node node : map.getChildren()) {
             // make buttons invisible
-            if (node.getId().equals(id + "_tileButton")) {
-                Button tileButton = (Button) node;
+            if (node.getId().equals(id + "_tileButton") || node.getId().equals(id + "_harborButton")) {
+                Button button = (Button) node;
                 if (flag) {
-                    tileButton.setVisible(false);
-                    Button harborButton = (Button) event.getSource();
-                    harborButton.setVisible(false);
+                    button.setVisible(false);
                 }
             }
 
@@ -580,11 +637,7 @@ public class MapEditorController implements Controller {
     }
 
     public void mapSizePlusButtonPressed() {
-        if (Integer.parseInt(this.mapSizeLabel.getText()) < 11) {
-            checkMap(1);
-        } else {
-            new AlertService().showAlert("The map can only be extended to a maximum of 10!");
-        }
+        checkMap(1);
     }
 
     private void checkMap(int i) {
@@ -685,5 +738,9 @@ public class MapEditorController implements Controller {
         // for temporary use, to get back
         final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
         this.app.show(controller);
+    }
+
+    public void setMapTemplate(MapTemplate mapTemplate) {
+        this.mapTemplate = mapTemplate;
     }
 }

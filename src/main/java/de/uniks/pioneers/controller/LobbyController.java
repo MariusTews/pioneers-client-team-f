@@ -280,8 +280,9 @@ public class LobbyController implements Controller {
 	}
 
 	public void createGameButtonPressed() {
-		//makes sure if user in game or not , and depending on that allows user to create the game
-		lobbyComService.createGame(createGameController);
+		if (createGameController != null) {
+			app.show(createGameController.get());
+		}
 	}
 
 	public void enterKeyPressed(KeyEvent event) {

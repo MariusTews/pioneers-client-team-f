@@ -189,7 +189,7 @@ public class MapTemplatesScreenController implements Controller {
     private void addMapTemplateItem(MapTemplate template, int position) {
         boolean ownMap = idStorage.getID().equals(template.createdBy());
         String userName = userNames.getOrDefault(template.createdBy(), "");
-        MapTemplateSubController controller = new MapTemplateSubController(this.app, template, ownMap, userName, idStorage.getID(), this);
+        MapTemplateSubController controller = new MapTemplateSubController(this.app, template, ownMap, userName, idStorage.getID(), this, mapEditorController);
         mapTemplateSubCons.put(template._id(), controller);
         controller.init();
         Parent item = controller.render();

@@ -79,34 +79,6 @@ public class LobbyComService {
 				);
 	}
 
-	public void createGame(Provider<CreateGameController> createGameController) {
-		if (gameStorage.getId() != null) {
-			memberService.getAllGameMembers(gameStorage.getId()).observeOn(FX_SCHEDULER)
-					.subscribe(result -> {
-						boolean trace = true;
-						for (Member member : result) {
-							if (!app.getTest() && member.userId().equals(idStorage.getID())) {
-								Alert alert = new Alert(Alert.AlertType.ERROR, "You cannot create Game while being part of another Game");
-								// Change style of error alert
-								DialogPane dialogPane = alert.getDialogPane();
-								dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-										.getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-								alert.showAndWait();
-								trace = false;
-								break;
-							}
-						}
-						if (trace) {
-							final CreateGameController controller = createGameController.get();
-							app.show(controller);
-						}
-					});
-		} else {
-			final CreateGameController controller = createGameController.get();
-			app.show(controller);
-		}
-	}
-
 	public void checkMessageField(TextField chatMessageField, DirectChatStorage currentDirectStorage) {
 		if (!chatMessageField.getText().isEmpty()) {
 			if (currentDirectStorage != null) {
