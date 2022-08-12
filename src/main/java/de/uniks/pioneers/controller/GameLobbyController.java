@@ -339,7 +339,7 @@ public class GameLobbyController implements Controller {
         //checks if combobox has been clicked,if not
         //then automatically picks color for the user.
         if (colorPicker.getSelectionModel().isEmpty()) {
-            if (readyMembers == members.size() + spectatorMember.size()) {
+            if (member.userId().equals(idStorage.getID()) && !member.spectator()) {
                 gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
             }
         }
@@ -349,6 +349,7 @@ public class GameLobbyController implements Controller {
 
         clearAll();
     }
+
 
     //This makes sure the user is offline
     // and is not  part of the game anymore.
@@ -396,7 +397,7 @@ public class GameLobbyController implements Controller {
         for (Member member : this.members) {
             if (member.userId().equals(idStorage.getID())) {
                 if (member.ready()) {
-                    memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), false, member.color(), member.spectator()).subscribe();
+                    memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), false, member.color(), member.spectator()).observeOn(FX_SCHEDULER).subscribe();
                     this.idReadyButton.setText("Ready");
                 } else {
                     memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), true, member.color(), member.spectator()).subscribe();
