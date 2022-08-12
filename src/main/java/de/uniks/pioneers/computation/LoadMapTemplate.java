@@ -30,11 +30,11 @@ public class LoadMapTemplate {
         maxRange = 0;
 
         for (Tile tile : map.tiles()) {
-            checkRange(tile.x(), tile.y(), tile.z());
+            maxRange = checkRange(tile.x(), tile.y(), tile.z(), maxRange);
         }
 
-        for (Harbor harbor : map.harbors()) {
-            checkRange(harbor.x(), harbor.y(), harbor.z());
+		for (Harbor harbor : map.harbors()) {
+			 maxRange = checkRange(harbor.x(), harbor.y(), harbor.z(), maxRange);
         }
         this.pane = calculateMap.buildPane(maxRange);
         double center = calculateMap.getCenter();
@@ -164,19 +164,23 @@ public class LoadMapTemplate {
         return this.pane;
     }
 
-    private void checkRange(Number a, Number b, Number c) {
+    public int checkRange(Number a, Number b, Number c, int maxRange) {
         int x = Math.abs(a.intValue());
         int y = Math.abs(b.intValue());
         int z = Math.abs(c.intValue());
 
-        if (x > maxRange) {
-            maxRange = x;
+        int range = maxRange;
+
+		if (x > maxRange) {
+			range = x;
         } else if (y > maxRange) {
-            maxRange = y;
+            range = y;
         } else if (z > maxRange) {
-            maxRange = z;
-        }
-    }
+            range = z;
+		}
+
+		return range;
+	}
 
     private void buildRoadCircle(int i, double xCoordinate, double yCoordinate, int x, int y, int z) {
         switch (i) {
