@@ -11,7 +11,7 @@
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
-    -fx-background-size: 426 300;
+    -fx-background-size: 428 305;
 }
 
 #userView .text {
@@ -40,7 +40,7 @@
     -fx-background-image: url("../assets/green_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
-    -fx-background-size: 230 180;
+    -fx-background-size: 235 185;
 }
 
 #cactus {
@@ -152,7 +152,7 @@
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-position: center;
     -fx-background-repeat: stretch;
-    -fx-background-size: 180 60;
+    -fx-background-size: 180 50;
 }
 
 #zoomContainer {
@@ -179,7 +179,7 @@
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-position: center;
     -fx-background-repeat: stretch;
-    -fx-background-size: 200 60;
+    -fx-background-size: 200 50;
 
 }
 
@@ -199,4 +199,16 @@
     -fx-background-color: transparent;
     -fx-font-size: 18;
     -fx-text-fill: WHITE;
+}
+
+
+#chatPaneFoldOut {
+    -fx-background-image: url("../assets/blue_panel.png");
+    -fx-background-position: center;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 200 60;
+}
+
+#imageChatNotification {
+    -fx-background-color: transparent;
 }

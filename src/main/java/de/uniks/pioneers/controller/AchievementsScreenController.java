@@ -111,7 +111,7 @@ public class AchievementsScreenController implements Controller {
     }
 
     private void showAchievement(Achievement achievement, String achievementName, String path) {
-        HBox achievementHbox = new HBox();
+        HBox achievementHBox = new HBox();
 
         // achievement image and unlocked image
         ImageView icon = new ImageView();
@@ -155,10 +155,10 @@ public class AchievementsScreenController implements Controller {
         buffer.setPrefWidth(30);
         Pane buffer1 = new Pane();
         buffer1.setPrefWidth(50);
-        achievementHbox.getChildren().addAll(icon, achievementNameLabel, unlockedImage, buffer, needed, buffer1, currentScore);
-        achievementHbox.setAlignment(Pos.CENTER_LEFT);
-        achievementHbox.setSpacing(30);
-        achievementsList.getItems().add(achievementHbox);
+        achievementHBox.getChildren().addAll(icon, achievementNameLabel, unlockedImage, buffer, needed, buffer1, currentScore);
+        achievementHBox.setAlignment(Pos.CENTER_LEFT);
+        achievementHBox.setSpacing(30);
+        achievementsList.getItems().add(achievementHBox);
     }
 
     public void OnBackClicked() {

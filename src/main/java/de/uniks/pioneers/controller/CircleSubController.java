@@ -128,7 +128,7 @@ public class CircleSubController implements Controller {
                 this.pioneersService.move(gameStorage.getId(), "build", x, y, z, side, build, null, null)
                         .observeOn(FX_SCHEDULER)
                         .subscribe(move -> {
-                            if (Objects.equals(build, "settlment")) {
+                            if (Objects.equals(build, "settlement")) {
                                 this.achievementsService.putOrUpdateAchievement(SETTLEMENT_BUILDER, 1).blockingFirst();
                             } else if (Objects.equals(build, "city")) {
                                 this.achievementsService.putOrUpdateAchievement(CITY_BUILDER, 1).blockingFirst();

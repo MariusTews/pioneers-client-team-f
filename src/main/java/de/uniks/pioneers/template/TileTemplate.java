@@ -1,5 +1,6 @@
 package de.uniks.pioneers.template;
 
+@SuppressWarnings("unused")
 public record TileTemplate(
            Number x,
            Number y,
