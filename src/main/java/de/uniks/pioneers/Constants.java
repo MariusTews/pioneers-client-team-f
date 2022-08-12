@@ -183,11 +183,16 @@ public class Constants {
 
     //Array of Colors as Strings for the Label text
     public static final String[] COLORSTRINGARRAY = {"DARKRED", "BLUE", "ORANGE", "DARKVIOLET", "TEAL", "YELLOW",
-            "ROSYBROWN", "OLIVE", "MAGENTA", "AQUA"};
+            "ROSYBROWN", "OLIVE", "MAGENTA", "AQUA", "BEIGE"};
 
     //Array of Colors
     public static final Color[] COLORARRAY = {Color.DARKRED, Color.BLUE, Color.ORANGE, Color.DARKVIOLET, Color.TEAL,
-            Color.YELLOW, Color.ROSYBROWN, Color.OLIVE, Color.MAGENTA, Color.AQUA};
+            Color.YELLOW, Color.ROSYBROWN, Color.OLIVE, Color.MAGENTA, Color.AQUA, Color.BEIGE};
+
+    // use a second array without Color.BEIGE because there is no image for this color, and it would lead to
+    // a NullPointerException in the CircleSubController setSettlement and setCity methods if this color would be inside
+    public static final Color[] COLORARRAY2 = {Color.DARKRED, Color.BLUE, Color.ORANGE, Color.DARKVIOLET, Color.TEAL,
+            Color.YELLOW, Color.ROSYBROWN, Color.OLIVE, Color.MAGENTA, Color.AQUA,};
 
     //Array of resources
     public static final String[] RESOURCES = {"lumber", "brick", "ore", "wool", "grain"};
