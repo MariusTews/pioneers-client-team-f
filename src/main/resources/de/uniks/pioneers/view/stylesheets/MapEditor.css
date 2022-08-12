@@ -23,6 +23,8 @@
 
 /*noinspection ALL*/
 .numberField {
+    -fx-background-image: url("../assets/grey_blue_textfield.png");
+    -fx-background-size: cover;
     -fx-text-fill: green;
 }
 
@@ -35,5 +37,14 @@
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
-    -fx-background-size: 420 420;
+    -fx-background-size: 220 220;
+}
+
+#headline {
+    -fx-text-fill: white;
+    -fx-font-size: 40;
+}
+
+#mapName {
+    -fx-text-fill: white;
 }
