@@ -277,6 +277,8 @@ public class TestModule {
 
             private boolean firstBuildRoad = true;
 
+            private boolean testOffer = true;
+
             private final HashMap<String, Integer> playerResources = new HashMap<>();
 
             {
@@ -566,16 +568,45 @@ public class TestModule {
                         testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
                         return Observable.just(new Move("", "", gameId, "01", "build", 5, null, null, null, null, "road-building"));
                     }
-                    //finish move
+                    //finish move / receive trade request
                     else {
-                        State state = new State("", gameId, List.of(
-                                new ExpectedMove("roll", List.of("01"))
-                        ), null);
-                        expectedMoves = state.expectedMoves();
-                        //new expected move is "roll" now
-                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        if (testOffer) {
+                            HashMap<String, Integer> resourcesOffer = new HashMap<>();
+                            resourcesOffer.put("lumber", -1);
+                            resourcesOffer.put("ore", 1);
+                            resourcesOffer.put("grain", -1);
+                            resourcesOffer.put("brick", 1);
+                            resourcesOffer.put("wool", -1);
+                            testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                                    new Move("1", "2", gameId, "02", "build", 3, null, null, resourcesOffer, null, null)));
+                            State state = new State("", gameId, List.of(
+                                    new ExpectedMove("offer", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            //new expected move is "offer" now
+                            testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                            testOffer = false;
+                        } else {
+                            State state = new State("", gameId, List.of(
+                                    new ExpectedMove("roll", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            //new expected move is "roll" now
+                            testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        }
+
 
                     }
+
+                }
+                //make trade offer
+                else if (dto.action().equals("offer")) {
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("roll", List.of("01"))
+                    ), null);
+                    expectedMoves = state.expectedMoves();
+                    //new expected move is "roll" now
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
 
                 }
                 // first founding roll

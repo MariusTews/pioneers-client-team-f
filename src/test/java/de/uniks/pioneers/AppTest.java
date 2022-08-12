@@ -95,10 +95,10 @@ public class AppTest extends ApplicationTest {
         type(KeyCode.SPACE);
         write("\t\t\t");
         type(KeyCode.SPACE);
+        sleep(5000);
         clickOn("#saveButton");
         write("\t");
         type(KeyCode.SPACE);
-        sleep(5000);
         write("\t\t\t\t\t");
         type(KeyCode.SPACE);
         doubleClickOn("#nameLabel");
@@ -158,6 +158,8 @@ public class AppTest extends ApplicationTest {
         clickOn("#tradeButton");
         //finish turn
         clickOn("#finishTurnButton");
+        clickOn("#acceptOfferButton");
+        sleep(5000);
         clickOn("#roll");
         //discard resources
         clickOn("#increment_lumber");
