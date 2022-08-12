@@ -14,7 +14,6 @@ import java.util.List;
 
 import static de.uniks.pioneers.Constants.*;
 
-@SuppressWarnings("ClassCanBeRecord")
 public class PioneersService {
 
     private final PioneersApiService pioneersApiService;
@@ -62,6 +61,18 @@ public class PioneersService {
         } else {
             return this.pioneersApiService.create(gameId, new CreateMoveDto(action, null, null, null, null, new CreateBuildingDto(x, y, z, side, type)));
         }
+    }
+
+    public Observable<Move> playDevCard(String gameId, String devCard) {
+        return this.pioneersApiService.create(gameId, new CreateMoveDto("build", null, null, null, devCard, null));
+    }
+
+    public Observable<Move> yearOfPlentyCard(String gameId, HashMap<String, Integer> resources) {
+        return this.pioneersApiService.create(gameId,new CreateMoveDto("year-of-plenty", null, resources, null, null, null));
+    }
+
+    public Observable<Move> monopolyCard(String gameId, HashMap<String, Integer> resources) {
+        return this.pioneersApiService.create(gameId, new CreateMoveDto("monopoly", null, resources, null, null, null));
     }
 
     public Observable<Move> tradeBank(String gameId, HashMap<String, Integer> resources) {

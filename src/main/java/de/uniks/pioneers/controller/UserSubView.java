@@ -222,7 +222,8 @@ public class UserSubView implements Controller {
                         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
                                 .observeOn(FX_SCHEDULER).subscribe(p -> pioneersService.move(this.gameStorage.getId(), e.expectedMoves().get(0).action(),
                                                 0, 0, 0, 0, NEW, null, null)
-                                        .observeOn(FX_SCHEDULER).subscribe());
+                                        .observeOn(FX_SCHEDULER).subscribe(est -> {
+                                        }));
                     } else if (e.expectedMoves().get(0).action().equals(BUILD) &&
                             !e.expectedMoves().get(0).players().contains(this.idStorage.getID())) {
                         alertService.showAlert("Not Your Turn");

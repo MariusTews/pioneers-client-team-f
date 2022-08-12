@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 @Module
 public class TestModule {
 
@@ -33,7 +34,7 @@ public class TestModule {
     }
 
     static class TestEventListener extends EventListener {
-        java.util.Map<String, ObservableEmitter<?>> emitterMap = new HashMap<>();
+        final java.util.Map<String, ObservableEmitter<?>> emitterMap = new HashMap<>();
 
         public TestEventListener(TokenStorage tokenStorage, ObjectMapper mapper) {
             super(tokenStorage, mapper);

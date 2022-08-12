@@ -63,6 +63,7 @@ public class App extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapTemplatesScreenStyle.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapEditor.css")).toString());
         scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/AchievementsStyle.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/stylesheets/MapTemplateView.css")).toString());
 
         setAppIcon(stage);
 
@@ -134,9 +135,9 @@ public class App extends Application {
                     group.getTransforms().add(scale);
                     stage.getScene().setRoot(group);
                     stage.setWidth(scaleFactor * 1600);
-                    stage.setHeight(bounds.getHeight());
+                    // reduce height by 7 otherwise there is a white bar at the bottom of the screen
+                    stage.setHeight(bounds.getHeight() - 7);
                     stage.centerOnScreen();
-
                 }
                 // "higher" screens
                 else {
@@ -147,7 +148,8 @@ public class App extends Application {
                     group.getTransforms().add(scale);
                     stage.getScene().setRoot(group);
                     stage.setWidth(bounds.getWidth());
-                    stage.setHeight(scaleFactor * 950);
+                    // reduce height by 7 otherwise there is a white bar at the bottom of the screen
+                    stage.setHeight((scaleFactor * 950) - 7);
                     stage.centerOnScreen();
                 }
             } else {
@@ -159,7 +161,7 @@ public class App extends Application {
                         || controller.getClass().equals(MapTemplatesScreenController.class)) {
                     stage.setWidth(1010);
                     stage.setHeight(600);
-                } else if (controller.getClass().equals(MapEditorController.class)) {
+                } else if (controller.getClass().equals(MapEditorController.class) || controller.getClass().equals(MapTemplateViewController.class)) {
                     stage.setWidth(1100);
                     stage.setHeight(700);
                 }

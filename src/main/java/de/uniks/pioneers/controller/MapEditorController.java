@@ -573,13 +573,13 @@ public class MapEditorController implements Controller {
     /*
      * increase or decrease the map size and place the buttons
      * */
-    public void mapSizeMinusButtonPressed(ActionEvent event) {
+    public void mapSizeMinusButtonPressed() {
         if (Integer.parseInt(this.mapSizeLabel.getText()) > 0) {
             checkMap(-1);
         }
     }
 
-    public void mapSizePlusButtonPressed(ActionEvent event) {
+    public void mapSizePlusButtonPressed() {
         if (Integer.parseInt(this.mapSizeLabel.getText()) < 11) {
             checkMap(1);
         } else {
@@ -642,7 +642,7 @@ public class MapEditorController implements Controller {
         return tmp;
     }
 
-    public void saveButtonPressed(ActionEvent event) {
+    public void saveButtonPressed() {
         // check if harbor is alone
         for (HarborTemplate harbor : harbors) {
             if (initSides(new ChoiceBox<>(), harbor.x().intValue(), harbor.y().intValue(), harbor.z().intValue())) {

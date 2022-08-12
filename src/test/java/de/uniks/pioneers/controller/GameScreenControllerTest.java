@@ -10,7 +10,9 @@ import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -99,7 +101,16 @@ class GameScreenControllerTest extends ApplicationTest {
         when(gameStorage.getId()).thenReturn("02");
         when(gameStorage.getSize()).thenReturn(1);
         when(idStorage.getID()).thenReturn("01");
-        when(pioneersService.findOnePlayer(any(), any())).thenReturn(Observable.empty());
+
+        //findPlayer fo OneDev-card
+        List<DevelopmentCard> devCards1 = new ArrayList<>();
+        DevelopmentCard d1 = new DevelopmentCard("knight", true, false);
+        devCards1.add(d1);
+
+        Player player1 = new Player("id", "3", "#223", true, 2, null, null,
+                4, 5, null, devCards1);
+        when(pioneersService.findOnePlayer("02", "01")).thenReturn(Observable.just(player1));
+
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         List<Player> players = new ArrayList<>();
         players.add(new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null, null));
@@ -196,9 +207,10 @@ class GameScreenControllerTest extends ApplicationTest {
     void finishTurn() {
         when(gameStorage.getId()).thenReturn("02");
         when(pioneersService.move("02", "build", null, null, null, null, null, null, null)).thenReturn(Observable.empty());
-        for (int i = 0; i < 17; i++) {
-            type(KeyCode.TAB);
-        }
+
+        type(KeyCode.TAB);
+        type(KeyCode.TAB);
+        type(KeyCode.TAB);
         type(KeyCode.SPACE);
         verify(pioneersService).move("02", "build", null, null, null, null, null, null, null);
     }
@@ -243,16 +255,14 @@ class GameScreenControllerTest extends ApplicationTest {
         waitForFxEvents();
     }
 
-    /*
     @Test
-    void zoomMap() {
-        Button zoomIn = lookup("#zoomInButton").query();
-        Button zoomOut = lookup("#zoomOutButton").query();
-        clickOn(zoomIn);
-        clickOn(zoomOut);
+    void onClickDevLabel() {
+        Pane showCards = lookup("#devCardsPane").query();
+        clickOn(showCards);
 
+        Label devCardsAmountLabel = lookup("#devCardsAmountLabel").query();
+        org.testfx.assertions.api.Assertions.assertThat(devCardsAmountLabel.getText()).isEqualTo("1");
     }
-    */
 
     @Override
     public void stop() throws Exception {

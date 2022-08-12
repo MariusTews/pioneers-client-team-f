@@ -9,7 +9,6 @@ import io.reactivex.rxjava3.core.Observable;
 
 import javax.inject.Inject;
 
-@SuppressWarnings("ClassCanBeRecord")
 public class AuthService {
 
     private final AuthApiService authApiService;

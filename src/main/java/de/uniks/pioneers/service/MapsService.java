@@ -12,7 +12,6 @@ import io.reactivex.rxjava3.core.Observable;
 import javax.inject.Inject;
 import java.util.List;
 
-@SuppressWarnings("ClassCanBeRecord")
 public class MapsService {
     private final MapsApiService mapsApiService;
 
