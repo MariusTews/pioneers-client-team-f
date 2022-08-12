@@ -29,17 +29,17 @@ import java.util.List;
 import static de.uniks.pioneers.Constants.FX_SCHEDULER;
 
 public class GameLobbyInformation {
-
     @Inject
     public GameLobbyInformation() {
 
     }
 
     public void giveYourSelfColour(ObservableList<Member> members, MemberService memberService, IDStorage idStorage) {
-        ColorController controller = new ColorController();
-        List<Label> createdColors = controller.getColor();
 
-        List<String> allColors = createdColors(createdColors);
+        ColorController controller = new ColorController();
+        List<Label> colors = controller.getColor();
+
+        List<String> allColors = new ArrayList<>(createdColors(colors));
 
         //remove color from allColors if it belongs to a member
         for (Member member : members) {
@@ -48,13 +48,14 @@ public class GameLobbyInformation {
             }
         }
 
+
         //give color to member that do not have colors
         for (Member member : members) {
-            if ((member.color() == null || member.color().equals("#000000"))
+            if ((member.color() == null || member.color().equals("#000000") )
                     && member.userId().equals(idStorage.getID()) && !member.spectator()) {
-                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), false)
+                memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), false).observeOn(FX_SCHEDULER)
                         .subscribe();
-                allColors.remove(0);
+                break;
             }
         }
     }
