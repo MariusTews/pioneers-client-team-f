@@ -61,11 +61,12 @@ class LoadMapTemplateTest extends ApplicationTest {
 		Map map = new Map("testMap", this.createTiles(), this.createHarbors());
 		Pane mapPane = loadMapTemplate.loadMap(map, true);
 
-		Assertions.assertEquals(mapPane.getChildren().size(), 115);
+		Assertions.assertEquals(mapPane.getChildren().size(), 137);
 
 		List<Node> hexagons = new ArrayList<>();
 		List<Node> roadCircles = new ArrayList<>();
 		List<Node> buildingCircles = new ArrayList<>();
+		List<Node> colorCircles = new ArrayList<>();
 		List<Node> roads = new ArrayList<>();
 		List<Node> harborImages = new ArrayList<>();
 		List<Node> robberImages = new ArrayList<>();
@@ -87,6 +88,8 @@ class LoadMapTemplateTest extends ApplicationTest {
 				harborImages.add(node);
 			} else if (node.getId().endsWith("_RobberImage")) {
 				robberImages.add(node);
+			} else if (node.getId().endsWith("#color")) {
+				colorCircles.add(node);
 			} else {
 				hexagons.add(node);
 			}
@@ -99,6 +102,7 @@ class LoadMapTemplateTest extends ApplicationTest {
 		Assertions.assertEquals(numberLabels.size(), 7);
 		Assertions.assertEquals(harborImages.size(), 6);
 		Assertions.assertEquals(robberImages.size(), 7);
+		Assertions.assertEquals(colorCircles.size(), 22);
 		Assertions.assertEquals(hexagons.size(), 7);
 	}
 
@@ -137,7 +141,7 @@ class LoadMapTemplateTest extends ApplicationTest {
 		Map map = new Map("testMap", this.maxXList(), this.noHarbors());
 		Pane mapPane = loadMapTemplate.loadMap(map, true);
 
-		Assertions.assertEquals(mapPane.getChildren().size(),21);
+		Assertions.assertEquals(mapPane.getChildren().size(),27);
 	}
 
 	@Test
@@ -145,6 +149,6 @@ class LoadMapTemplateTest extends ApplicationTest {
 		Map map = new Map("testMap", this.maxZList(), this.noHarbors());
 		Pane mapPane = loadMapTemplate.loadMap(map, true);
 
-		Assertions.assertEquals(mapPane.getChildren().size(),21);
+		Assertions.assertEquals(mapPane.getChildren().size(),27);
 	}
 }

@@ -21,6 +21,7 @@ import javafx.scene.shape.Polygon;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,6 +36,7 @@ public class GameFieldSubController implements Controller {
     private final List<Node> roads = new ArrayList<>();
     private final List<Node> roadCircles = new ArrayList<>();
     private final List<Node> buildingCircles = new ArrayList<>();
+    private final HashMap<String, Node> colorCircles = new HashMap<>();
     private final List<Node> hexagons = new ArrayList<>();
 
     private final IDStorage idStorage;
@@ -118,6 +120,8 @@ public class GameFieldSubController implements Controller {
                 roadCircles.add(node);
             } else if (node.getId().endsWith("_0") || node.getId().endsWith("_6")) {
                 buildingCircles.add(node);
+            } else if (node.getId().endsWith("#color")) {
+                colorCircles.put(node.getId().split("#")[0], node);
             } else if (!node.getId().endsWith("_label") && !node.getId().endsWith("_HarbourImage") && !node.getId().endsWith("_RobberImage")) {
                 hexagons.add(node);
             }
@@ -161,7 +165,7 @@ public class GameFieldSubController implements Controller {
                 if (road.getId().contains(node.getId())) {
                     CircleSubController circleSubController = new CircleSubController(
                             (Circle) node, (Polygon) road, pioneersService, gameStorage,
-                            idStorage, buildingCircles, this, achievementsService);
+                            idStorage, buildingCircles, colorCircles.values(), this, achievementsService);
                     circleSubController.init();
                     this.circleSubControllers.add(circleSubController);
                 }
@@ -169,7 +173,8 @@ public class GameFieldSubController implements Controller {
             if (node.getId().endsWith("_0") || node.getId().endsWith("_6")) {
                 CircleSubController circleSubController = new CircleSubController(
                         (Circle) node, null, pioneersService, gameStorage,
-                        idStorage, buildingCircles, this, achievementsService);
+                        idStorage, buildingCircles, colorCircles.values(), this, achievementsService);
+                circleSubController.setColor((Circle) colorCircles.get(node.getId().split("#")[0]));
                 circleSubController.init();
                 this.circleSubControllers.add(circleSubController);
             }
