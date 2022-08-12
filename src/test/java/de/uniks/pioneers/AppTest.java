@@ -95,7 +95,7 @@ public class AppTest extends ApplicationTest {
         type(KeyCode.SPACE);
         write("\t\t\t");
         type(KeyCode.SPACE);
-        sleep(5000);
+        write("mapname");
         clickOn("#saveButton");
         write("\t");
         type(KeyCode.SPACE);
@@ -159,7 +159,6 @@ public class AppTest extends ApplicationTest {
         //finish turn
         clickOn("#finishTurnButton");
         clickOn("#acceptOfferButton");
-        sleep(5000);
         clickOn("#roll");
         //discard resources
         clickOn("#increment_lumber");
