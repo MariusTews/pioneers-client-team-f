@@ -55,7 +55,6 @@ public class GameLobbyInformation {
                     && member.userId().equals(idStorage.getID()) && !member.spectator()) {
                 memberService.statusUpdate(member.gameId(), member.userId(), member.ready(), allColors.get(0), false).observeOn(FX_SCHEDULER)
                         .subscribe();
-                //allColors.remove(0);
                 break;
             }
         }

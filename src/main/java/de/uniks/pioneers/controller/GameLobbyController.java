@@ -18,13 +18,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
@@ -177,7 +174,6 @@ public class GameLobbyController implements Controller {
                         if (!started) {
                             started = true;
                             gameLobbyInformation.changeView(gameScreenController, idStartGameButton, app);
-                            //changeView();
                         }
                     }
                 }));
@@ -352,13 +348,13 @@ public class GameLobbyController implements Controller {
             }
         }
         this.idStartGameButton.disableProperty().set(readyMembers < 1 || readyMembers != members.size()
-                + spectatorMember.size());// || members.size() == 0);
+                + spectatorMember.size());
 
         //checks if combobox has been clicked,if not
         //then automatically picks color for the user.
         if (colorPicker.getSelectionModel().isEmpty()) {
             if (member.userId().equals(idStorage.getID()) && !member.spectator()) {
-                    gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
+                gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
             }
         }
 
