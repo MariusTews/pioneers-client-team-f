@@ -280,8 +280,9 @@ public class LobbyController implements Controller {
 	}
 
 	public void createGameButtonPressed() {
-		final CreateGameController controller = createGameController.get();
-		app.show(controller);
+		if (createGameController != null) {
+			app.show(createGameController.get());
+		}
 	}
 
 	public void enterKeyPressed(KeyEvent event) {
