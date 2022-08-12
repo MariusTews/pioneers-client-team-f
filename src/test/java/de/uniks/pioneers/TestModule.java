@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.BANK_ID;
+import static de.uniks.pioneers.Constants.NEW;
 
 @Module
 public class TestModule {
@@ -272,6 +273,7 @@ public class TestModule {
             private boolean firstRoll = true;
 
             private final HashMap<String, Integer> playerResources = new HashMap<>();
+
             {
                 playerResources.put("lumber", 10);
                 playerResources.put("ore", 10);
@@ -305,20 +307,32 @@ public class TestModule {
             public Observable<List<Player>> findAllPlayers(String gameId) {
                 List<Player> players = new ArrayList<>();
                 HashMap<String, Integer> res = new HashMap<>();
-                res.put("lumber", 0);
+                res.put("lumber", 10);
+                res.put("ore", 10);
+                res.put("grain", 10);
+                res.put("brick", 10);
+                res.put("wool", 10);
                 players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, null, null));
-                players.add(new Player("01", "02", "#622424", true, 1, res, null, 0,0,null, null));
+                players.add(new Player("01", "02", "#622424", true, 1, res, null, 0, 0, null, null));
                 return Observable.just(players);
             }
 
             @Override
             public Observable<Player> findOnePlayer(String gameId, String userId) {
-                return Observable.empty();
+                HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                remainingBuildings.put("settlement", 3);
+                remainingBuildings.put("city", 4);
+                remainingBuildings.put("road", 13);
+                return Observable.just(new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false))));
             }
 
             @Override
             public Observable<Player> updatePlayer(String gameId, String userId, UpdatePlayerDto dto) {
-                return null;
+                HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                remainingBuildings.put("settlement", 3);
+                remainingBuildings.put("city", 4);
+                remainingBuildings.put("road", 13);
+                return Observable.just(new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false))));
             }
 
 
@@ -408,7 +422,7 @@ public class TestModule {
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 13);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1237", createBuildingDto.side(), "road", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, new ArrayList<>());
                         }
                         // normal building
                         default -> {
@@ -423,15 +437,16 @@ public class TestModule {
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1238", createBuildingDto.side(), "settlement", gameId, "01");
                                 player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 3, 0, null, null);
 
-                            }
-                            else if (dto.building().type().equals("city")) {
+                            } else if (dto.building().type().equals("city")) {
                                 remainingBuildings.put("settlement", 2);
                                 remainingBuildings.put("city", 3);
                                 remainingBuildings.put("road", 12);
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1212", createBuildingDto.side(), "city", gameId, "01");
                                 player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 4, 0, null, null);
-                            }
-                            else {
+                            } else {
+                                if (Objects.equals(dto.action(), "build-road")) {
+                                    System.out.println("test");
+                                }
                                 remainingBuildings.put("settlement", 3);
                                 remainingBuildings.put("city", 4);
                                 remainingBuildings.put("road", 12);
@@ -478,7 +493,7 @@ public class TestModule {
                         remainingBuildings.put("settlement", 3);
                         remainingBuildings.put("city", 4);
                         remainingBuildings.put("road", 13);
-                        Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, null);
+                        Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false)));
                         testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
                         State state = new State("", gameId, List.of(
                                 new ExpectedMove("build", List.of("01"))
@@ -509,6 +524,37 @@ public class TestModule {
                         //new expected move is "accept" now
                         testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
 
+                    }
+                    //buy dev card
+                    else if (Objects.equals(dto.developmentCard(), NEW)) {
+                        //update state
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("build", List.of("01"))
+                        ), null);
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        //update player
+                        HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                        remainingBuildings.put("settlement", 3);
+                        remainingBuildings.put("city", 4);
+                        remainingBuildings.put("road", 13);
+                        Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false)));
+                        testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
+                    }
+                    //play dev card
+                    else if (Objects.equals(dto.developmentCard(), "road-building")) {
+                        //update state
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("build-road", List.of("01"))
+                        ), null);
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        //update player
+                        HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                        remainingBuildings.put("settlement", 3);
+                        remainingBuildings.put("city", 4);
+                        remainingBuildings.put("road", 13);
+                        Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", true, false)));
+                        testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
+                        return Observable.just(new Move("", "", gameId, "01", "build-road", 5, null, null, null, null, null));
                     }
                     //finish move
                     else {
@@ -550,7 +596,7 @@ public class TestModule {
                     remainingBuildings.put("settlement", 3);
                     remainingBuildings.put("city", 4);
                     remainingBuildings.put("road", 13);
-                    Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, null);
+                    Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false)));
                     testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
                 }
                 //action = drop
@@ -571,8 +617,7 @@ public class TestModule {
                     expectedMoves = state.expectedMoves();
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
                     return Observable.just(new Move("1", "2", gameId, "01", "drop", 3, null, null, dropResources, null, null));
-                }
-                else if (Objects.equals(dto.action(), "rob")) {
+                } else if (Objects.equals(dto.action(), "rob")) {
                     testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
                             new Move("1", "2", gameId, "01", "drop", 3, null, dto.rob(), null, null, null)));
                     //new state with expected move build
@@ -582,8 +627,6 @@ public class TestModule {
                     expectedMoves = state.expectedMoves();
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
                 }
-                //action = rob
-                //TODO
                 return Observable.empty();
             }
 

@@ -96,8 +96,10 @@ public class AchievementsScreenController implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe(achievements -> {
                     for (Achievement achievement : achievements) {
-                        this.achievementExits.replace(achievement.id(), true);
-                        this.showAchievement(achievement, ACHIEVEMENT_NAMES.get(achievement.id()), ACHIEVEMENT_PATHS.get(achievement.id()));
+                        if (ACHIEVEMENT_NAMES.containsKey(achievement.id())) {
+                            this.achievementExits.replace(achievement.id(), true);
+                            this.showAchievement(achievement, ACHIEVEMENT_NAMES.get(achievement.id()), ACHIEVEMENT_PATHS.get(achievement.id()));
+                        }
                     }
 
                     for (Map.Entry<String, Boolean> entry : achievementExits.entrySet()) {

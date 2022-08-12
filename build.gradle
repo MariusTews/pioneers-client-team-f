@@ -90,7 +90,7 @@ test {
         exceptionFormat = 'full'
         showStackTraces = true
     }
-
+/*
     systemProperties = [
             'java.awt.headless': 'true',
             'testfx.robot'     : 'glass',
@@ -99,7 +99,7 @@ test {
             'monocle.platform' : 'Headless',
             'prism.order'      : 'sw',
             'prism.text'       : 't2k',
-    ]
+    ]*/
 
     jvmArgs += [
             '-Xmx4g',
