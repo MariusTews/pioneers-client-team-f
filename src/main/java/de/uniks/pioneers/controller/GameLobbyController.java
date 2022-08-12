@@ -18,10 +18,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static de.uniks.pioneers.Constants.*;
@@ -354,9 +357,8 @@ public class GameLobbyController implements Controller {
         //checks if combobox has been clicked,if not
         //then automatically picks color for the user.
         if (colorPicker.getSelectionModel().isEmpty()) {
-            if (readyMembers == members.size() + spectatorMember.size()) {
-                gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
-                //giveYourselfColor();
+            if (member.userId().equals(idStorage.getID()) && !member.spectator()) {
+                    gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
             }
         }
 
@@ -370,6 +372,7 @@ public class GameLobbyController implements Controller {
         this.spectatorViewId.getChildren().setAll(spectatorMember.stream().map(m -> gameLobbyInformation.renderSpectatorMember(m, playerList
                 , memberListSpectatorSubcontroller)).toList());
     }
+
 
     //This makes sure the user is offline
     // and is not  part of the game anymore.
@@ -417,7 +420,7 @@ public class GameLobbyController implements Controller {
         for (Member member : this.members) {
             if (member.userId().equals(idStorage.getID())) {
                 if (member.ready()) {
-                    memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), false, member.color(), member.spectator()).subscribe();
+                    memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), false, member.color(), member.spectator()).observeOn(FX_SCHEDULER).subscribe();
                     this.idReadyButton.setText("Ready");
                 } else {
                     memberService.statusUpdate(gameStorage.getId(), idStorage.getID(), true, member.color(), member.spectator()).subscribe();
