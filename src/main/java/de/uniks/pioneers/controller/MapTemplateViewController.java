@@ -35,7 +35,7 @@ public class MapTemplateViewController implements Controller {
 
 	private Map map;
 
-	private LoadMapTemplate loadMapTemplate = new LoadMapTemplate();
+	private final LoadMapTemplate loadMapTemplate = new LoadMapTemplate();
 	private final List<Tile> tiles = new ArrayList<>();
 	private final List<Harbor> harbors = new ArrayList<>();
 

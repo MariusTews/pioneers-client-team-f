@@ -14,8 +14,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 
     // https://mvnrepository.com/artifact/org.testfx/testfx-junit5
     testImplementation group: 'org.testfx', name: 'testfx-junit5', version: '4.0.16-alpha'
@@ -61,9 +61,9 @@ dependencies {
 
 
     // Dagger
-    implementation 'com.google.dagger:dagger:2.42'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.42'
-    testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.42'
+    implementation 'com.google.dagger:dagger:2.43.1'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.43.1'
+    testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.43.1'
 
      //konghq
     implementation group: 'com.konghq' , name: 'unirest-java', version: '3.13.10'

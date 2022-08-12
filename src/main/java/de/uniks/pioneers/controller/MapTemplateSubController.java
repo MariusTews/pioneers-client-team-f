@@ -65,7 +65,7 @@ public class MapTemplateSubController implements Controller {
     private final ColorAdjust brightColorAdjust = new ColorAdjust();
     private HashMap<String, String> userNames;
 
-    public MapTemplateSubController(App app, MapTemplate template, boolean ownMap, String createdBy, MapsService mapsService, String userId, MapTemplatesScreenController parentController) {
+    public MapTemplateSubController(App app, MapTemplate template, boolean ownMap, String createdBy, String userId, MapTemplatesScreenController parentController) {
         this.app = app;
         this.template = template;
         this.ownMap = ownMap;

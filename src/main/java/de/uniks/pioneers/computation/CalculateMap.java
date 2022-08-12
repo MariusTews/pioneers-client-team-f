@@ -39,7 +39,7 @@ public class CalculateMap {
 		hexagon.setLayoutY(yCoordinate);
 
 		if (isTemplate) {
-			hexagon.setFill(Color.TRANSPARENT);
+			hexagon.setFill(Color.grayRgb(100, 0.5));
 			hexagon.setStroke(Color.BLACK);
 		}
 

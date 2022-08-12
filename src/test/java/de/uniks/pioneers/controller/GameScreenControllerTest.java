@@ -207,9 +207,10 @@ class GameScreenControllerTest extends ApplicationTest {
     void finishTurn() {
         when(gameStorage.getId()).thenReturn("02");
         when(pioneersService.move("02", "build", null, null, null, null, null, null, null)).thenReturn(Observable.empty());
-        for (int i = 0; i < 17; i++) {
-            type(KeyCode.TAB);
-        }
+
+        type(KeyCode.TAB);
+        type(KeyCode.TAB);
+        type(KeyCode.TAB);
         type(KeyCode.SPACE);
         verify(pioneersService).move("02", "build", null, null, null, null, null, null, null);
     }
@@ -262,17 +263,6 @@ class GameScreenControllerTest extends ApplicationTest {
         Label devCardsAmountLabel = lookup("#devCardsAmountLabel").query();
         org.testfx.assertions.api.Assertions.assertThat(devCardsAmountLabel.getText()).isEqualTo("1");
     }
-
-    /*
-    @Test
-    void zoomMap() {
-        Button zoomIn = lookup("#zoomInButton").query();
-        Button zoomOut = lookup("#zoomOutButton").query();
-        clickOn(zoomIn);
-        clickOn(zoomOut);
-
-    }
-    */
 
     @Override
     public void stop() throws Exception {

@@ -42,6 +42,7 @@ public class MessageViewSubController implements Controller {
 
     private final UserService userService;
     private final MemberService memberService;
+    private final GameScreenController gameScreenController;
     private final MessageService messageService;
     private final HashMap<String, User> userHash = new HashMap<>();
     private final HashMap<String, Member> memberHash = new HashMap<>();
@@ -61,13 +62,15 @@ public class MessageViewSubController implements Controller {
                                     UserService userService,
                                     MessageService messageService,
                                     MemberIDStorage memberIDStorage,
-                                    MemberService memberService) {
+                                    MemberService memberService,
+                                    GameScreenController gameScreenController) {
         this.eventListener = eventListener;
         this.gameStorage = gameStorage;
         this.userService = userService;
         this.messageService = messageService;
         this.memberIDStorage = memberIDStorage;
         this.memberService = memberService;
+        this.gameScreenController = gameScreenController;
     }
 
     @Override
@@ -111,6 +114,9 @@ public class MessageViewSubController implements Controller {
                         // New message will be added to the chat view
                         this.messages.add(message);
                         this.renderOneMessage(message);
+                        if (gameScreenController != null) {
+                            gameScreenController.setNotificationCircle();
+                        }
                     } else if (event.event().endsWith(DELETED)) {
                         // Add message to list of deleted messages, so the message will not be rendered again
                         this.messages.removeIf(m -> m._id().equals(message._id()));
