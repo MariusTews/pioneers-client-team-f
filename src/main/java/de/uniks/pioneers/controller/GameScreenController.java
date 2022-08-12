@@ -8,8 +8,6 @@ import de.uniks.pioneers.computation.SpectatorRenderInGame;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
-import de.uniks.pioneers.util.JsonUtil;
-import de.uniks.pioneers.util.ResourceManager;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
@@ -611,7 +609,7 @@ public class GameScreenController implements Controller {
 
                 // change the cursor when action is "rob" instead of alert (or notification),
                 //  remove the image from cursor, when leaving the game or when placing robber
-                if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID())) {
+                if (currentMove.equals(ROB_ACTION) && currentPlayer._id().equals(idStorage.getID()) && !app.getTest()) {
                     Image image = new Image(Objects.requireNonNull(Main.class.getResource("view/assets/robber.png")).toString());
                     currentPlayerLabel.getScene().setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
                 } else {

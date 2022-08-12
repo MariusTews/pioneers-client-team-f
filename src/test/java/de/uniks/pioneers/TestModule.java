@@ -199,6 +199,7 @@ public class TestModule {
     @Singleton
     GameMembersApiService gameMembersApiService() {
         return new GameMembersApiService() {
+
             @Override
             public Observable<List<Member>> findAll(String gameId) {
                 ArrayList<Member> members = new ArrayList<>();
@@ -273,6 +274,8 @@ public class TestModule {
             private final TestEventListener testEventListener = (TestEventListener) eventListener;
 
             private boolean firstRoll = true;
+
+            private boolean firstBuildRoad = true;
 
             private final HashMap<String, Integer> playerResources = new HashMap<>();
 
@@ -445,15 +448,20 @@ public class TestModule {
                                 remainingBuildings.put("road", 12);
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1212", createBuildingDto.side(), "city", gameId, "01");
                                 player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 4, 0, null, null);
-                            } else {
-                                if (Objects.equals(dto.action(), "build-road")) {
-                                    System.out.println("test");
-                                }
+                            }
+                            //action = build-road
+                            else {
                                 remainingBuildings.put("settlement", 3);
                                 remainingBuildings.put("city", 4);
                                 remainingBuildings.put("road", 12);
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1239", createBuildingDto.side(), "road", gameId, "01");
                                 player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, null);
+                                if (firstBuildRoad) {
+                                    state = new State("", gameId, List.of(
+                                            new ExpectedMove("build-road", List.of("01"))
+                                    ), null);
+                                    firstBuildRoad = false;
+                                }
                             }
                         }
                     }
@@ -461,7 +469,7 @@ public class TestModule {
                     testEventListener.fireEvent("games.01.buildings.*.*", new Event<>("games.01.updated", building));
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
                     testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
-                    return Observable.just(new Move("1", "2", gameId, "01", "build", 3, "building", null, null, null, null));
+                    return Observable.just(new Move("1", "2", gameId, "01", "build", 3, building.type(), null, null, null, null));
                 }
                 // roll the dice
                 else if (Objects.equals(dto.action(), "roll")) {
@@ -487,7 +495,7 @@ public class TestModule {
                     }
 
                 }
-                // create move with action "build"
+                //create move with action "build"
                 else if (Objects.equals(dto.action(), "build")) {
                     //bank trade
                     if (Objects.equals(dto.partner(), BANK_ID)) {
@@ -556,7 +564,7 @@ public class TestModule {
                         remainingBuildings.put("road", 13);
                         Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", true, false)));
                         testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
-                        return Observable.just(new Move("", "", gameId, "01", "build-road", 5, null, null, null, null, null));
+                        return Observable.just(new Move("", "", gameId, "01", "build", 5, null, null, null, null, "road-building"));
                     }
                     //finish move
                     else {
@@ -619,7 +627,9 @@ public class TestModule {
                     expectedMoves = state.expectedMoves();
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
                     return Observable.just(new Move("1", "2", gameId, "01", "drop", 3, null, null, dropResources, null, null));
-                } else if (Objects.equals(dto.action(), "rob")) {
+                }
+                //action = rob
+                else if (Objects.equals(dto.action(), "rob")) {
                     testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
                             new Move("1", "2", gameId, "01", "drop", 3, null, dto.rob(), null, null, null)));
                     //new state with expected move build
@@ -651,6 +661,7 @@ public class TestModule {
             public Observable<MapTemplate> createMapTemplate(@Body CreateMapTemplateDto dto) {
                 return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, null, null));
             }
+
             @Override
             public Observable<List<MapTemplate>> findAllMaps() {
                 return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, null, null)));

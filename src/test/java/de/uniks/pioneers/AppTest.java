@@ -5,9 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
-import org.testfx.api.FxRobotInterface;
 import org.testfx.framework.junit5.ApplicationTest;
-import org.testfx.service.adapter.impl.AwtRobotAdapter;
 import org.testfx.util.WaitForAsyncUtils;
 
 import static org.testfx.assertions.api.Assertions.assertThat;
@@ -20,7 +18,7 @@ public class AppTest extends ApplicationTest {
     public void start(Stage stage) {
         final App app = new App(null);
         MainComponent testComponent = DaggerTestComponent.builder().mainapp(app).build();
-
+        app.setTest(true);
         app.start(stage);
         app.show(testComponent.loginController());
     }
@@ -38,6 +36,8 @@ public class AppTest extends ApplicationTest {
 
         //test back button in SignUp
         type(KeyCode.SPACE);
+        WaitForAsyncUtils.waitForFxEvents();
+        type(KeyCode.ENTER);
         type(KeyCode.SPACE);
         write("\t\t\t");
         type(KeyCode.SPACE);
@@ -46,8 +46,8 @@ public class AppTest extends ApplicationTest {
 
         //test Login
         write("test\t");
-        write("00000000\t\t");
-        type(KeyCode.SPACE);
+        write("00000000");
+        type(KeyCode.ENTER);
 
         //test RulesScreen
         type(KeyCode.SPACE);
@@ -98,11 +98,10 @@ public class AppTest extends ApplicationTest {
         clickOn("#saveButton");
         write("\t");
         type(KeyCode.SPACE);
+        sleep(5000);
         write("\t\t\t\t\t");
         type(KeyCode.SPACE);
         doubleClickOn("#nameLabel");
-        /*clickOn("#votesLabel");
-        clickOn("#closeVotesButton");*/
         write("\t\t\t");
         type(KeyCode.SPACE);
 
@@ -140,7 +139,8 @@ public class AppTest extends ApplicationTest {
         clickOn("#roll");
         //buy dev card
         clickOn("#developmentBuyIdButton");
-        clickOn("OK");
+        type(KeyCode.ENTER);
+        //clickOn("OK");
         //trade with bank
         clickOn("#tradingFoldOutId");
         clickOn("#giveCactusPlusButton");
@@ -186,7 +186,7 @@ public class AppTest extends ApplicationTest {
         clickOn("#increment_grain");
         clickOn("#increment_grain");
         clickOn("#discardButton");
-        clickOn("OK");
+        type(KeyCode.ENTER);
 
         //rob (coordinates, because on the tile is also a number label -> can't click on the tile directly with the id
         clickOn(new Point2D(670, 303));
@@ -195,17 +195,16 @@ public class AppTest extends ApplicationTest {
         clickOn("#devCardsPane");
         WaitForAsyncUtils.waitForFxEvents();
         clickOn("#devCardBuildRoad");
-        sleep(5000);
         //build road
-        clickOn("#road");
         clickOn("#x1yM1z0_11");
+        clickOn("#x2yM1zM1_7");
 
         //build settlement
         clickOn("#sett");
-        clickOn("#x1yM1z0_0");
+        clickOn("#x2yM1zM1_6");
         //build city
         clickOn("#city");
-        clickOn("#x1yM1z0_0");
+        clickOn("#x2yM1zM1_6");
         WaitForAsyncUtils.waitForFxEvents();
         //back to lobbyScreen
         clickOn("#CloseGameButton");

@@ -85,7 +85,7 @@ public class LobbyComService {
 					.subscribe(result -> {
 						boolean trace = true;
 						for (Member member : result) {
-							if (member.userId().equals(idStorage.getID())) {
+							if (!app.getTest() && member.userId().equals(idStorage.getID())) {
 								Alert alert = new Alert(Alert.AlertType.ERROR, "You cannot create Game while being part of another Game");
 								// Change style of error alert
 								DialogPane dialogPane = alert.getDialogPane();
