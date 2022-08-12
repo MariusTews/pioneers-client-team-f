@@ -1,11 +1,11 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.websocket.EventListener;
 import de.uniks.pioneers.dto.ErrorResponse;
 import de.uniks.pioneers.dto.Event;
 import de.uniks.pioneers.model.*;
 import de.uniks.pioneers.service.*;
+import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
@@ -64,7 +64,6 @@ class LobbyControllerTest extends ApplicationTest {
 
     @InjectMocks
     LobbyController lobbyController;
-
     @InjectMocks
     EditUserController editUserController;
 
@@ -164,11 +163,8 @@ class LobbyControllerTest extends ApplicationTest {
 
     @Test
     void createGameTest() {
-        when(gameStorage.getId()).thenReturn("id");
-        when(idStorage.getID()).thenReturn("3");
         List<Member> memberList = new ArrayList<>();
         memberList.add(new Member("0", "2", "id", "3", true, "#00012f", false));
-        when(memberService.getAllGameMembers("id")).thenReturn(Observable.just(memberList));
 
         lobbyController.createGameButtonPressed();
     }
