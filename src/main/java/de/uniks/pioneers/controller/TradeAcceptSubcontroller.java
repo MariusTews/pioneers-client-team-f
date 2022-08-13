@@ -107,6 +107,8 @@ public class TradeAcceptSubcontroller implements Controller {
 
     private Node renderUser() {
         Label label = new Label(tradingUsers.get(0).name());
+        //need the id to click on the user in the test
+        label.setId("tradePartnerLabel");
         label.setOnMouseClicked(event -> {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
                 if (event.getClickCount() == 1) {

@@ -1,5 +1,6 @@
 package de.uniks.pioneers;
 
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
@@ -17,7 +18,7 @@ public class AppTest extends ApplicationTest {
     public void start(Stage stage) {
         final App app = new App(null);
         MainComponent testComponent = DaggerTestComponent.builder().mainapp(app).build();
-
+        app.setTest(true);
         app.start(stage);
         app.show(testComponent.loginController());
     }
@@ -32,13 +33,21 @@ public class AppTest extends ApplicationTest {
         write("00000000\t");
         write("00000000\t");
 
+
+        //test back button in SignUp
         type(KeyCode.SPACE);
+        WaitForAsyncUtils.waitForFxEvents();
+        type(KeyCode.ENTER);
+        type(KeyCode.SPACE);
+        write("\t\t\t");
+        type(KeyCode.SPACE);
+        write("\t\t\t");
         type(KeyCode.SPACE);
 
         //test Login
         write("test\t");
-        write("00000000\t\t");
-        type(KeyCode.SPACE);
+        write("00000000");
+        type(KeyCode.ENTER);
 
         //test RulesScreen
         type(KeyCode.SPACE);
@@ -55,26 +64,67 @@ public class AppTest extends ApplicationTest {
         write("\t\t\t\t\t\t\t");
         type(KeyCode.SPACE);
 
+        //test AchievementsScreen
+        write("\t");
+        type(KeyCode.SPACE);
+
+        write("\t\t\t\t\t\t\t\t");
+        type(KeyCode.SPACE);
+
         //test CreateGameScreen
         write("testGame\t");
         write("12\t");
         type(KeyCode.SPACE);
         write("\t\t");
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 6; i++) {
             type(KeyCode.SPACE);
         }
-        write("\t\t\t");
 
+        //test back button game lobby
+        WaitForAsyncUtils.waitForFxEvents();
+        write("\t\t");
         type(KeyCode.SPACE);
+        write("\t\t\t\t\t\t\t\t");
+        type(KeyCode.SPACE);
+
+        //test maps screen
+        WaitForAsyncUtils.waitForFxEvents();
+        write("\t\t");
+        type(KeyCode.SPACE);
+        write("\t\t\t\t\t");
+        type(KeyCode.SPACE);
+        write("\t\t\t");
+        type(KeyCode.SPACE);
+        write("mapname");
+        clickOn("#saveButton");
+        write("\t");
+        type(KeyCode.SPACE);
+        write("\t\t\t\t\t");
+        type(KeyCode.SPACE);
+        doubleClickOn("#nameLabel");
+        write("\t\t\t");
+        type(KeyCode.SPACE);
+
+
+        //test CreateGameScreen
+        write("testGame\t");
+        write("12\t");
+        type(KeyCode.SPACE);
+        write("\t\t");
+        for (int i = 0; i < 6; i++) {
+            type(KeyCode.SPACE);
+        }
+        write("\t\t\t\t");
+        type(KeyCode.SPACE);
+
 
         //test gameLobby
         WaitForAsyncUtils.waitForFxEvents();
-
-
         write("\t\t\t\t\t\t");
         type(KeyCode.SPACE);
         WaitForAsyncUtils.waitForFxEvents();
         sleep(5000);
+
         //test ingameScreen
         WaitForAsyncUtils.waitForFxEvents();
         // founding-settlement-1
@@ -87,12 +137,75 @@ public class AppTest extends ApplicationTest {
         clickOn("#x1y0zM1_7");
         //roll dice
         clickOn("#roll");
+        //buy dev card
+        clickOn("#developmentBuyIdButton");
+        type(KeyCode.ENTER);
+        //clickOn("OK");
+        //trade with bank
+        clickOn("#tradingFoldOutId");
+        clickOn("#giveCactusPlusButton");
+        clickOn("#giveCactusPlusButton");
+        clickOn("#giveCactusPlusButton");
+        clickOn("#giveCactusPlusButton");
+        clickOn("#receiveMoonPlusButton");
+        clickOn("#offerBank");
+        //trade with player
+        clickOn("#giveCactusPlusButton");
+        clickOn("#receiveMoonPlusButton");
+        clickOn("#offerPlayer");
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#tradePartnerLabel");
+        clickOn("#tradeButton");
+        //finish turn
+        clickOn("#finishTurnButton");
+        clickOn("#acceptOfferButton");
+        clickOn("#roll");
+        //discard resources
+        clickOn("#increment_lumber");
+        clickOn("#increment_lumber");
+        clickOn("#increment_lumber");
+        clickOn("#increment_lumber");
+        clickOn("#increment_lumber");
+        clickOn("#increment_brick");
+        clickOn("#increment_brick");
+        clickOn("#increment_brick");
+        clickOn("#increment_brick");
+        clickOn("#increment_brick");
+        clickOn("#increment_ore");
+        clickOn("#increment_ore");
+        clickOn("#increment_ore");
+        clickOn("#increment_ore");
+        clickOn("#increment_ore");
+        clickOn("#increment_wool");
+        clickOn("#increment_wool");
+        clickOn("#increment_wool");
+        clickOn("#increment_wool");
+        clickOn("#increment_wool");
+        clickOn("#increment_grain");
+        clickOn("#increment_grain");
+        clickOn("#increment_grain");
+        clickOn("#increment_grain");
+        clickOn("#increment_grain");
+        clickOn("#discardButton");
+        type(KeyCode.ENTER);
+
+        //rob (coordinates, because on the tile is also a number label -> can't click on the tile directly with the id
+        clickOn(new Point2D(670, 303));
+
+        //play devCard
+        clickOn("#devCardsPane");
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#devCardBuildRoad");
         //build road
-        clickOn("#road");
         clickOn("#x1yM1z0_11");
+        clickOn("#x2yM1zM1_7");
+
         //build settlement
         clickOn("#sett");
-        clickOn("#x1yM1z0_0");
+        clickOn("#x2yM1zM1_6");
+        //build city
+        clickOn("#city");
+        clickOn("#x2yM1zM1_6");
         WaitForAsyncUtils.waitForFxEvents();
         //back to lobbyScreen
         clickOn("#CloseGameButton");
@@ -102,7 +215,5 @@ public class AppTest extends ApplicationTest {
         //screenAssert login
         Button loginButton = lookup("#loginButton").query();
         assertThat(loginButton).isVisible();
-
-
     }
 }
