@@ -67,10 +67,10 @@
         </font>
     </Label>
     <Pane prefHeight="100.0" prefWidth="1100.0">
-        <ComboBox fx:id="colorPicker" layoutX="10.0" layoutY="38.0" onAction="#colorPicked" prefHeight="24.0" prefWidth="210.0" promptText="Choose color" />
+        <ComboBox id="colorPicker" fx:id="colorPicker" layoutX="10.0" layoutY="38.0" onAction="#colorPicked" prefHeight="24.0" prefWidth="210.0" promptText="Choose color" />
         <VBox alignment="CENTER" layoutX="340.0" prefHeight="100.0" prefWidth="134.0" spacing="5.0">
             <Label fx:id="spectatorId" alignment="CENTER" prefHeight="30.0" prefWidth="134.0" styleClass="spectatorStyle" text="Spectator" />
-            <CheckBox fx:id="checkBoxId" mnemonicParsing="false" onAction="#onCheckBox" prefHeight="18.0" prefWidth="18.0" styleClass="checkboxStyle">
+            <CheckBox id="spectatorCheckBox" fx:id="checkBoxId" mnemonicParsing="false" onAction="#onCheckBox" prefHeight="18.0" prefWidth="18.0" styleClass="checkboxStyle">
                 <VBox.margin>
                     <Insets />
                 </VBox.margin>

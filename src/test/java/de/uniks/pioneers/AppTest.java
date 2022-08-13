@@ -1,7 +1,7 @@
 package de.uniks.pioneers;
 
 import javafx.geometry.Point2D;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -95,6 +95,27 @@ public class AppTest extends ApplicationTest {
         type(KeyCode.SPACE);
         write("\t\t\t");
         type(KeyCode.SPACE);
+        clickOn("#mapSizePlusButton");
+        clickOn("#mapSizeMinusButton");
+        clickOn("#mapSizePlusButton");
+        clickOn("#x0y0z0_tileButton");
+        clickOn("random");
+        clickOn("moon");
+        clickOn("#x1yM1z0_harborButton");
+        clickOn("#x1yM1z0_cancelButton");
+        clickOn("#x0y0z0_cancelButton");
+        clickOn("#x0y0z0_tileButton");
+        clickOn("#x0yM1z1_tileButton");
+        clickOn("random");
+        clickOn("moon");
+        clickOn("#x0yM1z1_numberField");
+        write("8");
+        clickOn("#xM1y0z1_harborButton");
+        clickOn("Top_right");
+        clickOn("Middle_right");
+        clickOn("3:1");
+        clickOn("mars_bar");
+        clickOn("#nameTextField");
         write("mapname");
         clickOn("#saveButton");
         write("\t");
@@ -120,12 +141,21 @@ public class AppTest extends ApplicationTest {
 
         //test gameLobby
         WaitForAsyncUtils.waitForFxEvents();
-        write("\t\t\t\t\t\t");
-        type(KeyCode.SPACE);
+        clickOn("Choose color");
+        clickOn("BEIGE");
+        clickOn("#spectatorCheckBox");
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("#spectatorCheckBox");
+        ComboBox<Label> colorPicker = lookup("#colorPicker").query();
+        colorPicker.setSelectionModel(null);
+        clickOn("Start");
         WaitForAsyncUtils.waitForFxEvents();
         sleep(5000);
 
         //test ingameScreen
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("Leave");
+        clickOn("Rejoin");
         WaitForAsyncUtils.waitForFxEvents();
         // founding-settlement-1
         clickOn("#x0y0z0_6");
