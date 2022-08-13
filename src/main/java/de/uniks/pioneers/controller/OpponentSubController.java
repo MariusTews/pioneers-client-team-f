@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.RoadAndFleet;
+import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.PioneersService;
@@ -17,6 +18,8 @@ import javafx.scene.paint.Color;
 
 import javax.inject.Inject;
 import java.io.IOException;
+
+import static de.uniks.pioneers.Constants.KNIGHT;
 
 public class OpponentSubController implements Controller {
 
@@ -102,6 +105,19 @@ public class OpponentSubController implements Controller {
             // Set the current victory points and total amount of resources
             this.victoryPointsLabel.setText("VP: " + this.opponent.victoryPoints() + "/" + maxVictoryPoints);
             this.totalResourcesLabel.setText("Total resources: " + opponent.resources().get("unknown"));
+            int knight = 0;
+            for(DevelopmentCard dc: opponent.developmentCards()){
+                if(dc.type().equals(KNIGHT) && dc.revealed()){
+                    knight+=1;
+                }
+            }
+            this.opponentFleetLabel.setText(":" + knight);
+            if(opponent.hasLargestArmy()){
+                this.opponentLargestFleetIcon.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/largestFleetIcon.png"))));
+            }
+            if(opponent.hasLongestRoad()){
+                this.opponentLongestRoadIcon.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/longestRoadIcon.png"))));
+            }
         }
 
         // Add information when hovering over items

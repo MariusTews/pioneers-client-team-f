@@ -14,6 +14,8 @@ public record Player(
         HashMap<String, Integer> remainingBuildings,
 		Number victoryPoints,
 		Number longestRoad,
+		boolean hasLongestRoad,
+		boolean hasLargestArmy,
 		// swagger documentation is not clear about the data type required for previousTradeOffer,
 		// therefore a generic list of objects is used that might need to be changed later.
 		List<Object> previousTradeOffer,

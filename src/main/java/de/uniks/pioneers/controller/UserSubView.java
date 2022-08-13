@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
 import de.uniks.pioneers.computation.RoadAndFleet;
+import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
@@ -11,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
@@ -68,7 +70,7 @@ public class UserSubView implements Controller {
 
     @Override
     public void init() {
-        ld = new RoadAndFleet();
+        //ld = new RoadAndFleet();
         userService.findAllUsers().observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.users.addAll(col);
@@ -82,6 +84,19 @@ public class UserSubView implements Controller {
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
                 this.victoryPoints.setText(player.victoryPoints() + "/" + maxVictoryPoints);
+                int knight = 0;
+                for(DevelopmentCard dc: player.developmentCards()){
+                    if(dc.type().equals(KNIGHT) && dc.revealed()){
+                        knight+=1;
+                    }
+                }
+                this.fleetLabel.setText(":" + knight);
+                if(player.hasLargestArmy()){
+                    this.largestFleetIconDisplay.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/largestFleetIcon.png"))));
+                }
+                if(player.hasLongestRoad()){
+                    this.longestRoadIconDisplay.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/longestRoadIcon.png"))));
+                }
             }
         }
     }
@@ -191,7 +206,7 @@ public class UserSubView implements Controller {
         Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
         Tooltip.install(this.city, new Tooltip("3 Moon rock, \n2 Venus grain "));
 
-        roadAndFleet();
+        //roadAndFleet();
 
         return parent;
     }
