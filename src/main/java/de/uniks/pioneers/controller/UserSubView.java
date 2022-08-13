@@ -1,7 +1,6 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.computation.RoadAndFleet;
 import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
@@ -54,7 +53,6 @@ public class UserSubView implements Controller {
     @FXML
     public Button developmentBuyIdButton;
 
-    private RoadAndFleet ld;
 
     @Inject
     public UserSubView(IDStorage idStorage, GameStorage gameStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
@@ -84,17 +82,20 @@ public class UserSubView implements Controller {
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
                 this.victoryPoints.setText(player.victoryPoints() + "/" + maxVictoryPoints);
-                int knight = 0;
-                for(DevelopmentCard dc: player.developmentCards()){
-                    if(dc.type().equals(KNIGHT) && dc.revealed()){
-                        knight+=1;
+                if (player.developmentCards() != null) {
+                    int knight = 0;
+                    for (DevelopmentCard dc : player.developmentCards()) {
+                        if (dc.type().equals(KNIGHT) && dc.revealed()) {
+                            knight += 1;
+                        }
                     }
+                    this.fleetLabel.setText(":" + knight);
                 }
-                this.fleetLabel.setText(":" + knight);
-                if(player.hasLargestArmy()){
+
+                if (player.hasLargestArmy()) {
                     this.largestFleetIconDisplay.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/largestFleetIcon.png"))));
                 }
-                if(player.hasLongestRoad()){
+                if (player.hasLongestRoad()) {
                     this.longestRoadIconDisplay.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/longestRoadIcon.png"))));
                 }
             }
@@ -211,11 +212,6 @@ public class UserSubView implements Controller {
         return parent;
     }
 
-    public void roadAndFleet() {
-        ld.calculateLongestRoad(pioneersService, gameStorage.getId(), idStorage.getID(), longestRoadIconDisplay);
-        ld.calculateLargestFleet(pioneersService, gameStorage.getId(), idStorage.getID(), largestFleetIconDisplay);
-
-    }
 
     public void onSett() {
         gameFieldSubController.build("settlement");

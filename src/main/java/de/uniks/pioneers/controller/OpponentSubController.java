@@ -1,11 +1,9 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.computation.RoadAndFleet;
 import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
-import de.uniks.pioneers.service.PioneersService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,7 +22,7 @@ import static de.uniks.pioneers.Constants.KNIGHT;
 public class OpponentSubController implements Controller {
 
     private final int maxVictoryPoints;
-    private final PioneersService pioneersService;
+
     @FXML
     public VBox singleOpponentView;
     @FXML
@@ -59,13 +57,13 @@ public class OpponentSubController implements Controller {
     private Parent parent;
 
     @Inject
-    public OpponentSubController(Player player, User user, int maxVictoryPoints, PioneersService pioneersService) {
+    public OpponentSubController(Player player, User user, int maxVictoryPoints) {
         // Opponent as player needed for victory points and color
         this.opponent = player;
         // Opponents as user needed for username and avatar
         this.opponentAsUser = user;
         this.maxVictoryPoints = maxVictoryPoints;
-        this.pioneersService = pioneersService;
+
     }
 
     @Override
@@ -105,17 +103,26 @@ public class OpponentSubController implements Controller {
             // Set the current victory points and total amount of resources
             this.victoryPointsLabel.setText("VP: " + this.opponent.victoryPoints() + "/" + maxVictoryPoints);
             this.totalResourcesLabel.setText("Total resources: " + opponent.resources().get("unknown"));
-            int knight = 0;
-            for(DevelopmentCard dc: opponent.developmentCards()){
-                if(dc.type().equals(KNIGHT) && dc.revealed()){
-                    knight+=1;
+            if (opponent.developmentCards() != null) {
+                this.developmentCardsLabel.setText("Development cards: " + opponent.developmentCards().size());
+                int knight = 0;
+
+                for (DevelopmentCard dc : opponent.developmentCards()) {
+                    if (dc.type().equals(KNIGHT) && dc.revealed()) {
+                        knight += 1;
+                    }
                 }
+                this.opponentFleetLabel.setText(":" + knight);
+            } else {
+                this.developmentCardsLabel.setText("Development cards: 0");
+                this.opponentFleetLabel.setText(": 0");
             }
-            this.opponentFleetLabel.setText(":" + knight);
-            if(opponent.hasLargestArmy()){
+
+
+            if (opponent.hasLargestArmy()) {
                 this.opponentLargestFleetIcon.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/largestFleetIcon.png"))));
             }
-            if(opponent.hasLongestRoad()){
+            if (opponent.hasLongestRoad()) {
                 this.opponentLongestRoadIcon.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/longestRoadIcon.png"))));
             }
         }
@@ -127,18 +134,12 @@ public class OpponentSubController implements Controller {
         Tooltip.install(neptunCrystalsImage, new Tooltip("Neptune crystals"));
         Tooltip.install(venusGrainImage, new Tooltip("Venus grain"));
 
-        roadAndFleet();
+        //roadAndFleet();
 
         this.parent = parent;
         return parent;
     }
 
-    public void roadAndFleet() {
-        RoadAndFleet ld = new RoadAndFleet();
-        ld.calculateLongestRoad(pioneersService, opponent.gameId(), opponent.userId(), opponentLongestRoadIcon);
-        ld.calculateLargestFleet(pioneersService, opponent.gameId(), opponent.gameId(), opponentLargestFleetIcon);
-        ld.showTotalDevelopmentCards(pioneersService,opponent.gameId(),opponent.userId(),developmentCardsLabel);
-    }
 
     public String getId() {
         return userId;

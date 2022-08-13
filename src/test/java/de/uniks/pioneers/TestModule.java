@@ -294,7 +294,7 @@ public class TestModule {
                 List<Player> players = new ArrayList<>();
                 HashMap<String, Integer> res = new HashMap<>();
                 res.put("lumber", 0);
-                players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, null, null));
+                players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, false, false, null, null));
                 return Observable.just(players);
             }
 
@@ -365,7 +365,7 @@ public class TestModule {
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 15);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1234", createBuildingDto.side(), "settlement", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 1, 0, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 1, 0, false, false, null, null);
                         }
                         case "founding-road-1" -> {
                             state = new State("", gameId, List.of(
@@ -383,7 +383,7 @@ public class TestModule {
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 14);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1235", createBuildingDto.side(), "road", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 1, 0, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 1, 0, false, false, null, null);
                         }
                         case "founding-settlement-2" -> {
                             state = new State("", gameId, List.of(
@@ -400,7 +400,7 @@ public class TestModule {
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 14);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1236", createBuildingDto.side(), "settlement", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, false, false, null, null);
                         }
                         case "founding-road-2" -> {
                             state = new State("", gameId, List.of(
@@ -416,7 +416,7 @@ public class TestModule {
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 13);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1237", createBuildingDto.side(), "road", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, false, false, null, null);
                         }
                         // normal building
                         default -> {
@@ -434,7 +434,7 @@ public class TestModule {
                                 remainingBuildings.put("city", 4);
                                 remainingBuildings.put("road", 12);
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1238", createBuildingDto.side(), "settlement", gameId, "01");
-                                player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 3, 0, null, null);
+                                player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 3, 0, false, false, null, null);
 
                             } else {
                                 resources.put("lumber", 10);
@@ -446,7 +446,7 @@ public class TestModule {
                                 remainingBuildings.put("city", 4);
                                 remainingBuildings.put("road", 12);
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1239", createBuildingDto.side(), "road", gameId, "01");
-                                player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, null, null);
+                                player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, false, false, null, null);
                             }
                         }
                     }
@@ -509,6 +509,7 @@ public class TestModule {
             public Observable<MapTemplate> createMapTemplate(@Body CreateMapTemplateDto dto) {
                 return Observable.just(new MapTemplate("", "", "1", "map", null, "01", 0, null, null));
             }
+
             @Override
             public Observable<List<MapTemplate>> findAllMaps() {
                 return Observable.just(List.of(new MapTemplate("", "", "1", "map", null, "01", 0, null, null)));

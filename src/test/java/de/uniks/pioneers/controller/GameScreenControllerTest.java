@@ -108,12 +108,12 @@ class GameScreenControllerTest extends ApplicationTest {
         devCards1.add(d1);
 
         Player player1 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards1);
+                4, 5, false, false, null, devCards1);
         when(pioneersService.findOnePlayer("02", "01")).thenReturn(Observable.just(player1));
 
         when(memberService.getAllGameMembers(any())).thenReturn(Observable.empty());
         List<Player> players = new ArrayList<>();
-        players.add(new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null, null));
+        players.add(new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, false, false, null, null));
         when(pioneersService.findAllPlayers(any())).thenReturn(Observable.just(players));
         Map map = new Map("02", createMap(), createHarbors());
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(map));
@@ -129,7 +129,7 @@ class GameScreenControllerTest extends ApplicationTest {
         remain.put("settlement", 3);
         remain.put("city", 3);
         remain.put("road", 3);
-        Player player = new Player("01", "02", "#00ffff", true, 4, null, remain, 2, 2, null, null);
+        Player player = new Player("01", "02", "#00ffff", true, 4, null, remain, 2, 2, false, false, null, null);
         gameScreenController.getGameFieldSubController().getPlayers().add(player);
     }
 
@@ -247,7 +247,7 @@ class GameScreenControllerTest extends ApplicationTest {
         moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "roll", 8, null, null, null, null, null)));
         moveSubject.onNext(new Event<>(".created", new Move("0", "1", "02", "01", "build", 8, null, null, null, null, null)));
 
-        playerSubject.onNext(new Event<>(".updated", new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, null, null)));
+        playerSubject.onNext(new Event<>(".updated", new Player("02", "01", "ffff00", true, 3, null, null, 2, 2, false, false, null, null)));
         waitForFxEvents();
 
         stateSubject.onNext(new Event<>(".updated", new State("0", "02", Collections.singletonList(ex), null)));
