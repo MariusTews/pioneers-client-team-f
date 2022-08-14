@@ -231,7 +231,8 @@ public class UserSubView implements Controller {
                 .observeOn(FX_SCHEDULER).subscribe(e -> {
                     if (e.expectedMoves().get(0).action().equals(BUILD) && e.expectedMoves().get(0).players().contains(this.idStorage.getID())) {
                         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
-                                .observeOn(FX_SCHEDULER).subscribe(p -> pioneersService.move(this.gameStorage.getId(), e.expectedMoves().get(0).action(),
+                                .observeOn(FX_SCHEDULER).subscribe(p ->
+                                        pioneersService.move(this.gameStorage.getId(), e.expectedMoves().get(0).action(),
                                                 0, 0, 0, 0, NEW, null, null)
                                         .observeOn(FX_SCHEDULER).subscribe(est -> {
                                         }));

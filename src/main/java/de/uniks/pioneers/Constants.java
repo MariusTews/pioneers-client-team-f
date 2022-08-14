@@ -181,6 +181,8 @@ public class Constants {
 
     public static final String MONOPOLY = "monopoly";
 
+    public static final String VICTORY = "victory-point";
+
     //Array of Colors as Strings for the Label text
     public static final String[] COLORSTRINGARRAY = {"DARKRED", "BLUE", "ORANGE", "DARKVIOLET", "TEAL", "YELLOW",
             "ROSYBROWN", "OLIVE", "MAGENTA", "AQUA", "BEIGE"};

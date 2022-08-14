@@ -13,6 +13,7 @@ import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
+import javafx.scene.paint.Color;
 import retrofit2.http.Body;
 
 import javax.inject.Singleton;
@@ -20,6 +21,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+
+import static de.uniks.pioneers.Constants.BANK_ID;
+import static de.uniks.pioneers.Constants.NEW;
 
 @SuppressWarnings("unused")
 @Module
@@ -77,6 +81,7 @@ public class TestModule {
             public Observable<List<User>> findAllUsers() {
                 ArrayList<User> users = new ArrayList<>();
                 users.add(new User("1234", "12345", "01", "Alice", "online", null, null));
+                users.add(new User("12", "34", "02", "Bob", "online", null, null));
                 return Observable.just(users);
             }
 
@@ -193,13 +198,17 @@ public class TestModule {
 
     @Provides
     @Singleton
-    GameMembersApiService gameMembersApiService() {
+    GameMembersApiService gameMembersApiService(EventListener eventListener) {
         return new GameMembersApiService() {
+
+            private final TestEventListener testEventListener = (TestEventListener) eventListener;
+            int flag = 0;
+
             @Override
             public Observable<List<Member>> findAll(String gameId) {
                 ArrayList<Member> members = new ArrayList<>();
                 members.add(new Member("0", "0", "01", "01", true, null, false));
-                members.add(new Member("0", "0", "01", "15", true, null, false));
+                members.add(new Member("0", "0", "01", "02", true, null, false));
                 return Observable.just(members);
             }
 
@@ -215,6 +224,17 @@ public class TestModule {
 
             @Override
             public Observable<Member> patch(String gameId, String userId, UpdateMemberDto dto) {
+                if (flag == 0) {
+                    flag++;
+                }
+                else if (flag == 1) {
+                    Member member1 = new Member("", "", "01", "10", false, null, true);
+                    testEventListener.fireEvent("games.01.members.*.*", new Event<>("games.01.members.10.updated", member1));
+                    flag++;
+                } else {
+                    Member member2 = new Member("", "", "01", "10", true, null, false);
+                    testEventListener.fireEvent("games.01.members.*.*", new Event<>("games.01.members.10.updated", member2));
+                }
                 return Observable.empty();
             }
 
@@ -238,17 +258,17 @@ public class TestModule {
 
             @Override
             public Observable<Game> create(CreateGameDto dto) {
-                return Observable.just(new Game("0", "0", "01", "testGame", "01", 1, false, new GameSettings(2, 10, null, false, 0)));
+                return Observable.just(new Game("0", "0", "01", "testGame", "01", 1, false, new GameSettings(2, 4, null, false, 0)));
             }
 
             @Override
             public Observable<Game> findOne(String id) {
-                return Observable.just(new Game("0", "1", "01", "TestGame", "7", 1, false, new GameSettings(1, 3, null, false, 0)));
+                return Observable.just(new Game("0", "1", "01", "TestGame", "7", 1, false, new GameSettings(1, 4, null, false, 0)));
             }
 
             @Override
             public Observable<Game> patch(String id, UpdateGameDto dto) {
-                Game game = new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 10, null, false, 0));
+                Game game = new Game("0", "0", "01", "testGame", "10", 2, true, new GameSettings(2, 4, null, false, 0));
                 Message message = new Message("1", "2", "01", "me", null);
                 testEventListener.fireEvent("games.01.*.*", new Event<>("games.01.state.created", message));
                 return Observable.just(game);
@@ -267,6 +287,22 @@ public class TestModule {
         return new PioneersApiService() {
             private List<ExpectedMove> expectedMoves;
             private final TestEventListener testEventListener = (TestEventListener) eventListener;
+
+            private boolean firstRoll = true;
+
+            private boolean firstBuildRoad = true;
+
+            private boolean testOffer = true;
+
+            private final HashMap<String, Integer> playerResources = new HashMap<>();
+
+            {
+                playerResources.put("lumber", 10);
+                playerResources.put("ore", 10);
+                playerResources.put("brick", 10);
+                playerResources.put("grain", 10);
+                playerResources.put("wool", 10);
+            }
 
             @Override
             public Observable<Map> findAllTiles(String gameId) {
@@ -293,19 +329,32 @@ public class TestModule {
             public Observable<List<Player>> findAllPlayers(String gameId) {
                 List<Player> players = new ArrayList<>();
                 HashMap<String, Integer> res = new HashMap<>();
-                res.put("lumber", 0);
-                players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, false, false, null, null));
+                res.put("lumber", 10);
+                res.put("ore", 10);
+                res.put("grain", 10);
+                res.put("brick", 10);
+                res.put("wool", 10);
+                players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, null, null));
+                players.add(new Player("01", "02", Color.BEIGE.toString(), true, 1, res, null, 0, 0, null, null));
                 return Observable.just(players);
             }
 
             @Override
             public Observable<Player> findOnePlayer(String gameId, String userId) {
-                return Observable.empty();
+                HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                remainingBuildings.put("settlement", 3);
+                remainingBuildings.put("city", 4);
+                remainingBuildings.put("road", 13);
+                return Observable.just(new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false))));
             }
 
             @Override
             public Observable<Player> updatePlayer(String gameId, String userId, UpdatePlayerDto dto) {
-                return null;
+                HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                remainingBuildings.put("settlement", 3);
+                remainingBuildings.put("city", 4);
+                remainingBuildings.put("road", 13);
+                return Observable.just(new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false))));
             }
 
 
@@ -329,7 +378,8 @@ public class TestModule {
 
             @Override
             public Observable<List<Building>> findAllBuildings(String gameId) {
-                return Observable.empty();
+                return Observable.just(List.of(new Building(1,-1,0,"100",0,"settlement", "01", "02"),
+                        new Building(1,-1,0,"200",6,"city", "01", "02")));
             }
 
             @Override
@@ -344,7 +394,6 @@ public class TestModule {
                     Building building;
                     State state;
                     Player player;
-                    HashMap<String, Integer> resources = new HashMap<>();
                     HashMap<String, Integer> remainingBuildings = new HashMap<>();
                     switch (dto.action()) {
                         //founding phase
@@ -356,16 +405,11 @@ public class TestModule {
                                     new ExpectedMove("roll", List.of("01"))
                             ), null);
                             expectedMoves = state.expectedMoves();
-                            resources.put("lumber", 10);
-                            resources.put("ore", 10);
-                            resources.put("brick", 10);
-                            resources.put("grain", 10);
-                            resources.put("wool", 10);
                             remainingBuildings.put("settlement", 4);
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 15);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1234", createBuildingDto.side(), "settlement", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 1, 0, false, false, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 1, 0, null, null);
                         }
                         case "founding-road-1" -> {
                             state = new State("", gameId, List.of(
@@ -374,16 +418,11 @@ public class TestModule {
                                     new ExpectedMove("roll", List.of("01"))
                             ), null);
                             expectedMoves = state.expectedMoves();
-                            resources.put("lumber", 10);
-                            resources.put("ore", 10);
-                            resources.put("brick", 10);
-                            resources.put("grain", 10);
-                            resources.put("wool", 10);
                             remainingBuildings.put("settlement", 4);
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 14);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1235", createBuildingDto.side(), "road", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 1, 0, false, false, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 1, 0, null, null);
                         }
                         case "founding-settlement-2" -> {
                             state = new State("", gameId, List.of(
@@ -391,32 +430,22 @@ public class TestModule {
                                     new ExpectedMove("roll", List.of("01"))
                             ), null);
                             expectedMoves = state.expectedMoves();
-                            resources.put("lumber", 10);
-                            resources.put("ore", 10);
-                            resources.put("brick", 10);
-                            resources.put("grain", 10);
-                            resources.put("wool", 10);
                             remainingBuildings.put("settlement", 3);
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 14);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1236", createBuildingDto.side(), "settlement", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, false, false, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, null);
                         }
                         case "founding-road-2" -> {
                             state = new State("", gameId, List.of(
                                     new ExpectedMove("roll", List.of("01"))
                             ), null);
                             expectedMoves = state.expectedMoves();
-                            resources.put("lumber", 10);
-                            resources.put("ore", 10);
-                            resources.put("brick", 10);
-                            resources.put("grain", 10);
-                            resources.put("wool", 10);
                             remainingBuildings.put("settlement", 3);
                             remainingBuildings.put("city", 4);
                             remainingBuildings.put("road", 13);
                             building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1237", createBuildingDto.side(), "road", gameId, "01");
-                            player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, false, false, null, null);
+                            player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, new ArrayList<>());
                         }
                         // normal building
                         default -> {
@@ -425,28 +454,32 @@ public class TestModule {
                             ), null);
                             expectedMoves = state.expectedMoves();
                             if (dto.building().type().equals("settlement")) {
-                                resources.put("lumber", 10);
-                                resources.put("ore", 10);
-                                resources.put("brick", 10);
-                                resources.put("grain", 10);
-                                resources.put("wool", 10);
                                 remainingBuildings.put("settlement", 2);
                                 remainingBuildings.put("city", 4);
                                 remainingBuildings.put("road", 12);
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1238", createBuildingDto.side(), "settlement", gameId, "01");
-                                player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 3, 0, false, false, null, null);
+                                player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 3, 0, null, null);
 
-                            } else {
-                                resources.put("lumber", 10);
-                                resources.put("ore", 10);
-                                resources.put("brick", 10);
-                                resources.put("grain", 10);
-                                resources.put("wool", 10);
+                            } else if (dto.building().type().equals("city")) {
+                                remainingBuildings.put("settlement", 2);
+                                remainingBuildings.put("city", 3);
+                                remainingBuildings.put("road", 12);
+                                building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1212", createBuildingDto.side(), "city", gameId, "01");
+                                player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 4, 0, null, null);
+                            }
+                            //action = build-road
+                            else {
                                 remainingBuildings.put("settlement", 3);
                                 remainingBuildings.put("city", 4);
                                 remainingBuildings.put("road", 12);
                                 building = new Building(createBuildingDto.x(), createBuildingDto.y(), createBuildingDto.z(), "1239", createBuildingDto.side(), "road", gameId, "01");
-                                player = new Player(gameId, "01", "#C44F4F", true, 1, resources, remainingBuildings, 2, 0, false, false, null, null);
+                                player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, null);
+                                if (firstBuildRoad) {
+                                    state = new State("", gameId, List.of(
+                                            new ExpectedMove("build-road", List.of("01"))
+                                    ), null);
+                                    firstBuildRoad = false;
+                                }
                             }
                         }
                     }
@@ -454,26 +487,143 @@ public class TestModule {
                     testEventListener.fireEvent("games.01.buildings.*.*", new Event<>("games.01.updated", building));
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
                     testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
-                    return Observable.just(new Move("1", "2", gameId, "01", "build", 3, "building", null, null, null, null));
+                    return Observable.just(new Move("1", "2", gameId, "01", "build", 3, building.type(), null, null, null, null));
                 }
                 // roll the dice
                 else if (Objects.equals(dto.action(), "roll")) {
-                    State state = new State("", gameId, List.of(
-                            new ExpectedMove("build", List.of("01"))
-                    ), null);
-                    expectedMoves = state.expectedMoves();
-                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
-                    testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
-                            new Move("1", "2", gameId, "01", "roll", 3, null, null, null, null, null)));
+                    if (firstRoll) {
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("build", List.of("01"))
+                        ), null);
+                        expectedMoves = state.expectedMoves();
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                                new Move("1", "2", gameId, "01", "roll", 3, null, null, null, null, null)));
+                        firstRoll = false;
+                    }
+                    //roll 7
+                    else {
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("drop", List.of("01"))
+                        ), null);
+                        expectedMoves = state.expectedMoves();
+                        testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                                new Move("1", "2", gameId, "01", "roll", 7, null, null, null, null, null)));
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                    }
 
                 }
-                // create move with action "build"
+                //create move with action "build"
                 else if (Objects.equals(dto.action(), "build")) {
+                    //bank trade
+                    if (Objects.equals(dto.partner(), BANK_ID)) {
+                        HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                        remainingBuildings.put("settlement", 3);
+                        remainingBuildings.put("city", 4);
+                        remainingBuildings.put("road", 13);
+                        Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false)));
+                        testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("build", List.of("01"))
+                        ), null);
+                        expectedMoves = state.expectedMoves();
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+
+                    }
+                    //private trade
+                    else if (dto.resources() != null) {
+                        //make first move
+                        HashMap<String, Integer> resources = new HashMap<>();
+                        resources.put("lumber", -1);
+                        resources.put("ore", 1);
+                        testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                                new Move("1", "2", gameId, "01", "build", 3, null, null, resources, null, null)));
+
+                        //other "player" sends an offer
+                        HashMap<String, Integer> resources1 = new HashMap<>();
+                        resources1.put("lumber", 1);
+                        resources1.put("ore", -1);
+                        testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                                new Move("1", "2", gameId, "02", "offer", 3, null, null, resources1, null, null)));
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("accept", List.of("01"))
+                        ), null);
+                        expectedMoves = state.expectedMoves();
+                        //new expected move is "accept" now
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+
+                    }
+                    //buy dev card
+                    else if (Objects.equals(dto.developmentCard(), NEW)) {
+                        //update state
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("build", List.of("01"))
+                        ), null);
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        //update player
+                        HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                        remainingBuildings.put("settlement", 3);
+                        remainingBuildings.put("city", 4);
+                        remainingBuildings.put("road", 13);
+                        Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false)));
+                        testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
+                    }
+                    //play dev card
+                    else if (Objects.equals(dto.developmentCard(), "road-building")) {
+                        //update state
+                        State state = new State("", gameId, List.of(
+                                new ExpectedMove("build-road", List.of("01"))
+                        ), null);
+                        testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        //update player
+                        HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                        remainingBuildings.put("settlement", 3);
+                        remainingBuildings.put("city", 4);
+                        remainingBuildings.put("road", 13);
+                        Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", true, false)));
+                        testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
+                        return Observable.just(new Move("", "", gameId, "01", "build", 5, null, null, null, null, "road-building"));
+                    }
+                    //finish move / receive trade request
+                    else {
+                        if (testOffer) {
+                            HashMap<String, Integer> resourcesOffer = new HashMap<>();
+                            resourcesOffer.put("lumber", -1);
+                            resourcesOffer.put("ore", 1);
+                            resourcesOffer.put("grain", -1);
+                            resourcesOffer.put("brick", 1);
+                            resourcesOffer.put("wool", -1);
+                            testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                                    new Move("1", "2", gameId, "02", "build", 3, null, null, resourcesOffer, null, null)));
+                            State state = new State("", gameId, List.of(
+                                    new ExpectedMove("offer", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            //new expected move is "offer" now
+                            testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                            testOffer = false;
+                        } else {
+                            State state = new State("", gameId, List.of(
+                                    new ExpectedMove("roll", List.of("01"))
+                            ), null);
+                            expectedMoves = state.expectedMoves();
+                            //new expected move is "roll" now
+                            testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                        }
+
+
+                    }
+
+                }
+                //make trade offer
+                else if (dto.action().equals("offer")) {
                     State state = new State("", gameId, List.of(
                             new ExpectedMove("roll", List.of("01"))
                     ), null);
                     expectedMoves = state.expectedMoves();
+                    //new expected move is "roll" now
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+
                 }
                 // first founding roll
                 else if (Objects.equals(dto.action(), "founding-roll")) {
@@ -484,6 +634,55 @@ public class TestModule {
                             new ExpectedMove("founding-road-2", List.of("01")),
                             new ExpectedMove("roll", List.of("01"))
                     ), null);
+                    expectedMoves = state.expectedMoves();
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                }
+                //accept the trade
+                else if (Objects.equals(dto.action(), "accept")) {
+                    //new move with action "accept"
+                    testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                            new Move("1", "2", gameId, "01", "accept", 3, null, null, null, dto.partner(), null)));
+                    //updated state with expected move "build"
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("build", List.of("01"))
+                    ), null);
+                    expectedMoves = state.expectedMoves();
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                    //update player after accept
+                    HashMap<String, Integer> remainingBuildings = new HashMap<>();
+                    remainingBuildings.put("settlement", 3);
+                    remainingBuildings.put("city", 4);
+                    remainingBuildings.put("road", 13);
+                    Player player = new Player(gameId, "01", "#C44F4F", true, 1, playerResources, remainingBuildings, 2, 0, null, List.of(new DevelopmentCard("road-building", false, false)));
+                    testEventListener.fireEvent("games.01.players.*.*", new Event<>("games.01.updated", player));
+                }
+                //action = drop
+                else if (Objects.equals(dto.action(), "drop")) {
+                    //new move with action "drop"
+                    HashMap<String, Integer> dropResources = new HashMap<>();
+                    dropResources.put("lumber", -5);
+                    dropResources.put("ore", -5);
+                    dropResources.put("wool", -5);
+                    dropResources.put("brick", -5);
+                    dropResources.put("grain", -5);
+                    testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                            new Move("1", "2", gameId, "01", "drop", 3, null, null, dropResources, null, null)));
+                    //new state with expected move rob
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("rob", List.of("01"))
+                    ), null);
+                    expectedMoves = state.expectedMoves();
+                    testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
+                    return Observable.just(new Move("1", "2", gameId, "01", "drop", 3, null, null, dropResources, null, null));
+                }
+                //action = rob
+                else if (Objects.equals(dto.action(), "rob")) {
+                    testEventListener.fireEvent("games.01.moves.*.created", new Event<>("games.01.updated",
+                            new Move("1", "2", gameId, "01", "drop", 3, null, dto.rob(), null, null, null)));
+                    //new state with expected move build
+                    State state = new State("", gameId, List.of(
+                            new ExpectedMove("build", List.of("01"))
+                    ), new Point3D(1, 0, -1));
                     expectedMoves = state.expectedMoves();
                     testEventListener.fireEvent("games.01.state.*", new Event<>("games.01.updated", state));
                 }

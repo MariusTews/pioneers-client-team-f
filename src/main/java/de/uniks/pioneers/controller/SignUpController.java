@@ -73,7 +73,7 @@ public class SignUpController implements Controller {
         final BooleanBinding usernameLengthMin = Bindings.greaterThan(1, usernameTextField.lengthProperty());
 
         passwordField.textProperty().addListener(((observable, oldValue, newValue) -> {
-            if( newValue.length() <8 ) {
+            if (newValue.length() < 8) {
                 errorLabel.textProperty().bind(
                         Bindings.when(match)
                                 .then("Passwords is too short")
@@ -87,12 +87,12 @@ public class SignUpController implements Controller {
                 );
             }
             repeatPasswordField.textProperty().addListener((observable1, oldValue1, newValue1) -> {
-                if( newValue.length() <8 || newValue1 .length() <8 ) {
-                       errorLabel.textProperty().bind(
-                               Bindings.when(match)
-                                       .then("Passwords is too short")
-                                       .otherwise("Passwords do not match")
-                       );
+                if (newValue.length() < 8 || newValue1.length() < 8) {
+                    errorLabel.textProperty().bind(
+                            Bindings.when(match)
+                                    .then("Passwords is too short")
+                                    .otherwise("Passwords do not match")
+                    );
 
                 } else {
                     errorLabel.textProperty().bind(
@@ -112,32 +112,31 @@ public class SignUpController implements Controller {
     }
 
 
-
     public void register(String username, String avatar, String password) {
 
         userService.register(username, avatar, password)
                 .observeOn(FX_SCHEDULER)
-                .doOnError(error -> {
-                    if (error.getMessage().equals("HTTP 409 ")) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR, "Username already taken");
-                        // set style of error
-                        DialogPane dialogPane = alert.getDialogPane();
-                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                        alert.showAndWait();
-                    }
-                })
                 .subscribe(result -> {
-                    if (result._id() != null) {
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "sign up successful");
-                        // set style of information
-                        DialogPane dialogPane = alert.getDialogPane();
-                        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
-                                .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
-                        alert.showAndWait()
-                                .ifPresent((btn) -> app.show(loginController.get()));
-                    }
-                });
+                            if (result._id() != null) {
+                                Alert alert = new Alert(Alert.AlertType.INFORMATION, "sign up successful");
+                                // set style of information
+                                DialogPane dialogPane = alert.getDialogPane();
+                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                alert.showAndWait()
+                                        .ifPresent((btn) -> app.show(loginController.get()));
+                            }
+                        },
+                        error -> {
+                            if (error.getMessage().equals("HTTP 409 ")) {
+                                Alert alert = new Alert(Alert.AlertType.ERROR, "Username already taken");
+                                // set style of error
+                                DialogPane dialogPane = alert.getDialogPane();
+                                dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class
+                                        .getResource("view/stylesheets/AlertStyle.css")).toExternalForm());
+                                alert.showAndWait();
+                            }
+                        });
     }
 
 

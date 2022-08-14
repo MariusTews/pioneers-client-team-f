@@ -30,6 +30,8 @@ public class App extends Application {
 
     private Controller controller;
 
+    private boolean test = false;
+
     public App() {
         final MainComponent mainComponent = DaggerMainComponent.builder().mainapp(this).build();
         controller = mainComponent.loginController();
@@ -190,5 +192,13 @@ public class App extends Application {
 
     public Stage getStage() {
         return this.stage;
+    }
+
+    public void setTest(boolean test) {
+        this.test = test;
+    }
+
+    public boolean getTest() {
+        return this.test;
     }
 }

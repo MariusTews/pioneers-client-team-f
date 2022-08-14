@@ -127,7 +127,6 @@ public class CircleSubController implements Controller {
                     });
         } else {//if you build a new building in round-loop
             if (build != null) {
-
                 this.pioneersService.move(gameStorage.getId(), "build", x, y, z, side, build, null, null)
                         .observeOn(FX_SCHEDULER)
                         .subscribe(move -> {

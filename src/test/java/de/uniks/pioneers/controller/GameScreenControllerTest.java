@@ -261,7 +261,7 @@ class GameScreenControllerTest extends ApplicationTest {
         clickOn(showCards);
 
         Label devCardsAmountLabel = lookup("#devCardsAmountLabel").query();
-        org.testfx.assertions.api.Assertions.assertThat(devCardsAmountLabel.getText()).isEqualTo("1");
+        org.testfx.assertions.api.Assertions.assertThat(devCardsAmountLabel.getText()).isEqualTo("0");
     }
 
     @Override
