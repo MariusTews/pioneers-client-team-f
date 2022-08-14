@@ -442,20 +442,26 @@ public class GameScreenController implements Controller {
 
         //wait until everybody made an offer, then show accept dialog
         if (move.action().equals("offer") && !move.userId().equals(idStorage.getID())) {
-            if (move.resources() != null) {
-                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()));
-                tradeAcceptSubcontroller.setMove(move);
-            } else {
-                playerOffer++;
-            }
-
             if (acceptRenderFlag) {
                 tradeAcceptSubcontroller.render();
                 acceptRenderFlag = false;
             }
 
+            tradeAcceptSubcontroller.setMove(move);
+
+            if (move.resources() != null) {
+                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()), true);
+            } else {
+                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()), false);
+                playerOffer++;
+            }
+
+            System.out.println("PlayerOffer     -> " + playerOffer);
+            System.out.println("Opponents size  -> " + opponents.size());
+
             if (playerOffer == this.opponents.size()) {
                 tradeAcceptSubcontroller.declineTrade();
+                playerOffer = 0;
                 new AlertService().showAlert("Every player declined the trade");
             }
         }

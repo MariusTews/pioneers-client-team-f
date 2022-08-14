@@ -42,7 +42,7 @@ class TradeAcceptSubcontrollerTest extends ApplicationTest {
 
         TradeAcceptSubcontroller tradeAcceptSubcontroller = new TradeAcceptSubcontroller(userService, pioneersService, achievementsService, gameStorage);
         tradeAcceptSubcontroller.init();
-        tradeAcceptSubcontroller.addUser(user);
+        tradeAcceptSubcontroller.addUser(user, true);
         tradeAcceptSubcontroller.render();
     }
 

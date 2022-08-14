@@ -26,3 +26,7 @@
 #descriptionHBox {
     -fx-border-color: transparent transparent white transparent;
 }
+
+.list-cell {
+    -fx-background-color: transparent;
+}

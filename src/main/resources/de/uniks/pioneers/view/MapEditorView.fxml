@@ -19,6 +19,7 @@
       </Label>
       <VBox id="templateMenu" fx:id="menu" alignment="TOP_CENTER" layoutX="765.0" layoutY="38.0" prefHeight="220.0" prefWidth="220.0">
          <children>
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#backButtonPressed" text="Back" />
             <Label id="mapName" text="map name" />
             <TextField fx:id="nameTextField" maxWidth="200.0" promptText="type name">
                <VBox.margin>
@@ -35,6 +36,17 @@
                      </font>
                   </Label>
                   <Button fx:id="mapSizePlusButton" mnemonicParsing="false" onAction="#mapSizePlusButtonPressed" prefHeight="25.0" prefWidth="40.0" text="+" />
+               </children>
+            </HBox>
+
+            <HBox alignment="CENTER" prefHeight="48.0" prefWidth="220.0">
+               <children>
+                  <Label id="addTilePlus" text="+ " />
+                  <Label id="addTile" text=": add tile" />
+                  <Label id="addHarborPlus" text="+ " />#
+                  <Label id="addHarbor" text=": add harbor" />
+                  <Label id="deleteButton" text="x " />
+                  <Label id="deleteText" text=": delete" />
                </children>
             </HBox>
             <Label text="+ : add tile" />

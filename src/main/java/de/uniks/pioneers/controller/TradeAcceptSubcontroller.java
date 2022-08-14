@@ -51,6 +51,7 @@ public class TradeAcceptSubcontroller implements Controller {
     final PioneersService pioneersService;
     private final AchievementsService achievementsService;
     private final GameStorage gameStorage;
+    private boolean acceptedFlag = false;
 
     private Move move;
 
@@ -98,26 +99,52 @@ public class TradeAcceptSubcontroller implements Controller {
             return null;
         }
 
-        tradeUsers.getChildren().add(renderUser());
+        // look if vbox is empty to load first user
+        /*if (tradeUsers.getChildren().isEmpty()) {
+            tradeUsers.getChildren().add(renderUser());
+        }*/
 
-        tradingUsers.addListener((ListChangeListener<? super User>) c -> tradeUsers.getChildren().addAll(c.getList().stream().map(user -> renderUser()).toList()));
+        /*if (!tradingUsers.isEmpty()) {
+            tradingUsers.addListener((ListChangeListener<? super User>) c -> tradeUsers.getChildren().setAll(c.getList().stream().map(user -> renderUser()).toList()));
+        }*/
+
+        tradingUsers.addListener((ListChangeListener<? super User>) this::onUserAccepted);
 
         return root;
     }
 
-    private Node renderUser() {
-        Label label = new Label(tradingUsers.get(0).name());
-        //need the id to click on the user in the test
-        label.setId("tradePartnerLabel");
-        label.setOnMouseClicked(event -> {
-            if (event.getButton().equals(MouseButton.PRIMARY)) {
-                if (event.getClickCount() == 1) {
-                    label.setStyle("-fx-background-color: grey");
-                    tradePartner = userHash.get(label.getText());
+    private void onUserAccepted(ListChangeListener.Change<? extends User> c) {
+        // clear list
+        this.tradeUsers.getChildren().clear();
+
+        this.tradeUsers.getChildren().addAll(tradingUsers.stream().map(this::renderUser).toList());
+    }
+
+    private Node renderUser(User user) {
+
+
+        /*if (!tradingUsers.isEmpty()) {
+            label = new Label(tradingUsers.get(0).name());
+        } else {
+            label = new Label("");
+        }*/
+
+        if (acceptedFlag) {
+            Label label = new Label(user.name());
+            //need the id to click on the user in the test
+            label.setId("tradePartnerLabel");
+            label.setOnMouseClicked(event -> {
+                if (event.getButton().equals(MouseButton.PRIMARY)) {
+                    if (event.getClickCount() == 1) {
+                        label.setStyle("-fx-background-color: grey");
+                        tradePartner = userHash.get(label.getText());
+                    }
                 }
-            }
-        });
-        return label;
+            });
+            return label;
+        }
+
+        return new Label(user.name() + " -> declined offer");
     }
 
     public void tradeButton() {
@@ -145,7 +172,8 @@ public class TradeAcceptSubcontroller implements Controller {
         primaryStage.close();
     }
 
-    public void addUser(User user) {
+    public void addUser(User user, boolean accepted) {
+        this.acceptedFlag = accepted;
         this.tradingUsers.add(user);
     }
 
