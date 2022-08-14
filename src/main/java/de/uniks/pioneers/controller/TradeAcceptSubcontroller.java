@@ -52,6 +52,7 @@ public class TradeAcceptSubcontroller implements Controller {
     private final AchievementsService achievementsService;
     private final GameStorage gameStorage;
     private boolean acceptedFlag = false;
+    private HashMap<User, Boolean> checkAcceptHash = new HashMap<>();
 
     private Move move;
 
@@ -79,7 +80,9 @@ public class TradeAcceptSubcontroller implements Controller {
 
     @Override
     public void destroy() {
-
+        checkAcceptHash.clear();
+        tradingUsers.clear();
+        tradeUsers.getChildren().clear();
     }
 
     @Override
@@ -99,37 +102,20 @@ public class TradeAcceptSubcontroller implements Controller {
             return null;
         }
 
-        // look if vbox is empty to load first user
-        /*if (tradeUsers.getChildren().isEmpty()) {
-            tradeUsers.getChildren().add(renderUser());
-        }*/
-
-        /*if (!tradingUsers.isEmpty()) {
-            tradingUsers.addListener((ListChangeListener<? super User>) c -> tradeUsers.getChildren().setAll(c.getList().stream().map(user -> renderUser()).toList()));
-        }*/
-
         tradingUsers.addListener((ListChangeListener<? super User>) this::onUserAccepted);
 
         return root;
     }
 
     private void onUserAccepted(ListChangeListener.Change<? extends User> c) {
-        // clear list
+        // clear list and reload
         this.tradeUsers.getChildren().clear();
-
         this.tradeUsers.getChildren().addAll(tradingUsers.stream().map(this::renderUser).toList());
     }
 
     private Node renderUser(User user) {
-
-
-        /*if (!tradingUsers.isEmpty()) {
-            label = new Label(tradingUsers.get(0).name());
-        } else {
-            label = new Label("");
-        }*/
-
-        if (acceptedFlag) {
+        // check if user has accepted or declined and create label
+        if (checkAcceptHash.get(user)) {
             Label label = new Label(user.name());
             //need the id to click on the user in the test
             label.setId("tradePartnerLabel");
@@ -143,7 +129,6 @@ public class TradeAcceptSubcontroller implements Controller {
             });
             return label;
         }
-
         return new Label(user.name() + " -> declined offer");
     }
 
@@ -161,6 +146,7 @@ public class TradeAcceptSubcontroller implements Controller {
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> achievementsService.putOrUpdateAchievement(TRADE_PLAYER, 1).blockingFirst());
             primaryStage.close();
+            destroy();
         }
     }
 
@@ -170,10 +156,11 @@ public class TradeAcceptSubcontroller implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe();
         primaryStage.close();
+        destroy();
     }
 
     public void addUser(User user, boolean accepted) {
-        this.acceptedFlag = accepted;
+        checkAcceptHash.put(user, accepted);
         this.tradingUsers.add(user);
     }
 

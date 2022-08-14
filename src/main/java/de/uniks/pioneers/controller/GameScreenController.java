@@ -444,6 +444,8 @@ public class GameScreenController implements Controller {
         if (move.action().equals("offer") && !move.userId().equals(idStorage.getID())) {
             if (acceptRenderFlag) {
                 tradeAcceptSubcontroller.render();
+                // if a previous trade happened and someone declined, reset
+                playerOffer = 0;
                 acceptRenderFlag = false;
             }
 
@@ -456,12 +458,8 @@ public class GameScreenController implements Controller {
                 playerOffer++;
             }
 
-            System.out.println("PlayerOffer     -> " + playerOffer);
-            System.out.println("Opponents size  -> " + opponents.size());
-
             if (playerOffer == this.opponents.size()) {
                 tradeAcceptSubcontroller.declineTrade();
-                playerOffer = 0;
                 new AlertService().showAlert("Every player declined the trade");
             }
         }
