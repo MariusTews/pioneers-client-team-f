@@ -48,27 +48,3 @@
 #mapName {
     -fx-text-fill: white;
 }
-
-#addTilePlus {
-    -fx-text-fill: green;
-}
-
-#addTile {
-    -fx-text-fill: white;
-}
-
-#addHarborPlus {
-    -fx-text-fill: orange;
-}
-
-#addHarbor {
-    -fx-text-fill: white;
-}
-
-#deleteButton {
-    -fx-text-fill: #450606;
-}
-
-#deleteText {
-    -fx-text-fill: white;
-}
