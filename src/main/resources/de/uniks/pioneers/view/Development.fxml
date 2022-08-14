@@ -53,7 +53,7 @@
                      </VBox.margin>
                   </Label>
                </children></VBox>
-            <Button layoutX="34.0" layoutY="254.0" mnemonicParsing="false" onAction="#onRoadBuildingClick" prefHeight="33.0" prefWidth="81.0" styleClass="move" text="Play" />
+            <Button id="devCardBuildRoad" layoutX="34.0" layoutY="254.0" mnemonicParsing="false" onAction="#onRoadBuildingClick" prefHeight="33.0" prefWidth="81.0" styleClass="move" text="Play" />
          </children>
       </Pane>
       <Pane fx:id="rocketPaneId" prefHeight="400.0" prefWidth="150.0">

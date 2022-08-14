@@ -1,7 +1,10 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
+import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
+import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,9 @@ import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class WinnerControllerTest extends ApplicationTest {
@@ -35,10 +41,10 @@ public class WinnerControllerTest extends ApplicationTest {
     @Mock
     UserService userService;
 
-    @Spy
+    @Mock
     Provider<LobbyController> lobbyController;
 
-    @Spy
+    @Mock
     App app;
 
     List<String> pointsAndValues;
@@ -70,6 +76,24 @@ public class WinnerControllerTest extends ApplicationTest {
         Assertions.assertThat(loserTitle.getText()).isEqualTo("Loser");
 
         Assertions.assertThat(!userNamePAndV.isEmpty()).isTrue();
+    }
+
+    @Test
+    void gameEndingAsOwner() {
+        Game game = new Game("", "", "1", "", "1", 1, true, null);
+        when(gameStorage.getId()).thenReturn("1");
+        when(idStorage.getID()).thenReturn("1");
+        when(gameService.findOneGame("1")).thenReturn(Observable.just(game));
+        when(gameService.deleteGame("1")).thenReturn(Observable.just(game));
+        clickOn("CLOSE GAME");
+        verify(gameStorage).setId(null);
+    }
+
+    @Test
+    void errorOnClose() {
+        when(gameService.findOneGame(null)).thenReturn(Observable.error(new Throwable()));
+        clickOn("CLOSE GAME");
+        verify(gameStorage).setId(null);
     }
 
     @Override

@@ -228,6 +228,7 @@ public class MapTemplateSubController implements Controller {
         downVoteImageView.setTranslateY(5);
 
         Button closeButton = new Button("X");
+        closeButton.setId("closeVotesButton");
         closeButton.setTranslateX(260);
         closeButton.setOnAction(event -> mainPane.getChildren().remove(pane));
 

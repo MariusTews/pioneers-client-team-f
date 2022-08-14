@@ -47,12 +47,15 @@ public class MapTemplateViewController implements Controller {
 
 	@Override
 	public void init() {
-		for (TileTemplate tileTemplate : mapTemplate.tiles()) {
-			tiles.add(new Tile(tileTemplate.x(), tileTemplate.y(), tileTemplate.z(), tileTemplate.type(), tileTemplate.numberToken()));
+		if (mapTemplate.tiles() != null) {
+			for (TileTemplate tileTemplate : mapTemplate.tiles()) {
+				tiles.add(new Tile(tileTemplate.x(), tileTemplate.y(), tileTemplate.z(), tileTemplate.type(), tileTemplate.numberToken()));
+			}
 		}
-
-		for (HarborTemplate harborTemplate : mapTemplate.harbors()) {
-			harbors.add(new Harbor(harborTemplate.x(), harborTemplate.y(), harborTemplate.z(), harborTemplate.type(), harborTemplate.side()));
+		if (mapTemplate.harbors() != null) {
+			for (HarborTemplate harborTemplate : mapTemplate.harbors()) {
+				harbors.add(new Harbor(harborTemplate.x(), harborTemplate.y(), harborTemplate.z(), harborTemplate.type(), harborTemplate.side()));
+			}
 		}
 		map = new Map(null, tiles, harbors);
 	}
