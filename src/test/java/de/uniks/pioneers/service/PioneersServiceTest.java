@@ -16,8 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,6 +92,8 @@ public class PioneersServiceTest {
 		assertEquals(player.foundingRoll(), 3);
 		assertEquals(player.resources(), resources);
 		assertEquals(player.remainingBuildings(), remainingBuildings);
+		assertTrue(player.active());
+		assertNull(player.previousTradeOffer());
 
 		verify(pioneersApiService).findOnePlayer("2", "12");
 	}
@@ -164,6 +165,8 @@ public class PioneersServiceTest {
 		assertEquals(result.action(), "build");
 		assertEquals(result.roll(), 3);
 		assertEquals(result.building(), "city");
+		assertNull(result.developmentCard());
+		assertNull(result.rob());
 
 		verify(pioneersApiService).create("100", new CreateMoveDto("build", null, null, null, null,
 				new CreateBuildingDto(1, 2, 3, 20, "city")));

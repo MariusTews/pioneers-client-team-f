@@ -3,7 +3,6 @@ package de.uniks.pioneers.model;
 import java.util.HashMap;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public record Player(
         String gameId,
         String userId,

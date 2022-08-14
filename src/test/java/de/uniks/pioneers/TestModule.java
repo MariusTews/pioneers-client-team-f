@@ -13,6 +13,7 @@ import de.uniks.pioneers.template.MapTemplate;
 import de.uniks.pioneers.websocket.EventListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
+import javafx.scene.paint.Color;
 import retrofit2.http.Body;
 
 import javax.inject.Singleton;
@@ -197,8 +198,11 @@ public class TestModule {
 
     @Provides
     @Singleton
-    GameMembersApiService gameMembersApiService() {
+    GameMembersApiService gameMembersApiService(EventListener eventListener) {
         return new GameMembersApiService() {
+
+            private final TestEventListener testEventListener = (TestEventListener) eventListener;
+            int flag = 0;
 
             @Override
             public Observable<List<Member>> findAll(String gameId) {
@@ -220,6 +224,17 @@ public class TestModule {
 
             @Override
             public Observable<Member> patch(String gameId, String userId, UpdateMemberDto dto) {
+                if (flag == 0) {
+                    flag++;
+                }
+                else if (flag == 1) {
+                    Member member1 = new Member("", "", "01", "10", false, null, true);
+                    testEventListener.fireEvent("games.01.members.*.*", new Event<>("games.01.members.10.updated", member1));
+                    flag++;
+                } else {
+                    Member member2 = new Member("", "", "01", "10", true, null, false);
+                    testEventListener.fireEvent("games.01.members.*.*", new Event<>("games.01.members.10.updated", member2));
+                }
                 return Observable.empty();
             }
 
@@ -320,7 +335,7 @@ public class TestModule {
                 res.put("brick", 10);
                 res.put("wool", 10);
                 players.add(new Player("01", "01", "#0000ff", true, 1, res, null, 0, 0, null, null));
-                players.add(new Player("01", "02", "#622424", true, 1, res, null, 0, 0, null, null));
+                players.add(new Player("01", "02", Color.BEIGE.toString(), true, 1, res, null, 0, 0, null, null));
                 return Observable.just(players);
             }
 
@@ -363,7 +378,8 @@ public class TestModule {
 
             @Override
             public Observable<List<Building>> findAllBuildings(String gameId) {
-                return Observable.empty();
+                return Observable.just(List.of(new Building(1,-1,0,"100",0,"settlement", "01", "02"),
+                        new Building(1,-1,0,"200",6,"city", "01", "02")));
             }
 
             @Override

@@ -17,6 +17,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
+import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,8 +45,8 @@ class EditUserControllerTest extends ApplicationTest {
         File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
-        when(userService.findOne(any())).thenReturn(Observable.just(new User("1234","12345","01", "Alice","offline",
-                                                                                            avatar, new ArrayList<>())));
+        when(userService.findOne(any())).thenReturn(Observable.just(new User("1234", "12345", "01", "Alice", "offline",
+                avatar, new ArrayList<>())));
         when(idStorage.getID()).thenReturn(("01"));
 
         App app = new App(editUserController);
@@ -54,20 +55,20 @@ class EditUserControllerTest extends ApplicationTest {
     }
 
     @Test
-    void changePicture(){
-    write("\t\t\t\t\t");
-    type(KeyCode.SPACE);
-    type(KeyCode.RIGHT);
-    type(KeyCode.SPACE);
+    void deletePicture() {
+        write("\t\t\t\t\t");
+        type(KeyCode.SPACE);
+        type(KeyCode.RIGHT);
+        type(KeyCode.SPACE);
 
-    Image image = new Image(String.valueOf(Main.class.getResource("defaultPicture.png")));
+        Image image = new Image(String.valueOf(Main.class.getResource("defaultPicture.png")));
 
-    assertEquals(image.getUrl(), this.editUserController.userPicture.getImage().getUrl());
+        assertEquals(image.getUrl(), this.editUserController.userPicture.getImage().getUrl());
     }
 
     @Test
     void deleteUser() {
-        when(userService.delete(any())).thenReturn(Observable.just(new User("1234","12345","01","Alice","offline",null,new ArrayList<>())));
+        when(userService.delete(any())).thenReturn(Observable.just(new User("1234", "12345", "01", "Alice", "offline", null, new ArrayList<>())));
 
         write("\t\t\t\t");
         type(KeyCode.SPACE);
@@ -80,7 +81,7 @@ class EditUserControllerTest extends ApplicationTest {
         File file = new File(Objects.requireNonNull(Main.class.getResource("defaultPicture.png")).getFile());
 
         String avatar = editUserController.encodeFileToBase64Binary(file);
-        when(userService.userUpdate(any(),any(),any(),any(),any(),any())).thenReturn(Observable.just(new User("1234","12345","01","Alice","offline",avatar,new ArrayList<>())));
+        when(userService.userUpdate(any(), any(), any(), any(), any(), any())).thenReturn(Observable.just(new User("1234", "12345", "01", "Alice", "offline", avatar, new ArrayList<>())));
         write("\t\t\t\t\t\t");
         //check if all text-fields are empty
         type(KeyCode.SPACE);
@@ -100,14 +101,14 @@ class EditUserControllerTest extends ApplicationTest {
 
         //check if username and password are changed
         type(KeyCode.SPACE);
-        verify(userService).userUpdate("01","Alice",avatar,new ArrayList<>(),"online","12345678");
+        verify(userService).userUpdate("01", "Alice", avatar, new ArrayList<>(), "online", "12345678");
         write("\t\t");
         type(KeyCode.BACK_SPACE);
         write("\t\t\t\t\t");
 
         //check if only password changed
         type(KeyCode.SPACE);
-        verify(userService).userUpdate("01","Alice",avatar,new ArrayList<>(),"online","12345678");
+        verify(userService).userUpdate("01", "Alice", avatar, new ArrayList<>(), "online", "12345678");
         write("\t\tAlice\t");
         type(KeyCode.BACK_SPACE);
         write("\t");
@@ -116,8 +117,33 @@ class EditUserControllerTest extends ApplicationTest {
 
         //check if only username changed
         type(KeyCode.SPACE);
-        verify(userService).userUpdate("01","Alice",avatar,new ArrayList<>(),"online","12345678");
+        verify(userService).userUpdate("01", "Alice", avatar, new ArrayList<>(), "online", "12345678");
         type(KeyCode.SPACE);
+    }
+
+    @Test
+    void avatarTooBig() {
+        File file = new File(Objects.requireNonNull(Main.class.getResource("FATARI_logo.png")).getFile());
+        editUserController.setPictureFile(file);
+        clickOn("Confirm");
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("OK");
+    }
+
+    @Test
+    void usernameAlreadyTaken() {
+        when(userService.userUpdate(any(), any(), any(), any(), any(), any())).thenReturn(Observable.error(new Throwable("HTTP 409 ")));
+        clickOn("Confirm");
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("OK");
+    }
+
+    @Test
+    void usernameTooLong() {
+        when(userService.userUpdate(any(), any(), any(), any(), any(), any())).thenReturn(Observable.error(new Throwable("HTTP 400 ")));
+        clickOn("Confirm");
+        WaitForAsyncUtils.waitForFxEvents();
+        clickOn("OK");
     }
 
     @Override
