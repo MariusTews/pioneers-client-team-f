@@ -293,13 +293,13 @@ public class MapEditorController implements Controller {
                     numberField.setText(String.valueOf(tileTemplate.numberToken()));
 
                     switch (tileTemplate.type()) {
-                        case "random"       -> choiceBox.getSelectionModel().select(1);
-                        case "desert"       -> choiceBox.getSelectionModel().select(2);
-                        case "field"        -> choiceBox.getSelectionModel().select(3);
-                        case "mountains"    -> choiceBox.getSelectionModel().select(4);
-                        case "hills"        -> choiceBox.getSelectionModel().select(5);
-                        case "forest"       -> choiceBox.getSelectionModel().select(6);
-                        case "pasture"      -> choiceBox.getSelectionModel().select(7);
+                        default             -> choiceBox.getSelectionModel().select(0);
+                        case "desert"       -> choiceBox.getSelectionModel().select(1);
+                        case "fields"        -> choiceBox.getSelectionModel().select(2);
+                        case "mountains"    -> choiceBox.getSelectionModel().select(3);
+                        case "hills"        -> choiceBox.getSelectionModel().select(4);
+                        case "forest"       -> choiceBox.getSelectionModel().select(5);
+                        case "pasture"      -> choiceBox.getSelectionModel().select(6);
                     }
 
                 } else {
@@ -470,12 +470,12 @@ public class MapEditorController implements Controller {
                 if (template != null) {
                     if (template.type() != null) {
                         switch (template.type()) {
-                            case MARS_BAR -> chooseResource.getSelectionModel().select(2);
-                            case MOON_ROCK -> chooseResource.getSelectionModel().select(3);
-                            case EARTH_CACTUS -> chooseResource.getSelectionModel().select(4);
-                            case VENUS_GRAIN -> chooseResource.getSelectionModel().select(5);
-                            case NEPTUNE_CRYSTAL -> chooseResource.getSelectionModel().select(6);
-                            case "random" -> chooseResource.getSelectionModel().select(7);
+                            case MARS_BAR -> chooseResource.getSelectionModel().select(1);
+                            case MOON_ROCK -> chooseResource.getSelectionModel().select(2);
+                            case EARTH_CACTUS -> chooseResource.getSelectionModel().select(3);
+                            case VENUS_GRAIN -> chooseResource.getSelectionModel().select(4);
+                            case NEPTUNE_CRYSTAL -> chooseResource.getSelectionModel().select(5);
+                            case "random" -> chooseResource.getSelectionModel().select(6);
                             default         -> chooseResource.getSelectionModel().selectFirst();
                         }
                     }
