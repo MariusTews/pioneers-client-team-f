@@ -63,11 +63,11 @@ public class WinnerControllerTest extends ApplicationTest {
 
     @Test
     public void testParameters() {
-        Label winnerTitel = lookup("#winnerTitle").query();
-        Assertions.assertThat(winnerTitel.getText()).isEqualTo("Winner");
+        Label winnerTitle = lookup("#winnerTitle").query();
+        Assertions.assertThat(winnerTitle.getText()).isEqualTo("Winner");
 
-        Label loserTitel = lookup("#loserTitle").query();
-        Assertions.assertThat(loserTitel.getText()).isEqualTo("Loser");
+        Label loserTitle = lookup("#loserTitle").query();
+        Assertions.assertThat(loserTitle.getText()).isEqualTo("Loser");
 
         Assertions.assertThat(!userNamePAndV.isEmpty()).isTrue();
     }

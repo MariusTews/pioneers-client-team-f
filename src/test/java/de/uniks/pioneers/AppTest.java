@@ -103,6 +103,5 @@ public class AppTest extends ApplicationTest {
         Button loginButton = lookup("#loginButton").query();
         assertThat(loginButton).isVisible();
 
-
     }
 }
