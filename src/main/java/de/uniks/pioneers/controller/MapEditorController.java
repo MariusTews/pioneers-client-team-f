@@ -147,9 +147,15 @@ public class MapEditorController implements Controller {
                 maxRange = loadMapTemplate.checkRange(tileTemplate.x(),tileTemplate.y(),tileTemplate.z(), maxRange);
             }
 
+            boolean harborFlag = false;
             for (HarborTemplate harborTemplate: this.mapTemplate.harbors())
             {
+                harborFlag = true;
                 maxRange = loadMapTemplate.checkRange(harborTemplate.x(),harborTemplate.y(),harborTemplate.z(), maxRange);
+            }
+            if (harborFlag) {
+                // makes range +1 because harbor coordinates are 1 off
+                maxRange++;
             }
 
             map = calculateMap.buildMap(maxRange, true);
