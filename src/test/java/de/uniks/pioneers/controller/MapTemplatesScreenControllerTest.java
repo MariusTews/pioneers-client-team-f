@@ -274,6 +274,18 @@ class MapTemplatesScreenControllerTest extends ApplicationTest {
         Assertions.assertThat(mapTemplates.get(4).getId()).isEqualTo(map3._id());
         Assertions.assertThat(mapTemplates.get(5).getId()).isEqualTo(map1._id());
         Assertions.assertThat(mapTemplates.get(6).getId()).isEqualTo(map4._id());
+
+        // reverse sort order
+        clickOn("#votesArrow");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        mapTemplates = mapTemplatesScreenController.getMapTemplates();
+        Assertions.assertThat(mapTemplates.get(0).getId()).isEqualTo(user1Map._id());
+        Assertions.assertThat(mapTemplates.get(6).getId()).isEqualTo(map2._id());
+        Assertions.assertThat(mapTemplates.get(5).getId()).isEqualTo(user2Map._id());
+        Assertions.assertThat(mapTemplates.get(4).getId()).isEqualTo(map3._id());
+        Assertions.assertThat(mapTemplates.get(3).getId()).isEqualTo(map1._id());
+        Assertions.assertThat(mapTemplates.get(2).getId()).isEqualTo(map4._id());
     }
 
     @Test
