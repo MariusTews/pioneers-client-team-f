@@ -294,7 +294,10 @@ public class MapEditorController implements Controller {
 
                     if (tileTemplate.type() != null) {
                         switch (tileTemplate.type()) {
-                            case "desert" -> choiceBox.getSelectionModel().select(1);
+                            case "desert" -> {
+                                choiceBox.getSelectionModel().select(1);
+                                numberField.setVisible(false);
+                            }
                             case "fields" -> choiceBox.getSelectionModel().select(2);
                             case "mountains" -> choiceBox.getSelectionModel().select(3);
                             case "hills" -> choiceBox.getSelectionModel().select(4);
