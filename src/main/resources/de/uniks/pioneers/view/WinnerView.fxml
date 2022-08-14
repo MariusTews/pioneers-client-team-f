@@ -6,19 +6,16 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+<VBox id="winnerVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
       prefHeight="276.0" prefWidth="213.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="de.uniks.pioneers.controller.WinnerController">
-   <Label fx:id="winnerTitle" alignment="CENTER" prefHeight="37.0" prefWidth="213.0"
-          style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT;" text="Label">
+   <Label fx:id="winnerTitle" alignment="CENTER" prefHeight="37.0" prefWidth="213.0" >
       <VBox.margin>
          <Insets bottom="5.0"/>
       </VBox.margin>
    </Label>
-   <Label fx:id="winnerName" alignment="CENTER" prefHeight="39.0" prefWidth="213.0"
-          style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT;" text="Label"/>
-   <Label fx:id="loserTitle" alignment="CENTER" prefHeight="35.0" prefWidth="213.0"
-          style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT;" text="Label">
+   <Label id="winnerName" fx:id="winnerName" alignment="CENTER" prefHeight="39.0" prefWidth="213.0" />
+   <Label id="loserTitle" fx:id="loserTitle" alignment="CENTER" prefHeight="35.0" prefWidth="213.0" >
       <VBox.margin>
          <Insets bottom="5.0"/>
       </VBox.margin>
@@ -27,7 +24,7 @@
                style="-fx-background-color: TRANSPARENT; -fx-background: TRANSPARENT;">
       <VBox fx:id="loserBoxId" prefHeight="103.0" prefWidth="206.0"/>
    </ScrollPane>
-   <Button id="CloseGameButton" mnemonicParsing="false" onAction="#onClickCloseGame" prefHeight="33.0"
+   <Button id="closeGameButtonId" mnemonicParsing="false" onAction="#onClickCloseGame" prefHeight="33.0"
            prefWidth="148.0" text="CLOSE GAME">
       <VBox.margin>
          <Insets left="30.0" top="10.0"/>
