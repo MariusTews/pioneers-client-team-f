@@ -292,14 +292,17 @@ public class MapEditorController implements Controller {
                 if (tileTemplate != null) {
                     numberField.setText(String.valueOf(tileTemplate.numberToken()));
 
-                    switch (tileTemplate.type()) {
-                        default             -> choiceBox.getSelectionModel().select(0);
-                        case "desert"       -> choiceBox.getSelectionModel().select(1);
-                        case "fields"        -> choiceBox.getSelectionModel().select(2);
-                        case "mountains"    -> choiceBox.getSelectionModel().select(3);
-                        case "hills"        -> choiceBox.getSelectionModel().select(4);
-                        case "forest"       -> choiceBox.getSelectionModel().select(5);
-                        case "pasture"      -> choiceBox.getSelectionModel().select(6);
+                    if (tileTemplate.type() != null) {
+                        switch (tileTemplate.type()) {
+                            case "desert" -> choiceBox.getSelectionModel().select(1);
+                            case "fields" -> choiceBox.getSelectionModel().select(2);
+                            case "mountains" -> choiceBox.getSelectionModel().select(3);
+                            case "hills" -> choiceBox.getSelectionModel().select(4);
+                            case "forest" -> choiceBox.getSelectionModel().select(5);
+                            case "pasture" -> choiceBox.getSelectionModel().select(6);
+                        }
+                    } else {
+                        choiceBox.getSelectionModel().selectFirst();
                     }
 
                 } else {
