@@ -305,7 +305,6 @@ public class MapEditorController implements Controller {
                 } else {
                     choiceBox.getSelectionModel().selectFirst();
                 }
-                choiceBox.getSelectionModel().selectFirst();
             }
         }
 
