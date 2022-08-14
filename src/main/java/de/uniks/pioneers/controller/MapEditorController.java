@@ -734,8 +734,6 @@ public class MapEditorController implements Controller {
         disposables.add(achievementsService.initUserAchievements().observeOn(FX_SCHEDULER).subscribe());
         disposables.add(achievementsService.putOrUpdateAchievement(CREATE_MAP, 1).observeOn(FX_SCHEDULER).subscribe());
 
-
-        // for temporary use, to get back
         final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
         this.app.show(controller);
     }
