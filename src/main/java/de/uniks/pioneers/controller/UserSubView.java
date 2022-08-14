@@ -68,7 +68,6 @@ public class UserSubView implements Controller {
 
     @Override
     public void init() {
-        //ld = new RoadAndFleet();
         userService.findAllUsers().observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.users.addAll(col);
@@ -207,7 +206,6 @@ public class UserSubView implements Controller {
         Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
         Tooltip.install(this.city, new Tooltip("3 Moon rock, \n2 Venus grain "));
 
-        //roadAndFleet();
 
         return parent;
     }
@@ -233,9 +231,9 @@ public class UserSubView implements Controller {
                         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
                                 .observeOn(FX_SCHEDULER).subscribe(p ->
                                         pioneersService.move(this.gameStorage.getId(), e.expectedMoves().get(0).action(),
-                                                0, 0, 0, 0, NEW, null, null)
-                                        .observeOn(FX_SCHEDULER).subscribe(est -> {
-                                        }));
+                                                        0, 0, 0, 0, NEW, null, null)
+                                                .observeOn(FX_SCHEDULER).subscribe(est -> {
+                                                }));
                     } else if (e.expectedMoves().get(0).action().equals(BUILD) &&
                             !e.expectedMoves().get(0).players().contains(this.idStorage.getID())) {
                         alertService.showAlert("Not Your Turn");
