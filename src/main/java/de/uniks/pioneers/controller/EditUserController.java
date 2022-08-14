@@ -269,4 +269,8 @@ public class EditUserController implements Controller {
         this.avatar = "data:image/png;base64,";
         this.pictureFile = null;
     }
+
+    public void setPictureFile(File pictureFile) {
+        this.pictureFile = pictureFile;
+    }
 }

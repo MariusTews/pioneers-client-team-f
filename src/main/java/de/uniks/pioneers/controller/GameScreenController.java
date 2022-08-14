@@ -381,7 +381,18 @@ public class GameScreenController implements Controller {
 
     private void allTheCards() {
         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
-                .observeOn(FX_SCHEDULER).subscribe(e -> devCardsAmountLabel.setText(String.valueOf(e.developmentCards().size())));
+                .observeOn(FX_SCHEDULER).subscribe(e -> {
+                    //get only not revealed development cards
+                    List<DevelopmentCard> developmentCards = e.developmentCards();
+                    int sizeNotRevealedCard = 0;
+                    for (DevelopmentCard currentDevCard: developmentCards) {
+                        if (!currentDevCard.revealed() && !currentDevCard.type().equals(VICTORY)) {
+                            sizeNotRevealedCard++;
+                        }
+                    }
+                    //set label for not revealed development cards
+                    devCardsAmountLabel.setText(String.valueOf(sizeNotRevealedCard));
+                });
     }
 
     private void actionOnCloseScreen() {
@@ -548,6 +559,7 @@ public class GameScreenController implements Controller {
             if (s.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
                 WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
                         , gameStorage, idStorage, userService, achievementsService, gameService, app, lobbyController);
+                winnerController.init();
                 winnerController.render();
             }
         }

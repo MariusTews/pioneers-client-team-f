@@ -36,7 +36,7 @@ class SignUpControllerTest extends ApplicationTest {
 
     @Test
     void register() {
-        when(userService.register("Bob", null, "bobbob111")).thenReturn(Observable
+        when(userService.register("Bob", null, "bob bob111")).thenReturn(Observable
                                 .just(new User("1234","12345","123", "Bob", "status", null, new ArrayList<>())));
 
         write("Bob\t");
@@ -53,14 +53,24 @@ class SignUpControllerTest extends ApplicationTest {
         type(KeyCode.TAB);
 
         write("Bob\t");
-        write("bobbob111\t");
-        write("bobbob111\t");
+        write("bob bob111\t");
+        write("bob bob111\t");
 
         FxAssert.verifyThat("#signUpButton", NodeMatchers.isEnabled());
 
         type(KeyCode.SPACE);
 
-        verify(userService).register("Bob", null, "bobbob111");
+        verify(userService).register("Bob", null, "bob bob111");
+    }
+
+    @Test
+    void usernameAlreadyTaken() {
+        when(userService.register("Bob", null, "bob bob111")).thenReturn(Observable.error(new Throwable("HTTP 409 ")));
+        write("Bob\t");
+        write("bob bob111\t");
+        write("bob bob111\t");
+        type(KeyCode.SPACE);
+        clickOn("OK");
     }
 
     @Override
