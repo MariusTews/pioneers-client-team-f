@@ -17,26 +17,26 @@ public class SpectatorRenderInGameTest {
     SpectatorRenderInGame spectatorRenderInGame;
 
     @Test
-    void renderSingleSpectatorTest(){
+    void renderSingleSpectatorTest() {
 
         spectatorRenderInGame = new SpectatorRenderInGame();
 
         ObservableList<User> allUsers = FXCollections.observableArrayList();
 
-        User user = new User("2022-11-30T18:35:24.00Z", "1:00","7","Bob",null,null,null);
+        User user = new User("2022-11-30T18:35:24.00Z", "1:00", "7", "Bob", null, null, null);
         allUsers.add(user);
 
-        spectatorRenderInGame.renderSingleSpectator(allUsers,"7",new Label());
+        spectatorRenderInGame.renderSingleSpectator(allUsers, "7", new Label());
 
-        Assertions.assertEquals(allUsers.size(),1);
+        Assertions.assertEquals(allUsers.size(), 1);
 
     }
 
     @Test
-    void checkMemberTest(){
+    void checkMemberTest() {
         ObservableList<User> allUsers = FXCollections.observableArrayList();
 
-        User user = new User("2022-11-30T18:35:24.00Z", "1:00","7","Bob",null,null,null);
+        User user = new User("2022-11-30T18:35:24.00Z", "1:00", "7", "Bob", null, null, null);
         allUsers.add(user);
         ObservableList<Member> members = FXCollections.observableArrayList();
         Member member = new Member("2022-11-30T18:35:24.00Z", "1:00", "id", "7", true, "#ffa510", false);
@@ -47,10 +47,10 @@ public class SpectatorRenderInGameTest {
         spectatorLabel.setText("Spectator");
 
         spectatorRenderInGame = new SpectatorRenderInGame();
-        spectatorRenderInGame.checkMember(members,spectatorPane,allUsers,spectatorLabel,new ImageView());
+        spectatorRenderInGame.checkMember(members, spectatorPane, allUsers, spectatorLabel, new ImageView());
 
-        Assertions.assertEquals(allUsers.size(),1);
-        Assertions.assertEquals(members.size(),1);
+        Assertions.assertEquals(allUsers.size(), 1);
+        Assertions.assertEquals(members.size(), 1);
 
     }
 }

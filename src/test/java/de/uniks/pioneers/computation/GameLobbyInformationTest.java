@@ -19,38 +19,38 @@ public class GameLobbyInformationTest {
     @Mock
     MemberService memberService;
 
-     @InjectMocks
-     GameLobbyInformation gameLobbyInformation;
+    @InjectMocks
+    GameLobbyInformation gameLobbyInformation;
 
     @Test
-    void giveYourselfTest(){
+    void giveYourselfTest() {
         idStorage = new IDStorage();
         idStorage.setID("id");
-        memberService = new MemberService(null,null,null);
+        memberService = new MemberService(null, null, null);
 
         ObservableList<Member> members = FXCollections.observableArrayList();
         Member member = new Member("2022-11-30T18:35:24.00Z", "1:00", "id", "7", true, "#ffa510", false);
         members.add(member);
 
         gameLobbyInformation = new GameLobbyInformation();
-        gameLobbyInformation.giveYourSelfColour(members,memberService,idStorage);
+        gameLobbyInformation.giveYourSelfColour(members, memberService, idStorage);
 
-        Assertions.assertEquals(members.size(),1);
+        Assertions.assertEquals(members.size(), 1);
     }
 
     @Test
-    void renderSpectatorMemberTest(){
+    void renderSpectatorMemberTest() {
 
         Member member = new Member("2022-11-30T18:35:24.00Z", "1:00", "id", "7", true, "#ffa510", true);
         ObservableList<User> allUsers = FXCollections.observableArrayList();
 
-        User user = new User("2022-11-30T18:35:24.00Z", "1:00","7","Bob",null,null,null);
+        User user = new User("2022-11-30T18:35:24.00Z", "1:00", "7", "Bob", null, null, null);
         allUsers.add(user);
 
         gameLobbyInformation = new GameLobbyInformation();
-        gameLobbyInformation.renderSpectatorMember(member,allUsers);
+        gameLobbyInformation.renderSpectatorMember(member, allUsers);
 
-        Assertions.assertEquals(allUsers.size(),1);
+        Assertions.assertEquals(allUsers.size(), 1);
     }
 
 }
