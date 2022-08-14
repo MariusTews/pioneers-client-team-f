@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +30,7 @@ class UserServiceTest {
 	void register() {
 		when(userApiService.createUser(any())).thenReturn(Observable.just(new User("1234", "12345", "01", "Alice",
 				"online", null, new ArrayList<>())));
-		User user = userService.register("Alice", null, "testtest").blockingFirst();
+		User user = userService.register("Alice", null, "test test").blockingFirst();
 		assertEquals("User[createdAt=1234, updatedAt=12345, _id=01, name=Alice, status=online, avatar=null, friends=[]]", user.toString());
 	}
 
@@ -38,8 +39,11 @@ class UserServiceTest {
 		when(userApiService.updateUser(any(), any())).thenReturn(Observable.just((new User("1234", "12345", "01", "Alice",
 				"offline", null, new ArrayList<>()))));
 		User user = userService.userUpdate("01", "Alice", null, new ArrayList<>(), "offline",
-				"testtest").blockingFirst();
+				"test test").blockingFirst();
 		assertEquals("User[createdAt=1234, updatedAt=12345, _id=01, name=Alice, status=offline, avatar=null, friends=[]]", user.toString());
+		assertEquals("1234", user.createdAt());
+		assertEquals("12345", user.updatedAt());
+		assertNotNull(user.friends());
 	}
 
 	@Test
