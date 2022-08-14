@@ -181,7 +181,7 @@ public class MapEditorController implements Controller {
                     case 11 -> id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z() - 1);
                 }
                 if (id != null) {
-                    addHarbor(id);
+                    addHarbor(id, harborTemplate);
                 }
             }
         }
@@ -417,10 +417,10 @@ public class MapEditorController implements Controller {
 
     private void harborButtonPressed(ActionEvent event) {
         String id = filterID(event.getSource().toString());
-        addHarbor(id);
+        addHarbor(id, null);
     }
 
-    private void addHarbor(String id) {
+    private void addHarbor(String id, HarborTemplate template) {
         Button cancelTileButton = null;
         ChoiceBox<String> chooseResource = null;
         ChoiceBox<String> chooseSide = null;
@@ -469,7 +469,21 @@ public class MapEditorController implements Controller {
                 chooseResource.setLayoutY(hexagon.getLayoutY() - 16);
                 chooseResource.toFront();
                 chooseResource.setId(hexagon.getId() + "_chooseResource");
-                chooseResource.getSelectionModel().selectFirst();
+                if (template != null) {
+                    if (template.type() != null) {
+                        switch (template.type()) {
+                            case MARS_BAR -> chooseResource.getSelectionModel().select(2);
+                            case MOON_ROCK -> chooseResource.getSelectionModel().select(3);
+                            case EARTH_CACTUS -> chooseResource.getSelectionModel().select(4);
+                            case VENUS_GRAIN -> chooseResource.getSelectionModel().select(5);
+                            case NEPTUNE_CRYSTAL -> chooseResource.getSelectionModel().select(6);
+                            case "random" -> chooseResource.getSelectionModel().select(7);
+                            default         -> chooseResource.getSelectionModel().selectFirst();
+                        }
+                    }
+                } else {
+                    chooseResource.getSelectionModel().selectFirst();
+                }
 
                 chooseSide = new ChoiceBox<>(FXCollections.observableArrayList());
 
@@ -490,7 +504,28 @@ public class MapEditorController implements Controller {
                             (observable, oldValue, newValue) -> selectedResourceOrType(pos.get(0), pos.get(1), pos.get(2), newValue, false)
                     );
 
-                    chooseSide.getSelectionModel().selectFirst();
+                    if (template != null) {
+                        String sideTemplate = "";
+                        switch (template.side().intValue()) {
+                            case 1  -> sideTemplate = "Top_right";
+                            case 3  -> sideTemplate = "Middle_right";
+                            case 5  -> sideTemplate = "Bottom_right";
+                            case 7  -> sideTemplate = "Bottom_left";
+                            case 9  -> sideTemplate = "Middle_left";
+                            case 11 -> sideTemplate = "Top_left";
+                        }
+                        int index = 0;
+                        for (String side: chooseSide.getItems()) {
+                            if (side.equals(sideTemplate)) {
+                                break;
+                            }
+                            index++;
+                        }
+                        chooseSide.getSelectionModel().select(index);
+
+                    } else {
+                        chooseSide.getSelectionModel().selectFirst();
+                    }
 
                     // create harbor template
                     HarborTemplate harborTemplate = new HarborTemplate(pos.get(0), pos.get(1), pos.get(2),
