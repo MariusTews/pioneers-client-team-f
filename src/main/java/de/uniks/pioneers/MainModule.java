@@ -45,7 +45,7 @@ public class MainModule {
             return chain.proceed(newRequest);
         }).build();
     }
-    
+
 
     @Provides
     @Singleton
@@ -108,5 +108,7 @@ public class MainModule {
 
     @Provides
     @Singleton
-    AchievementsApiService achievementsApiService(Retrofit retrofit) {return retrofit.create(AchievementsApiService.class);}
+    AchievementsApiService achievementsApiService(Retrofit retrofit) {
+        return retrofit.create(AchievementsApiService.class);
+    }
 }

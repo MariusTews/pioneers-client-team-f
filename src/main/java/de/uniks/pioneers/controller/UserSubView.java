@@ -1,7 +1,7 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.Main;
-import de.uniks.pioneers.computation.RoadAndFleet;
+import de.uniks.pioneers.model.DevelopmentCard;
 import de.uniks.pioneers.model.Player;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
@@ -52,7 +53,6 @@ public class UserSubView implements Controller {
     @FXML
     public Button developmentBuyIdButton;
 
-    private RoadAndFleet ld;
 
     @Inject
     public UserSubView(IDStorage idStorage, GameStorage gameStorage, UserService userService, Player player, GameFieldSubController gameFieldSubController,
@@ -68,7 +68,6 @@ public class UserSubView implements Controller {
 
     @Override
     public void init() {
-        ld = new RoadAndFleet();
         userService.findAllUsers().observeOn(FX_SCHEDULER)
                 .subscribe(col -> {
                     this.users.addAll(col);
@@ -82,6 +81,22 @@ public class UserSubView implements Controller {
                 this.attachName(user.name(), player.color());
                 this.attachResources(player.resources());
                 this.victoryPoints.setText(player.victoryPoints() + "/" + maxVictoryPoints);
+                if (player.developmentCards() != null) {
+                    int knight = 0;
+                    for (DevelopmentCard dc : player.developmentCards()) {
+                        if (dc.type().equals(KNIGHT) && dc.revealed()) {
+                            knight += 1;
+                        }
+                    }
+                    this.fleetLabel.setText(":" + knight);
+                }
+
+                if (player.hasLargestArmy()) {
+                    this.largestFleetIconDisplay.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/largestFleetIcon.png"))));
+                }
+                if (player.hasLongestRoad()) {
+                    this.longestRoadIconDisplay.setImage(new Image(String.valueOf(Main.class.getResource("view/assets/longestRoadIcon.png"))));
+                }
             }
         }
     }
@@ -191,16 +206,10 @@ public class UserSubView implements Controller {
         Tooltip.install(this.sett, new Tooltip("1 Earth cactus, \n1 Mars bar, \n1 Neptune crystals, \n1 Venus grain "));
         Tooltip.install(this.city, new Tooltip("3 Moon rock, \n2 Venus grain "));
 
-        roadAndFleet();
 
         return parent;
     }
 
-    public void roadAndFleet() {
-        ld.calculateLongestRoad(pioneersService, gameStorage.getId(), idStorage.getID(), longestRoadIconDisplay);
-        ld.calculateLargestFleet(pioneersService, gameStorage.getId(), idStorage.getID(), largestFleetIconDisplay);
-
-    }
 
     public void onSett() {
         gameFieldSubController.build("settlement");
@@ -222,9 +231,9 @@ public class UserSubView implements Controller {
                         pioneersService.findOnePlayer(this.gameStorage.getId(), this.idStorage.getID())
                                 .observeOn(FX_SCHEDULER).subscribe(p ->
                                         pioneersService.move(this.gameStorage.getId(), e.expectedMoves().get(0).action(),
-                                                0, 0, 0, 0, NEW, null, null)
-                                        .observeOn(FX_SCHEDULER).subscribe(est -> {
-                                        }));
+                                                        0, 0, 0, 0, NEW, null, null)
+                                                .observeOn(FX_SCHEDULER).subscribe(est -> {
+                                                }));
                     } else if (e.expectedMoves().get(0).action().equals(BUILD) &&
                             !e.expectedMoves().get(0).players().contains(this.idStorage.getID())) {
                         alertService.showAlert("Not Your Turn");

@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 
@@ -20,14 +21,13 @@ import static de.uniks.pioneers.Constants.*;
 
 public class LoadMapTemplate {
 
-    private int maxRange;
     private Pane pane;
     private final CalculateMap calculateMap = new CalculateMap();
     private final HexFillService hexFillService = new HexFillService();
 
     public Pane loadMap(Map map, boolean loadForIngame) {
 
-        maxRange = 0;
+        int maxRange = 0;
 
         for (Tile tile : map.tiles()) {
             maxRange = checkRange(tile.x(), tile.y(), tile.z(), maxRange);
@@ -57,7 +57,11 @@ public class LoadMapTemplate {
                 }
             } else {
                 Polygon hexagon = calculateMap.buildHexagon(xCoordinate, yCoordinate, x, y, z, false);
-                hexFillService.fillHexagon(hexagon, tile.type());
+                if (tile.type() != null) {
+                    hexFillService.fillHexagon(hexagon, tile.type());
+                } else {
+                    hexagon.setFill(Color.GREY);
+                }
                 this.pane.getChildren().add(hexagon);
 
                 Label label = calculateMap.buildLabel(xCoordinate, yCoordinate, x, y, z);

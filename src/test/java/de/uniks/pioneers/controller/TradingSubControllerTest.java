@@ -61,7 +61,7 @@ public class TradingSubControllerTest extends ApplicationTest {
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
         List<Tile> tiles = new ArrayList<>();
-        tiles.add(new Tile(1,1,1, "grain", 1));
+        tiles.add(new Tile(1, 1, 1, "grain", 1));
 
         List<Harbor> harbors = new ArrayList<>();
         harbors.add(new Harbor(1, 0, -1, "lumber", 1));
@@ -72,8 +72,7 @@ public class TradingSubControllerTest extends ApplicationTest {
         harbors.add(new Harbor(0, 1, -1, "brick", 11));
 
 
-
-        when(pioneersService.findAllPlayers(any())).thenReturn(Observable.just(new Player("g1", "u1", "b", true, 1, resources, null, 2, 3, null, null)).buffer(1));
+        when(pioneersService.findAllPlayers(any())).thenReturn(Observable.just(new Player("g1", "u1", "b", true, 1, resources, null, 2, 3, false, false, null, null)).buffer(1));
         when(pioneersService.findAllTiles(any())).thenReturn(Observable.just(new Map("g1", tiles, harbors)));
         when(eventListener.listen(any(), any())).thenReturn(Observable.empty());
         when(gameStorage.getId()).thenReturn("g1");

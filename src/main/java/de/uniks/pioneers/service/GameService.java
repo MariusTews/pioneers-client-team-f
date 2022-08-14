@@ -8,7 +8,6 @@ import de.uniks.pioneers.rest.GamesApiService;
 import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
 import io.reactivex.rxjava3.core.Observable;
-import kong.unirest.json.JSONObject;
 
 import javax.inject.Inject;
 import java.util.List;

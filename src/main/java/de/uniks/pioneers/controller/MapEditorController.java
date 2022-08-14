@@ -14,7 +14,6 @@ import de.uniks.pioneers.template.TileTemplate;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -60,6 +59,8 @@ public class MapEditorController implements Controller {
     public ScrollPane mapPane;
     @FXML
     public VBox menu;
+    @FXML
+    public Button backButton;
 
     private Pane map;
 
@@ -143,14 +144,18 @@ public class MapEditorController implements Controller {
 
             int maxRange = 0;
 
-            for (TileTemplate tileTemplate: this.mapTemplate.tiles())
-            {
-                maxRange = loadMapTemplate.checkRange(tileTemplate.x(),tileTemplate.y(),tileTemplate.z(), maxRange);
+            for (TileTemplate tileTemplate : this.mapTemplate.tiles()) {
+                maxRange = loadMapTemplate.checkRange(tileTemplate.x(), tileTemplate.y(), tileTemplate.z(), maxRange);
             }
 
-            for (HarborTemplate harborTemplate: this.mapTemplate.harbors())
-            {
-                maxRange = loadMapTemplate.checkRange(harborTemplate.x(),harborTemplate.y(),harborTemplate.z(), maxRange);
+            boolean harborFlag = false;
+            for (HarborTemplate harborTemplate : this.mapTemplate.harbors()) {
+                 harborFlag = true;
+                maxRange = loadMapTemplate.checkRange(harborTemplate.x(), harborTemplate.y(), harborTemplate.z(), maxRange);
+            }
+            if (harborFlag) {
+                // makes range +1 because harbor coordinates are 1 off
+                maxRange++;
             }
 
             map = calculateMap.buildMap(maxRange, true);
@@ -162,26 +167,30 @@ public class MapEditorController implements Controller {
 
 
         if (this.mapTemplate != null) {
-            for (TileTemplate tileTemplate: this.mapTemplate.tiles())
-            {
+            for (TileTemplate tileTemplate : this.mapTemplate.tiles()) {
                 String id = createId((Integer) tileTemplate.x(), (Integer) tileTemplate.y(), (Integer) tileTemplate.z());
-                addTile(id);
+                addTile(id, tileTemplate);
             }
 
-            for (HarborTemplate harborTemplate: this.mapTemplate.harbors())
-            {
+            for (HarborTemplate harborTemplate : this.mapTemplate.harbors()) {
                 int i = harborTemplate.side().intValue();
                 String id = null;
                 switch (i) {
-                    case 1 -> id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() - 1);
-                    case 3 -> id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z());
-                    case 5 -> id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z() + 1);
-                    case 7 -> id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() + 1);
-                    case 9 -> id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z());
-                    case 11 -> id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z() - 1);
+                    case 1 ->
+                            id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() - 1);
+                    case 3 ->
+                            id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z());
+                    case 5 ->
+                            id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z() + 1);
+                    case 7 ->
+                            id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() + 1);
+                    case 9 ->
+                            id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z());
+                    case 11 ->
+                            id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z() - 1);
                 }
                 if (id != null) {
-                    addHarbor(id);
+                    addHarbor(id, harborTemplate);
                 }
             }
         }
@@ -234,10 +243,10 @@ public class MapEditorController implements Controller {
 
     private void tileButtonPressed(ActionEvent event) {
         String id = filterID(event.getSource().toString());
-        addTile(id);
+        addTile(id, null);
     }
 
-    private void addTile(String id) {
+    private void addTile(String id, TileTemplate tileTemplate) {
         Button cancelTileButton = null;
         TextField numberField = null;
         ChoiceBox<String> choiceBox = null;
@@ -269,6 +278,10 @@ public class MapEditorController implements Controller {
                 numberField.toFront();
                 numberField.setId(hexagon.getId() + "_numberField");
 
+                if (tileTemplate != null) {
+                    numberField.setText(String.valueOf(tileTemplate.numberToken()));
+                }
+
                 numberField.setOnKeyReleased(this::numberFieldEvent);
 
                 // choice box
@@ -286,7 +299,29 @@ public class MapEditorController implements Controller {
                 choiceBox.setLayoutY(hexagon.getLayoutY());
                 choiceBox.toFront();
                 choiceBox.setId(hexagon.getId() + "_choiceBox");
-                choiceBox.getSelectionModel().selectFirst();
+                if (tileTemplate != null) {
+                    numberField.setText(String.valueOf(tileTemplate.numberToken()));
+
+                    if (tileTemplate.type() != null) {
+                        switch (tileTemplate.type()) {
+                            case "desert" -> {
+                                choiceBox.getSelectionModel().select(1);
+                                numberField.setVisible(false);
+                            }
+                            case "fields" -> choiceBox.getSelectionModel().select(2);
+                            case "mountains" -> choiceBox.getSelectionModel().select(3);
+                            case "hills" -> choiceBox.getSelectionModel().select(4);
+                            case "forest" -> choiceBox.getSelectionModel().select(5);
+                            case "pasture" -> choiceBox.getSelectionModel().select(6);
+                        }
+                    } else {
+                        choiceBox.getSelectionModel().selectFirst();
+                    }
+
+                } else {
+                    choiceBox.getSelectionModel().selectFirst();
+                    numberField.setText("0");
+                }
             }
         }
 
@@ -382,7 +417,9 @@ public class MapEditorController implements Controller {
             } else {
                 tileTemplate = new TileTemplate(x, y, z, null, 0);
             }
-        } else {
+        } else if (choices.get(newValue).equals("desert")) {
+                tileTemplate = new TileTemplate(x, y, z, choices.get(newValue), 7);
+        }else {
             if (numberValidFlag) {
                 tileTemplate = new TileTemplate(x, y, z, choices.get(newValue), Integer.parseInt(numberField.getText()));
             } else {
@@ -397,10 +434,10 @@ public class MapEditorController implements Controller {
 
     private void harborButtonPressed(ActionEvent event) {
         String id = filterID(event.getSource().toString());
-        addHarbor(id);
+        addHarbor(id, null);
     }
 
-    private void addHarbor(String id) {
+    private void addHarbor(String id, HarborTemplate template) {
         Button cancelTileButton = null;
         ChoiceBox<String> chooseResource = null;
         ChoiceBox<String> chooseSide = null;
@@ -449,7 +486,22 @@ public class MapEditorController implements Controller {
                 chooseResource.setLayoutY(hexagon.getLayoutY() - 16);
                 chooseResource.toFront();
                 chooseResource.setId(hexagon.getId() + "_chooseResource");
-                chooseResource.getSelectionModel().selectFirst();
+                if (template != null) {
+                    if (template.type() != null) {
+                        switch (template.type()) {
+                            case MARS_BAR -> chooseResource.getSelectionModel().select(1);
+                            case MOON_ROCK -> chooseResource.getSelectionModel().select(2);
+                            case EARTH_CACTUS -> chooseResource.getSelectionModel().select(3);
+                            case VENUS_GRAIN -> chooseResource.getSelectionModel().select(4);
+                            case NEPTUNE_CRYSTAL -> chooseResource.getSelectionModel().select(5);
+                            case "random" -> chooseResource.getSelectionModel().select(6);
+                        }
+                    } else {
+                        chooseResource.getSelectionModel().selectFirst();
+                    }
+                } else {
+                    chooseResource.getSelectionModel().selectFirst();
+                }
 
                 chooseSide = new ChoiceBox<>(FXCollections.observableArrayList());
 
@@ -470,7 +522,28 @@ public class MapEditorController implements Controller {
                             (observable, oldValue, newValue) -> selectedResourceOrType(pos.get(0), pos.get(1), pos.get(2), newValue, false)
                     );
 
-                    chooseSide.getSelectionModel().selectFirst();
+                    if (template != null) {
+                        String sideTemplate = "";
+                        switch (template.side().intValue()) {
+                            case 1  -> sideTemplate = "Bottom_left";
+                            case 3  -> sideTemplate = "Middle_left";
+                            case 5 -> sideTemplate = "Top_left";
+                            case 7  -> sideTemplate = "Top_right";
+                            case 9  -> sideTemplate = "Middle_right";
+                            case 11  -> sideTemplate = "Bottom_right";
+                        }
+                        int index = 0;
+                        for (String side: chooseSide.getItems().stream().toList()) {
+                            if (side.equals(sideTemplate)) {
+                                break;
+                            }
+                            index++;
+                        }
+                        chooseSide.getSelectionModel().select(index);
+
+                    } else {
+                        chooseSide.getSelectionModel().selectFirst();
+                    }
 
                     // create harbor template
                     HarborTemplate harborTemplate = new HarborTemplate(pos.get(0), pos.get(1), pos.get(2),
@@ -734,8 +807,11 @@ public class MapEditorController implements Controller {
         disposables.add(achievementsService.initUserAchievements().observeOn(FX_SCHEDULER).subscribe());
         disposables.add(achievementsService.putOrUpdateAchievement(CREATE_MAP, 1).observeOn(FX_SCHEDULER).subscribe());
 
+        final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
+        this.app.show(controller);
+    }
 
-        // for temporary use, to get back
+    public void backButtonPressed(ActionEvent event) {
         final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
         this.app.show(controller);
     }

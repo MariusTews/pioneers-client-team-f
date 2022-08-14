@@ -17,8 +17,8 @@ import org.testfx.framework.junit5.ApplicationTest;
 @ExtendWith(MockitoExtension.class)
 class MemberListSubControllerSpectatorWithColorTest extends ApplicationTest {
 
-    Member member = new Member("", "", "", "", false, Color.BROWN.toString(), true);
-    User user = new User("", "", "", "Karl", "online", null, null);
+    final Member member = new Member("", "", "", "", false, Color.BROWN.toString(), true);
+    final User user = new User("", "", "", "Karl", "online", null, null);
     MemberListSubController memberListSubcontroller = new MemberListSubController(member, user);
 
     public void start(Stage stage) {

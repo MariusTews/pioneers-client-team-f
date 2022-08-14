@@ -49,31 +49,19 @@ public class UserSubViewTest extends ApplicationTest {
 
     @InjectMocks
     UserSubView userSubView = new UserSubView(idStorage, gameStorage, userService, new Player("id", "2",
-            "#000000", true, 2, hm, new HashMap<>(), 2, 2, null, null), gameFieldSubController, 10, pioneersService);
+            "#000000", true, 2, hm, new HashMap<>(), 2, 2, false, false, null, null), gameFieldSubController, 10, pioneersService);
 
 
     public void start(Stage stage) {
-        List<DevelopmentCard> devCards = new ArrayList<>();
-        DevelopmentCard d1 = new DevelopmentCard("knight", true, false);
-        DevelopmentCard d2 = new DevelopmentCard("knight", true, false);
-        DevelopmentCard d3 = new DevelopmentCard("knight", true, false);
-        devCards.add(d1);
-        devCards.add(d2);
-        devCards.add(d3);
-
-        Player player = new Player("id", "3", "#223", true, 2, hm, null,
-                4, 5, null, devCards);
-        List<Player> players = new ArrayList<>();
-        players.add(player);
+        
 
         when(idStorage.getID()).thenReturn("2");
-        when(gameStorage.getId()).thenReturn("id");
+
         when(userService.findAllUsers()).thenReturn(Observable.just(List.of(
                 new User("1234", "12345", "2", "tests", "online", null, new ArrayList<>()))));
-        when(pioneersService.findAllPlayers("id")).thenReturn(Observable.just(players));
 
         userSubView = new UserSubView(idStorage, gameStorage, userService, new Player("id", "2",
-                "#000000", true, 2, hm, new HashMap<>(), 2, 10, null, null), gameFieldSubController, 10, pioneersService);
+                "#000000", true, 2, hm, new HashMap<>(), 2, 10, false, false, null, null), gameFieldSubController, 10, pioneersService);
 
         final App app = new App(userSubView);
         app.start(stage);
@@ -116,6 +104,7 @@ public class UserSubViewTest extends ApplicationTest {
 
     @Test
     public void onClickDevTests() {
+        when(gameStorage.getId()).thenReturn("id");
         List<String> players = new ArrayList<>();
         players.add("2");
         List<ExpectedMove> expectedMoves = new ArrayList<>();
@@ -131,6 +120,7 @@ public class UserSubViewTest extends ApplicationTest {
 
     @Test
     public void onClickDevGetError() {
+        when(gameStorage.getId()).thenReturn("id");
         List<String> players = new ArrayList<>();
         players.add("d");
         List<ExpectedMove> expectedMoves = new ArrayList<>();
@@ -145,6 +135,7 @@ public class UserSubViewTest extends ApplicationTest {
 
     @Test
     public void onClickDevGetSecondError() {
+        when(gameStorage.getId()).thenReturn("id");
         List<String> players = new ArrayList<>();
         players.add("d");
         List<ExpectedMove> expectedMoves = new ArrayList<>();

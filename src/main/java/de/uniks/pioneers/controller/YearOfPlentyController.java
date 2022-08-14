@@ -32,7 +32,7 @@ public class YearOfPlentyController implements Controller {
     @FXML
     public Pane discardView;
     @FXML
-    public Button discardButton;
+    public Button getResourcesButton;
     @FXML
     public Label lumber;
     @FXML
@@ -75,7 +75,7 @@ public class YearOfPlentyController implements Controller {
 
     @Override
     public Parent render() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/DiscardResourcesView.fxml"));
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/YearOfPlentyView.fxml"));
         loader.setControllerFactory(c -> this);
         Parent root;
         try {
@@ -96,8 +96,8 @@ public class YearOfPlentyController implements Controller {
         }
 
         // Load UI elements
-        this.discardButton.setText("Get 0/2");
-        this.discardButton.setDisable(true);
+        this.getResourcesButton.setText("Get 0/2");
+        this.getResourcesButton.setDisable(true);
 
         allLabels.add(lumber);
         allLabels.add(brick);
@@ -152,12 +152,12 @@ public class YearOfPlentyController implements Controller {
             quantity += Integer.parseInt(amountLabel.getText());
         }
 
-        this.discardButton.setText("Get " + quantity + "/" + 2);
-        this.discardButton.setDisable(quantity != 2);
+        this.getResourcesButton.setText("Get " + quantity + "/" + 2);
+        this.getResourcesButton.setDisable(quantity != 2);
     }
 
     // The Get button is only enabled when the correct amount of resources is chosen
-    public void onDiscardButtonPressed() {
+    public void onGetResourcesButtonPressed() {
         this.resourcesMap.put(VENUS_GRAIN, Integer.parseInt(grain.getText()));
         this.resourcesMap.put(MARS_BAR, Integer.parseInt(brick.getText()));
         this.resourcesMap.put(MOON_ROCK, Integer.parseInt(ore.getText()));
