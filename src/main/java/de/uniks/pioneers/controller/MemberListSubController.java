@@ -15,7 +15,7 @@ import javafx.scene.shape.Circle;
 import javax.inject.Inject;
 import java.io.IOException;
 
-public class MemberListSubcontroller implements Controller {
+public class MemberListSubController implements Controller {
     @FXML
     public ImageView idAvatar;
     @FXML
@@ -27,7 +27,7 @@ public class MemberListSubcontroller implements Controller {
     public Circle circleId;
 
     @Inject
-    public MemberListSubcontroller(Member member, User user) {
+    public MemberListSubController(Member member, User user) {
         this.member = member;
         this.user = user;
     }

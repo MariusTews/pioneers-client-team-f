@@ -3,7 +3,7 @@ package de.uniks.pioneers.computation;
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.controller.ColorController;
 import de.uniks.pioneers.controller.GameScreenController;
-import de.uniks.pioneers.controller.MemberListSubcontroller;
+import de.uniks.pioneers.controller.MemberListSubController;
 import de.uniks.pioneers.model.Member;
 import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.GameStorage;
@@ -189,18 +189,18 @@ public class GameLobbyInformation {
         //This flag will make sure,
         //Null Pointer exception will not be thrown
         //,if there are more Players
-        MemberListSubcontroller memberListSubcontroller = null;
+        MemberListSubController memberListSubcontroller = null;
         boolean ch = false;
         playersNumberId.setText("Players " + members.size() + "/6");
         for (User user : playerList) {
             if (user._id().equals(member.userId()) && !member.spectator()) {
                 ch = true;
-                memberListSubcontroller = new MemberListSubcontroller(member, user);
+                memberListSubcontroller = new MemberListSubController(member, user);
                 break;
             }
         }
         if (!ch) {
-            memberListSubcontroller = new MemberListSubcontroller(null, null);
+            memberListSubcontroller = new MemberListSubController(null, null);
         }
         return memberListSubcontroller.render();
 
@@ -208,16 +208,16 @@ public class GameLobbyInformation {
 
     public Node renderSpectatorMember(Member member, ObservableList<User> playerList) {
         boolean ch = false;
-        MemberListSubcontroller memberListSpectatorSubController = null;
+        MemberListSubController memberListSpectatorSubController = null;
         for (User user : playerList) {
             if (user._id().equals(member.userId()) && member.spectator()) {
                 ch = true;
-                memberListSpectatorSubController = new MemberListSubcontroller(member, user);
+                memberListSpectatorSubController = new MemberListSubController(member, user);
                 break;
             }
         }
         if (!ch) {
-            memberListSpectatorSubController = new MemberListSubcontroller(null, null);
+            memberListSpectatorSubController = new MemberListSubController(null, null);
         }
         return memberListSpectatorSubController.render();
     }
