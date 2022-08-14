@@ -599,7 +599,7 @@ public class MapEditorController implements Controller {
                 if (isResource) {
                     String type;
                     if (newValue.equals("random")) {
-                        type = null;
+                        type = "random";
                     } else {
                         type = resources.get(newValue);
                     }
