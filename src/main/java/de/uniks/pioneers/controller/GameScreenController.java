@@ -137,6 +137,7 @@ public class GameScreenController implements Controller {
     private boolean acceptRenderFlag = false;
     private ExpectedMove nextMove;
     private boolean rejoin = false;
+    private int playerOffer = 0;
 
     @Inject
     public GameScreenController(Provider<LobbyController> lobbyController,
@@ -452,15 +453,25 @@ public class GameScreenController implements Controller {
 
         //wait until everybody made an offer, then show accept dialog
         if (move.action().equals("offer") && !move.userId().equals(idStorage.getID())) {
-            if (move.resources() != null) {
-                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()));
-            }
-            // wait until everybody made an offer
-            tradeAcceptSubcontroller.setMove(move);
-
             if (acceptRenderFlag) {
                 tradeAcceptSubcontroller.render();
+                // if a previous trade happened and someone declined, reset
+                playerOffer = 0;
                 acceptRenderFlag = false;
+            }
+
+            tradeAcceptSubcontroller.setMove(move);
+
+            if (move.resources() != null) {
+                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()), true);
+            } else {
+                tradeAcceptSubcontroller.addUser(userHash.get(move.userId()), false);
+                playerOffer++;
+            }
+
+            if (playerOffer == this.opponents.size()) {
+                tradeAcceptSubcontroller.declineTrade();
+                new AlertService().showAlert("Every player declined the trade");
             }
         }
     }

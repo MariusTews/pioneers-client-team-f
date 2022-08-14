@@ -297,6 +297,7 @@ public class TradingSubController implements Controller {
      * */
     public void offerPlayerButtonPressed() {
         HashMap<String, Integer> tmp = new HashMap<>();
+
         for (String res : RESOURCES) {
             tmp.put(res, 0);
         }
@@ -323,6 +324,7 @@ public class TradingSubController implements Controller {
                     .observeOn(FX_SCHEDULER)
                     .subscribe();
         }
+
         resetButtonsAndLabels();
     }
 

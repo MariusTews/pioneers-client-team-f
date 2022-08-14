@@ -59,8 +59,23 @@ public class MapEditorControllerTest extends ApplicationTest {
         clickOn("#x0y0z0_tileButton");
         clickOn("#x1yM1z0_harborButton");
 
-        Button cancel = (Button) lookup("#x1yM1z0_cancelButton").queryButton();
+        Button cancel = lookup("#x1yM1z0_cancelButton").queryButton();
 
         Assertions.assertEquals("x", cancel.getText());
+    }
+
+    @Test
+    public void cancelButtonTest() {
+        // init tile
+        clickOn("#x0y0z0_tileButton");
+
+        // lookup cancel button and click
+        Button cancel = lookup("#x0y0z0_cancelButton").queryButton();
+
+        clickOn(cancel);
+
+        // check if the empty template is visible
+        Button addTile = lookup("#x0y0z0_tileButton").queryButton();
+        Assertions.assertTrue(addTile.isVisible());
     }
 }

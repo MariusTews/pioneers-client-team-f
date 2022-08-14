@@ -51,6 +51,8 @@ public class TradeAcceptSubcontroller implements Controller {
     final PioneersService pioneersService;
     private final AchievementsService achievementsService;
     private final GameStorage gameStorage;
+    private boolean acceptedFlag = false;
+    private HashMap<User, Boolean> checkAcceptHash = new HashMap<>();
 
     private Move move;
 
@@ -78,7 +80,9 @@ public class TradeAcceptSubcontroller implements Controller {
 
     @Override
     public void destroy() {
-
+        checkAcceptHash.clear();
+        tradingUsers.clear();
+        tradeUsers.getChildren().clear();
     }
 
     @Override
@@ -98,26 +102,34 @@ public class TradeAcceptSubcontroller implements Controller {
             return null;
         }
 
-        tradeUsers.getChildren().add(renderUser());
-
-        tradingUsers.addListener((ListChangeListener<? super User>) c -> tradeUsers.getChildren().addAll(c.getList().stream().map(user -> renderUser()).toList()));
+        tradingUsers.addListener((ListChangeListener<? super User>) this::onUserAccepted);
 
         return root;
     }
 
-    private Node renderUser() {
-        Label label = new Label(tradingUsers.get(0).name());
-        //need the id to click on the user in the test
-        label.setId("tradePartnerLabel");
-        label.setOnMouseClicked(event -> {
-            if (event.getButton().equals(MouseButton.PRIMARY)) {
-                if (event.getClickCount() == 1) {
-                    label.setStyle("-fx-background-color: grey");
-                    tradePartner = userHash.get(label.getText());
+    private void onUserAccepted(ListChangeListener.Change<? extends User> c) {
+        // clear list and reload
+        this.tradeUsers.getChildren().clear();
+        this.tradeUsers.getChildren().addAll(tradingUsers.stream().map(this::renderUser).toList());
+    }
+
+    private Node renderUser(User user) {
+        // check if user has accepted or declined and create label
+        if (checkAcceptHash.get(user)) {
+            Label label = new Label(user.name());
+            //need the id to click on the user in the test
+            label.setId("tradePartnerLabel");
+            label.setOnMouseClicked(event -> {
+                if (event.getButton().equals(MouseButton.PRIMARY)) {
+                    if (event.getClickCount() == 1) {
+                        label.setStyle("-fx-background-color: grey");
+                        tradePartner = userHash.get(label.getText());
+                    }
                 }
-            }
-        });
-        return label;
+            });
+            return label;
+        }
+        return new Label(user.name() + " -> declined offer");
     }
 
     public void tradeButton() {
@@ -134,6 +146,7 @@ public class TradeAcceptSubcontroller implements Controller {
                     .observeOn(FX_SCHEDULER)
                     .subscribe(result -> achievementsService.putOrUpdateAchievement(TRADE_PLAYER, 1).blockingFirst());
             primaryStage.close();
+            destroy();
         }
     }
 
@@ -143,9 +156,11 @@ public class TradeAcceptSubcontroller implements Controller {
                 .observeOn(FX_SCHEDULER)
                 .subscribe();
         primaryStage.close();
+        destroy();
     }
 
-    public void addUser(User user) {
+    public void addUser(User user, boolean accepted) {
+        checkAcceptHash.put(user, accepted);
         this.tradingUsers.add(user);
     }
 
