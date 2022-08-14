@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,6 +54,8 @@ public class WinnerControllerTest extends ApplicationTest {
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
+        User user = new User("","","1", "", "1","",null);
+        when(userService.findOne(null)).thenReturn(Observable.just(user));
         pointsAndValues = new ArrayList<>();
         pointsAndValues.add("#00000F");
         pointsAndValues.add("10");
