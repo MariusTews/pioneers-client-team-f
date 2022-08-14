@@ -165,7 +165,7 @@ public class MapEditorController implements Controller {
             for (TileTemplate tileTemplate: this.mapTemplate.tiles())
             {
                 String id = createId((Integer) tileTemplate.x(), (Integer) tileTemplate.y(), (Integer) tileTemplate.z());
-                addTile(id);
+                addTile(id, tileTemplate);
             }
 
             for (HarborTemplate harborTemplate: this.mapTemplate.harbors())
@@ -234,10 +234,10 @@ public class MapEditorController implements Controller {
 
     private void tileButtonPressed(ActionEvent event) {
         String id = filterID(event.getSource().toString());
-        addTile(id);
+        addTile(id, null);
     }
 
-    private void addTile(String id) {
+    private void addTile(String id, TileTemplate tileTemplate) {
         Button cancelTileButton = null;
         TextField numberField = null;
         ChoiceBox<String> choiceBox = null;
@@ -269,6 +269,10 @@ public class MapEditorController implements Controller {
                 numberField.toFront();
                 numberField.setId(hexagon.getId() + "_numberField");
 
+                if (tileTemplate != null) {
+                    numberField.setText(String.valueOf(tileTemplate.numberToken()));
+                }
+
                 numberField.setOnKeyReleased(this::numberFieldEvent);
 
                 // choice box
@@ -286,6 +290,22 @@ public class MapEditorController implements Controller {
                 choiceBox.setLayoutY(hexagon.getLayoutY());
                 choiceBox.toFront();
                 choiceBox.setId(hexagon.getId() + "_choiceBox");
+                if (tileTemplate != null) {
+                    numberField.setText(String.valueOf(tileTemplate.numberToken()));
+
+                    switch (tileTemplate.type()) {
+                        case "random"       -> choiceBox.getSelectionModel().select(1);
+                        case "desert"       -> choiceBox.getSelectionModel().select(2);
+                        case "field"        -> choiceBox.getSelectionModel().select(3);
+                        case "mountains"    -> choiceBox.getSelectionModel().select(4);
+                        case "hills"        -> choiceBox.getSelectionModel().select(5);
+                        case "forest"       -> choiceBox.getSelectionModel().select(6);
+                        case "pasture"      -> choiceBox.getSelectionModel().select(7);
+                    }
+
+                } else {
+                    choiceBox.getSelectionModel().selectFirst();
+                }
                 choiceBox.getSelectionModel().selectFirst();
             }
         }
