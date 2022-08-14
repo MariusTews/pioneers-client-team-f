@@ -145,7 +145,7 @@ public class TestModule {
 
             @Override
             public Observable<Group> create(CreateGroupDto dto) {
-                return null;
+                return Observable.empty();
             }
 
             @Override
