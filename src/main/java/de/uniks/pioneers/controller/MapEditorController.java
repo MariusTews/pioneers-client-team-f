@@ -59,6 +59,8 @@ public class MapEditorController implements Controller {
     public ScrollPane mapPane;
     @FXML
     public VBox menu;
+    @FXML
+    public Button backButton;
 
     private Pane map;
 
@@ -805,8 +807,11 @@ public class MapEditorController implements Controller {
         disposables.add(achievementsService.initUserAchievements().observeOn(FX_SCHEDULER).subscribe());
         disposables.add(achievementsService.putOrUpdateAchievement(CREATE_MAP, 1).observeOn(FX_SCHEDULER).subscribe());
 
+        final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
+        this.app.show(controller);
+    }
 
-        // for temporary use, to get back
+    public void backButtonPressed(ActionEvent event) {
         final MapTemplatesScreenController controller = mapTemplatesScreenController.get();
         this.app.show(controller);
     }

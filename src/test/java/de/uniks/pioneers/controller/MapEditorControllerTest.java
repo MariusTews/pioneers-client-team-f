@@ -60,4 +60,19 @@ public class MapEditorControllerTest extends ApplicationTest {
 
         Assertions.assertEquals("x", cancel.getText());
     }
+
+    @Test
+    public void cancelButtonTest() {
+        // init tile
+        clickOn("#x0y0z0_tileButton");
+
+        // lookup cancel button and click
+        Button cancel = lookup("#x0y0z0_cancelButton").queryButton();
+
+        clickOn(cancel);
+
+        // check if the empty template is visible
+        Button addTile = lookup("#x0y0z0_tileButton").queryButton();
+        Assertions.assertTrue(addTile.isVisible());
+    }
 }

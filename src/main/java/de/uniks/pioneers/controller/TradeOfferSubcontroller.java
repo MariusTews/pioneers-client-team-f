@@ -68,7 +68,6 @@ public class TradeOfferSubcontroller implements Controller {
 
     @Override
     public void destroy() {
-
     }
 
     @Override
