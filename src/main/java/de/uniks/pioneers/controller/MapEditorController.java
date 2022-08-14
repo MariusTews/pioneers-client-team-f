@@ -481,8 +481,9 @@ public class MapEditorController implements Controller {
                             case VENUS_GRAIN -> chooseResource.getSelectionModel().select(4);
                             case NEPTUNE_CRYSTAL -> chooseResource.getSelectionModel().select(5);
                             case "random" -> chooseResource.getSelectionModel().select(6);
-                            default         -> chooseResource.getSelectionModel().selectFirst();
                         }
+                    } else {
+                        chooseResource.getSelectionModel().selectFirst();
                     }
                 } else {
                     chooseResource.getSelectionModel().selectFirst();
@@ -594,7 +595,7 @@ public class MapEditorController implements Controller {
                 if (isResource) {
                     String type;
                     if (newValue.equals("random")) {
-                        type = "random";
+                        type = null;
                     } else {
                         type = resources.get(newValue);
                     }
