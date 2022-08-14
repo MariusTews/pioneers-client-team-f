@@ -129,19 +129,21 @@ public class DevelopmentCardController implements Controller {
             int knight = 0;
             int monopoly = 0;
             for (DevelopmentCard card : e.developmentCards()) {
-                if (card.type().equals(KNIGHT)) {
-                    knight++;
+                //dont count revealed development cards
+                if (!card.revealed()) {
+                    if (card.type().equals(KNIGHT)) {
+                        knight++;
+                    }
+                    if (card.type().equals(YEAR_OF_PLENTY)) {
+                        year_of_plenty++;
+                    }
+                    if (card.type().equals(ROAD_BUILDING)) {
+                        road_building++;
+                    }
+                    if (card.type().equals(MONOPOLY)) {
+                        monopoly++;
+                    }
                 }
-                if (card.type().equals(YEAR_OF_PLENTY)) {
-                    year_of_plenty++;
-                }
-                if (card.type().equals(ROAD_BUILDING)) {
-                    road_building++;
-                }
-                if (card.type().equals(MONOPOLY)) {
-                    monopoly++;
-                }
-
             }
             yearOfPlentyCard.setText(String.valueOf(year_of_plenty));
             roadBuildingCard.setText(String.valueOf(road_building));
