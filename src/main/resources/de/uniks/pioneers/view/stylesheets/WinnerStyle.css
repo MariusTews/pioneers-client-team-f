@@ -1,25 +1,33 @@
-#winnerVBox{
+.root {
+    -fx-font-family: "A-Space Black Demo";
+}
+
+#winnerVBox {
     -fx-background-image: url("../assets/blue_panel.png");
     -fx-background-repeat: stretch;
     -fx-background-position: center;
     -fx-background-size: 220 289;
+    -fx-background-color: transparent;
 }
 
-#winnerTitle{
+#winnerTitle {
     -fx-font-size: 18;
     -fx-text-fill: #000000;
+    -fx-background-color: transparent;
 }
 
-#winnerName{
+#winnerName {
     -fx-font-size: 22;
+    -fx-background-color: transparent;
 }
 
-#loserTitle{
+#loserTitle {
     -fx-font-size: 18;
     -fx-text-fill: #000000;
+    -fx-background-color: transparent;
 }
 
-#closeGameButtonId{
+#closeGameButtonId {
     -fx-border-color: #0096FF;
     -fx-border-insets: 4px;
 }

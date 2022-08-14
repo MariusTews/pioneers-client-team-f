@@ -2,6 +2,7 @@ package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
 import de.uniks.pioneers.model.Game;
+import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import io.reactivex.rxjava3.core.Observable;
 import javafx.scene.control.Label;
@@ -18,6 +19,7 @@ import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,6 +54,8 @@ public class WinnerControllerTest extends ApplicationTest {
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
+        User user = new User("","","1", "", "1","",null);
+        when(userService.findOne(null)).thenReturn(Observable.just(user));
         pointsAndValues = new ArrayList<>();
         pointsAndValues.add("#00000F");
         pointsAndValues.add("10");

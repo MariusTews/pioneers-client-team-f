@@ -240,12 +240,13 @@ public class AppTest extends ApplicationTest {
         clickOn("#x2yM1zM1_6");
         WaitForAsyncUtils.waitForFxEvents();
         //back to lobbyScreen
-        clickOn("#CloseGameButton");
+        clickOn("#closeGameButtonId");
         //back to loginScreen
         clickOn("#logoutButton");
         WaitForAsyncUtils.waitForFxEvents();
         //screenAssert login
         Button loginButton = lookup("#loginButton").query();
         assertThat(loginButton).isVisible();
+
     }
 }

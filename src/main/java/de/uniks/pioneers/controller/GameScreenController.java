@@ -556,10 +556,10 @@ public class GameScreenController implements Controller {
         }
 
         for (List<String> s : userNumberPoints.values()) {
-            if (s.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
-                WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow()
-                        , gameStorage, idStorage, userService, achievementsService, gameService, app, lobbyController);
-                winnerController.init();
+            // The VPs of the player is always added on 2nd place
+            if (Integer.parseInt(s.get(1)) >= this.gameStorage.getVictoryPoints()) {
+                WinnerController winnerController = new WinnerController(userNumberPoints, currentPlayerLabel.getScene().getWindow(),
+                        gameStorage, idStorage, userService, achievementsService, gameService, app, lobbyController);
                 winnerController.render();
             }
         }

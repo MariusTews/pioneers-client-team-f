@@ -6,6 +6,7 @@ import de.uniks.pioneers.model.User;
 import de.uniks.pioneers.service.*;
 import de.uniks.pioneers.util.JsonUtil;
 import de.uniks.pioneers.util.ResourceManager;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -32,9 +33,13 @@ import static de.uniks.pioneers.Constants.WIN_GAME;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class WinnerController implements Controller {
+    @FXML
     public Label winnerTitle;
+    @FXML
     public Label winnerName;
+    @FXML
     public Label loserTitle;
+    @FXML
     public VBox loserBoxId;
 
     private final HashMap<String, List<String>> userNumberPoints;
@@ -81,7 +86,7 @@ public class WinnerController implements Controller {
 
     @Override
     public Parent render() {
-        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/WinnerController.fxml"));
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("view/WinnerView.fxml"));
         loader.setControllerFactory(c -> this);
         final Parent root;
         try {
@@ -109,7 +114,8 @@ public class WinnerController implements Controller {
         for (Map.Entry<String, List<String>> entry : userNumberPoints.entrySet()) {
             String key = entry.getKey();
             List<String> value = entry.getValue();
-            if (value.contains(String.valueOf(this.gameStorage.getVictoryPoints()))) {
+            // The VPs of the player is always added on 2nd place in the GameScreenController's save method
+            if (Integer.parseInt(value.get(1)) >= this.gameStorage.getVictoryPoints()) {
                 User myUser = userService.findOne(idStorage.getID()).blockingFirst();
                 if (myUser.name().equals(key)) {
                     achievementsService.putOrUpdateAchievement(WIN_GAME, 1).blockingFirst();
