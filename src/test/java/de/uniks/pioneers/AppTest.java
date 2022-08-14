@@ -95,7 +95,7 @@ public class AppTest extends ApplicationTest {
         clickOn("#x1yM1z0_0");
         WaitForAsyncUtils.waitForFxEvents();
         //back to lobbyScreen
-        clickOn("#CloseGameButton");
+        clickOn("#closeGameButtonId");
         //back to loginScreen
         clickOn("#logoutButton");
         WaitForAsyncUtils.waitForFxEvents();
