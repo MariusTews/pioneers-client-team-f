@@ -29,8 +29,8 @@ import static org.mockito.Mockito.when;
 public class OpponentSubControllerTest extends ApplicationTest {
     // Create resources hash
     @Mock
-    PioneersService pioneersService ;
-    final  HashMap<String, Integer> resources = new HashMap<>() {{
+    PioneersService pioneersService;
+    final HashMap<String, Integer> resources = new HashMap<>() {{
         put("unknown", 3);
     }};
     // Get the path of an image
@@ -39,17 +39,15 @@ public class OpponentSubControllerTest extends ApplicationTest {
 
     @InjectMocks
     OpponentSubController opponentSubController = new OpponentSubController(new Player("01", "00",
-            Color.DARKORCHID.toString(), true,6, resources, null,2,2,null, null),
-            new User("1234","12345","00", "bob", "online", avatar, null), 4, pioneersService);
+            Color.DARKORCHID.toString(), true, 6, resources, null, 2, 2, false, false, null, null),
+            new User("1234", "12345", "00", "bob", "online", avatar, null), 4);
 
     @ExtendWith(MockitoExtension.class)
     public void start(Stage stage) {
         // start application with the created opponent sub controller
-        when(pioneersService.findAllPlayers(any())).thenReturn(Observable.empty());
-        when(pioneersService.findOnePlayer(any(),any())).thenReturn(Observable.empty());
         opponentSubController = new OpponentSubController(new Player("01", "00",
-                Color.DARKORCHID.toString(), true,6, resources, null,2,2,null, null),
-                new User("1234","12345","00", "bob", "online", avatar, null), 4, pioneersService);
+                Color.DARKORCHID.toString(), true, 6, resources, null, 2, 2, false, false, null, null),
+                new User("1234", "12345", "00", "bob", "online", avatar, null), 4);
         final App app = new App(opponentSubController);
         app.start(stage);
     }

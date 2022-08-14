@@ -28,7 +28,7 @@ class DiscardResourcesControllerTest extends ApplicationTest {
     @Mock
     PioneersService pioneersService;
 
-     final HashMap<String, Integer> resources = new HashMap<>() {{
+    final HashMap<String, Integer> resources = new HashMap<>() {{
         put(VENUS_GRAIN, 1);
         put(MOON_ROCK, 2);
         put(MARS_BAR, 3);
@@ -40,8 +40,8 @@ class DiscardResourcesControllerTest extends ApplicationTest {
     public void start(Stage stage) {
         // open new window therefore starting via app is not needed (discard window has another root)
         DiscardResourcesController discardResourcesController = new DiscardResourcesController(new Player("01", "00",
-                Color.DARKORCHID.toString(), true,6, resources, null,2,
-                2,null, null), "01", pioneersService, null);
+                Color.DARKORCHID.toString(), true, 6, resources, null, 2,
+                2, false, false, null, null), "01", pioneersService, null);
         discardResourcesController.render();
     }
 
@@ -217,6 +217,7 @@ class DiscardResourcesControllerTest extends ApplicationTest {
         Assertions.assertTrue(decResource4Btn.isDisabled());
         Assertions.assertEquals(discardButton.getText(), "Discard 0/5");
     }
+
     @Test
     void adjustResource5Test() {
         // Resource 5 - venus grain UI elements
@@ -250,7 +251,7 @@ class DiscardResourcesControllerTest extends ApplicationTest {
         this.resources.put(VENUS_GRAIN, 0);
         this.resources.put(MARS_BAR, 0);
 
-        when(pioneersService.move(any(), any(), any(), any(), any(),any(), any(), any(), any()))
+        when(pioneersService.move(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(Observable.just(new Move("4", "10", "01", "00", DROP_ACTION,
                         7, null, null, this.resources, null, null)));
 
