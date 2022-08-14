@@ -8,96 +8,90 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<!--suppress JavaFxDefaultTag, JavaFxUnresolvedFxIdReference -->
-<HBox fx:id="mainHBoxId" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.pioneers.controller.DevelopmentCardController">
-   <children>
-      <Pane fx:id="paneForLumberId" prefHeight="400.0" prefWidth="150.0">
-         <children>
-            <VBox fx:id="vBoxForLumberId" layoutX="25.0" layoutY="14.0" prefHeight="194.0" prefWidth="100.0">
-               <children>
-                  <HBox fx:id="hBoxForLumberId" prefHeight="95.0" prefWidth="100.0">
-                     <children>
-                        <Label fx:id="labelForLumberId" alignment="CENTER" prefHeight="36.0" prefWidth="45.0" text="+2">
-                           <HBox.margin>
-                              <Insets top="20.0" />
-                           </HBox.margin>
-                        </Label>
-                        <ImageView fx:id="lumberImageId" fitHeight="38.0" fitWidth="58.0" pickOnBounds="true" preserveRatio="true">
-                           <HBox.margin>
-                              <Insets left="5.0" top="20.0" />
-                           </HBox.margin>
-                        </ImageView>
-                     </children>
-                  </HBox>
-                  <Label fx:id="yearOfPlentyCard" alignment="CENTER" prefHeight="32.0" prefWidth="29.0" text="0">
-                     <VBox.margin>
-                        <Insets left="20.0" top="30.0" />
-                     </VBox.margin>
-                  </Label>
-               </children></VBox>
-            <Button layoutX="31.0" layoutY="254.0" mnemonicParsing="false" onAction="#onYearOfPlentyClick" prefHeight="33.0" prefWidth="81.0" styleClass="move" text="Play" />
-         </children>
-      </Pane>
-      <Pane fx:id="roadPaneId" prefHeight="400.0" prefWidth="150.0">
-         <children>
-            <VBox fx:id="vBoxRoadId" layoutX="25.0" layoutY="14.0" prefHeight="194.0" prefWidth="100.0">
-               <children>
-                  <ImageView fx:id="roadImageId" fitHeight="59.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
-                     <VBox.margin>
-                        <Insets top="20.0" />
-                     </VBox.margin>
-                  </ImageView>
-                  <Label fx:id="roadBuildingCard" alignment="CENTER" prefHeight="64.0" prefWidth="38.0" text="0">
-                     <VBox.margin>
-                        <Insets left="20.0" top="55.0" />
-                     </VBox.margin>
-                  </Label>
-               </children></VBox>
-            <Button id="devCardBuildRoad" layoutX="34.0" layoutY="254.0" mnemonicParsing="false" onAction="#onRoadBuildingClick" prefHeight="33.0" prefWidth="81.0" styleClass="move" text="Play" />
-         </children>
-      </Pane>
-      <Pane fx:id="rocketPaneId" prefHeight="400.0" prefWidth="150.0">
-         <children>
-            <VBox fx:id="rocketVboxId" layoutX="25.0" layoutY="14.0" prefHeight="194.0" prefWidth="100.0">
-               <children>
-                  <ImageView fx:id="rocketImageId" fitHeight="56.0" fitWidth="76.0" pickOnBounds="true" preserveRatio="true">
-                     <VBox.margin>
-                        <Insets left="20.0" top="20.0" />
-                     </VBox.margin>
-                  </ImageView>
-                  <Label fx:id="knightCard" alignment="CENTER" prefHeight="63.0" prefWidth="38.0" text="0">
-                     <VBox.margin>
-                        <Insets left="20.0" top="40.0" />
-                     </VBox.margin>
-                  </Label>
-               </children></VBox>
-            <Button layoutX="34.0" layoutY="254.0" mnemonicParsing="false" onAction="#onKnightClick" prefHeight="33.0" prefWidth="81.0" styleClass="move" text="Play" />
-         </children>
-      </Pane>
-      <Pane fx:id="threeImgPaneId" prefHeight="400.0" prefWidth="150.0">
-         <children>
-            <VBox fx:id="threeImagesVboxId" layoutX="25.0" layoutY="14.0" prefHeight="194.0" prefWidth="100.0">
-               <children>
-                  <HBox fx:id="threeImagesHBoxId" prefHeight="50.0" prefWidth="107.0">
-                     <children>
-                        <ImageView fx:id="threeUsersImageId" fitHeight="67.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" />
-                        <ImageView fx:id="rockImageId" fitHeight="39.0" fitWidth="59.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </HBox>
-                  <ImageView fx:id="arrowImageId" fitHeight="35.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true">
-                     <VBox.margin>
-                        <Insets left="30.0" top="10.0" />
-                     </VBox.margin>
-                  </ImageView>
-                  <Label fx:id="monoPolyCard" alignment="CENTER" prefHeight="64.0" prefWidth="42.0" text="0">
-                     <VBox.margin>
-                        <Insets left="20.0" top="20.0" />
-                     </VBox.margin>
-                  </Label>
-               </children></VBox>
-            <Button layoutX="34.0" layoutY="254.0" mnemonicParsing="false" onAction="#onMonopolyClick" prefHeight="33.0" prefWidth="81.0" styleClass="move" text="Play" />
-            <Button alignment="CENTER" layoutX="25.0" layoutY="353.0" mnemonicParsing="false" onAction="#onClickCancel" prefHeight="33.0" prefWidth="100.0" styleClass="move" text="Cancel" />
-         </children>
-      </Pane>
-   </children>
+<HBox fx:id="mainHBoxId" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.uniks.pioneers.controller.DevelopmentCardController">
+   <Pane fx:id="paneForLumberId" prefHeight="400.0" prefWidth="150.0">
+      <VBox fx:id="vBoxForLumberId" layoutX="25.0" layoutY="14.0" prefHeight="194.0" prefWidth="100.0">
+         <HBox fx:id="hBoxForLumberId" prefHeight="95.0" prefWidth="100.0">
+            <Label fx:id="labelForLumberId" alignment="CENTER" prefHeight="36.0" prefWidth="45.0" text="+2">
+               <HBox.margin>
+                  <Insets top="20.0"/>
+               </HBox.margin>
+            </Label>
+            <ImageView fx:id="lumberImageId" fitHeight="38.0" fitWidth="58.0" pickOnBounds="true"
+                       preserveRatio="true">
+               <HBox.margin>
+                  <Insets left="5.0" top="20.0"/>
+               </HBox.margin>
+            </ImageView>
+         </HBox>
+         <Label fx:id="yearOfPlentyCard" alignment="CENTER" prefHeight="32.0" prefWidth="29.0" text="0">
+            <VBox.margin>
+               <Insets left="20.0" top="30.0"/>
+            </VBox.margin>
+         </Label>
+      </VBox>
+      <Button layoutX="31.0" layoutY="254.0" mnemonicParsing="false" onAction="#onYearOfPlentyClick"
+              prefHeight="33.0" prefWidth="81.0" styleClass="move" text="Play"/>
+   </Pane>
+   <Pane id="roadPaneId" prefHeight="400.0" prefWidth="150.0">
+      <VBox id="vBoxRoadId" layoutX="25.0" layoutY="14.0" prefHeight="194.0" prefWidth="100.0">
+         <ImageView fx:id="roadImageId" fitHeight="59.0" fitWidth="100.0" pickOnBounds="true"
+                    preserveRatio="true">
+            <VBox.margin>
+               <Insets top="20.0"/>
+            </VBox.margin>
+         </ImageView>
+         <Label fx:id="roadBuildingCard" alignment="CENTER" prefHeight="64.0" prefWidth="38.0" text="0">
+            <VBox.margin>
+               <Insets left="20.0" top="55.0"/>
+            </VBox.margin>
+         </Label>
+      </VBox>
+      <Button id="devCardBuildRoad" layoutX="34.0" layoutY="254.0" mnemonicParsing="false"
+              onAction="#onRoadBuildingClick" prefHeight="33.0" prefWidth="81.0" styleClass="move" text="Play"/>
+   </Pane>
+   <Pane id="rocketPaneId" prefHeight="400.0" prefWidth="150.0">
+      <VBox id="rocketVboxId" layoutX="25.0" layoutY="14.0" prefHeight="194.0" prefWidth="100.0">
+         <ImageView fx:id="rocketImageId" fitHeight="56.0" fitWidth="76.0" pickOnBounds="true"
+                    preserveRatio="true">
+            <VBox.margin>
+               <Insets left="20.0" top="20.0"/>
+            </VBox.margin>
+         </ImageView>
+         <Label fx:id="knightCard" alignment="CENTER" prefHeight="63.0" prefWidth="38.0" text="0">
+            <VBox.margin>
+               <Insets left="20.0" top="40.0"/>
+            </VBox.margin>
+         </Label>
+      </VBox>
+      <Button layoutX="34.0" layoutY="254.0" mnemonicParsing="false" onAction="#onKnightClick" prefHeight="33.0"
+              prefWidth="81.0" styleClass="move" text="Play"/>
+   </Pane>
+   <Pane id="threeImgPaneId" prefHeight="400.0" prefWidth="150.0">
+      <VBox id="threeImagesVboxId" layoutX="25.0" layoutY="14.0" prefHeight="194.0" prefWidth="100.0">
+         <HBox id="threeImagesHBoxId" prefHeight="50.0" prefWidth="107.0">
+            <ImageView fx:id="threeUsersImageId" fitHeight="67.0" fitWidth="48.0" pickOnBounds="true"
+                       preserveRatio="true"/>
+            <ImageView fx:id="rockImageId" fitHeight="39.0" fitWidth="59.0" pickOnBounds="true"
+                       preserveRatio="true"/>
+         </HBox>
+         <ImageView fx:id="arrowImageId" fitHeight="35.0" fitWidth="42.0" pickOnBounds="true"
+                    preserveRatio="true">
+            <VBox.margin>
+               <Insets left="30.0" top="10.0"/>
+            </VBox.margin>
+         </ImageView>
+         <Label fx:id="monoPolyCard" alignment="CENTER" prefHeight="64.0" prefWidth="42.0" text="0">
+            <VBox.margin>
+               <Insets left="20.0" top="20.0"/>
+            </VBox.margin>
+         </Label>
+      </VBox>
+      <Button layoutX="34.0" layoutY="254.0" mnemonicParsing="false" onAction="#onMonopolyClick" prefHeight="33.0"
+              prefWidth="81.0" styleClass="move" text="Play"/>
+      <Button alignment="CENTER" layoutX="25.0" layoutY="353.0" mnemonicParsing="false" onAction="#onClickCancel"
+              prefHeight="33.0" prefWidth="100.0" styleClass="move" text="Cancel"/>
+   </Pane>
 </HBox>

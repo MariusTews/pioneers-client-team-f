@@ -73,7 +73,7 @@ public class YearOfPlentyControllerTest extends ApplicationTest {
         Button incResource5Btn = lookup("#increment_grain").query();
         Button decResource5Btn = lookup("#decrement_grain").query();
 
-        Button discardButton = lookup("#discardButton").query();
+        Button discardButton = lookup("#getResourcesButton").query();
 
         // Assert discard button
         Assertions.assertEquals(discardButton.getText(), "Get 0/2");
@@ -112,7 +112,7 @@ public class YearOfPlentyControllerTest extends ApplicationTest {
         Button incResource1Btn = lookup("#increment_" + EARTH_CACTUS).query();
         Button decResource1Btn = lookup("#decrement_" + EARTH_CACTUS).query();
 
-        Button discardButton = lookup("#discardButton").query();
+        Button discardButton = lookup("#getResourcesButton").query();
 
         // change amount of earth cactus
         clickOn(incResource1Btn);
@@ -143,7 +143,7 @@ public class YearOfPlentyControllerTest extends ApplicationTest {
                         "userId", "action", 5, null, null, this.resources, null, null)));
 
         Button incResource1Btn = lookup("#increment_" + EARTH_CACTUS).query();
-        Button GetButton = lookup("#discardButton").query();
+        Button GetButton = lookup("#getResourcesButton").query();
 
         clickOn(incResource1Btn);
         clickOn(incResource1Btn);

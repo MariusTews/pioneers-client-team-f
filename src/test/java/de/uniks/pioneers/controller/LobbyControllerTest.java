@@ -163,9 +163,6 @@ class LobbyControllerTest extends ApplicationTest {
 
     @Test
     void createGameTest() {
-        List<Member> memberList = new ArrayList<>();
-        memberList.add(new Member("0", "2", "id", "3", true, "#00012f", false));
-
         lobbyController.createGameButtonPressed();
     }
 
@@ -176,7 +173,6 @@ class LobbyControllerTest extends ApplicationTest {
         List<Member> memberList = new ArrayList<>();
         memberList.add(new Member("0", "2", "id", "3", true, "#00012f", false));
         when(memberService.getAllGameMembers("id")).thenReturn(Observable.just(memberList));
-        //when(memberService.join("id","00000")).thenReturn(Observable.empty());
         Game game = new Game("0", "1", "2", "ert", "2", 0, true,
                 new GameSettings(2, 10, null, false, 0));
         lobbyController.joinGame(game);

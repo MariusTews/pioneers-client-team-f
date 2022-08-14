@@ -40,7 +40,7 @@ public class MapTemplateSubController implements Controller {
     private final String createdBy;
     private final String userId;
     private final MapTemplatesScreenController parentController;
-    private Provider<MapEditorController> mapEditorController;
+    private final Provider<MapEditorController> mapEditorController;
     private MapsService mapsService;
     private Image leftActionImage;
     private Image rightActionImage;

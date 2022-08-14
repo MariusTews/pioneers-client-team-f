@@ -21,14 +21,13 @@ import static de.uniks.pioneers.Constants.*;
 
 public class LoadMapTemplate {
 
-    private int maxRange;
     private Pane pane;
     private final CalculateMap calculateMap = new CalculateMap();
     private final HexFillService hexFillService = new HexFillService();
 
     public Pane loadMap(Map map, boolean loadForIngame) {
 
-        maxRange = 0;
+        int maxRange = 0;
 
         for (Tile tile : map.tiles()) {
             maxRange = checkRange(tile.x(), tile.y(), tile.z(), maxRange);

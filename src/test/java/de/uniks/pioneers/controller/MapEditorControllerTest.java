@@ -1,7 +1,6 @@
 package de.uniks.pioneers.controller;
 
 import de.uniks.pioneers.App;
-import de.uniks.pioneers.service.MapsService;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -19,9 +18,6 @@ import org.testfx.framework.junit5.ApplicationTest;
 public class MapEditorControllerTest extends ApplicationTest {
     @Mock
     App app;
-
-    @Mock
-    MapsService mapsService;
 
     @InjectMocks
     MapEditorController mapEditorController;
@@ -46,9 +42,10 @@ public class MapEditorControllerTest extends ApplicationTest {
     public void tileButtonTest() {
         clickOn("#x0y0z0_tileButton");
 
-        Button cancel = (Button) lookup("#x0y0z0_cancelButton").queryButton();
-        TextField numberToken = (TextField) lookup("#x0y0z0_numberField").query();
+        Button cancel = lookup("#x0y0z0_cancelButton").queryButton();
+        TextField numberToken = lookup("#x0y0z0_numberField").query();
         doubleClickOn(numberToken);
+        
         type(KeyCode.DIGIT6);
         Assertions.assertEquals("x", cancel.getText());
         Assertions.assertEquals("6", numberToken.getText());

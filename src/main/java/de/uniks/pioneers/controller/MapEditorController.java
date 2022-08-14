@@ -144,16 +144,14 @@ public class MapEditorController implements Controller {
 
             int maxRange = 0;
 
-            for (TileTemplate tileTemplate: this.mapTemplate.tiles())
-            {
-                maxRange = loadMapTemplate.checkRange(tileTemplate.x(),tileTemplate.y(),tileTemplate.z(), maxRange);
+            for (TileTemplate tileTemplate : this.mapTemplate.tiles()) {
+                maxRange = loadMapTemplate.checkRange(tileTemplate.x(), tileTemplate.y(), tileTemplate.z(), maxRange);
             }
 
             boolean harborFlag = false;
-            for (HarborTemplate harborTemplate: this.mapTemplate.harbors())
-            {
-                harborFlag = true;
-                maxRange = loadMapTemplate.checkRange(harborTemplate.x(),harborTemplate.y(),harborTemplate.z(), maxRange);
+            for (HarborTemplate harborTemplate : this.mapTemplate.harbors()) {
+                 harborFlag = true;
+                maxRange = loadMapTemplate.checkRange(harborTemplate.x(), harborTemplate.y(), harborTemplate.z(), maxRange);
             }
             if (harborFlag) {
                 // makes range +1 because harbor coordinates are 1 off
@@ -169,23 +167,27 @@ public class MapEditorController implements Controller {
 
 
         if (this.mapTemplate != null) {
-            for (TileTemplate tileTemplate: this.mapTemplate.tiles())
-            {
+            for (TileTemplate tileTemplate : this.mapTemplate.tiles()) {
                 String id = createId((Integer) tileTemplate.x(), (Integer) tileTemplate.y(), (Integer) tileTemplate.z());
                 addTile(id, tileTemplate);
             }
 
-            for (HarborTemplate harborTemplate: this.mapTemplate.harbors())
-            {
+            for (HarborTemplate harborTemplate : this.mapTemplate.harbors()) {
                 int i = harborTemplate.side().intValue();
                 String id = null;
                 switch (i) {
-                    case 1 -> id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() - 1);
-                    case 3 -> id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z());
-                    case 5 -> id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z() + 1);
-                    case 7 -> id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() + 1);
-                    case 9 -> id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z());
-                    case 11 -> id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z() - 1);
+                    case 1 ->
+                            id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() - 1);
+                    case 3 ->
+                            id = createId((Integer) harborTemplate.x() + 1, (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z());
+                    case 5 ->
+                            id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() - 1, (Integer) harborTemplate.z() + 1);
+                    case 7 ->
+                            id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y(), (Integer) harborTemplate.z() + 1);
+                    case 9 ->
+                            id = createId((Integer) harborTemplate.x() - 1, (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z());
+                    case 11 ->
+                            id = createId((Integer) harborTemplate.x(), (Integer) harborTemplate.y() + 1, (Integer) harborTemplate.z() - 1);
                 }
                 if (id != null) {
                     addHarbor(id, harborTemplate);
