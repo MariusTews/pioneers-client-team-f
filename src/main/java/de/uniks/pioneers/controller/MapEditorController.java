@@ -307,6 +307,7 @@ public class MapEditorController implements Controller {
 
                 } else {
                     choiceBox.getSelectionModel().selectFirst();
+                    numberField.setText("0");
                 }
             }
         }
