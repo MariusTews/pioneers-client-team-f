@@ -707,7 +707,7 @@ public class GameScreenController implements Controller {
         }
 
         OpponentSubController opponentCon = new OpponentSubController(player, this.userHash.get(player.userId()),
-                this.gameStorage.getVictoryPoints(), pioneersService);
+                this.gameStorage.getVictoryPoints());
         opponentSubCons.add(opponentCon);
         return opponentCon.render();
     }
