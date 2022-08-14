@@ -57,7 +57,7 @@ public class PioneersServiceTest {
 
 		when(pioneersService.findAllPlayers(any()))
 				.thenReturn(Observable.just(List.of(new Player("2", "12", Color.BLACK.toString(), true,
-						3, resources, remainingBuildings, 2, 2, null, null))));
+						3, resources, remainingBuildings, 2, 2, false,false,null, null))));
 		final List<Player> result = pioneersService.findAllPlayers("2").blockingFirst();
 		Player player = result.get(0);
 
@@ -83,7 +83,7 @@ public class PioneersServiceTest {
 
 		when(pioneersService.findOnePlayer(any(), any()))
 				.thenReturn(Observable.just(new Player("2", "12", Color.BLACK.toString(), true,
-						3, resources, remainingBuildings, 2, 2, null, null)));
+						3, resources, remainingBuildings, 2, 2, false,false,null, null)));
 		final Player player = pioneersService.findOnePlayer("2", "12").blockingFirst();
 
 		assertEquals(player.gameId(), "2");
