@@ -403,7 +403,9 @@ public class MapEditorController implements Controller {
             } else {
                 tileTemplate = new TileTemplate(x, y, z, null, 0);
             }
-        } else {
+        } else if (choices.get(newValue).equals("desert")) {
+                tileTemplate = new TileTemplate(x, y, z, choices.get(newValue), 7);
+        }else {
             if (numberValidFlag) {
                 tileTemplate = new TileTemplate(x, y, z, choices.get(newValue), Integer.parseInt(numberField.getText()));
             } else {
