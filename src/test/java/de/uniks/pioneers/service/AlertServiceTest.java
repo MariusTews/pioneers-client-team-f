@@ -21,14 +21,14 @@ public class AlertServiceTest {
         devCards.add(d2);
 
         Player player = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards);
+                4, 5, false, false, null, devCards);
 
         List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
         devCards2.add(d11);
 
         Player player2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards2);
+                4, 5, false, false, null, devCards2);
 
         PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
@@ -44,14 +44,14 @@ public class AlertServiceTest {
         devCards.add(d2);
 
         Player player = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards);
+                4, 5, false, false, null, devCards);
 
         List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
         devCards2.add(d11);
 
         Player player2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards2);
+                4, 5, false, false, null, devCards2);
 
         PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
@@ -67,14 +67,14 @@ public class AlertServiceTest {
         devCards.add(d2);
 
         Player player = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards);
+                4, 5, false, false, null, devCards);
 
         List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
         devCards2.add(d11);
 
         Player player2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards2);
+                4, 5, false, false, null, devCards2);
 
         PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
@@ -90,14 +90,14 @@ public class AlertServiceTest {
         devCards.add(d2);
 
         Player player = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards);
+                4, 5, false, false, null, devCards);
 
         List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
         devCards2.add(d11);
 
         Player player2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards2);
+                4, 5, false, false, null, devCards2);
 
         PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 
@@ -113,14 +113,14 @@ public class AlertServiceTest {
         devCards.add(d2);
 
         Player player = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards);
+                4, 5, false, false, null, devCards);
 
         List<DevelopmentCard> devCards2 = new ArrayList<>();
         DevelopmentCard d11 = new DevelopmentCard("knight", false, false);
         devCards2.add(d11);
 
         Player player2 = new Player("id", "3", "#223", true, 2, null, null,
-                4, 5, null, devCards2);
+                4, 5, false, false, null, devCards2);
 
         PlatformImpl.startup(() -> alertService.alertForEachCard(player, player2));
 

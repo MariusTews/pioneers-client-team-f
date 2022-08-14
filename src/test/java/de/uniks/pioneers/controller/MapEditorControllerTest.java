@@ -44,7 +44,8 @@ public class MapEditorControllerTest extends ApplicationTest {
 
         Button cancel = lookup("#x0y0z0_cancelButton").queryButton();
         TextField numberToken = lookup("#x0y0z0_numberField").query();
-        clickOn(numberToken);
+        doubleClickOn(numberToken);
+        
         type(KeyCode.DIGIT6);
         Assertions.assertEquals("x", cancel.getText());
         Assertions.assertEquals("6", numberToken.getText());
