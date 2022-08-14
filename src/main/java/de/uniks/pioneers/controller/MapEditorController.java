@@ -521,15 +521,15 @@ public class MapEditorController implements Controller {
                     if (template != null) {
                         String sideTemplate = "";
                         switch (template.side().intValue()) {
-                            case 1  -> sideTemplate = "Top_right";
-                            case 3  -> sideTemplate = "Middle_right";
-                            case 5  -> sideTemplate = "Bottom_right";
-                            case 7  -> sideTemplate = "Bottom_left";
-                            case 9  -> sideTemplate = "Middle_left";
-                            case 11 -> sideTemplate = "Top_left";
+                            case 1  -> sideTemplate = "Bottom_left";
+                            case 3  -> sideTemplate = "Middle_left";
+                            case 5 -> sideTemplate = "Top_left";
+                            case 7  -> sideTemplate = "Top_right";
+                            case 9  -> sideTemplate = "Middle_right";
+                            case 11  -> sideTemplate = "Bottom_right";
                         }
                         int index = 0;
-                        for (String side: chooseSide.getItems()) {
+                        for (String side: chooseSide.getItems().stream().toList()) {
                             if (side.equals(sideTemplate)) {
                                 break;
                             }
