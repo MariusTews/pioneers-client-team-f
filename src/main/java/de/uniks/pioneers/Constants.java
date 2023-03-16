@@ -14,10 +14,10 @@ public class Constants {
     public static final String VERSION_PREFIX = "/v4";
     public static final String API_PREFIX = "/api";
 
-    public static final String BASE_URL = "https://pioneers.uniks.de" + API_PREFIX + VERSION_PREFIX + "/";
+    public static final String BASE_URL = "http://localhost:3000" + API_PREFIX + VERSION_PREFIX + "/";
 
     //Network
-    public static final String WS_URL = "wss://pioneers.uniks.de";
+    public static final String WS_URL = "ws://localhost:3000";
 
     public static final String WS_PREFIX = "/ws";
     public static final String WS_AUTHTOKEN_PREFIX = "/events?authToken=";
