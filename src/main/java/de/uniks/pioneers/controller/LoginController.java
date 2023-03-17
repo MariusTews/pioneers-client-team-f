@@ -119,6 +119,9 @@ public class LoginController implements Controller {
                     if ("HTTP 401 ".equals(error.getMessage())) {
                         errorLabel.setText("Invalid username or password");
                     }
+                    else {
+                        errorLabel.setText(error.getMessage());
+                    }
                 });
     }
 
@@ -134,6 +137,7 @@ public class LoginController implements Controller {
     }
 
     public void loginButtonPressed() {
+        errorLabel.setText("");
         login(usernameTextField.getText(), userPasswordField.getText());
     }
 
