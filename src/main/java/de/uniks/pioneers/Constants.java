@@ -14,10 +14,12 @@ public class Constants {
     public static final String VERSION_PREFIX = "/v4";
     public static final String API_PREFIX = "/api";
 
-    public static final String BASE_URL = "http://77.1.121.138:61170" + API_PREFIX + VERSION_PREFIX + "/";
+    public static final String URL = "77.3.232.118:61170";
+
+    public static final String BASE_URL = "http://" + URL + API_PREFIX + VERSION_PREFIX + "/";
 
     //Network
-    public static final String WS_URL = "ws://77.1.121.138:61170";
+    public static final String WS_URL = "ws://" + URL;
 
     public static final String WS_PREFIX = "/ws";
     public static final String WS_AUTHTOKEN_PREFIX = "/events?authToken=";
